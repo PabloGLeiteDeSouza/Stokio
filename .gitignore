@@ -1,0 +1,9 @@
+node_modules
+.expo
+.idea
+.vscode
+*.disb
+*.7z
+android
+*.apk
+fonts

@@ -1,0 +1,75 @@
+{
+  "cli": {
+    "version": ">= 7.6.2"
+  },
+  "build": {
+    "dev-internal-apk": {
+      "android": {
+        "image": "sdk-50",
+        "buildType": "apk",
+        "resourceClass": "medium"
+      },
+      "ios": {
+        
+      },
+      "developmentClient": true
+    },
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview-dev-internal-apk": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "developmentClient": true
+    },
+    "preview-dev-internal-app-bundle": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "developmentClient": true
+    },
+    "preview-prod-internal-apk" : {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "preview-prod-store-apk" : {
+      "distribution": "store",
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "preview-prod-store-app-bundle" : {
+      "distribution": "store",
+      "android": {
+        "buildType": "app-bundle"
+      }
+    },
+    "preview-prod-teste": {
+      "android": {
+        "buildType": "apk"
+      },
+      "distribution": "store"
+    },
+    "preview2": {
+      "android": {
+        "gradleCommand": ":app:assembleRelease"
+      }
+    },
+    "preview3": {
+      "developmentClient": true
+    },
+    "preview4": {
+      "distribution": "internal"
+    },
+    "production": {}
+  },
+  "submit": {
+    "production": {}
+  }
+}
