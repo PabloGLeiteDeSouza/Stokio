@@ -62,6 +62,7 @@ import { ScrollView } from "@gluestack-ui/themed";
 import { Box } from "@gluestack-ui/themed";
 import { useThemeApp } from "$providers/theme";
 import { FontAwesome6, MaterialIcons } from "@expo/vector-icons";
+import SelectEstado from "$components/SelectEstado";
 
 const CadastrarClientesScreen: React.FC = () => {
     
@@ -401,36 +402,7 @@ const CadastrarClientesScreen: React.FC = () => {
                 </FormControlErrorText>
                 </FormControlError>
             </FormControl>
-            <FormControl
-                isInvalid={false}
-                size={"md"}
-                isDisabled={false}
-                isRequired={true}
-            >
-                <FormControlLabel>
-                <FormControlLabelText>Password</FormControlLabelText>
-                </FormControlLabel>
-                <Input>
-                <InputField
-                    type="password"
-                    defaultValue="12345"
-                    placeholder="password"
-                />
-                </Input>
-
-                <FormControlHelper>
-                <FormControlHelperText>
-                    Must be atleast 6 characters.
-                </FormControlHelperText>
-                </FormControlHelper>
-
-                <FormControlError>
-                <FormControlErrorIcon as={AlertCircleIcon} />
-                <FormControlErrorText>
-                    Atleast 6 characters are required.
-                </FormControlErrorText>
-                </FormControlError>
-            </FormControl>
+            <SelectEstado/>
             <FormControl
                 isInvalid={false}
                 size={"md"}

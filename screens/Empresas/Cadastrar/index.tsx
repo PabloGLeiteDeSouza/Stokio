@@ -64,6 +64,8 @@ import RNDateTimePicker, {
   WindowsNativeProps,
 } from "@react-native-community/datetimepicker";
 import { useThemeApp } from "$providers/theme";
+import { CalendarDaysIcon } from "@gluestack-ui/themed";
+import { ButtonIcon } from "@gluestack-ui/themed";
 const CadastrarEmpresasScreen: React.FC = () => {
   let selectIconSize = "";
   const [date, setDate] = React.useState<Date>(new Date());
@@ -231,7 +233,7 @@ const CadastrarEmpresasScreen: React.FC = () => {
                 <FormControlLabelText>Cnpj</FormControlLabelText>
               </FormControlLabel>
               <Input>
-                <InputField type="text" placeholder="Cnpj" />
+                <InputField keyboardType="number-pad" type="text" placeholder="Cnpj" />
               </Input>
 
               <FormControlHelper>
@@ -342,31 +344,36 @@ const CadastrarEmpresasScreen: React.FC = () => {
           isRequired={true}
         >
           <FormControlLabel>
-            <FormControlLabelText>Data de criação</FormControlLabelText>
+            <FormControlLabelText>{tipoEmpresa === 'pj' ? "Data de criação" : "Data de nascimento"}</FormControlLabelText>
+
           </FormControlLabel>
           <Input>
             <InputField
+              editable={false}
               readOnly={true}
               type="text"
               value={dateFormat()}
               placeholder="data"
-              onPressIn={() => {
-                DateTimePickerAndroid.open({
-                  value: new Date(),
-                  mode: "date",
-                  onChange: (event, date) => {
-                    if (date) {
-                      setDate(date);
-                    }
-                  },
-                });
-              }}
             />
+            <Button onPress={() => {
+              DateTimePickerAndroid.open({
+                value: new Date(),
+                mode: "date",
+                onChange: (event, date) => {
+                  if (date) {
+                    setDate(date);
+                  }
+                },
+              });
+            }} >
+              <ButtonIcon as={CalendarDaysIcon} />
+            </Button>
           </Input>
 
           <FormControlHelper>
             <FormControlHelperText>
-              Deve ser informada a data de criação da empresa.
+              {tipoEmpresa === 'pj' ? "Deve ser informada a data de criação da empresa." : "Deve ser informada a data de nascimento."}
+              
             </FormControlHelperText>
           </FormControlHelper>
 

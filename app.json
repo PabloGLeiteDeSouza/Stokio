@@ -2,7 +2,7 @@
   "expo": {
     "name": "Stokio",
     "slug": "Stokio",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -33,7 +33,7 @@
         "NSFaceIDUsageDescription": "Allow $(PRODUCT_NAME) to use Face ID."
       },
       "bundleIdentifier": "com.swykanysolutions.stokio",
-      "buildNumber": "1.0.0"
+      "buildNumber": "0.1.0"
     },
     "android": {
       "adaptiveIcon": {

@@ -1,3 +1,5 @@
+import { RemoveIcon } from "@gluestack-ui/themed";
+
 import React from "react";
 import {
   FormControl,
@@ -77,53 +79,68 @@ interface CadastrarProdutosScreenProps {
   navigation?: CadastrarProdutosScreenNavigationProp;
   route?: CadastrarProdutosScreennRouteProp;
 }
-
 type CadastrarProdutosAction = {
   type:
-    | "alterar_codigo"
-    | "alterar_nome"
+    | "alt_edt_qtd_unidades"
+    | "alt_codigo"
+    | "alt_nome"
     | "tipo_produto"
-    | "alterar_unidades"
-    | "alterar_quantidade"
-    | "alterar_tipo_quantidade"
-    | "alterar_valor"
-    | "alterar_empresa"
-    | "alterar_categoria";
+    | "alt_unidades"
+    | "alt_quantidade"
+    | "alt_tipo_quantidade"
+    | "alt_valor"
+    | "alt_empresa"
+    | "alt_categoria";
+  qtd_unidades_is_edt?: boolean;
   codigo?: string;
   nome?: string;
   tipo?: string;
   unidades?: number;
   quantidade?: number;
   tipo_quantidade?: string;
-  valor?: number;
+  valor?: string;
   empresa?: number;
   categoria?: number;
 };
-
 type CadastrarProdutosState = {
+  qtd_unidades_is_edt: boolean;
   codigo: string;
   nome: string;
   tipo: string;
   unidades: number;
   quantidade: number;
   tipo_quantidade: string;
-  valor: number;
+  valor: string;
   empresa: number;
   categoria: number;
-}
-
+};
 const CadastrarProdutosScreen: React.FC<CadastrarProdutosScreenProps> = ({
   navigation,
   route,
 }) => {
-
+  const teste = [{ id: 25, name: 'Natura' }, { id: 50, name: 'Boticário'}, { id: 155, name: 'WesleyRoupasLTDA'}]
   const reducer = (
     state: CadastrarProdutosState,
     action: CadastrarProdutosAction
   ): CadastrarProdutosState => {
     switch (action.type) {
-      case "alterar_codigo":
+      case "alt_edt_qtd_unidades":
         return {
+          qtd_unidades_is_edt: Boolean(action.qtd_unidades_is_edt),
+          categoria: state.categoria,
+          codigo: state.codigo,
+          empresa: state.empresa,
+          nome: state.nome,
+          quantidade: state.quantidade,
+          tipo_quantidade: state.tipo_quantidade,
+          unidades: state.unidades,
+          valor: state.valor,
+          tipo: state.tipo,
+        }
+
+      case "alt_codigo":
+        return {
+          qtd_unidades_is_edt: state.qtd_unidades_is_edt,
           categoria: state.categoria,
           codigo: String(action.codigo),
           empresa: state.empresa,
@@ -132,10 +149,11 @@ const CadastrarProdutosScreen: React.FC<CadastrarProdutosScreenProps> = ({
           tipo_quantidade: state.tipo_quantidade,
           unidades: state.unidades,
           valor: state.valor,
-          tipo: state.tipo
-        }
-      case "alterar_nome":
+          tipo: state.tipo,
+        };
+      case "alt_nome":
         return {
+          qtd_unidades_is_edt: state.qtd_unidades_is_edt,
           categoria: state.categoria,
           codigo: state.codigo,
           empresa: state.empresa,
@@ -144,10 +162,11 @@ const CadastrarProdutosScreen: React.FC<CadastrarProdutosScreenProps> = ({
           tipo_quantidade: state.tipo_quantidade,
           unidades: state.unidades,
           valor: state.valor,
-          tipo: state.tipo
-        }
-      case "alterar_quantidade":
+          tipo: state.tipo,
+        };
+      case "alt_quantidade":
         return {
+          qtd_unidades_is_edt: state.qtd_unidades_is_edt,
           categoria: state.categoria,
           codigo: state.codigo,
           empresa: state.empresa,
@@ -156,10 +175,11 @@ const CadastrarProdutosScreen: React.FC<CadastrarProdutosScreenProps> = ({
           tipo_quantidade: state.tipo_quantidade,
           unidades: state.unidades,
           valor: state.valor,
-          tipo: state.tipo
-        }
-      case "alterar_tipo_quantidade":
+          tipo: state.tipo,
+        };
+      case "alt_tipo_quantidade":
         return {
+          qtd_unidades_is_edt: state.qtd_unidades_is_edt,
           categoria: state.categoria,
           codigo: state.codigo,
           empresa: state.empresa,
@@ -168,10 +188,11 @@ const CadastrarProdutosScreen: React.FC<CadastrarProdutosScreenProps> = ({
           tipo_quantidade: String(action.tipo_quantidade),
           unidades: state.unidades,
           valor: state.valor,
-          tipo: state.tipo
-        }
-      case "alterar_unidades":
+          tipo: state.tipo,
+        };
+      case "alt_unidades":
         return {
+          qtd_unidades_is_edt: state.qtd_unidades_is_edt,
           categoria: state.categoria,
           codigo: state.codigo,
           empresa: state.empresa,
@@ -180,10 +201,11 @@ const CadastrarProdutosScreen: React.FC<CadastrarProdutosScreenProps> = ({
           tipo_quantidade: state.tipo_quantidade,
           unidades: Number(action.unidades),
           valor: state.valor,
-          tipo: state.tipo
-        }
-      case "alterar_categoria":
+          tipo: state.tipo,
+        };
+      case "alt_categoria":
         return {
+          qtd_unidades_is_edt: state.qtd_unidades_is_edt,
           categoria: state.categoria,
           codigo: String(action.codigo),
           empresa: state.empresa,
@@ -192,10 +214,11 @@ const CadastrarProdutosScreen: React.FC<CadastrarProdutosScreenProps> = ({
           tipo_quantidade: state.tipo_quantidade,
           unidades: state.unidades,
           valor: state.valor,
-          tipo: state.tipo
-        }
-      case "alterar_empresa":
+          tipo: state.tipo,
+        };
+      case "alt_empresa":
         return {
+          qtd_unidades_is_edt: state.qtd_unidades_is_edt,
           categoria: state.categoria,
           codigo: state.codigo,
           empresa: Number(action.empresa),
@@ -204,10 +227,11 @@ const CadastrarProdutosScreen: React.FC<CadastrarProdutosScreenProps> = ({
           tipo_quantidade: state.tipo_quantidade,
           unidades: state.unidades,
           valor: state.valor,
-          tipo: state.tipo
-        }
-      case "alterar_valor":
+          tipo: state.tipo,
+        };
+      case "alt_valor":
         return {
+          qtd_unidades_is_edt: state.qtd_unidades_is_edt,
           categoria: state.categoria,
           codigo: state.codigo,
           empresa: state.empresa,
@@ -215,11 +239,12 @@ const CadastrarProdutosScreen: React.FC<CadastrarProdutosScreenProps> = ({
           quantidade: state.quantidade,
           tipo_quantidade: state.tipo_quantidade,
           unidades: state.unidades,
-          valor: Number(action.valor),
-          tipo: state.tipo
-        }
+          valor: String(action.valor),
+          tipo: state.tipo,
+        };
       case "tipo_produto":
         return {
+          qtd_unidades_is_edt: state.qtd_unidades_is_edt,
           categoria: state.categoria,
           codigo: state.codigo,
           empresa: state.empresa,
@@ -228,24 +253,36 @@ const CadastrarProdutosScreen: React.FC<CadastrarProdutosScreenProps> = ({
           tipo_quantidade: state.tipo_quantidade,
           unidades: state.unidades,
           valor: state.valor,
-          tipo: String(action.tipo)
-        }
+          tipo: String(action.tipo),
+        };
       default:
         throw new Error("Erro ao atualizar o estado");
     }
   };
-
-
-
-  const [state, dispatch] = React.useReducer<React.Reducer<CadastrarProdutosState, CadastrarProdutosAction>>(reducer, {categoria: 0, codigo: "", empresa: 0, nome: "", quantidade: 0, tipo_quantidade: "", unidades: 0, valor: 0, tipo: ""});
-
+  const [state, dispatch] = React.useReducer<
+    React.Reducer<CadastrarProdutosState, CadastrarProdutosAction>
+  >(reducer, {
+    qtd_unidades_is_edt: false,
+    categoria: 0,
+    codigo: "",
+    empresa: 0,
+    nome: "",
+    quantidade: 0,
+    tipo_quantidade: "",
+    unidades: 0,
+    valor: '0,00',
+    tipo: "",
+  });
   const [haveEmprise, setHaveEmprise] = React.useState(false);
   const [quantidade, setQauntidade] = React.useState<number>(0);
   const [valor, setValor] = React.useState("");
   const { theme } = useThemeApp();
   React.useEffect(() => {
     if (route?.params?.code) {
-      dispatch({ type: "alterar_codigo", codigo: route.params.code});
+      dispatch({
+        type: "alt_codigo",
+        codigo: route.params.code,
+      });
     }
     return () => {};
   }, [route?.params?.code]);
@@ -268,7 +305,12 @@ const CadastrarProdutosScreen: React.FC<CadastrarProdutosScreenProps> = ({
             <InputField
               type="text"
               value={state.codigo}
-              onChangeText={(txt) => dispatch({ type: "alterar_codigo", codigo: txt})}
+              onChangeText={(txt) =>
+                dispatch({
+                  type: "alt_codigo",
+                  codigo: txt,
+                })
+              }
               placeholder="código de barras"
             />
             <Button
@@ -312,7 +354,16 @@ const CadastrarProdutosScreen: React.FC<CadastrarProdutosScreenProps> = ({
             <FormControlLabelText>Nome do produto</FormControlLabelText>
           </FormControlLabel>
           <Input w="$full">
-            <InputField type="text" placeholder="Nome do Produto" onChangeText={(text) => dispatch({type: 'alterar_nome', nome: text})} />
+            <InputField
+              type="text"
+              placeholder="Nome do Produto"
+              onChangeText={(text) =>
+                dispatch({
+                  type: "alt_nome",
+                  nome: text,
+                })
+              }
+            />
           </Input>
 
           <FormControlHelper>
@@ -393,6 +444,27 @@ const CadastrarProdutosScreen: React.FC<CadastrarProdutosScreenProps> = ({
           </FormControlError>
         </FormControl>
 
+        {/* Checkbox enable or disable manual digitation */}
+
+        <Checkbox
+          m="$2"
+          size={"md"}
+          isInvalid={false}
+          isIndeterminate
+          aria-label="Label 1"
+          value="Label 1"
+          accessibilityLabel="Checkbox"
+          isChecked={state.qtd_unidades_is_edt}
+          onChange={(isSelected: boolean) => dispatch({type: 'alt_edt_qtd_unidades', qtd_unidades_is_edt: isSelected})}
+          nativeID="checkbox-1"
+        >
+          <CheckboxIndicator mr="$2">
+            <CheckboxIcon as={CheckIcon} />
+          </CheckboxIndicator>
+          <CheckboxLabel>Editar quantidade de unidades</CheckboxLabel>
+        </Checkbox>
+        
+
         {/*  */}
         <FormControl
           isInvalid={false}
@@ -415,10 +487,12 @@ const CadastrarProdutosScreen: React.FC<CadastrarProdutosScreenProps> = ({
               />
             </Button>
             <InputField
+              editable={state.qtd_unidades_is_edt}
+              keyboardType="numeric"
               textAlign="center"
               type="text"
-              onChange={(text) => {
-                setQauntidade(Number(text));
+              onChangeText={(text) => {
+                setQauntidade(Number(text.replace(/\D/g,'')));
               }}
               value={String(quantidade)}
               placeholder="Quantidade"
@@ -474,25 +548,11 @@ const CadastrarProdutosScreen: React.FC<CadastrarProdutosScreenProps> = ({
             </Box>
             <InputField
               type="text"
-              value={valor}
+              value={state.valor}
               keyboardType="number-pad"
-              onChangeText={(text) => setValor(text)}
-              onEndEditing={() => {
-                if (isNaN(Number(valor.replace(",", ".")))) {
-                  setValor("0,00");
-                } else {
-                  if (valor.includes(",")) {
-                    setValor(valor);
-                  } else {
-                    setValor(
-                      `${
-                        valor.substring(0, valor.length - 2) +
-                        "," +
-                        valor.substring(valor.length - 2, valor.length)
-                      }`
-                    );
-                  }
-                }
+              onChangeText={(text) => dispatch({ type: 'alt_valor', valor: text})}
+              onEndEditing={(e) => {
+                dispatch({type: 'alt_valor', valor: parseFloat(Number(state.valor.replace(',', '.')).toString()).toFixed(2).replace('.', ',')});
               }}
               placeholder="R$XXX,XX"
             />
@@ -512,14 +572,20 @@ const CadastrarProdutosScreen: React.FC<CadastrarProdutosScreenProps> = ({
           </FormControlError>
         </FormControl>
 
-        {/*  */}
+        {/*  Selecione a empresa desejada */}
         <FormControl w="$full">
           <FormControlLabel>
-            <FormControlHelperText>Empresa</FormControlHelperText>
+            <FormControlHelperText>Selecione a empresa</FormControlHelperText>
           </FormControlLabel>
-          <Select isInvalid={false} w={"$full"} isDisabled={false}>
+          <Select 
+            isInvalid={false} 
+            w={"$full"}
+            onValueChange={async (value) => {
+              dispatch({type: 'alt_empresa', empresa: Number(value)})
+            }}
+          >
             <SelectTrigger size={"md"} variant={"outline"}>
-              <SelectInput placeholder="Select option" />
+              <SelectInput placeholder="Selecione uma empresa" />
               <SelectIcon mr={"$3"} ml={0} as={ChevronDownIcon} />
             </SelectTrigger>
             <SelectPortal>
@@ -528,21 +594,15 @@ const CadastrarProdutosScreen: React.FC<CadastrarProdutosScreenProps> = ({
                 <SelectDragIndicatorWrapper>
                   <SelectDragIndicator />
                 </SelectDragIndicatorWrapper>
-                <SelectItem label="UX Research" value="UX Research" />
-                <SelectItem label="Web Development" value="Web Development" />
-                <SelectItem
-                  label="Cross Platform Development Process"
-                  value="Cross Platform Development Process"
-                />
-                <SelectItem
-                  label="UI Designing"
-                  value="UI Designing"
-                  isDisabled={true}
-                />
-                <SelectItem
-                  label="Backend Development"
-                  value="Backend Development"
-                />
+                {
+                  teste.map((item) => (
+                    <SelectItem
+                      key={item.id}
+                      label={item.name}
+                      value={item.id.toString()}
+                    />
+                  ))
+                }
               </SelectContent>
             </SelectPortal>
           </Select>
