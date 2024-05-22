@@ -5,5 +5,8 @@ node_modules
 *.disb
 *.7z
 android
+ios
 *.apk
 fonts
+yarn.lock
+package-lock.json

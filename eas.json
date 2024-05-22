@@ -5,7 +5,7 @@
   "build": {
     "dev-internal-apk": {
       "android": {
-        "image": "sdk-50",
+        "image": "sdk-51",
         "buildType": "apk",
         "resourceClass": "medium"
       },
@@ -13,7 +13,7 @@
     },
     "build:apk": {
       "android": {
-        "image": "sdk-50",
+        "image": "sdk-51",
         "buildType": "apk",
         "resourceClass": "medium"
       },
