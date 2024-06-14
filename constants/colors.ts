@@ -1,7 +1,7 @@
 import { config } from "@gluestack-ui/config";
 import { Theme } from "@react-navigation/native";
 
-const ColorsLightMode = {
+export const ColorsLightMode = {
     Text: {
         Title1: config.tokens.colors.textLight950,
         Title2: config.tokens.colors.textLight900,
@@ -11,7 +11,7 @@ const ColorsLightMode = {
     }
 }
 
-const ColorsDarkMode = {
+export const ColorsDarkMode = {
     Text: {
         Title1: config.tokens.colors.textDark0,
         Title2: config.tokens.colors.textLight50,
@@ -21,7 +21,7 @@ const ColorsDarkMode = {
     }
 }
 
-const ConfigTheme = {
+export const ConfigTheme = {
     dark: {
         dark: true,
         colors: {
@@ -46,4 +46,4 @@ const ConfigTheme = {
     } as Theme
 }
 
-export { ColorsDarkMode, ColorsLightMode, ConfigTheme };
+export default { ColorsDarkMode, ColorsLightMode, ConfigTheme };

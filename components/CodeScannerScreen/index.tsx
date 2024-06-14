@@ -1,7 +1,7 @@
 import { Box } from "@gluestack-ui/themed";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { BarcodeScanningResult, CameraView, useCameraPermissions } from "expo-camera/next";
+import { BarcodeScanningResult, CameraView, useCameraPermissions } from "expo-camera";
 import { RootStackParamList, ScreensScanCode } from "../../types";
 import React from "react";
 import * as SplashScreen from 'expo-splash-screen'
