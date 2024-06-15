@@ -174,24 +174,56 @@ export class Produto {
     }
   }
 
-  async update(Produto: UpdateProdutoDto) {
-    const { id, nome, descricao, tipo, categoria,codigo_de_barras, id_empresa, preco, quantidade, subcategoria, tamanho, data_de_validade } = Produto;
-    const data = {
-      $id: id,
-      $nome: nome,
-      $descricao: descricao,
-      $tipo: tipo,
-    };
+  async update(id: number, Produto: UpdateProdutoDto) {
+    const { nome, descricao, tipo, categoria,codigo_de_barras, id_empresa, preco, quantidade, subcategoria, tamanho, data_de_validade } = Produto;
     try {
       const db = await this.db;
-      const result = await db.runAsync(
-        'UPDATE produto SET nome = $nome, descricao = $descricao, tipo = $tipo, categoria = $categoria, codigo_de_barras = $codigo_de_barras, id_empresa = $id_empresa, preco = $preco, quantidade = $quantidade, subcategoria = $subcategoria, tamanho = $tamanho, data_de_validade $data_de_validade WHERE id = $id',
-        data,
-      );
-      if (!result) {
-        return { error: true };
+      if (data_de_validade) {
+        const data = {
+          $id: id,
+          $nome: nome,
+          $descricao: descricao,
+          $tipo: tipo,
+          $categoria: categoria,
+          $codigo_de_barras: codigo_de_barras,
+          $id_empresa: id_empresa,
+          $preco: preco,
+          $quantidade: quantidade,
+          $subcategoria: subcategoria,
+          $tamanho: tamanho,
+          $data_de_validade: data_de_validade.toDateString(),
+        };
+        const result = await db.runAsync(
+          'UPDATE produto SET nome = $nome, descricao = $descricao, tipo = $tipo, categoria = $categoria, codigo_de_barras = $codigo_de_barras, id_empresa = $id_empresa, preco = $preco, quantidade = $quantidade, subcategoria = $subcategoria, tamanho = $tamanho, data_de_validade = $data_de_validade WHERE id = $id',
+          data,
+        );
+        if (!result) {
+          return { error: true };
+        }
+        return Produto;
+      } else {
+        const data = {
+          $id: id,
+          $nome: nome,
+          $descricao: descricao,
+          $tipo: tipo,
+          $categoria: categoria,
+          $codigo_de_barras: codigo_de_barras,
+          $id_empresa: id_empresa,
+          $preco: preco,
+          $quantidade: quantidade,
+          $subcategoria: subcategoria,
+          $tamanho: tamanho,
+        };
+        const result = await db.runAsync(
+          'UPDATE produto SET nome = $nome, descricao = $descricao, tipo = $tipo, categoria = $categoria, codigo_de_barras = $codigo_de_barras, id_empresa = $id_empresa, preco = $preco, quantidade = $quantidade, subcategoria = $subcategoria, tamanho = $tamanho WHERE id = $id',
+          data,
+        );
+        if (!result) {
+          return { error: true };
+        }
+        return Produto;
       }
-      return Produto;
     } catch (error) {
       console.error(error);
       return { error: true };
@@ -202,7 +234,7 @@ export class Produto {
     try {
       const db = await this.db;
       const result = await db.runAsync(
-        'DELETE * FROM unidades_de_armazenamento WHERE id = $id',
+        'DELETE * FROM produto WHERE id = $id',
         { $id: id },
       );
       if (!result) {

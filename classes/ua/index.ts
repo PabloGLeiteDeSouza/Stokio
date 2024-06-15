@@ -83,8 +83,8 @@ export class Ua {
         }
     }
 
-    async update(Ua: UpdateUaDto){
-        const { id, nome, descricao, tipo } = Ua;
+    async update(id: number, Ua: UpdateUaDto){
+        const { nome, descricao, tipo } = Ua;
         const data = {
             $id: id,
             $nome: nome,

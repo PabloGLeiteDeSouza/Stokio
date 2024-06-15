@@ -1,4 +1,5 @@
 export class CreateProdutoDto {
+  id?: number;
   codigo_de_barras: string;
   nome: string;
   descricao: string;
@@ -22,6 +23,7 @@ export class CreateProdutoDto {
     quantidade: number,
     preco: number,
     id_empresa: number,
+    id?: number,
     data_de_validade?: Date,
   ) {
     this.nome = nome;
@@ -34,8 +36,7 @@ export class CreateProdutoDto {
     this.quantidade = quantidade;
     this.preco = preco;
     this.id_empresa = id_empresa;
-    if (data_de_validade) {
-      this.data_de_validade = data_de_validade;
-    }
+    this.id = id;
+    this.data_de_validade = data_de_validade;
   }
 }
