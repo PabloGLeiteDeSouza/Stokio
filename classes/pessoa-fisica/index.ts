@@ -77,15 +77,15 @@ export class PessoaFisica {
   }
 
   async update(id: number, PessoaFisica: UpdatePessoaFisicaDto) {
-    const { cpf, data_de_nascimento, id_pessoa, id_endereco } = PessoaFisica;
+    const { cpf, data_de_nascimento, id_endereco } = PessoaFisica;
     try {
       const db = await this.db;
 
       const data = {
         $id: id,
         $cpf: cpf,
-        $id_endereco: 
         $data_de_nascimento: data_de_nascimento.toDateString(),
+        $id_endereco: id_endereco,
       };
       const result = await db.runAsync(
         'UPDATE pessoa_fisica SET cpf = $cpf, data_de_nascimento = $data_de_nascimento, id_endereco = $id_endereco WHERE id = $id',
