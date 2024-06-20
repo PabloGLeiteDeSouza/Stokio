@@ -10,12 +10,12 @@ export class Produto {
       nome,
       tipo,
       descricao,
-      categoria,
+      id_categoria,
       codigo_de_barras,
       id_empresa,
       preco,
       quantidade,
-      subcategoria,
+      id_marca,
       tamanho,
       data_de_validade,
     } = Produto;
@@ -28,17 +28,17 @@ export class Produto {
                 $nome: nome,
                 $descricao: descricao,
                 $tipo: tipo,
-                $categoria: categoria,
+                $id_categoria: id_categoria,
                 $codigo_de_barras: codigo_de_barras,
                 $id_empresa: id_empresa,
                 $preco: preco,
                 $quantidade: quantidade,
-                $subcategoria: subcategoria,
+                $id_marca: id_marca,
                 $tamanho: tamanho,
                 $data_de_validade: data_de_validade.toDateString(),
             };
             const result = await db.runAsync(
-                'INSERT INTO produto (nome, descricao, tipo, categoria, codigo_de_barras, id_empresa, preco, quantidade, subcategoria, tamanho, data_de_validade ) VALUES ( $nome, $descricao, $tipo, $categoria, $codigo_de_barras, $id_empresa, $preco, $quantidade, $subcategoria, $tamanho, $data_de_validade )',
+                'INSERT INTO produto (nome, descricao, tipo, id_categoria, codigo_de_barras, id_empresa, preco, quantidade, id_marca, tamanho, data_de_validade ) VALUES ( $nome, $descricao, $tipo, $id_categoria, $codigo_de_barras, $id_empresa, $preco, $quantidade, $id_marca, $tamanho, $data_de_validade )',
                 data,
             );
             if (!result) {
@@ -50,16 +50,16 @@ export class Produto {
             $nome: nome,
             $descricao: descricao,
             $tipo: tipo,
-            $categoria: categoria,
+            $id_categoria: id_categoria,
             $codigo_de_barras: codigo_de_barras,
             $id_empresa: id_empresa,
             $preco: preco,
             $quantidade: quantidade,
-            $subcategoria: subcategoria,
+            $id_marca: id_marca,
             $tamanho: tamanho,
         };
         const result = await db.runAsync(
-            'INSERT INTO produto (nome, descricao, tipo, categoria, codigo_de_barras, id_empresa, preco, quantidade, subcategoria, tamanho ) VALUES ( $nome, $descricao, $tipo, $categoria, $codigo_de_barras, $id_empresa, $preco, $quantidade, $subcategoria, $tamanho )',
+            'INSERT INTO produto (nome, descricao, tipo, id_categoria, codigo_de_barras, id_empresa, preco, quantidade, id_marca, tamanho ) VALUES ( $nome, $descricao, $tipo, $id_categoria, $codigo_de_barras, $id_empresa, $preco, $quantidade, $id_marca, $tamanho )',
             data,
         );
       
@@ -86,6 +86,17 @@ export class Produto {
     } catch (error) {
       console.error(error);
       return { error: true };
+    }
+  }
+
+  async findFirstByIdMarca(id_marca: number){
+    try {
+      const db = await this.db;
+      const result = await db.getFirstAsync('SELECT * FROM produto WHERE id_marca = $id_marca', { $id_marca: id_marca })
+      return result;
+    } catch (error) {
+      console.error(error)
+      return { error: true }
     }
   }
 
@@ -157,12 +168,12 @@ export class Produto {
     }
   }
 
-  async findAllByCategory(categoria: string) {
+  async findAllByCategory(id_categoria: number) {
     try {
       const db = await this.db;
       const result = await db.getAllAsync(
-        'SELECT * FROM produto WHERE categoria = $categoria',
-        { $categoria: categoria },
+        'SELECT * FROM produto WHERE id_categoria = $id_categoria',
+        { $id_categoria: id_categoria },
       );
       if (!result) {
         return { error: true };
@@ -175,7 +186,7 @@ export class Produto {
   }
 
   async update(id: number, Produto: UpdateProdutoDto) {
-    const { nome, descricao, tipo, categoria,codigo_de_barras, id_empresa, preco, quantidade, subcategoria, tamanho, data_de_validade } = Produto;
+    const { nome, descricao, tipo, id_categoria,codigo_de_barras, id_empresa, preco, quantidade, id_marca, tamanho, data_de_validade } = Produto;
     try {
       const db = await this.db;
       if (data_de_validade) {
@@ -184,17 +195,17 @@ export class Produto {
           $nome: nome,
           $descricao: descricao,
           $tipo: tipo,
-          $categoria: categoria,
+          $id_categoria: id_categoria,
           $codigo_de_barras: codigo_de_barras,
           $id_empresa: id_empresa,
           $preco: preco,
           $quantidade: quantidade,
-          $subcategoria: subcategoria,
+          $id_marca: id_marca,
           $tamanho: tamanho,
           $data_de_validade: data_de_validade.toDateString(),
         };
         const result = await db.runAsync(
-          'UPDATE produto SET nome = $nome, descricao = $descricao, tipo = $tipo, categoria = $categoria, codigo_de_barras = $codigo_de_barras, id_empresa = $id_empresa, preco = $preco, quantidade = $quantidade, subcategoria = $subcategoria, tamanho = $tamanho, data_de_validade = $data_de_validade WHERE id = $id',
+          'UPDATE produto SET nome = $nome, descricao = $descricao, tipo = $tipo, id_categoria = $id_categoria, codigo_de_barras = $codigo_de_barras, id_empresa = $id_empresa, preco = $preco, quantidade = $quantidade, id_marca = $id_marca, tamanho = $tamanho, data_de_validade = $data_de_validade WHERE id = $id',
           data,
         );
         if (!result) {
@@ -207,16 +218,16 @@ export class Produto {
           $nome: nome,
           $descricao: descricao,
           $tipo: tipo,
-          $categoria: categoria,
+          $id_categoria: id_categoria,
           $codigo_de_barras: codigo_de_barras,
           $id_empresa: id_empresa,
           $preco: preco,
           $quantidade: quantidade,
-          $subcategoria: subcategoria,
+          $id_marca: id_marca,
           $tamanho: tamanho,
         };
         const result = await db.runAsync(
-          'UPDATE produto SET nome = $nome, descricao = $descricao, tipo = $tipo, categoria = $categoria, codigo_de_barras = $codigo_de_barras, id_empresa = $id_empresa, preco = $preco, quantidade = $quantidade, subcategoria = $subcategoria, tamanho = $tamanho WHERE id = $id',
+          'UPDATE produto SET nome = $nome, descricao = $descricao, tipo = $tipo, id_categoria = $id_categoria, codigo_de_barras = $codigo_de_barras, id_empresa = $id_empresa, preco = $preco, quantidade = $quantidade, id_marca = $id_marca, tamanho = $tamanho WHERE id = $id',
           data,
         );
         if (!result) {

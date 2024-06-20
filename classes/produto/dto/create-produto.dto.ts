@@ -4,8 +4,8 @@ export class CreateProdutoDto {
   nome: string;
   descricao: string;
   tipo: string;
-  categoria: string;
-  subcategoria: string;
+  id_categoria: number;
+  id_marca: number;
   tamanho: string;
   quantidade: number;
   preco: number;
@@ -17,8 +17,8 @@ export class CreateProdutoDto {
     codigo_de_barras: string,
     descricao: string,
     tipo: string,
-    categoria: string,
-    subcategoria: string,
+    id_categoria: number,
+    id_marca: number,
     tamanho: string,
     quantidade: number,
     preco: number,
@@ -30,8 +30,8 @@ export class CreateProdutoDto {
     this.codigo_de_barras = codigo_de_barras;
     this.descricao = descricao;
     this.tipo = tipo;
-    this.categoria = categoria;
-    this.subcategoria = subcategoria;
+    this.id_categoria = id_categoria;
+    this.id_marca = id_marca;
     this.tamanho = tamanho;
     this.quantidade = quantidade;
     this.preco = preco;

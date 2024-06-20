@@ -1,25 +1,25 @@
 import * as SQLite from "expo-sqlite";
-import { CreateUaDto } from "./dto/create-ua.dto";
-import { UpdateUaDto } from "./dto/update-ua.dto";
+import { CreateUnidadeDeArmazenamentoDto } from "./dto/create-ua.dto";
+import { UpdateUnidadeDeArmazenamentoDto } from "./dto/update-ua.dto";
 
-export class Ua {
+export class UnidadeDeArmazenamento {
 
     private db = SQLite.openDatabaseAsync('stock.db');
 
-    async create(Ua: CreateUaDto){
-        const { nome, descricao, tipo } = Ua;
+    async create(UnidadeDeArmazenamento: CreateUnidadeDeArmazenamentoDto){
+        const { nome, descricao, id_tipo_unidade_de_armazenamento } = UnidadeDeArmazenamento;
         const data = {
             $nome: nome,
             $descricao: descricao,
-            $tipo: tipo,
+            $id_tipo_unidade_de_armazenamento: id_tipo_unidade_de_armazenamento,
         }
         try {
             const db = await this.db;
-            const result = await db.runAsync('INSERT INTO unidade_de_armazenamento (nome, descricao, tipo ) VALUES ($nome, $descricao, $tipo)', data);
+            const result = await db.runAsync('INSERT INTO unidade_de_armazenamento (nome, descricao, tipo ) VALUES ($nome, $descricao, $id_tipo_unidade_de_armazenamento)', data);
             if (!result) {
                 return { error: true }
             }
-            return { id: result.lastInsertRowId, ...Ua };
+            return { id: result.lastInsertRowId, ...UnidadeDeArmazenamento };
         } catch (error) {
             console.error(error);
             return { error: true }
@@ -69,10 +69,10 @@ export class Ua {
         }
     }
 
-    async findAllByTipo(tipo: string){
+    async findAllByTipo(id_tipo_unidade_de_armazenamento: number){
         try {
             const db = await this.db;
-            const result = await db.getAllAsync('SELECT * FROM unidade_de_armazenamento WHERE tipo = $tipo', {$tipo: tipo});
+            const result = await db.getAllAsync('SELECT * FROM unidade_de_armazenamento WHERE id_tipo_unidade_de_armazenamento = $id_tipo_unidade_de_armazenamento', {$id_tipo_unidade_de_armazenamento: id_tipo_unidade_de_armazenamento});
             if (!result) {
                 return { error: true };
             }
@@ -83,21 +83,21 @@ export class Ua {
         }
     }
 
-    async update(id: number, Ua: UpdateUaDto){
-        const { nome, descricao, tipo } = Ua;
+    async update(id: number, UnidadeDeArmazenamento: UpdateUnidadeDeArmazenamentoDto){
+        const { nome, descricao, id_tipo_unidade_de_armazenamento } = UnidadeDeArmazenamento;
         const data = {
             $id: id,
             $nome: nome,
             $descricao: descricao,
-            $tipo: tipo,
+            $id_tipo_unidade_de_armazenamento: id_tipo_unidade_de_armazenamento,
         }
         try {
             const db = await this.db;
-            const result = await db.runAsync('UPDATE unidade_de_armazenamento SET nome = $nome, descricao = $descricao, tipo = $tipo, WHERE id = $id', data);
+            const result = await db.runAsync('UPDATE unidade_de_armazenamento SET nome = $nome, descricao = $descricao, id_tipo_unidade_de_armazenamento = $id_tipo_unidade_de_armazenamento, WHERE id = $id', data);
             if (!result) {
                 return { error: true }
             }
-            return Ua;
+            return {...UnidadeDeArmazenamento, id};
         } catch (error) {
             console.error(error);
             return { error: true }
