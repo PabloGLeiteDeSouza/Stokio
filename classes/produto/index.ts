@@ -211,7 +211,7 @@ export class Produto {
         if (!result) {
           return { error: true };
         }
-        return Produto;
+        return {...Produto, id};
       } else {
         const data = {
           $id: id,
@@ -233,7 +233,7 @@ export class Produto {
         if (!result) {
           return { error: true };
         }
-        return Produto;
+        return {...Produto, id};
       }
     } catch (error) {
       console.error(error);

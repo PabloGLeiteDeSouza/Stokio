@@ -44,7 +44,10 @@ export class TipoDeUnidadeDeArmazenamento {
         try {
             const db = await this.db;
             const { nome } = tipo_de_unidade_de_armazenamento;
-            await db.runAsync('UPDATE tipo_de_unidade_de_armazenamento SET nome = $nome', { $nome: nome });
+            const result = await db.runAsync('UPDATE tipo_de_unidade_de_armazenamento SET nome = $nome', { $nome: nome });
+            if (!result) {
+                return { error: true };
+            }
             return { nome, id };
         } catch (error) {
             console.error(error);

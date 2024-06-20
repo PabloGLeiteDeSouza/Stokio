@@ -47,8 +47,10 @@ export class Endereco {
             $id_endereco: id_endereco,
           }
 
-          await db.runAsync('UPDATE empresa SET nome_completo = $nome_completo, data_de_nascimento = $data_de_nascimento, cpf = $cpf, id_endereco = $id_endereco', data);
-          
+          const result = await db.runAsync('UPDATE empresa SET nome_completo = $nome_completo, data_de_nascimento = $data_de_nascimento, cpf = $cpf, id_endereco = $id_endereco', data);
+          if (!result) {
+            return { error: true };
+          }
           return { ...empresa, id }
         
         } else {
@@ -58,8 +60,10 @@ export class Endereco {
             $cnpj: String(cnpj),
             $id_endereco: id_endereco,
           }
-          await db.runAsync('UPDATE empresa SET nome_fantasia = $nome_fantasia, razao_social = $razao_social, cnpj = $cnpj, id_endereco = $id_endereco', data);
-        
+          const result = await db.runAsync('UPDATE empresa SET nome_fantasia = $nome_fantasia, razao_social = $razao_social, cnpj = $cnpj, id_endereco = $id_endereco', data);
+          if (!result) {
+            return { error: true };
+          }
           return { ...empresa, id }
         }
       } catch (error) {

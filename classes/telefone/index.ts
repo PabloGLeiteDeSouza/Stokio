@@ -55,7 +55,10 @@ export class Telefone {
         try {
             const { telefone, id_empresa } = Telefone;
             const db = await this.db;
-            const result = db.runAsync('UPDATE telefone SET telefone = $telefone, id_empresa = $id_empresa', { $telefone: telefone, $id_empresa: id_empresa });
+            const result = await db.runAsync('UPDATE telefone SET telefone = $telefone, id_empresa = $id_empresa', { $telefone: telefone, $id_empresa: id_empresa });
+            if (!result) {
+                return { error: true };
+            }
             return { ...Telefone, id };
         } catch (error) {
             console.error(error);
