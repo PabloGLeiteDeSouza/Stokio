@@ -6,7 +6,7 @@ import { UpdateMarcaDto } from "./dto/update-marca.dto";
 
 export class Marca {
 
-    db = SQLite.openDatabaseAsync('stock.db');
+    private db = SQLite.openDatabaseAsync('stock.db');
 
     async create(marca: CreateMarcaDto){
         try {

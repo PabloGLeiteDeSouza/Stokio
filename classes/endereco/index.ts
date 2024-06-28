@@ -4,7 +4,7 @@ import { UpdateEnderecoDto } from './dto/update-endereco.dto';
 
 export class Endereco {
 
-    db = SQLite.openDatabaseAsync('stock.db');
+    private db = SQLite.openDatabaseAsync('stock.db');
 
     async create(endereco: CreateEnderecoDto){
         const { rua, numero, cep, complemento, bairro, cidade, UF } = endereco;
