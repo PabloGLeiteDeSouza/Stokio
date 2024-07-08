@@ -1,61 +1,71 @@
 export class CreateEmpresaDto {
-    id?: number;
-    nome_completo?: string;
-    data_de_nascimento?: Date;
-    cpf?: string;
-    nome_fantasia?: string;
-    razao_social?: string;
-    cnpj?: string;
-    tipo: 'PF' | 'PJ';
-    id_endereco: number;
+  id?: number;
+  nome_completo?: string;
+  data_de_nascimento?: Date;
+  cpf?: string;
+  nome_fantasia?: string;
+  razao_social?: string;
+  cnpj?: string;
+  id_endereco: number;
 
-    // Sobrecarga para Pessoa Jurídica (PJ)
-    constructor(
-        tipo: 'PJ',
-        id_endereco: number,
-        razao_social: string,
-        nome_fantasia: string,
-        cnpj: string,
-        id?: number
-    );
-    // Sobrecarga para Pessoa Física (PF)
-    constructor(
-        tipo: 'PF',
-        id_endereco: number,
-        nome_completo: string,
-        data_de_nascimento: Date,
-        cpf: string,
-        id?: number
-    );
-    // Implementação do construtor
-    constructor(
-        tipo: 'PF' | 'PJ',
-        id_endereco: number,
-        ...args: any[]
-    ) {
-        this.id_endereco = id_endereco;
-        this.tipo = tipo;
+  constructor(id_endereco: number, id?: number) {
+    this.id_endereco = id_endereco;
+    this.id = id;
+  }
 
-        if (tipo === 'PF') {
-            // Assegura que os atributos necessários para PF estão presentes
-            if (args.length < 3) {
-                throw new Error("Faltam atributos obrigatórios para Pessoa Física");
-            }
-            this.nome_completo = args[0];
-            this.data_de_nascimento = args[1];
-            this.cpf = args[2];
-            if (args[3] !== undefined) this.id = args[3];
-        } else if (tipo === 'PJ') {
-            // Assegura que os atributos necessários para PJ estão presentes
-            if (args.length < 3) {
-                throw new Error("Faltam atributos obrigatórios para Pessoa Jurídica");
-            }
-            this.razao_social = args[0];
-            this.nome_fantasia = args[1];
-            this.cnpj = args[2];
-            if (args[3] !== undefined) this.id = args[3];
-        } else {
-            throw new Error("Tipo de empresa inválido");
-        }
-    }
+  public get_id() {
+    return this.id;
+  }
+
+  public set_id(id: number) {
+    this.id = id;
+  }
+
+  public set_nome_completo(nome_completo: string) {
+    this.nome_completo = nome_completo;
+  }
+
+  public get_nome_completo() {
+    return this.nome_completo;
+  }
+
+  public set_data_de_nascimento(data_de_nascimento: Date) {
+    this.data_de_nascimento = data_de_nascimento;
+  }
+
+  public get_data_de_nascimento() {
+    return this.data_de_nascimento;
+  }
+
+  public set_cpf(cpf: string) {
+    this.cpf = cpf;
+  }
+
+  public get_cpf() {
+    return this.cpf;
+  }
+
+  public set_nome_fantasia(nome_fantasia: string) {
+    this.nome_fantasia = nome_fantasia;
+  }
+
+  public get_nome_fantasia() {
+    return this.nome_fantasia;
+  }
+
+  public set_razao_social(razao_social: string) {
+    this.razao_social = razao_social;
+  }
+
+  public get_razao_social() {
+    return this.razao_social;
+  }
+
+  public set_cnpj(cnpj: string) {
+    this.cnpj = cnpj;
+  }
+
+  public get_cnpj() {
+    return this.cnpj;
+  }
 }

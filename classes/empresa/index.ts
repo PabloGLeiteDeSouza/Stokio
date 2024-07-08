@@ -2,14 +2,13 @@ import * as SQLite from 'expo-sqlite';
 import { CreateEmpresaDto } from './dto/create-empresa.dto';
 import { UpdateEmpresaDto } from './dto/update-empresa.dto';
 
-export class Endereco {
+export class Empresa {
   private db = SQLite.openDatabaseAsync('stock.db');
 
   async create(empresa: CreateEmpresaDto) {
     try {
       const db = await this.db;
       const {
-        tipo,
         nome_completo,
         data_de_nascimento,
         cpf,
@@ -18,7 +17,7 @@ export class Endereco {
         nome_fantasia,
         razao_social,
       } = empresa;
-      if (tipo === 'PJ') {
+      if (cnpj) {
         const data = {
           $nome_fantasia: String(nome_fantasia),
           $razao_social: String(razao_social),
@@ -53,7 +52,6 @@ export class Endereco {
     try {
       const db = await this.db;
       const {
-        tipo,
         id_endereco,
         cnpj,
         cpf,
@@ -62,7 +60,7 @@ export class Endereco {
         nome_fantasia,
         razao_social,
       } = empresa;
-      if (tipo === 'PF') {
+      if (cpf) {
         const data = {
           $nome_completo: String(nome_completo),
           $data_de_nascimento: String(data_de_nascimento?.toLocaleDateString()),
@@ -104,13 +102,13 @@ export class Endereco {
     try {
       const db = await this.db;
       const result = await db.getAllAsync('SELECT * FROM empresa');
-      if (!result) {
-        return { error: true };
+      if (result.length === 0) {
+        throw new Error('Não foi encontrado nenhum registro!')
       }
       return result;
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error
     }
   }
 
@@ -138,13 +136,13 @@ export class Endereco {
         'SELECT * FROM empresa WHERE nome_completo = $nome_completo',
         { $nome_completo: nome_completo },
       );
-      if (!result) {
-        return { error: true };
+      if (result.length === 0) {
+        throw new Error('Não foram encontrados registros')
       }
       return result;
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw new Error('Erro ao buscar os registros tente novamente ' + String(error));
     }
   }
 
@@ -155,13 +153,13 @@ export class Endereco {
         'SELECT * FROM empresa WHERE nome_fantasia = $nome_fantasia',
         { $nome_fantasia: nome_fantasia },
       );
-      if (!result) {
-        return { error: true };
+      if (result.length === 0) {
+        throw new Error('Não foram encontrados registros')
       }
       return result;
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw new Error('Erro ao buscar os registros tente novamente ' + String(error));
     }
   }
 

@@ -4,7 +4,7 @@ import { CreateEmailDto } from "./dto/create-email.dto";
 
 export class Email {
     
-    private db = SQLite.openDatabaseAsync('stock.db');
+    private db = SQLite.openDatabaseAsync('stock');
 
     async create(email: CreateEmailDto){
         try {

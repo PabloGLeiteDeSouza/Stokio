@@ -4,7 +4,7 @@ import * as SQLite from "expo-sqlite";
 
 export class Categoria {
 
-    private db = SQLite.openDatabaseAsync('stock.db');
+    private db = SQLite.openDatabaseAsync('stock');
 
     async create(categoria: CreateCategotiaDto){
         try {
