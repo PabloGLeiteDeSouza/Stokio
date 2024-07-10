@@ -1,6 +1,7 @@
 import * as SQLite from 'expo-sqlite';
 import { CreateEmpresaDto } from './dto/create-empresa.dto';
 import { UpdateEmpresaDto } from './dto/update-empresa.dto';
+import { resolveUri } from 'expo-asset/build/AssetSources';
 
 export class Empresa {
   private db = SQLite.openDatabaseAsync('stock.db');
@@ -112,20 +113,20 @@ export class Empresa {
     }
   }
 
-  async findUniqueByCpf(cpf: string) {
+  async findUniqueByCpf(cpf: string) : Promise<any> {
     try {
       const db = await this.db;
       const result = await db.getFirstAsync(
-        'SELECT * FROM empresa WHERE cpf = $cpf',
-        { $cpf: cpf },
+        'SELECT * FROM empresa WHERE cpf LIKE $cpf',
+        { $cpf: `%${cpf}%` },
       );
       if (!result) {
-        return { error: true };
+        throw new Error('Nenhum registro foi encontrado')
       }
       return result;
     } catch (error) {
-      console.error(error);
-      return { error: true };
+      console.error("o que deu errado: ",(error as Error).message);
+      throw new Error((error as Error).message);
     }
   }
 
@@ -133,8 +134,8 @@ export class Empresa {
     try {
       const db = await this.db;
       const result = await db.getAllAsync(
-        'SELECT * FROM empresa WHERE nome_completo = $nome_completo',
-        { $nome_completo: nome_completo },
+        'SELECT * FROM empresa WHERE nome_completo LIKE $nome_completo',
+        { $nome_completo: `%${nome_completo}%` },
       );
       if (result.length === 0) {
         throw new Error('Não foram encontrados registros')
@@ -143,6 +144,8 @@ export class Empresa {
     } catch (error) {
       console.error(error);
       throw new Error('Erro ao buscar os registros tente novamente ' + String(error));
+    } finally {
+      await (await this.db).closeAsync();
     }
   }
 
@@ -150,16 +153,17 @@ export class Empresa {
     try {
       const db = await this.db;
       const result = await db.getAllAsync(
-        'SELECT * FROM empresa WHERE nome_fantasia = $nome_fantasia',
-        { $nome_fantasia: nome_fantasia },
+        'SELECT * FROM empresa WHERE nome_fantasia LIKE $nome_fantasia',
+        { $nome_fantasia: `%${nome_fantasia}%` },
       );
       if (result.length === 0) {
         throw new Error('Não foram encontrados registros')
       }
       return result;
     } catch (error) {
-      console.error(error);
-      throw new Error('Erro ao buscar os registros tente novamente ' + String(error));
+      
+      console.error("o que deu errado: ",(error as Error).message);
+      throw new Error((error as Error).message);
     }
   }
 
@@ -168,15 +172,15 @@ export class Empresa {
       const db = await this.db;
       const result = await db.getAllAsync(
         'SELECT * FROM empresa WHERE razao_social = $razao_social',
-        { $razao_social: razao_social },
+        { $razao_social: `%${razao_social}%` },
       );
-      if (!result) {
-        return { error: true };
+      if (result.length === 0) {
+        throw new Error('Nao foram encontrados nenhum registro!');
       }
       return result;
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw new Error('Erro ao buscar os registros tente novamente ' + String(error));
     }
   }
 
@@ -184,16 +188,16 @@ export class Empresa {
     try {
       const db = await this.db;
       const result = await db.getFirstAsync(
-        'SELECT * FROM empresa WHERE cnpj = $cnpj',
-        { $cnpj: cnpj },
+        'SELECT * FROM empresa WHERE cnpj LIKE $cnpj',
+        { $cnpj: `%${cnpj}%` },
       );
       if (!result) {
-        return { error: true };
+        throw new Error('Nao foi encontrado nenhum registro!');
       }
       return result;
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw new Error('');
     }
   }
 
@@ -205,12 +209,12 @@ export class Empresa {
         { $id: id },
       );
       if (!result) {
-        return { error: true };
+        throw new Error('');
       }
       return { sucess: true };
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw new Error('');
     }
   }
 }

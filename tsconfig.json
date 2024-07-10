@@ -9,7 +9,7 @@
       "$databases/*": ["./databases/*"],
       "$providers/*": ["./providers/*"],
       "$assets/*": ["./assets/*"],
-      "$functions": ["./functions"]
+      "$functions": ["./functions"],
     }
   }
 }

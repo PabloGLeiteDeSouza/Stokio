@@ -66,31 +66,15 @@ import RNDateTimePicker, {
 import { useThemeApp } from "$providers/theme";
 import { CalendarDaysIcon } from "@gluestack-ui/themed";
 import { ButtonIcon } from "@gluestack-ui/themed";
+import { formatDateString } from 'utils';
+
+
 const CadastrarEmpresasScreen: React.FC = () => {
   let selectIconSize = "";
   const [date, setDate] = React.useState<Date>(new Date());
   const [tipoEmpresa, setTipoEmpresa] = React.useState<"pj" | "pf">("pj");
   const {theme} = useThemeApp();
 
-
-  const dateFormat = () => {
-    const dia = date.getDate();
-    const mes = date.getMonth() + 1;
-    const ano = date.getFullYear();
-    if (dia < 10) {
-      if (mes < 10) {
-        return `0${dia}/0${mes}/${ano}`;
-      } else {
-        return `0${dia}/${mes}/${ano}`;
-      }
-    } else {
-      if (mes < 10) {
-        return `${dia}/0${mes}/${ano}`;
-      } else {
-        return `${dia}/${mes}/${ano}`;
-      }
-    }
-  };
   return (
     <ScrollView>
       <Box mx="$10" my="$5" gap="$5">
@@ -352,7 +336,7 @@ const CadastrarEmpresasScreen: React.FC = () => {
               editable={false}
               readOnly={true}
               type="text"
-              value={dateFormat()}
+              value={formatDateString(date)}
               placeholder="data"
             />
             <Button onPress={() => {
