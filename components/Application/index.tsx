@@ -71,7 +71,6 @@ const Application: React.FC = () => {
       const res = await Auth();
       if (res) {
         dispatch({ type: 'change_all', isAuth: true, isLoad: false});
-        await SplashScreen.hideAsync();
       } else {
         dispatch({ type: 'change_load', isLoad: false })
         await SplashScreen.hideAsync();

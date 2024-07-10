@@ -25,6 +25,7 @@ module.exports = function(api) {
             "$databases": "./databases",
             "$functions": "./functions",
             "$providers": "./providers",
+            "$classes": "./classes",
           },
         },
       ],

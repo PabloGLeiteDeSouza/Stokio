@@ -10,6 +10,7 @@
       "$providers/*": ["./providers/*"],
       "$assets/*": ["./assets/*"],
       "$functions": ["./functions"],
+      "$classes": ["./classes/*"],
     }
   }
 }

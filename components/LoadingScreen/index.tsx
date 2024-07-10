@@ -6,7 +6,7 @@ export default function LoadingScreen() {
         <Box w='$full' h='$full' alignItems='center' justifyContent='center' >
             <VStack gap={15}>
                 <Spinner size='large' />
-                <Text >O aplicativo esta iniciando</Text>
+                <Text >Carregando informações. Aguarde...</Text>
             </VStack>
         </Box>
     )

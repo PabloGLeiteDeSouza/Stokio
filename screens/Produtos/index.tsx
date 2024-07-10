@@ -14,6 +14,7 @@ import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
 import { useThemeApp } from "$providers/theme";
+import * as SplashScreen from "expo-splash-screen";
 
 const Stack = createNativeStackNavigator();
 
@@ -54,6 +55,10 @@ const ListarProdutosScreen: React.FC<ListarProdutosScreenProps> = ({
 }) => {
   const [haveProducts, setHaveProducts] = React.useState(false);
   const { theme } = useThemeApp();
+
+  React.useEffect(() => {
+    SplashScreen.hideAsync();
+  },[])
 
   return( 
     <>
