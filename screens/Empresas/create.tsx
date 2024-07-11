@@ -67,6 +67,10 @@ import { RootStackParamList } from '$types/index';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { Formik } from 'formik';
+import { Alert, FlatListComponent } from 'react-native';
+import * as Yup from 'yup';
+import { ValidateForms } from '../../constants/validations';
+import { FA6Style } from '@expo/vector-icons/build/FontAwesome6';
 
 
 type CadastrarEmpresasScreenNavigationProp = StackNavigationProp<
@@ -82,6 +86,46 @@ interface CadastrarEmpresasScreenProps {
   route?: CadastrarEmpresasScreenRouteProp;
 }
 
+const validator = Yup.object().shape({
+  tipo_de_empresa: Yup.string().required(),
+  nome_completo: Yup.string().when('tipo_de_empresa', {
+    is: (value: string) => value === "pf",
+    then: (yup) => yup.required(ValidateForms.required),
+  }),
+  data_de_nascimento: Yup.date().when('tipo_de_empresa', {
+    is: (value: string) => value === "pf",
+    then: (yup) => yup.required(ValidateForms.required),
+  }),
+  cpf: Yup.string().when('tipo_de_empresa', {
+    is: (value: string) => value === "pf",
+    then: (yup) => yup.required(ValidateForms.required),
+  }),
+  nome_fantasia: Yup.string().when('tipo_de_empresa', {
+    is: (value: string) => value === "pj",
+    then: (yup) => yup.required(ValidateForms.required),
+  }),
+  razao_social: Yup.string().when('tipo_de_empresa', {
+    is: (value: string) => value === "pj",
+    then: (yup) => yup.required(ValidateForms.required),
+  }),
+  cnpj: Yup.string().when('tipo_de_empresa', {
+    is: (value: string) => value === "pj",
+    then: (yup) => yup.required(ValidateForms.required),
+  }),
+  cep: Yup.string().required(ValidateForms.required),
+  logradouro: Yup.string().required(ValidateForms.required),
+  numero: Yup.string().required(ValidateForms.required).matches(/^[0-9]+$/, ValidateForms.number_only),
+  bairro: Yup.string().required(ValidateForms.required),
+  cidade: Yup.string().required(ValidateForms.required),
+  uf: Yup.string().required(ValidateForms.required),
+  emails: Yup.array().of(Yup.string().email(ValidateForms.email)).required(ValidateForms.required),
+  telefones: Yup.array().of(Yup.string().matches(/^(\+\d{1,3} )?\(\d{2}\) \d{4,5}-\d{4}$/, ValidateForms.phone_number)).required(ValidateForms.required),
+})
+
+
+
+
+
 const Create: React.FC<CadastrarEmpresasScreenProps> = ({
   navigation,
   route,
@@ -89,6 +133,25 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
   const [date, setDate] = React.useState<Date>(new Date());
   const [tipoEmpresa, setTipoEmpresa] = React.useState<'pj' | 'pf'>('pj');
   const { theme } = useThemeApp();
+  const [isAllDisabled, setIsAllDisabled] = React.useState({
+    tipo_empresa: false,
+    nome_completo: false,
+    cpf: false,
+    data_de_nascimento: false,
+    nome_fantasia: false,
+    razao_social: false,
+    cnpj: false,
+    cep: false,
+    logradouro: false,
+    numero: false,
+    complemento: false,
+    bairro: false,
+    cidade: false,
+    uf: false,
+    emails: [false],
+    telefones: [false],
+  })
+  
 
   return (
     <ScrollView>
@@ -97,7 +160,9 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
           Informe os dados da empresa:
         </Text>
         <Formik
+          validationSchema={validator}
           initialValues={{
+            tipo_empresa: 'pj' as 'pj' | 'pf',
             nome_completo: '',
             cpf: '',
             data_de_nascimento: new Date(),
@@ -110,14 +175,27 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
             complemento: '',
             bairro: '',
             cidade: '',
-            estado: '',
+            uf: '',
             emails: [],
             telefones: [],
           }}
           onSubmit={(values) => {}}
         >
-          {({ values, errors, handleChange, setFieldValue }) => (
-            <>
+          {({ values, errors, handleChange, setFieldValue }) => {
+            const busca_cep = async (cep: String) => {
+              try{
+                
+                const data = await fetch(`viacep.com.br/ws/${cep}/json`);
+                if(!data.ok){
+                  throw new Error('Erro ao realizar a validacao tente novamente')
+                }
+              } catch(error) {
+                Alert.alert('Erro', (error as Error).message);
+              }
+              
+            }
+            return (
+              <>
               <FormControl
                 isInvalid={false}
                 size={'md'}
@@ -174,16 +252,16 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
               {tipoEmpresa === 'pj' ? (
                 <>
                   <FormControl
-                    isInvalid={false}
+                    isInvalid={errors.nome_fantasia ? true : false}
                     size={'md'}
-                    isDisabled={false}
+                    isDisabled={isAllDisabled.nome_fantasia}
                     isRequired={true}
                   >
                     <FormControlLabel>
                       <FormControlLabelText>Nome Fantasia</FormControlLabelText>
                     </FormControlLabel>
                     <Input>
-                      <InputField type="text" placeholder="Nome fantasia" />
+                      <InputField onChangeText={handleChange('nome_fantasia')} type="text" placeholder="Nome fantasia" />
                     </Input>
 
                     <FormControlHelper>
@@ -202,14 +280,14 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                   <FormControl
                     isInvalid={false}
                     size={'md'}
-                    isDisabled={false}
+                    isDisabled={isAllDisabled.razao_social}
                     isRequired={true}
                   >
                     <FormControlLabel>
                       <FormControlLabelText>Razão Social</FormControlLabelText>
                     </FormControlLabel>
                     <Input>
-                      <InputField type="text" placeholder="Razão social" />
+                      <InputField onChangeText={handleChange('razao_social')} type="text" placeholder="Razão social" />
                     </Input>
 
                     <FormControlHelper>
@@ -228,7 +306,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                   <FormControl
                     isInvalid={false}
                     size={'md'}
-                    isDisabled={false}
+                    isDisabled={isAllDisabled.cnpj}
                     isRequired={true}
                   >
                     <FormControlLabel>
@@ -236,6 +314,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                     </FormControlLabel>
                     <Input>
                       <InputField
+                        onChangeText={handleChange('cnpj')}
                         keyboardType="number-pad"
                         type="text"
                         placeholder="Cnpj"
@@ -259,9 +338,9 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
               ) : (
                 <>
                   <FormControl
-                    isInvalid={false}
+                    isInvalid={errors.nome_completo ? true : false}
                     size={'md'}
-                    isDisabled={false}
+                    isDisabled={isAllDisabled.nome_completo}
                     isRequired={true}
                   >
                     <FormControlLabel>
@@ -269,6 +348,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                     </FormControlLabel>
                     <Input>
                       <InputField
+                        onChangeText={handleChange('nome_completo')}
                         type="text"
                         placeholder="ex: João Carlos dos Santos Souza"
                       />
@@ -288,9 +368,9 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                     </FormControlError>
                   </FormControl>
                   <FormControl
-                    isInvalid={false}
+                    isInvalid={errors.data_de_nascimento ? true : false}
                     size={'md'}
-                    isDisabled={false}
+                    isDisabled={isAllDisabled.cpf}
                     isRequired={true}
                   >
                     <FormControlLabel>
@@ -316,7 +396,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                   <FormControl
                     isInvalid={false}
                     size={'md'}
-                    isDisabled={false}
+                    isDisabled={isAllDisabled.data_de_nascimento}
                     isRequired={true}
                   >
                     <FormControlLabel>
@@ -358,23 +438,28 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                     <FormControlError>
                       <FormControlErrorIcon as={AlertCircleIcon} />
                       <FormControlErrorText>
-                        {errors.data_de_nascimento}
+                        {String(errors.data_de_nascimento)}
                       </FormControlErrorText>
                     </FormControlError>
                   </FormControl>
                 </>
               )}
               <FormControl
-                isInvalid={false}
+                isInvalid={errors.cep ? true : false}
                 size={'md'}
-                isDisabled={false}
+                isDisabled={isAllDisabled.cep}
                 isRequired={true}
               >
                 <FormControlLabel>
                   <FormControlLabelText>Cep</FormControlLabelText>
                 </FormControlLabel>
                 <Input>
-                  <InputField type="text" placeholder="ex: 12.123-321" />
+                  <InputField 
+                    type="text" 
+                    placeholder="ex: 12.123-321" 
+                    onChangeText={handleChange('cep')}
+                    onBlur={() => { busca_cep(values.cep); }}
+                    />
                 </Input>
 
                 <FormControlHelper>
@@ -391,9 +476,9 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                 </FormControlError>
               </FormControl>
               <FormControl
-                isInvalid={false}
+                isInvalid={errors.logradouro ? true : false}
                 size={'md'}
-                isDisabled={false}
+                isDisabled={isAllDisabled.logradouro}
                 isRequired={true}
               >
                 <FormControlLabel>
@@ -401,6 +486,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                 </FormControlLabel>
                 <Input>
                   <InputField
+                    onChangeText={handleChange('logradouro')}
                     type="text"
                     placeholder="ex: Rua José Canóvas"
                   />
@@ -420,9 +506,9 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                 </FormControlError>
               </FormControl>
               <FormControl
-                isInvalid={false}
+                isInvalid={errors.numero ? true : false}
                 size={'md'}
-                isDisabled={false}
+                isDisabled={isAllDisabled.numero}
                 isRequired={true}
               >
                 <FormControlLabel>
@@ -430,6 +516,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                 </FormControlLabel>
                 <Input>
                   <InputField
+                    onChangeText={handleChange('numero')}
                     type="text"
                     placeholder="ex: 123"
                   />
@@ -450,14 +537,17 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
               </FormControl>
               <FormControl
                 size={'md'}
-                isDisabled={false}
+                isDisabled={isAllDisabled.complemento}
                 isRequired={false}
               >
                 <FormControlLabel>
                   <FormControlLabelText>Complemento</FormControlLabelText>
                 </FormControlLabel>
                 <Textarea size="lg">
-                  <TextareaInput placeholder="Your text goes here..." />
+                  <TextareaInput 
+                    onChangeText={handleChange('complemento')}
+                    placeholder="Informe o complemento do seu endereco aqui." 
+                  />
                 </Textarea>
 
                 <FormControlHelper>
@@ -468,16 +558,16 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
               </FormControl>
 
               <FormControl
-                isInvalid={false}
+                isInvalid={errors.bairro ? true : false}
                 size={'md'}
-                isDisabled={false}
+                isDisabled={isAllDisabled.bairro}
                 isRequired={true}
               >
                 <FormControlLabel>
                   <FormControlLabelText>Bairro</FormControlLabelText>
                 </FormControlLabel>
                 <Input>
-                  <InputField type="text" placeholder="ex: Tucanos" />
+                  <InputField onChangeText={handleChange('bairro')} type="text" placeholder="ex: Tucanos" />
                 </Input>
 
                 <FormControlHelper>
@@ -494,16 +584,16 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                 </FormControlError>
               </FormControl>
               <FormControl
-                isInvalid={false}
+                isInvalid={errors.cidade ? true : false}
                 size={'md'}
-                isDisabled={false}
+                isDisabled={isAllDisabled.cidade}
                 isRequired={true}
               >
                 <FormControlLabel>
                   <FormControlLabelText>Cidade</FormControlLabelText>
                 </FormControlLabel>
                 <Input>
-                  <InputField type="text" placeholder="ex: Araras" />
+                  <InputField onChangeText={handleChange('cidadde')} type="text" placeholder="ex: Araras" />
                 </Input>
 
                 <FormControlHelper>
@@ -520,9 +610,9 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                 </FormControlError>
               </FormControl>
               <FormControl
-                isInvalid={false}
+                isInvalid={errors.uf ? true :  false}
                 size={'md'}
-                isDisabled={false}
+                isDisabled={isAllDisabled.uf}
                 isRequired={true}
               >
                 <FormControlLabel>
@@ -549,7 +639,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                             key={estado.id}
                             value={estado.sigla}
                             label={estado.nome}
-                            isPressed={values.estado === estado.sigla}
+                            isPressed={values.uf === estado.sigla}
                           />
                         ))}
                       </ScrollView>
@@ -565,7 +655,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                 <FormControlError>
                   <FormControlErrorIcon as={AlertCircleIcon} />
                   <FormControlErrorText>
-                    Atleast 6 characters are required.
+                    {errors.uf}
                   </FormControlErrorText>
                 </FormControlError>
               </FormControl>
@@ -582,7 +672,8 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                 </Button>
               </Box>
             </>
-          )}
+          )
+            }}
         </Formik>
       </Box>
     </ScrollView>
