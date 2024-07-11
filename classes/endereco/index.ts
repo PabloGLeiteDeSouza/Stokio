@@ -21,12 +21,12 @@ export class Endereco {
             const db = await this.db;
             const result = await db.runAsync('INSERT INTO endereco (rua, numero, cep, complemento, bairro, cidade, UF) VALUES ($rua, $numero, $cep, $complemento, $bairro, $cidade, $UF)', data);
             if (!result) {
-                return { error: true }
+                throw new Error('Erro não foi possível executar a query')
             }
             return { ...endereco, id: result.lastInsertRowId, };
         } catch (error) {
             console.error(error);
-            return { error: true }
+            throw error;
         }
     }
 

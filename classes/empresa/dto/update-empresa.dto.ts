@@ -1,7 +1,12 @@
 import { CreateEmpresaDto } from "./create-empresa.dto";
 
 export class UpdateEmpresaDto extends CreateEmpresaDto {
-    constructor(id: number, id_endereco: number){
-        super(id_endereco, id);
+    constructor(id: number, id_endereco: number, nome_completo?: string,
+        data_de_nascimento?: Date,
+        cpf?: string,
+        nome_fantasia?: string,
+        razao_social?: string,
+        cnpj?: string){
+        super(id_endereco, nome_completo, data_de_nascimento, cpf, nome_fantasia, razao_social, cnpj, id);
     }
 }
