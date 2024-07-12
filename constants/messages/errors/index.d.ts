@@ -1,5 +1,5 @@
 import { TypeDBErros } from './types'
 
-declare module "errors-application" {
+declare module "messages-error" {
     export const DBErros: TypeDBErros
 }

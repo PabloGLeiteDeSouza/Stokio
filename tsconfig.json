@@ -4,7 +4,7 @@
     "strict": true,
     "paths": {
       "utils": ["./utils"],
-      "errors-application/*": ["./constants/erros/*"],
+      "messages-error": ["./constants/messages/errors"],
       "$components/*": ["./components/*"],
       "$screens/*": ["./screens/*"],
       "$types/*": ["./types/*"],
