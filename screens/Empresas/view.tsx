@@ -57,6 +57,7 @@ import {
   ButtonIcon,
   SearchIcon,
   AddIcon,
+  TrashIcon,
 } from '@gluestack-ui/themed';
 
 import { Empresa } from '$classes/empresa';
@@ -71,6 +72,8 @@ import { Alert } from 'react-native';
 import { formatStringDate } from '../../utils';
 import { Ionicons } from '@expo/vector-icons';
 import { useSQLiteContext } from 'expo-sqlite';
+import { EditIcon } from '@gluestack-ui/themed';
+import { UpdateEmailDto } from '$classes/email/dto/update-email.dto';
 type ListarEmpresasScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   'listar-empresas'
@@ -145,9 +148,20 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation, route }) => {
     }, 1);
   }, [isFocused])
 
+  const deletarEmpresa = () => {
+
+  }
+
+  const editarEmpresa = (empresa: UpdateEmailDto) => {
+    navigation?.navigate('editar-empresa', { empresa: empresa })
+  }
+
+
+
   if (isStartingPage) {
     return <LoadingScreen />;
   }
+
   return haveCompanys ? (
     <ScrollView>
       <Box w="$full" px="$5">
@@ -235,20 +249,49 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation, route }) => {
         return (
           <Box key={i} w="$full" alignItems="center" gap="$2.5" my="$2.5">
             {value.cnpj ? (
-              <>
-                <Text>Nome Fantasia: {value.nome_fantasia}</Text>
-                <Text>Razão Social: {value.razao_social}</Text>
-                <Text>CNPJ: {value.cnpj}</Text>
-              </>
+              <HStack gap="$3" >
+                <Box>
+                  <Text  >Nome Fantasia: {value.nome_fantasia}</Text>
+                  <Text>Razão Social: {value.razao_social}</Text>
+                  <Text>CNPJ: {value.cnpj}</Text>
+                </Box>
+                <Box>
+                  <Button
+                    onPress={editarEmpresa}
+                  >
+                    <ButtonIcon as={EditIcon} />
+                  </Button>
+                  <Button
+                    onPress={deletarEmpresa}
+                  >
+                    <ButtonIcon as={TrashIcon} />
+                  </Button>
+                </Box>
+              </HStack>
             ) : (
-              <>
-                <Text>Nome Completo: {value.nome_completo}</Text>
-                <Text>
-                  Data de Nascimento:{' '}
-                  {formatStringDate(value.data_de_nascimento)}
-                </Text>
-                <Text>CPF: {value.cpf}</Text>
-              </>
+              <HStack px="$3" py="$3" rounded="$md" $light-bgColor='$purple400' $dark-bgColor='$purple700' gap="$3" >
+                <VStack gap="$2" >
+                  <Text><Text fontWeight="$bold" >Nome Completo:</Text> {value.nome_completo}</Text>
+                  <Text>
+                    <Text fontWeight="$bold" >
+                      Data de Nascimento:
+                    </Text>
+                    {' '}
+                    {formatStringDate(value.data_de_nascimento)}
+                  </Text>
+                  <Text><Text fontWeight="$bold" >CPF:</Text> {value.cpf}</Text>
+                </VStack>
+                <VStack gap="$2" >
+                  <Button>
+                    <ButtonIcon as={EditIcon} />
+                  </Button>
+                  <Button
+                    action='negative'
+                  >
+                    <ButtonIcon as={TrashIcon} />
+                  </Button>
+                </VStack>
+              </HStack>
             )}
           </Box>
         );

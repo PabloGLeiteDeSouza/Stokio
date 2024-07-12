@@ -1,3 +1,6 @@
+import { UpdateEmpresaDto } from "$classes/empresa/dto/update-empresa.dto";
+import { UpdateProdutoDto } from "$classes/produto/dto/update-produto.dto";
+import { UpdateUnidadeDeArmazenamentoDto } from "$classes/ua/dto/update-ua.dto";
 import { ParamListBase, RouteProp } from "@react-navigation/native";
 
 export type RootStackParamList = {
@@ -5,9 +8,14 @@ export type RootStackParamList = {
     "code-scanner"?: { screen: string, type: string };
     "listar-produtos"?: { code?: string; result?: boolean };
     "listar-empresas"?: {  };
+    "listar-ua"?: {  };
     "listar-clientes"?: {  };
     "cadastrar-clientes"?: {};
     "cadastrar-empresas"?: {};
+    "cadastrar-ua"?: { ua: UpdateUnidadeDeArmazenamentoDto };
+    "editar-produtos"?: { produto: {...UpdateProdutoDto} };
+    "editar-empresas"?: { empresa: UpdateEmpresaDto };
+    "editar-ua"?: {};
     "tab-bottom"?: {};
     "auth-screen"?: {};
 };
