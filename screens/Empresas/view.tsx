@@ -70,6 +70,7 @@ import React from 'react';
 import { Alert } from 'react-native';
 import { formatStringDate } from '../../utils';
 import { Ionicons } from '@expo/vector-icons';
+import { useSQLiteContext } from 'expo-sqlite';
 type ListarEmpresasScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   'listar-empresas'
@@ -83,6 +84,7 @@ interface ListarEmpresasScreenProps {
   route?: ListarEmpresasScreenRouteProp;
 }
 const View: React.FC<ListarEmpresasScreenProps> = ({ navigation, route }) => {
+  const db = useSQLiteContext();
   const [valorBusca, setValorBusca] = React.useState('');
   const [haveCompanys, setHaveCompanys] = React.useState(false);
   const [todasEmpresas, setTodasEmpresas] = React.useState<Array<any>>([]);
@@ -92,7 +94,7 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation, route }) => {
   const [isStartingPage, setIsStartingPage] = React.useState(true);
   async function Start() {
     try {
-      const empresas = await new Empresa().findAll();
+      const empresas = await new Empresa(db).findAll();
       console.log(empresas);
       setTodasEmpresas(empresas);
       setHaveCompanys(true);
@@ -108,22 +110,22 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation, route }) => {
     try {
       switch (tipo) {
         case 'nome_completo':
-          setTodasEmpresas(await new Empresa().findAllByNomeCompleto(valor));
+          setTodasEmpresas(await new Empresa(db).findAllByNomeCompleto(valor));
           break;
         case 'cpf':
-          setTodasEmpresas([await new Empresa().findUniqueByCpf(valor)]);
+          setTodasEmpresas([await new Empresa(db).findUniqueByCpf(valor)]);
           break;
         case 'nome_fantasia':
-          setTodasEmpresas(await new Empresa().findAllByNomeFantasia(valor));
+          setTodasEmpresas(await new Empresa(db).findAllByNomeFantasia(valor));
           break;
         case 'razao_social':
-          setTodasEmpresas(await new Empresa().findAllByRazaoSocial(valor));
+          setTodasEmpresas(await new Empresa(db).findAllByRazaoSocial(valor));
           break;
         case 'cnpj':
-          setTodasEmpresas([await new Empresa().findUniqueByCnpj(valor)]);
+          setTodasEmpresas([await new Empresa(db).findUniqueByCnpj(valor)]);
           break;
         default:
-          setTodasEmpresas(await new Empresa().findAll());
+          setTodasEmpresas(await new Empresa(db).findAll());
           break;
       }
     } catch (error) {

@@ -3,14 +3,17 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
+      "utils/*": ["./utils/*"],
+      "errors-application/*": ["./constants/erros/*"],
       "$components/*": ["./components/*"],
       "$screens/*": ["./screens/*"],
       "$types/*": ["./types/*"],
       "$databases/*": ["./databases/*"],
       "$providers/*": ["./providers/*"],
       "$assets/*": ["./assets/*"],
-      "$functions": ["./functions"],
-      "$classes": ["./classes/*"],
+      "$functions/*": ["./functions/*"],
+      "$classes/*": ["./classes/*"],
+      "$constants/*": ["./constants/*"],
     }
   }
 }

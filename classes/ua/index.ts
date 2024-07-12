@@ -4,7 +4,11 @@ import { UpdateUnidadeDeArmazenamentoDto } from "./dto/update-ua.dto";
 
 export class UnidadeDeArmazenamento {
 
-    private db = SQLite.openDatabaseAsync('stock.db');
+    private db: SQLite.SQLiteDatabase;
+
+    constructor(db: SQLite.SQLiteDatabase){
+      this.db = db;
+    }
 
     async create(UnidadeDeArmazenamento: CreateUnidadeDeArmazenamentoDto){
         const { nome, descricao, id_tipo_unidade_de_armazenamento } = UnidadeDeArmazenamento;

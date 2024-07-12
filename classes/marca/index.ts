@@ -6,19 +6,24 @@ import { UpdateMarcaDto } from "./dto/update-marca.dto";
 
 export class Marca {
 
-    private db = SQLite.openDatabaseAsync('stock.db');
+    private db: SQLite.SQLiteDatabase;
+
+    constructor(db: SQLite.SQLiteDatabase){
+      this.db = db;
+    }
 
     async create(marca: CreateMarcaDto){
         try {
             const db = await this.db;
             const result = await db.runAsync('INSERT INTO marca (nome) VALUES ($nome)', {$nome: marca.nome});
             if (!result) {
-                return { error: true }
+                throw new Error('Não foi possível inserir os dados tente novamente!')
             }
             return { ...marca, id: result.lastInsertRowId };
         } catch (error) {
             console.error(error);
-            return { error: true }
+            await (await this.db).closeAsync();
+            throw error;
         }
     }
 

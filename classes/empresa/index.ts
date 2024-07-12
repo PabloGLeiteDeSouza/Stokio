@@ -1,14 +1,17 @@
 import * as SQLite from 'expo-sqlite';
 import { CreateEmpresaDto } from './dto/create-empresa.dto';
 import { UpdateEmpresaDto } from './dto/update-empresa.dto';
-import { resolveUri } from 'expo-asset/build/AssetSources';
 
 export class Empresa {
-  private db = SQLite.openDatabaseAsync('stock.db');
+  private db: SQLite.SQLiteDatabase;
+
+  constructor(db: SQLite.SQLiteDatabase){
+    this.db = db;
+  }
 
   async create(empresa: CreateEmpresaDto) {
     try {
-      const db = await this.db;
+
       const {
         nome_completo,
         data_de_nascimento,
@@ -25,7 +28,7 @@ export class Empresa {
           $cnpj: String(cnpj),
           $id_endereco: Number(id_endereco),
         };
-        const result = await db.runAsync(
+        const result = await this.db.runAsync(
           'INSERT INTO empresa (nome_fantasia, razao_social, cnpj, id_endereco) VALUES ($nome_fantasia, $razao_social, $cnpj, $id_endereco)',
           data,
         );
@@ -37,21 +40,19 @@ export class Empresa {
           $cpf: String(cpf),
           $id_endereco: Number(id_endereco),
         };
-        const result = await db.runAsync(
+        const result = await this.db.runAsync(
           'INSERT INTO empresa (nome_completo, data_de_nascimento, cpf, id_endereco) VALUES ($nome_completo, $data_de_nascimento, $cpf, $id_endereco)',
           data,
         );
         return { ...empresa, id: result.lastInsertRowId };
       }
     } catch (error) {
-      console.error(error);
-      return { erro: true };
+      throw error;
     }
   }
 
   async update(id: number, empresa: UpdateEmpresaDto) {
     try {
-      const db = await this.db;
       const {
         id_endereco,
         cnpj,
@@ -69,7 +70,7 @@ export class Empresa {
           $id_endereco: id_endereco,
         };
 
-        const result = await db.runAsync(
+        const result = await this.db.runAsync(
           'UPDATE empresa SET nome_completo = $nome_completo, data_de_nascimento = $data_de_nascimento, cpf = $cpf, id_endereco = $id_endereco',
           data,
         );
@@ -84,7 +85,7 @@ export class Empresa {
           $cnpj: String(cnpj),
           $id_endereco: id_endereco,
         };
-        const result = await db.runAsync(
+        const result = await this.db.runAsync(
           'UPDATE empresa SET nome_fantasia = $nome_fantasia, razao_social = $razao_social, cnpj = $cnpj, id_endereco = $id_endereco',
           data,
         );
@@ -101,8 +102,7 @@ export class Empresa {
 
   async findAll() {
     try {
-      const db = await this.db;
-      const result = await db.getAllAsync('SELECT * FROM empresa');
+      const result = await this.db.getAllAsync('SELECT * FROM empresa');
       if (result.length === 0) {
         throw new Error('Não foi encontrado nenhum registro!')
       }
@@ -110,13 +110,14 @@ export class Empresa {
     } catch (error) {
       console.error(error);
       throw error
+    } finally {
+      console.log('finalizou!')
     }
   }
 
   async findUniqueByCpf(cpf: string) : Promise<any> {
     try {
-      const db = await this.db;
-      const result = await db.getFirstAsync(
+      const result = await this.db.getFirstAsync(
         'SELECT * FROM empresa WHERE cpf LIKE $cpf',
         { $cpf: `%${cpf}%` },
       );
@@ -132,8 +133,7 @@ export class Empresa {
 
   async findAllByNomeCompleto(nome_completo: string) {
     try {
-      const db = await this.db;
-      const result = await db.getAllAsync(
+      const result = await this.db.getAllAsync(
         'SELECT * FROM empresa WHERE nome_completo LIKE $nome_completo',
         { $nome_completo: `%${nome_completo}%` },
       );
@@ -144,15 +144,12 @@ export class Empresa {
     } catch (error) {
       console.error(error);
       throw new Error('Erro ao buscar os registros tente novamente ' + String(error));
-    } finally {
-      await (await this.db).closeAsync();
     }
   }
 
   async findAllByNomeFantasia(nome_fantasia: string) {
     try {
-      const db = await this.db;
-      const result = await db.getAllAsync(
+      const result = await this.db.getAllAsync(
         'SELECT * FROM empresa WHERE nome_fantasia LIKE $nome_fantasia',
         { $nome_fantasia: `%${nome_fantasia}%` },
       );
@@ -161,7 +158,6 @@ export class Empresa {
       }
       return result;
     } catch (error) {
-      
       console.error("o que deu errado: ",(error as Error).message);
       throw new Error((error as Error).message);
     }
@@ -169,8 +165,7 @@ export class Empresa {
 
   async findAllByRazaoSocial(razao_social: string) {
     try {
-      const db = await this.db;
-      const result = await db.getAllAsync(
+      const result = await this.db.getAllAsync(
         'SELECT * FROM empresa WHERE razao_social = $razao_social',
         { $razao_social: `%${razao_social}%` },
       );
@@ -186,8 +181,7 @@ export class Empresa {
 
   async findUniqueByCnpj(cnpj: string) {
     try {
-      const db = await this.db;
-      const result = await db.getFirstAsync(
+      const result = await this.db.getFirstAsync(
         'SELECT * FROM empresa WHERE cnpj LIKE $cnpj',
         { $cnpj: `%${cnpj}%` },
       );
@@ -203,8 +197,7 @@ export class Empresa {
 
   async delete(id: number) {
     try {
-      const db = await this.db;
-      const result = await db.runAsync(
+      const result = await this.db.runAsync(
         'DELETE * FROM endereco WHERE id = $id',
         { $id: id },
       );

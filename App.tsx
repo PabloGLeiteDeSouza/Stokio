@@ -4,6 +4,7 @@ import React from 'react'
 import * as SplashScreen from 'expo-splash-screen'
 import * as FileSystem from 'expo-file-system';
 import { Asset } from 'expo-asset';
+import { SQLiteProvider } from 'expo-sqlite';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -28,7 +29,9 @@ export default function App() {
 
   return (
     <ThemeProviderApp>
-      <Application />
+      <SQLiteProvider databaseName='stock.db' >
+        <Application />
+      </SQLiteProvider>
     </ThemeProviderApp>
   );
 }

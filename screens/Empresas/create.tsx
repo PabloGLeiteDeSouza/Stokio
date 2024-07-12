@@ -63,19 +63,27 @@ import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useThemeApp } from '$providers/theme';
 import { CalendarDaysIcon } from '@gluestack-ui/themed';
 import { ButtonIcon } from '@gluestack-ui/themed';
-import { formatDateString } from 'utils';
+import {
+  formatDateString,
+  verificarAtributosObjeto,
+  verificarArray,
+} from 'utils';
 import Estados from '$databases/Estados.json';
 import { RootStackParamList } from '$types/index';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { Formik } from 'formik';
-import { Alert, FlatListComponent } from 'react-native';
+import { Alert, FlatListComponent, GestureResponderEvent } from 'react-native';
 import * as Yup from 'yup';
 import { ValidateForms } from '../../constants/validations';
 import { FA6Style } from '@expo/vector-icons/build/FontAwesome6';
 import { MaskedTextInput, mask } from 'react-native-mask-text';
-import { Endereco } from '../../classes/endereco';
-import { Empresa } from '../../classes/empresa';
+import { Endereco } from '$classes/endereco';
+import { Empresa } from '$classes/empresa';
+import { View } from '@gluestack-ui/themed';
+import { Email } from '$classes/email';
+import { Telefone } from '$classes/telefone';
+import { useSQLiteContext } from 'expo-sqlite';
 type CadastrarEmpresasScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   'cadastrar-empresas'
@@ -89,29 +97,29 @@ interface CadastrarEmpresasScreenProps {
   route?: CadastrarEmpresasScreenRouteProp;
 }
 const validator = Yup.object().shape({
-  tipo_de_empresa: Yup.string().required(),
-  nome_completo: Yup.string().when('tipo_de_empresa', {
-    is: (value: string) => value === 'pf',
+  tipo_empresa: Yup.string().required(),
+  nome_completo: Yup.string().when('tipo_empresa', {
+    is: 'pf',
     then: (yup) => yup.required(ValidateForms.required),
   }),
-  data_de_nascimento: Yup.date().when('tipo_de_empresa', {
-    is: (value: string) => value === 'pf',
+  data_de_nascimento: Yup.string().when('tipo_empresa', {
+    is: 'pf',
     then: (yup) => yup.required(ValidateForms.required),
   }),
-  cpf: Yup.string().when('tipo_de_empresa', {
-    is: (value: string) => value === 'pf',
+  cpf: Yup.string().when('tipo_empresa', {
+    is: 'pf',
     then: (yup) => yup.required(ValidateForms.required),
   }),
-  nome_fantasia: Yup.string().when('tipo_de_empresa', {
-    is: (value: string) => value === 'pj',
+  nome_fantasia: Yup.string().when('tipo_empresa', {
+    is: 'pj',
     then: (yup) => yup.required(ValidateForms.required),
   }),
-  razao_social: Yup.string().when('tipo_de_empresa', {
-    is: (value: string) => value === 'pj',
+  razao_social: Yup.string().when('tipo_empresa', {
+    is: 'pj',
     then: (yup) => yup.required(ValidateForms.required),
   }),
-  cnpj: Yup.string().when('tipo_de_empresa', {
-    is: (value: string) => value === 'pj',
+  cnpj: Yup.string().when('tipo_empresa', {
+    is: 'pj',
     then: (yup) => yup.required(ValidateForms.required),
   }),
   cep: Yup.string().required(ValidateForms.required),
@@ -122,15 +130,17 @@ const validator = Yup.object().shape({
   bairro: Yup.string().required(ValidateForms.required),
   cidade: Yup.string().required(ValidateForms.required),
   uf: Yup.string().required(ValidateForms.required),
-  emails: Yup.array()
-    .of(Yup.string().email(ValidateForms.email))
-    .required(ValidateForms.required),
+  emails: Yup.array().of(
+    Yup.string().email(ValidateForms.email).required(ValidateForms.required),
+  ),
   telefones: Yup.array()
     .of(
-      Yup.string().matches(
-        /^(\+\d{1,3} )?\(\d{2}\) \d{4,5}-\d{4}$/,
-        ValidateForms.phone_number,
-      ),
+      Yup.string()
+        .matches(
+          /^(\+\d{1,3} )?\(\d{2}\) \d{4,5}-\d{4}$/,
+          ValidateForms.phone_number,
+        )
+        .required(ValidateForms.required),
     )
     .required(ValidateForms.required),
 });
@@ -138,9 +148,9 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
   navigation,
   route,
 }) => {
-  const [date, setDate] = React.useState<Date>(new Date());
-  const [tipoEmpresa, setTipoEmpresa] = React.useState<'pj' | 'pf'>('pj');
+  const db = useSQLiteContext();
   const { theme } = useThemeApp();
+  const [nomeEstado, setNomeEstado] = React.useState('');
   const [isAllDisabled, setIsAllDisabled] = React.useState({
     tipo_empresa: false,
     nome_completo: false,
@@ -186,34 +196,112 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
             telefones: [''],
           }}
           onSubmit={async (values) => {
-            if (values.tipo_empresa === 'pf') {
-              const data_pf = {
-                nome_completo: values.nome_completo,
-                cpf: values.cpf,
-                data_de_nascimento: values.data_de_nascimento,
-              };
-
-              const data_end = {
-                cep: values.cep,
-                rua: values.logradouro,
-                numero: Number(values.numero),
-                complemento: values.complemento,
-                bairro: values.bairro,
-                cidade: values.cidade,
-                UF: values.uf,
-              };
-              const { emails, telefones } = values;
-              const result_end = await new Endereco().create(data_end);
-              const id_pf = new Empresa().create({id_endereco: result_end.id, ...data_pf })
-            } else {
+            try {
+              if (values.tipo_empresa === 'pf') {
+                const data_pf = {
+                  nome_completo: values.nome_completo,
+                  cpf: values.cpf,
+                  data_de_nascimento: values.data_de_nascimento,
+                };
+                const data_end = {
+                  cep: values.cep,
+                  rua: values.logradouro,
+                  numero: Number(values.numero),
+                  complemento: values.complemento,
+                  bairro: values.bairro,
+                  cidade: values.cidade,
+                  UF: values.uf,
+                };
+                const { emails, telefones } = values;
+                const result_end = await new Endereco(db).create(data_end);
+                console.log('endereço', 'pass')
+                const result_pf = await new Empresa(db).create({
+                  id_endereco: result_end.id,
+                  ...data_pf,
+                });
+                emails.map(async (value: string) => {
+                  try {
+                    await new Email(db).create({
+                      email: value,
+                      id_empresa: result_pf.id,
+                    });
+                  } catch (error) {
+                    throw error;
+                  }
+                });
+                telefones.map(async (value: string) => {
+                  try {
+                    await new Telefone(db).create({
+                      telefone: value,
+                      id_empresa: result_pf.id,
+                    });
+                  } catch (error) {
+                    throw error;
+                  }
+                });
+                navigation?.navigate('listar-empresas');
+              } else {
+                const data_pj = {
+                  nome_fantasia: values.nome_fantasia,
+                  razao_social: values.razao_social,
+                  cnpj: values.cnpj,
+                };
+                if (!verificarAtributosObjeto(data_pj)) {
+                  throw new Error('Ainda Existem atributos vazios!');
+                }
+                const data_end = {
+                  cep: values.cep,
+                  rua: values.logradouro,
+                  numero: Number(values.numero),
+                  complemento: values.complemento,
+                  bairro: values.bairro,
+                  cidade: values.cidade,
+                  UF: values.uf,
+                };
+                if (!verificarAtributosObjeto(data_end)) {
+                  throw new Error('Ainda Existem atributos vazios!');
+                }
+                const { emails, telefones } = values;
+                if (!verificarArray(emails) || !verificarArray(telefones)) {
+                  throw new Error('Ainda Existem atributos vazios!');
+                }
+                const result_end = await new Endereco().create(data_end);
+                const result_pj = await new Empresa().create({
+                  id_endereco: result_end.id,
+                  ...data_pj,
+                });
+                emails.map(async (value: string) => {
+                  try {
+                    await new Email().create({
+                      email: value,
+                      id_empresa: result_pj.id,
+                    });
+                  } catch (error) {
+                    throw error;
+                  }
+                });
+                telefones.map(async (value: string) => {
+                  try {
+                    await new Telefone().create({
+                      telefone: value,
+                      id_empresa: result_pj.id,
+                    });
+                  } catch (error) {
+                    throw error;
+                  }
+                });
+                navigation?.navigate('listar-empresas');
+              }
+            } catch (error) {
+              Alert.alert('erro', (error as Error).message);
             }
           }}
         >
-          {({ values, errors, handleChange, setFieldValue }) => {
+          {({ values, errors, handleChange, setFieldValue, handleSubmit }) => {
             const busca_cep = async (cep: String) => {
               try {
                 const result = await fetch(
-                  `https://viacep.com.br/ws/${cep}/json`,
+                  `https://viacep.com.br/ws/${cep.replace(/[^a-zA-Z0-9 ]/g, '')}/json`,
                 );
                 if (!result.ok) {
                   throw new Error(
@@ -226,6 +314,8 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                 setFieldValue('bairro', data.bairro);
                 setFieldValue('cidade', data.localidade);
                 setFieldValue('uf', data.uf);
+                const nome = Estados.find((est) => est.sigla == data.uf)?.nome;
+                setNomeEstado(nome ? nome : data.uf);
                 console.log(data);
               } catch (error) {
                 Alert.alert('Erro', (error as Error).message);
@@ -244,9 +334,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                   </FormControlLabel>
                   <Select
                     defaultValue="Empresa Pessoa Juridica"
-                    onValueChange={(value) =>
-                      setTipoEmpresa(value as 'pf' | 'pj')
-                    }
+                    onValueChange={handleChange('tipo_empresa')}
                     isInvalid={false}
                     isDisabled={false}
                   >
@@ -263,12 +351,12 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                         <SelectItem
                           label="Empresa Pessoa Juridica"
                           value="pj"
-                          isPressed={tipoEmpresa === 'pj'}
+                          isPressed={values.tipo_empresa === 'pj'}
                         />
                         <SelectItem
                           label="Empresa Pessoa Física (Autonomo)"
                           value="pf"
-                          isPressed={tipoEmpresa === 'pf'}
+                          isPressed={values.tipo_empresa === 'pf'}
                         />
                       </SelectContent>
                     </SelectPortal>
@@ -286,7 +374,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                     </FormControlErrorText>
                   </FormControlError>
                 </FormControl>
-                {tipoEmpresa === 'pj' ? (
+                {values.tipo_empresa === 'pj' ? (
                   <>
                     <FormControl
                       isInvalid={errors.nome_fantasia ? true : false}
@@ -322,7 +410,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                       </FormControlError>
                     </FormControl>
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={errors.nome_fantasia ? true : false}
                       size={'md'}
                       isDisabled={isAllDisabled.razao_social}
                       isRequired={true}
@@ -355,7 +443,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                       </FormControlError>
                     </FormControl>
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={errors.cnpj ? true : false}
                       size={'md'}
                       isDisabled={isAllDisabled.cnpj}
                       isRequired={true}
@@ -366,7 +454,12 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                       <Input>
                         <InputField
                           value={values.cnpj}
-                          onChangeText={(text) => setFieldValue('cnpj', mask(text, "99.999.999/9999-99"))}
+                          onChangeText={(text) =>
+                            setFieldValue(
+                              'cnpj',
+                              mask(text, '99.999.999/9999-99'),
+                            )
+                          }
                           keyboardType="number-pad"
                           type="text"
                           placeholder="Cnpj"
@@ -423,7 +516,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                       </FormControlError>
                     </FormControl>
                     <FormControl
-                      isInvalid={errors.data_de_nascimento ? true : false}
+                      isInvalid={errors.cpf ? true : false}
                       size={'md'}
                       isDisabled={isAllDisabled.cpf}
                       isRequired={true}
@@ -435,7 +528,9 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                         <InputField
                           keyboardType="number-pad"
                           value={values.cpf}
-                          onChangeText={(text) => setFieldValue('cpf', mask(text, "999.999.999-99"))}
+                          onChangeText={(text) =>
+                            setFieldValue('cpf', mask(text, '999.999.999-99'))
+                          }
                           type="text"
                           placeholder="CPF"
                         />
@@ -455,7 +550,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                       </FormControlError>
                     </FormControl>
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={errors.data_de_nascimento ? true : false}
                       size={'md'}
                       isDisabled={isAllDisabled.data_de_nascimento}
                       isRequired={true}
@@ -499,7 +594,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          {String(errors.data_de_nascimento)}
+                          {errors.data_de_nascimento as string}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
@@ -516,7 +611,8 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                   </FormControlLabel>
                   <Input>
                     <InputField
-                      value={values.cep}
+                      value={mask(values.cep, '99.999-999')}
+                      keyboardType='number-pad'
                       type="text"
                       placeholder="ex: 12.123-321"
                       onChangeText={handleChange('cep')}
@@ -606,14 +702,13 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                   <FormControlLabel>
                     <FormControlLabelText>Complemento</FormControlLabelText>
                   </FormControlLabel>
-                  <Textarea size="lg">
+                  <View as={Textarea}>
                     <TextareaInput
                       value={values.complemento}
                       onChangeText={handleChange('complemento')}
                       placeholder="Informe o complemento do seu endereco aqui."
                     />
-                  </Textarea>
-
+                  </View>
                   <FormControlHelper>
                     <FormControlHelperText>
                       Informe o complemento do endereço.
@@ -691,8 +786,12 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                   <Select
                     isInvalid={false}
                     isDisabled={false}
-                    onValueChange={(value) => setFieldValue('estado', value)}
-                    selectedValue={values.uf}
+                    onValueChange={(value) => {
+                      const nome = Estados.find((est) => est.sigla == value)?.nome;
+                      setFieldValue('uf', value);
+                      setNomeEstado(nome ? nome : value);
+                    }}
+                    selectedValue={nomeEstado}
                   >
                     <SelectTrigger size={'lg'} variant={'outline'}>
                       <SelectInput placeholder="Select option" />
@@ -748,12 +847,12 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                         <Input>
                           <InputField
                             type="text"
-                            keyboardType='numeric'
+                            keyboardType="numeric"
                             value={value}
                             placeholder="ex: +55 99 99999-9999"
                             onChangeText={(text) => {
                               const valor = values.telefones;
-                              valor[i] = mask(text, "+55 (99) 99999-9999");
+                              valor[i] = mask(text, '+55 (99) 99999-9999');
                               setFieldValue('telefones', valor);
                             }}
                           />
@@ -768,7 +867,9 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                         <FormControlError>
                           <FormControlErrorIcon as={AlertCircleIcon} />
                           <FormControlErrorText>
-                            {errors.telefones && errors.telefones[i] ? errors.telefones[i] : null}
+                            {errors.telefones && errors.telefones[i]
+                              ? errors.telefones[i]
+                              : null}
                           </FormControlErrorText>
                         </FormControlError>
                       </FormControl>
@@ -776,18 +877,22 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                   );
                 })}
                 <Button
-                  action='positive'
-                  onPress={() => setFieldValue('telefones', [...values.telefones, ""])}
+                  action="positive"
+                  onPress={() =>
+                    setFieldValue('telefones', [...values.telefones, ''])
+                  }
                 >
                   <ButtonIcon as={AddIcon} />
                 </Button>
                 <Button
-                  action='negative'
+                  action="negative"
                   onPress={() => {
                     if (values.telefones.length > 1) {
-                      setFieldValue('telefones', [...values.telefones.slice(0, -1)])
+                      setFieldValue('telefones', [
+                        ...values.telefones.slice(0, -1),
+                      ]);
                     } else {
-                      Alert.alert("Erro", "Não há o que ser removido!")
+                      Alert.alert('Erro', 'Não há o que ser removido!');
                     }
                   }}
                 >
@@ -798,20 +903,24 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                     <>
                       <FormControl
                         key={i}
-                        isInvalid={errors.emails && errors.emails[i] ? true : false}
+                        isInvalid={
+                          errors.emails && errors.emails[i] ? true : false
+                        }
                         size={'md'}
                         isDisabled={false}
                         isRequired={true}
                       >
                         <FormControlLabel>
-                          <FormControlLabelText>E-mail {i+1}</FormControlLabelText>
+                          <FormControlLabelText>
+                            E-mail {i + 1}
+                          </FormControlLabelText>
                         </FormControlLabel>
                         <Input>
                           <InputField
                             type="text"
                             value={value}
                             placeholder="ex: teste@teste.com"
-                            onChangeText={(text) => { 
+                            onChangeText={(text) => {
                               const valor = values.emails;
                               valor[i] = text;
                               setFieldValue('emails', valor);
@@ -828,7 +937,9 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                         <FormControlError>
                           <FormControlErrorIcon as={AlertCircleIcon} />
                           <FormControlErrorText>
-                            {errors.emails && errors.emails[i] ? errors.emails[i] : null}
+                            {errors.emails && errors.emails[i]
+                              ? errors.emails[i]
+                              : null}
                           </FormControlErrorText>
                         </FormControlError>
                       </FormControl>
@@ -836,18 +947,20 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                   );
                 })}
                 <Button
-                  action='positive'
-                  onPress={() => setFieldValue('emails', [...values.emails, ""])}
+                  action="positive"
+                  onPress={() =>
+                    setFieldValue('emails', [...values.emails, ''])
+                  }
                 >
                   <ButtonIcon as={AddIcon} />
                 </Button>
                 <Button
-                  action='negative'
+                  action="negative"
                   onPress={() => {
                     if (values.emails.length > 1) {
-                      setFieldValue('emails', [...values.emails.slice(0, -1)])
+                      setFieldValue('emails', [...values.emails.slice(0, -1)]);
                     } else {
-                      Alert.alert("Erro", "Não há o que ser removido!")
+                      Alert.alert('Erro', 'Não há o que ser removido!');
                     }
                   }}
                 >
@@ -855,6 +968,11 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                 </Button>
                 <Box>
                   <Button
+                    onPress={
+                      handleSubmit as unknown as (
+                        event: GestureResponderEvent,
+                      ) => void
+                    }
                     $active-bgColor={
                       theme === 'dark' ? '$purple700' : '$purple500'
                     }

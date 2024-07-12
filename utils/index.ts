@@ -5,6 +5,32 @@ export const formatStringDate = (data: string) => {
     const ano = date.getFullYear().toString().padStart(4, '0');
     return `${dia+'/'+mes+'/'+ano}`;
 }
+export function verificarAtributosObjeto(obj: any) {
+    for (let key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            if (obj[key] === null || obj[key] === undefined || obj[key] === '') {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+export function verificarArray(array: Array<any>) {
+    // Verifica se o array está vazio
+    if (array.length === 0) {
+        return false;
+    }
+
+    // Verifica se algum valor no array é vazio, nulo ou indefinido
+    for (let i = 0; i < array.length; i++) {
+        if (array[i] === null || array[i] === undefined || array[i] === '') {
+            return false;
+        }
+    }
+
+    return true;
+}
 
 export const formatDateString = (data: Date) => {
     const dia = (data.getDate() + 1).toString().padStart(2, '0');
@@ -13,4 +39,4 @@ export const formatDateString = (data: Date) => {
     return `${dia}/${mes}/${ano}`;
 }
 
-export default { formatDateString, formatStringDate }
+export default { formatDateString, formatStringDate, verificarAtributosObjeto, verificarArray }

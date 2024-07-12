@@ -3,7 +3,12 @@ import { CreateProdutoDto } from './dto/create-produto.dto';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
 
 export class Produto {
-  private db = SQLite.openDatabaseAsync('stock.db');
+  
+  private db: SQLite.SQLiteDatabase;
+
+  constructor(db: SQLite.SQLiteDatabase){
+    this.db = db;
+  }
 
   async create(Produto: CreateProdutoDto) {
     const {

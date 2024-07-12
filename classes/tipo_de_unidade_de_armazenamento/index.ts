@@ -4,7 +4,11 @@ import * as SQLite from "expo-sqlite";
 
 export class TipoDeUnidadeDeArmazenamento {
     
-    private db = SQLite.openDatabaseAsync('stock.db');
+    private db: SQLite.SQLiteDatabase;
+
+    constructor(db: SQLite.SQLiteDatabase){
+      this.db = db;
+    }
 
     async create(tipo_de_unidade_de_armazenamento: CreateTipoDeUnidadeDeArmazenamento){
         try {

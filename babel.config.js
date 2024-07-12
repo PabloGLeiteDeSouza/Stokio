@@ -26,6 +26,7 @@ module.exports = function(api) {
             "$functions": "./functions",
             "$providers": "./providers",
             "$classes": "./classes",
+            "$constants": "./constants",
           },
         },
       ],

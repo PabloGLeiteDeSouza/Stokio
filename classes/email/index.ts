@@ -4,28 +4,30 @@ import { CreateEmailDto } from "./dto/create-email.dto";
 
 export class Email {
     
-    private db = SQLite.openDatabaseAsync('stock');
+    private db: SQLite.SQLiteDatabase;
+
+    constructor(db: SQLite.SQLiteDatabase){
+      this.db = db;
+    }
 
     async create(email: CreateEmailDto){
         try {
-            const db = await this.db;
-            const result = await db.runAsync('INSERT INTO email (email, id_empresa) VALUES ($email, $id_empresa)', { $email: email.email, $id_empresa: email.id_empresa })
+            const result = await this.db.runAsync('INSERT INTO email (email, id_empresa) VALUES ($email, $id_empresa)', { $email: email.email, $id_empresa: email.id_empresa })
             if (!result) {
-                return { error: true }
+                throw new Error('Não possível executar a inserção tente novamente!')
             }
             return { ...email, id: result.lastInsertRowId }
         } catch (error) {
             console.error(error);
-            return { error: true }
+            throw error;
         }
     }
 
     async update(id: number, email: UpdateEmailDto){
         try {
-            const db = await this.db;
-            const result = await db.runAsync('UPDATE email SET email = $email, id_pessoa = $id_pessoa WHERE id = $id', { $email: email.email, $id_empresa: email.id_empresa, $id: id });
+            const result = await this.db.runAsync('UPDATE email SET email = $email, id_pessoa = $id_pessoa WHERE id = $id', { $email: email.email, $id_empresa: email.id_empresa, $id: id });
             if (!result) {
-                return { error: true }
+                throw new Error('Não foi possível fazer a atualização!')
             }
             return { ...email, id }
         } catch (error) {
