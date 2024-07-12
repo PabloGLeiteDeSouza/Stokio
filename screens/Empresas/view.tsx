@@ -64,7 +64,7 @@ import LoadingScreen from '$components/LoadingScreen';
 import { useThemeApp } from '$providers/theme';
 import { RootStackParamList } from '$types/index';
 import { Box, FormControl, ScrollView } from '@gluestack-ui/themed';
-import { RouteProp } from '@react-navigation/native';
+import { RouteProp, useIsFocused } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { Alert } from 'react-native';
@@ -84,6 +84,7 @@ interface ListarEmpresasScreenProps {
   route?: ListarEmpresasScreenRouteProp;
 }
 const View: React.FC<ListarEmpresasScreenProps> = ({ navigation, route }) => {
+  const isFocused = useIsFocused();
   const db = useSQLiteContext();
   const [valorBusca, setValorBusca] = React.useState('');
   const [haveCompanys, setHaveCompanys] = React.useState(false);
@@ -95,13 +96,11 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation, route }) => {
   async function Start() {
     try {
       const empresas = await new Empresa(db).findAll();
-      console.log(empresas);
       setTodasEmpresas(empresas);
       setHaveCompanys(true);
       setIsStartingPage(false);
       return;
     } catch (error) {
-      console.error(error);
       setIsStartingPage(false);
       Alert.alert('Erro', String(error));
     }
@@ -138,6 +137,14 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation, route }) => {
       Start();
     }, 1);
   }, []);
+
+  React.useEffect(() => {
+    setIsStartingPage(true)
+    setTimeout(() => {
+      Start();
+    }, 1);
+  }, [isFocused])
+
   if (isStartingPage) {
     return <LoadingScreen />;
   }

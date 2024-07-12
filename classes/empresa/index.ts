@@ -110,8 +110,6 @@ export class Empresa {
     } catch (error) {
       console.error(error);
       throw error
-    } finally {
-      console.log('finalizou!')
     }
   }
 

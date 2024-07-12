@@ -14,10 +14,12 @@ export default function App() {
 
   React.useEffect(() => {
     async function Start() {
-      await FileSystem.downloadAsync(
-        Asset.fromModule(require('$assets/databases/stock.db')).uri,
-        `${FileSystem.documentDirectory}SQLite/stock.db`
-      );
+      if((await FileSystem.getInfoAsync(FileSystem.documentDirectory+"SQLite/stock.db")).exists){
+        await FileSystem.downloadAsync(
+          Asset.fromModule(require('$assets/databases/stock.db')).uri,
+          `${FileSystem.documentDirectory}SQLite/stock.db`
+        );
+      }
       setIsLoading(false)
     }
     Start();

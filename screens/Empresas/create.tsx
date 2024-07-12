@@ -330,18 +330,24 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                 console.log(data);
                 setIsAllDisabled({
                   ...isAllDisabled,
+                  logradouro: true,
                   complemento: false,
+                  bairro: true,
+                  uf: true,
+                  cidade: true,
                 })
               } catch (error) {
-                setIsAllDisabled({
-                  ...isAllDisabled,
-                  logradouro: false,
-                  complemento: false,
-                  bairro: false,
-                  uf: false,
-                  cidade: false,
-                })
-                Alert.alert('Erro', (error as Error).message);
+                if(error){
+                  setIsAllDisabled({
+                    ...isAllDisabled,
+                    logradouro: false,
+                    complemento: false,
+                    bairro: false,
+                    uf: false,
+                    cidade: false,
+                  })
+                  Alert.alert('Erro', (error as Error).message);
+                }
               }
             };
 
