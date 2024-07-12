@@ -3,7 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "utils/*": ["./utils/*"],
+      "utils": ["./utils"],
       "errors-application/*": ["./constants/erros/*"],
       "$components/*": ["./components/*"],
       "$screens/*": ["./screens/*"],

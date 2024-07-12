@@ -265,14 +265,14 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                 if (!verificarArray(emails) || !verificarArray(telefones)) {
                   throw new Error('Ainda Existem atributos vazios!');
                 }
-                const result_end = await new Endereco().create(data_end);
-                const result_pj = await new Empresa().create({
+                const result_end = await new Endereco(db).create(data_end);
+                const result_pj = await new Empresa(db).create({
                   id_endereco: result_end.id,
                   ...data_pj,
                 });
                 emails.map(async (value: string) => {
                   try {
-                    await new Email().create({
+                    await new Email(db).create({
                       email: value,
                       id_empresa: result_pj.id,
                     });
@@ -282,7 +282,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                 });
                 telefones.map(async (value: string) => {
                   try {
-                    await new Telefone().create({
+                    await new Telefone(db).create({
                       telefone: value,
                       id_empresa: result_pj.id,
                     });
