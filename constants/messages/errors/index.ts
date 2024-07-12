@@ -99,10 +99,25 @@ export const DBErros = {
             database: default_db_errors.delete
         },
         find: {
+            all: {
+                database: default_db_errors.find
+            },
             byId: {
                 database: default_db_errors.find
             },
             byCep: {
+                database: default_db_errors.find
+            },
+            bylogradouro: {
+                database: default_db_errors.find
+            },
+            byBairro: {
+                database: default_db_errors.find
+            },
+            byCidade: {
+                database: default_db_errors.find
+            },
+            byEstado: {
                 database: default_db_errors.find
             },
         }

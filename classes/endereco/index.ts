@@ -1,6 +1,7 @@
 import * as SQLite from 'expo-sqlite';
 import { CreateEnderecoDto } from './dto/create-endereco.dto';
 import { UpdateEnderecoDto } from './dto/update-endereco.dto';
+import { DBErros } from 'messages-error';
 
 export class Endereco {
 
@@ -11,24 +12,21 @@ export class Endereco {
   }
 
     async create(endereco: CreateEnderecoDto){
-        const { rua, numero, cep, complemento, bairro, cidade, UF } = endereco;
+        const { logradouro, numero, cep, complemento, bairro, cidade, UF } = endereco;
         const data = { 
-          $rua: rua, 
+          $logradouro: logradouro, 
           $numero: numero, 
           $cep: cep, 
           $complemento: complemento, 
           $bairro: bairro, 
           $cidade: cidade, 
-          $UF: UF 
+          $UF: UF,
         }
         try {
-          const db = await this.db;
-          console.log("chegou", await db.execAsync('SELECT * from empresas'))
-            const result = await db.runAsync('INSERT INTO endereco (rua, numero, cep, complemento, bairro, cidade, UF) VALUES ($rua, $numero, $cep, $complemento, $bairro, $cidade, $UF)', data);
+            const result = await this.db.runAsync('INSERT INTO endereco (logradouro, numero, cep, complemento, bairro, cidade, UF) VALUES ($logradouro, $numero, $cep, $complemento, $bairro, $cidade, $UF)', data);
             if (!result) {
-                throw new Error('Erro não foi possível executar a query')
+                throw new Error(DBErros.ErrorsEndereco.create.database)
             }
-            await db.closeAsync();
             return { ...endereco, id: result.lastInsertRowId, };
         } catch (error) {
             console.error(error);
@@ -37,9 +35,9 @@ export class Endereco {
     }
 
     async update(endereco: UpdateEnderecoDto){
-        const { rua, numero, cep, complemento, bairro, cidade, UF } = endereco;
+        const { logradouro, numero, cep, complemento, bairro, cidade, UF } = endereco;
         const data = { 
-            $rua: rua, 
+            $logradouro: logradouro, 
             $numero: numero, 
             $cep: cep, 
             $complemento: complemento, 
@@ -48,126 +46,109 @@ export class Endereco {
             $UF: UF 
         }
         try {
-            const db = await this.db;
-            const result = await db.runAsync('UPDATE SET rua = $rua, numero = $numero, cep = $cep, complemento = $complemento, bairro = $bairro, cidade = $cidade, UF = $UF', data);
+            const result = await this.db.runAsync('UPDATE SET logradouro = $logradouro, numero = $numero, cep = $cep, complemento = $complemento, bairro = $bairro, cidade = $cidade, UF = $UF', data);
             if (!result) {
-                return { error: true }
+                throw new Error(DBErros.ErrorsEndereco.update.database)
             }
-            await db.closeAsync();
             return { ...endereco, id: result.lastInsertRowId, };
         } catch (error) {
             console.error(error);
-            await (await this.db).closeAsync();
-            return { error: true }
+            throw error;
         }
     }
 
     async findAll() {
         try {
-          const db = await this.db;
-          const result = await db.getAllAsync(
+          const result = await this.db.getAllAsync(
             'SELECT * FROM endereco',
           );
           if (!result) {
-            return { error: true };
+            throw new Error(DBErros.ErrorsEndereco.find.all.database)
           }
-          await db.closeAsync();
           return result;
         } catch (error) {
           console.error(error);
-          await (await this.db).closeAsync();
-          return { error: true };
+          throw error;
         }
     }
 
     async findAllByCep(cep: string){
         try {
-            const db = await this.db;
-            const result = await db.getAllAsync(
+            const result = await this.db.getAllAsync(
               'SELECT * FROM endereco WHERE cep = $cep',
               { $cep: cep },
             );
             if (!result) {
-              return { error: true };
+              throw new Error(DBErros.ErrorsEndereco.find.byCep.database)
             }
-            await db.closeAsync();
             return result;
           } catch (error) {
             console.error(error);
-            await (await this.db).closeAsync();
-            return { error: true };
+            throw error;
           }
     }
 
-    async findAllByRua(rua: string){
+    async findAllByLogradouro(logradouro: string){
         try {
-            const db = await this.db;
-            const result = await db.getAllAsync(
-              'SELECT * FROM endereco WHERE rua = $rua',
-              { $rua: rua },
+            const result = this.db.getAllAsync(
+              'SELECT * FROM endereco WHERE logradouro = $logradouro',
+              { $logradouro: logradouro },
             );
             if (!result) {
-              return { error: true };
+              throw new Error(DBErros.ErrorsEndereco.find.bylogradouro.database)
             }
             return result;
           } catch (error) {
             console.error(error);
-            await (await this.db).closeAsync();
-            return { error: true };
+            throw error;
           }
     }
 
     async findAllByBairro(bairro: string){
         try {
-            const db = await this.db;
-            const result = await db.getAllAsync(
+            const result = await this.db.getAllAsync(
               'SELECT * FROM endereco WHERE bairro = $bairro',
               { $bairro: bairro },
             );
             if (!result) {
-              return { error: true };
+              throw new Error(DBErros.ErrorsEndereco.find.byBairro.database)
             }
             return result;
           } catch (error) {
             console.error(error);
-            await (await this.db).closeAsync();
-            return { error: true };
+            throw error;
           }
     }
 
     async findAllByCidade(cidade: string){
         try {
-            const db = await this.db;
-            const result = await db.getAllAsync(
+            const result = await this.db.getAllAsync(
               'SELECT * FROM endereco WHERE cidade = $cidade',
               { $cidade: cidade },
             );
             if (!result) {
-              return { error: true };
+              throw new Error(DBErros.ErrorsEndereco.find.byCidade.database)
             }
             return result;
           } catch (error) {
             console.error(error);
-            await (await this.db).closeAsync();
-            return { error: true };
+            throw error;
           }
     }
 
     async delete(id: number){
         try {
-            const db = await this.db;
-            const result = await db.runAsync(
+            const result = await this.db.runAsync(
             'DELETE * FROM endereco WHERE id = $id',
             { $id: id },
             );
             if (!result) {
-            return { error: true };
+              throw new Error(DBErros.ErrorsEndereco.delete.database)
             }
             return { sucess: true };
         } catch (error) {
             console.error(error);
-            await (await this.db).closeAsync();
-            return { error: true };
+            throw error
         }
     }
 

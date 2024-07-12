@@ -97,10 +97,25 @@ export type TypeDBErros = {
             database: string
         },
         find: {
+            all: {
+                database: string
+            },
             byId: {
                 database: string
             },
             byCep: {
+                database: string
+            },
+            bylogradouro: {
+                database: string
+            },
+            byBairro: {
+                database: string
+            },
+            byCidade: {
+                database: string
+            },
+            byEstado: {
                 database: string
             }
         }

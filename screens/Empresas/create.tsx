@@ -205,7 +205,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                 };
                 const data_end = {
                   cep: values.cep,
-                  rua: values.logradouro,
+                  logradouro: values.logradouro,
                   numero: Number(values.numero),
                   complemento: values.complemento,
                   bairro: values.bairro,
@@ -214,7 +214,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                 };
                 const { emails, telefones } = values;
                 const result_end = await new Endereco(db).create(data_end);
-                console.log('endereço', 'pass')
+                console.log('endereço', 'pass');
                 const result_pf = await new Empresa(db).create({
                   id_endereco: result_end.id,
                   ...data_pf,
@@ -251,7 +251,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                 }
                 const data_end = {
                   cep: values.cep,
-                  rua: values.logradouro,
+                  logradouro: values.logradouro,
                   numero: Number(values.numero),
                   complemento: values.complemento,
                   bairro: values.bairro,
@@ -299,9 +299,20 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
         >
           {({ values, errors, handleChange, setFieldValue, handleSubmit }) => {
             const busca_cep = async (cep: String) => {
+              setIsAllDisabled({
+                ...isAllDisabled,
+                logradouro: true,
+                complemento: true,
+                bairro: true,
+                uf: true,
+                cidade: true,
+              })
               try {
                 const result = await fetch(
-                  `https://viacep.com.br/ws/${cep.replace(/[^a-zA-Z0-9 ]/g, '')}/json`,
+                  `https://viacep.com.br/ws/${cep.replace(
+                    /[^a-zA-Z0-9 ]/g,
+                    '',
+                  )}/json`,
                 );
                 if (!result.ok) {
                   throw new Error(
@@ -317,10 +328,23 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                 const nome = Estados.find((est) => est.sigla == data.uf)?.nome;
                 setNomeEstado(nome ? nome : data.uf);
                 console.log(data);
+                setIsAllDisabled({
+                  ...isAllDisabled,
+                  complemento: false,
+                })
               } catch (error) {
+                setIsAllDisabled({
+                  ...isAllDisabled,
+                  logradouro: false,
+                  complemento: false,
+                  bairro: false,
+                  uf: false,
+                  cidade: false,
+                })
                 Alert.alert('Erro', (error as Error).message);
               }
             };
+
             return (
               <>
                 <FormControl
@@ -612,7 +636,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                   <Input>
                     <InputField
                       value={mask(values.cep, '99.999-999')}
-                      keyboardType='number-pad'
+                      keyboardType="number-pad"
                       type="text"
                       placeholder="ex: 12.123-321"
                       onChangeText={handleChange('cep')}
@@ -784,10 +808,12 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                     <FormControlLabelText>Estados</FormControlLabelText>
                   </FormControlLabel>
                   <Select
-                    isInvalid={false}
-                    isDisabled={false}
+                    isInvalid={errors.uf ? true : false}
+                    isDisabled={isAllDisabled.uf}
                     onValueChange={(value) => {
-                      const nome = Estados.find((est) => est.sigla == value)?.nome;
+                      const nome = Estados.find(
+                        (est) => est.sigla == value,
+                      )?.nome;
                       setFieldValue('uf', value);
                       setNomeEstado(nome ? nome : value);
                     }}
@@ -827,55 +853,51 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                     <FormControlErrorText>{errors.uf}</FormControlErrorText>
                   </FormControlError>
                 </FormControl>
-                {values.telefones.map((value, i) => {
-                  return (
-                    <>
-                      <FormControl
-                        key={i}
-                        isInvalid={
-                          errors.telefones && errors.telefones[i] ? true : false
-                        }
-                        size={'md'}
-                        isDisabled={false}
-                        isRequired={true}
-                      >
-                        <FormControlLabel>
-                          <FormControlLabelText>
-                            Telefone {i + 1}
-                          </FormControlLabelText>
-                        </FormControlLabel>
-                        <Input>
-                          <InputField
-                            type="text"
-                            keyboardType="numeric"
-                            value={value}
-                            placeholder="ex: +55 99 99999-9999"
-                            onChangeText={(text) => {
-                              const valor = values.telefones;
-                              valor[i] = mask(text, '+55 (99) 99999-9999');
-                              setFieldValue('telefones', valor);
-                            }}
-                          />
-                        </Input>
+                {values.telefones.map((value, i) => (
+                  <FormControl
+                    key={i}
+                    isInvalid={
+                      errors.telefones && errors.telefones[i] ? true : false
+                    }
+                    size={'md'}
+                    isDisabled={false}
+                    isRequired={true}
+                  >
+                    <FormControlLabel>
+                      <FormControlLabelText>
+                        Telefone {i + 1}
+                      </FormControlLabelText>
+                    </FormControlLabel>
+                    <Input>
+                      <InputField
+                        type="text"
+                        keyboardType="numeric"
+                        value={value}
+                        placeholder="ex: +55 99 99999-9999"
+                        onChangeText={(text) => {
+                          const valor = values.telefones;
+                          valor[i] = mask(text, '+55 (99) 99999-9999');
+                          setFieldValue('telefones', valor);
+                        }}
+                      />
+                    </Input>
 
-                        <FormControlHelper>
-                          <FormControlHelperText>
-                            Informe um telefone.
-                          </FormControlHelperText>
-                        </FormControlHelper>
+                    <FormControlHelper>
+                      <FormControlHelperText>
+                        Informe um telefone.
+                      </FormControlHelperText>
+                    </FormControlHelper>
 
-                        <FormControlError>
-                          <FormControlErrorIcon as={AlertCircleIcon} />
-                          <FormControlErrorText>
-                            {errors.telefones && errors.telefones[i]
-                              ? errors.telefones[i]
-                              : null}
-                          </FormControlErrorText>
-                        </FormControlError>
-                      </FormControl>
-                    </>
-                  );
-                })}
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        {errors.telefones && errors.telefones[i]
+                          ? errors.telefones[i]
+                          : null}
+                      </FormControlErrorText>
+                    </FormControlError>
+                  </FormControl>
+                ))}
                 <Button
                   action="positive"
                   onPress={() =>
@@ -898,54 +920,49 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                 >
                   <ButtonIcon as={RemoveIcon} />
                 </Button>
-                {values.emails.map((value, i) => {
-                  return (
-                    <>
-                      <FormControl
-                        key={i}
-                        isInvalid={
-                          errors.emails && errors.emails[i] ? true : false
-                        }
-                        size={'md'}
-                        isDisabled={false}
-                        isRequired={true}
-                      >
-                        <FormControlLabel>
-                          <FormControlLabelText>
-                            E-mail {i + 1}
-                          </FormControlLabelText>
-                        </FormControlLabel>
-                        <Input>
-                          <InputField
-                            type="text"
-                            value={value}
-                            placeholder="ex: teste@teste.com"
-                            onChangeText={(text) => {
-                              const valor = values.emails;
-                              valor[i] = text;
-                              setFieldValue('emails', valor);
-                            }}
-                          />
-                        </Input>
 
-                        <FormControlHelper>
-                          <FormControlHelperText>
-                            Informe Um E-mail.
-                          </FormControlHelperText>
-                        </FormControlHelper>
+                {values.emails.map((value, i) => (
+                  <FormControl
+                    key={i}
+                    isInvalid={errors.emails && errors.emails[i] ? true : false}
+                    size={'md'}
+                    isDisabled={false}
+                    isRequired={true}
+                  >
+                    <FormControlLabel>
+                      <FormControlLabelText>
+                        E-mail {i + 1}
+                      </FormControlLabelText>
+                    </FormControlLabel>
+                    <Input>
+                      <InputField
+                        type="text"
+                        value={value}
+                        placeholder="ex: teste@teste.com"
+                        onChangeText={(text) => {
+                          const valor = values.emails;
+                          valor[i] = text;
+                          setFieldValue('emails', valor);
+                        }}
+                      />
+                    </Input>
 
-                        <FormControlError>
-                          <FormControlErrorIcon as={AlertCircleIcon} />
-                          <FormControlErrorText>
-                            {errors.emails && errors.emails[i]
-                              ? errors.emails[i]
-                              : null}
-                          </FormControlErrorText>
-                        </FormControlError>
-                      </FormControl>
-                    </>
-                  );
-                })}
+                    <FormControlHelper>
+                      <FormControlHelperText>
+                        Informe Um E-mail.
+                      </FormControlHelperText>
+                    </FormControlHelper>
+
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        {errors.emails && errors.emails[i]
+                          ? errors.emails[i]
+                          : null}
+                      </FormControlErrorText>
+                    </FormControlError>
+                  </FormControl>
+                ))}
                 <Button
                   action="positive"
                   onPress={() =>

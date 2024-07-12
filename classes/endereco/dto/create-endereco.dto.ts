@@ -1,7 +1,7 @@
 export class CreateEnderecoDto {
 
     id?: number;
-    rua: string;
+    logradouro: string;
     numero: number;
     cep: string;
     complemento: string;
@@ -9,9 +9,9 @@ export class CreateEnderecoDto {
     cidade: string;
     UF: string;
 
-    constructor(rua: string, numero: number, cep: string, complemento: string, bairro: string, cidade: string, UF: string, id?: number) {
+    constructor(logradouro: string, numero: number, cep: string, complemento: string, bairro: string, cidade: string, UF: string, id?: number) {
         this.id = id;
-        this.rua = rua;
+        this.logradouro = logradouro;
         this.numero = numero;
         this.cep = cep;
         this.complemento = complemento;

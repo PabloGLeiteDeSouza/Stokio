@@ -91,7 +91,7 @@ const EmpresasScreens: React.FC = () => {
   return (
     <Stack.Navigator initialRouteName="listar-empresas">
       <Stack.Screen
-        name="listar-empreas"
+        name="listar-empresas"
         component={View}
         options={{
           title: 'Listar Empresas',
