@@ -5,6 +5,6 @@ export const FormCadastrarEmpresas = create;
 export const FormAtulizarEmpresas = update;
 
 export default {
-    FormCadastrarEmpresas: create,
-    FormAtulizarEmpresas: update
-}
+  FormCadastrarEmpresas: create,
+  FormAtulizarEmpresas: update,
+};

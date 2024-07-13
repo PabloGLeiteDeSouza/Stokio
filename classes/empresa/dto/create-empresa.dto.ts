@@ -8,12 +8,16 @@ export class CreateEmpresaDto {
   cnpj?: string;
   id_endereco: number;
 
-  constructor(id_endereco: number,   nome_completo?: string,
+  constructor(
+    id_endereco: number,
+    nome_completo?: string,
     data_de_nascimento?: Date,
     cpf?: string,
     nome_fantasia?: string,
     razao_social?: string,
-    cnpj?: string,id?: number) {
+    cnpj?: string,
+    id?: number,
+  ) {
     this.id_endereco = id_endereco;
     this.id = id;
     this.nome_completo = nome_completo;

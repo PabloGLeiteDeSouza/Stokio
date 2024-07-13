@@ -1,34 +1,36 @@
-// eslint.config.js
+// eslint.config.mjs
+import { FlatCompat } from '@eslint/eslintrc';
+import tsParser from '@typescript-eslint/parser';
+import tsPlugin from '@typescript-eslint/eslint-plugin';
+import prettierPlugin from 'eslint-plugin-prettier';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-import eslint_plugin from '@typescript-eslint/eslint-plugin';
-import eslint_recomended from '@typescript-eslint/recommended';
-import prettier_recomended from 'prettier/recommended';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const compat = new FlatCompat();
 
 export default [
-    
   {
-    plugins: {
-      '@typescript-eslint/recommended': eslint_recomended,
-      'prettier/recommended': prettier_recomended,
-    },
-  },
-  {
-    parser: '@typescript-eslint/parser',
-    parserOptions: {
+    files: ['**/*.ts', '**/*.tsx'],
+    ignores: ['.eslintrc.js'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
         project: 'tsconfig.json',
         tsconfigRootDir: __dirname,
         sourceType: 'module',
+      },
+      globals: {
+        node: true,
+        jest: true,
+      },
     },
-    files: ['**/*.js', '**/*.ts', '**/*.jsx', '**/*.tsx'],
     plugins: {
-      '@typescript-eslint/eslint-plugin': eslint_plugin,
+      '@typescript-eslint': tsPlugin,
+      prettier: prettierPlugin,
     },
-    root: true,
-    env: {
-      node: true,
-      jest: true,
-    },
-    ignorePatterns: ['.eslintrc.js', 'eslint.config.js'],
     rules: {
       '@typescript-eslint/interface-name-prefix': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',
@@ -36,4 +38,18 @@ export default [
       '@typescript-eslint/no-explicit-any': 'off',
     },
   },
+  {
+    files: ['**/*.js'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        node: true,
+        jest: true,
+      },
+    },
+  },
+  ...compat.extends('plugin:@typescript-eslint/recommended'),
+  ...compat.extends('plugin:prettier/recommended'),
+  ...compat.extends('prettier'),
 ];

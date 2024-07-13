@@ -82,7 +82,7 @@ import { Alert } from 'react-native';
 import { formatStringDate } from 'utils';
 import { AddIcon } from '@gluestack-ui/themed';
 import LoadingScreen from '$components/LoadingScreen';
-import View from "./view";
+import View from './view';
 import Create from './create';
 
 const Stack = createNativeStackNavigator();

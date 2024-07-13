@@ -1,13 +1,13 @@
-import { useThemeApp } from "$providers/theme";
-import { FontAwesome6 } from "@expo/vector-icons";
-import { Button, ButtonIcon } from "@gluestack-ui/themed";
+import { useThemeApp } from '$providers/theme';
+import { FontAwesome6 } from '@expo/vector-icons';
+import { Button, ButtonIcon } from '@gluestack-ui/themed';
 
 const ToggleTheme: React.FC = () => {
   const { theme, toggleTheme } = useThemeApp();
 
   return (
     <Button
-      $active-bgColor={theme === "dark" ? "$purple700" : "$purple500"}
+      $active-bgColor={theme === 'dark' ? '$purple700' : '$purple500'}
       rounded="$full"
       h={50}
       w={50}
@@ -20,7 +20,7 @@ const ToggleTheme: React.FC = () => {
     >
       <ButtonIcon
         as={(props: any) => (
-          <FontAwesome6 name={theme === "dark" ? "sun" : "moon"} {...props} />
+          <FontAwesome6 name={theme === 'dark' ? 'sun' : 'moon'} {...props} />
         )}
       />
     </Button>

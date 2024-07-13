@@ -1,9 +1,3 @@
-
-
-export const Update:React.FC = () => {
-    return(
-        <>
-            
-        </>
-    )
-}
+export const Update: React.FC = () => {
+  return <></>;
+};

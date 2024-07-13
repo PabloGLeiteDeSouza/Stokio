@@ -1,7 +1,5 @@
 const update: React.FC = () => {
-    return (
-        <></>
-    )
-}
+  return <></>;
+};
 
 export default update;

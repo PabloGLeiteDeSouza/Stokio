@@ -1,237 +1,236 @@
-import {default_db_errors} from './databse'
+import { default_db_errors } from './databse';
 
 export const DBErros = {
-    ErrorsEmail: {
-        update: {
-            database: default_db_errors.update
-        },
-        create: { 
-            database: default_db_errors.create
-        },
-        delete: {
-            database: default_db_errors.delete
-        },
-        find: {
-            all: {
-                database:default_db_errors.find
-            },
-            byEmail: {
-                database:default_db_errors.find
-            },
-            byId: {
-                database:default_db_errors.find
-            },
-            byIdEmpresa: {
-                database:default_db_errors.find
-            }
-        }
+  ErrorsEmail: {
+    update: {
+      database: default_db_errors.update,
     },
-    ErrorsCategoria: {
-        update: {
-            database: default_db_errors.update
-        },
-        create: { 
-            database: default_db_errors.create
-        },
-        delete: {
-            database: default_db_errors.delete
-        },
-        find: {
-            all: {
-                database:default_db_errors.find
-            },
-            byName: {
-                database:default_db_errors.find
-            },
-            byId: {
-                database:default_db_errors.find
-            },
-            byIdEmpresa: {
-                database:default_db_errors.find
-            }
-        }
+    create: {
+      database: default_db_errors.create,
     },
-    ErrorsEmpresa: {
-        update: {
-            database: default_db_errors.update
-        },
-        create: { 
-            database: default_db_errors.create
-        },
-        delete: {
-            database: default_db_errors.delete
-        },
-        find: {
-            all: {
-                database: default_db_errors.find
-            },
-            byNomeCompleto: {
-                database: default_db_errors.find
-            },
-            byCpf:{
-                database: default_db_errors.find
-            },
-            byNomeFantasia: {
-                database: default_db_errors.find
-            },
-            byRazaoSocial: {
-                database: default_db_errors.find
-            },
-            byCnpj: {
-                database: default_db_errors.find
-            },
-            byId: {
-                database: default_db_errors.find
-            },
-            byIdEmpresa: {
-                database: default_db_errors.find
-            }
-        }
+    delete: {
+      database: default_db_errors.delete,
     },
-    ErrorsEndereco: {
-        update: {
-            database: default_db_errors.update
-        },
-        create: { 
-            database: default_db_errors.create
-        },
-        delete: {
-            database: default_db_errors.delete
-        },
-        find: {
-            all: {
-                database: default_db_errors.find
-            },
-            byId: {
-                database: default_db_errors.find
-            },
-            byCep: {
-                database: default_db_errors.find
-            },
-            bylogradouro: {
-                database: default_db_errors.find
-            },
-            byBairro: {
-                database: default_db_errors.find
-            },
-            byCidade: {
-                database: default_db_errors.find
-            },
-            byEstado: {
-                database: default_db_errors.find
-            },
-        }
+    find: {
+      all: {
+        database: default_db_errors.find,
+      },
+      byEmail: {
+        database: default_db_errors.find,
+      },
+      byId: {
+        database: default_db_errors.find,
+      },
+      byIdEmpresa: {
+        database: default_db_errors.find,
+      },
     },
-    ErrorsMarca: {
-        update: {
-            database: default_db_errors.update
-        },
-        create: { 
-            database: default_db_errors.create
-        },
-        delete: {
-            database: default_db_errors.delete
-        },
-        find: {
-            byId: {
-                database: default_db_errors.find
-            },
-            byNome: {
-                database: default_db_errors.find
-            }
-        }
+  },
+  ErrorsCategoria: {
+    update: {
+      database: default_db_errors.update,
     },
-    ErrorsProduto: {
-        update: {
-            database: default_db_errors.update
-        },
-        create: { 
-            database: default_db_errors.create
-        },
-        delete: {
-            database: default_db_errors.delete
-        },
-        find: {
-            byId: {
-                database: default_db_errors.find
-            },
-            byNome: {
-                database: default_db_errors.find
-            },
-            byIdMarca: {
-                database: default_db_errors.find
-            },
-            byIdCategoria: {
-                database: default_db_errors.find
-            },
-            byCodigoDeBarras: {
-                database: default_db_errors.find
-            }
-        }
+    create: {
+      database: default_db_errors.create,
     },
-    ErrorsTelefone: {
-        update: {
-            database: default_db_errors.update
-        },
-        create: { 
-            database: default_db_errors.create
-        },
-        delete: {
-            database: default_db_errors.delete
-        },
-        find: {
-            byId: {
-                database: default_db_errors.find
-            },
-            byTelefone: {
-                database: default_db_errors.find
-            }
-        }
+    delete: {
+      database: default_db_errors.delete,
     },
-    ErrosTipoUA: {
-        update: {
-            database: default_db_errors.update
-        },
-        create: { 
-            database: default_db_errors.create
-        },
-        delete: {
-            database: default_db_errors.delete
-        },
-        find: {
-            byId: {
-                database: default_db_errors.find
-            },
-            byNome: {
-                database: default_db_errors.find
-            }
-        }
+    find: {
+      all: {
+        database: default_db_errors.find,
+      },
+      byName: {
+        database: default_db_errors.find,
+      },
+      byId: {
+        database: default_db_errors.find,
+      },
+      byIdEmpresa: {
+        database: default_db_errors.find,
+      },
     },
-    ErrorsUA: {
-        update: {
-            database: default_db_errors.update
-        },
-        create: { 
-            database: default_db_errors.create
-        },
-        delete: {
-            database: default_db_errors.delete
-        },
-        find: {
-            byId:{
-                database: default_db_errors.find
-            },
-            byNome: {
-                database: default_db_errors.find
-            },
-            byIdTipoUa: {
-                database: default_db_errors.find
-            }
-        }
-    }
-}
-
+  },
+  ErrorsEmpresa: {
+    update: {
+      database: default_db_errors.update,
+    },
+    create: {
+      database: default_db_errors.create,
+    },
+    delete: {
+      database: default_db_errors.delete,
+    },
+    find: {
+      all: {
+        database: default_db_errors.find,
+      },
+      byNomeCompleto: {
+        database: default_db_errors.find,
+      },
+      byCpf: {
+        database: default_db_errors.find,
+      },
+      byNomeFantasia: {
+        database: default_db_errors.find,
+      },
+      byRazaoSocial: {
+        database: default_db_errors.find,
+      },
+      byCnpj: {
+        database: default_db_errors.find,
+      },
+      byId: {
+        database: default_db_errors.find,
+      },
+      byIdEmpresa: {
+        database: default_db_errors.find,
+      },
+    },
+  },
+  ErrorsEndereco: {
+    update: {
+      database: default_db_errors.update,
+    },
+    create: {
+      database: default_db_errors.create,
+    },
+    delete: {
+      database: default_db_errors.delete,
+    },
+    find: {
+      all: {
+        database: default_db_errors.find,
+      },
+      byId: {
+        database: default_db_errors.find,
+      },
+      byCep: {
+        database: default_db_errors.find,
+      },
+      bylogradouro: {
+        database: default_db_errors.find,
+      },
+      byBairro: {
+        database: default_db_errors.find,
+      },
+      byCidade: {
+        database: default_db_errors.find,
+      },
+      byEstado: {
+        database: default_db_errors.find,
+      },
+    },
+  },
+  ErrorsMarca: {
+    update: {
+      database: default_db_errors.update,
+    },
+    create: {
+      database: default_db_errors.create,
+    },
+    delete: {
+      database: default_db_errors.delete,
+    },
+    find: {
+      byId: {
+        database: default_db_errors.find,
+      },
+      byNome: {
+        database: default_db_errors.find,
+      },
+    },
+  },
+  ErrorsProduto: {
+    update: {
+      database: default_db_errors.update,
+    },
+    create: {
+      database: default_db_errors.create,
+    },
+    delete: {
+      database: default_db_errors.delete,
+    },
+    find: {
+      byId: {
+        database: default_db_errors.find,
+      },
+      byNome: {
+        database: default_db_errors.find,
+      },
+      byIdMarca: {
+        database: default_db_errors.find,
+      },
+      byIdCategoria: {
+        database: default_db_errors.find,
+      },
+      byCodigoDeBarras: {
+        database: default_db_errors.find,
+      },
+    },
+  },
+  ErrorsTelefone: {
+    update: {
+      database: default_db_errors.update,
+    },
+    create: {
+      database: default_db_errors.create,
+    },
+    delete: {
+      database: default_db_errors.delete,
+    },
+    find: {
+      byId: {
+        database: default_db_errors.find,
+      },
+      byTelefone: {
+        database: default_db_errors.find,
+      },
+    },
+  },
+  ErrosTipoUA: {
+    update: {
+      database: default_db_errors.update,
+    },
+    create: {
+      database: default_db_errors.create,
+    },
+    delete: {
+      database: default_db_errors.delete,
+    },
+    find: {
+      byId: {
+        database: default_db_errors.find,
+      },
+      byNome: {
+        database: default_db_errors.find,
+      },
+    },
+  },
+  ErrorsUA: {
+    update: {
+      database: default_db_errors.update,
+    },
+    create: {
+      database: default_db_errors.create,
+    },
+    delete: {
+      database: default_db_errors.delete,
+    },
+    find: {
+      byId: {
+        database: default_db_errors.find,
+      },
+      byNome: {
+        database: default_db_errors.find,
+      },
+      byIdTipoUa: {
+        database: default_db_errors.find,
+      },
+    },
+  },
+};
 
 export default {
-    DBErros
-}
+  DBErros,
+};

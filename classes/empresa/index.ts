@@ -5,13 +5,12 @@ import { UpdateEmpresaDto } from './dto/update-empresa.dto';
 export class Empresa {
   private db: SQLite.SQLiteDatabase;
 
-  constructor(db: SQLite.SQLiteDatabase){
+  constructor(db: SQLite.SQLiteDatabase) {
     this.db = db;
   }
 
   async create(empresa: CreateEmpresaDto) {
     try {
-
       const {
         nome_completo,
         data_de_nascimento,
@@ -104,27 +103,27 @@ export class Empresa {
     try {
       const result = await this.db.getAllAsync('SELECT * FROM empresa');
       if (result.length === 0) {
-        throw new Error('Não foi encontrado nenhum registro!')
+        throw new Error('Não foi encontrado nenhum registro!');
       }
       return result;
     } catch (error) {
       console.error(error);
-      throw error
+      throw error;
     }
   }
 
-  async findUniqueByCpf(cpf: string) : Promise<any> {
+  async findUniqueByCpf(cpf: string): Promise<any> {
     try {
       const result = await this.db.getFirstAsync(
         'SELECT * FROM empresa WHERE cpf LIKE $cpf',
         { $cpf: `%${cpf}%` },
       );
       if (!result) {
-        throw new Error('Nenhum registro foi encontrado')
+        throw new Error('Nenhum registro foi encontrado');
       }
       return result;
     } catch (error) {
-      console.error("o que deu errado: ",(error as Error).message);
+      console.error('o que deu errado: ', (error as Error).message);
       throw new Error((error as Error).message);
     }
   }
@@ -136,12 +135,14 @@ export class Empresa {
         { $nome_completo: `%${nome_completo}%` },
       );
       if (result.length === 0) {
-        throw new Error('Não foram encontrados registros')
+        throw new Error('Não foram encontrados registros');
       }
       return result;
     } catch (error) {
       console.error(error);
-      throw new Error('Erro ao buscar os registros tente novamente ' + String(error));
+      throw new Error(
+        'Erro ao buscar os registros tente novamente ' + String(error),
+      );
     }
   }
 
@@ -152,11 +153,11 @@ export class Empresa {
         { $nome_fantasia: `%${nome_fantasia}%` },
       );
       if (result.length === 0) {
-        throw new Error('Não foram encontrados registros')
+        throw new Error('Não foram encontrados registros');
       }
       return result;
     } catch (error) {
-      console.error("o que deu errado: ",(error as Error).message);
+      console.error('o que deu errado: ', (error as Error).message);
       throw new Error((error as Error).message);
     }
   }
@@ -173,7 +174,9 @@ export class Empresa {
       return result;
     } catch (error) {
       console.error(error);
-      throw new Error('Erro ao buscar os registros tente novamente ' + String(error));
+      throw new Error(
+        'Erro ao buscar os registros tente novamente ' + String(error),
+      );
     }
   }
 

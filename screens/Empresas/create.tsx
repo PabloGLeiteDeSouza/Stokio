@@ -298,7 +298,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
           }}
         >
           {({ values, errors, handleChange, setFieldValue, handleSubmit }) => {
-            const busca_cep = async (cep: String) => {
+            const busca_cep = async (cep: string) => {
               setIsAllDisabled({
                 ...isAllDisabled,
                 logradouro: true,
@@ -306,7 +306,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                 bairro: true,
                 uf: true,
                 cidade: true,
-              })
+              });
               try {
                 const result = await fetch(
                   `https://viacep.com.br/ws/${cep.replace(
@@ -335,9 +335,9 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                   bairro: true,
                   uf: true,
                   cidade: true,
-                })
+                });
               } catch (error) {
-                if(error){
+                if (error) {
                   setIsAllDisabled({
                     ...isAllDisabled,
                     logradouro: false,
@@ -345,7 +345,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({
                     bairro: false,
                     uf: false,
                     cidade: false,
-                  })
+                  });
                   Alert.alert('Erro', (error as Error).message);
                 }
               }

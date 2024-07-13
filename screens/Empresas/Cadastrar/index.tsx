@@ -54,26 +54,25 @@ import {
   CheckIcon,
   AlertCircleIcon,
   ChevronDownIcon,
-} from "@gluestack-ui/themed";
-import { Box, ScrollView, Text } from "@gluestack-ui/themed";
-import React from "react";
+} from '@gluestack-ui/themed';
+import { Box, ScrollView, Text } from '@gluestack-ui/themed';
+import React from 'react';
 import RNDateTimePicker, {
   AndroidNativeProps,
   DateTimePickerAndroid,
   IOSNativeProps,
   WindowsNativeProps,
-} from "@react-native-community/datetimepicker";
-import { useThemeApp } from "$providers/theme";
-import { CalendarDaysIcon } from "@gluestack-ui/themed";
-import { ButtonIcon } from "@gluestack-ui/themed";
+} from '@react-native-community/datetimepicker';
+import { useThemeApp } from '$providers/theme';
+import { CalendarDaysIcon } from '@gluestack-ui/themed';
+import { ButtonIcon } from '@gluestack-ui/themed';
 import { formatDateString } from 'utils';
 
-
 const CadastrarEmpresasScreen: React.FC = () => {
-  let selectIconSize = "";
+  const selectIconSize = '';
   const [date, setDate] = React.useState<Date>(new Date());
-  const [tipoEmpresa, setTipoEmpresa] = React.useState<"pj" | "pf">("pj");
-  const {theme} = useThemeApp();
+  const [tipoEmpresa, setTipoEmpresa] = React.useState<'pj' | 'pf'>('pj');
+  const { theme } = useThemeApp();
 
   return (
     <ScrollView>
@@ -83,7 +82,7 @@ const CadastrarEmpresasScreen: React.FC = () => {
         </Text>
         <FormControl
           isInvalid={false}
-          size={"md"}
+          size={'md'}
           isDisabled={false}
           isRequired={true}
         >
@@ -92,13 +91,13 @@ const CadastrarEmpresasScreen: React.FC = () => {
           </FormControlLabel>
           <Select
             defaultValue="Empresa Pessoa Juridica"
-            onValueChange={(value) => setTipoEmpresa(value as "pf" | "pj")}
+            onValueChange={(value) => setTipoEmpresa(value as 'pf' | 'pj')}
             isInvalid={false}
             isDisabled={false}
           >
-            <SelectTrigger size={"md"} variant={"outline"}>
+            <SelectTrigger size={'md'} variant={'outline'}>
               <SelectInput placeholder="Select um tipo de empresa" />
-              <SelectIcon mr={"$3"} ml={0} as={ChevronDownIcon} />
+              <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
             </SelectTrigger>
             <SelectPortal>
               <SelectBackdrop />
@@ -129,7 +128,7 @@ const CadastrarEmpresasScreen: React.FC = () => {
         </FormControl>
         <FormControl
           isInvalid={false}
-          size={"md"}
+          size={'md'}
           isDisabled={false}
           isRequired={true}
         >
@@ -153,11 +152,11 @@ const CadastrarEmpresasScreen: React.FC = () => {
             </FormControlErrorText>
           </FormControlError>
         </FormControl>
-        {tipoEmpresa === "pj" ? (
+        {tipoEmpresa === 'pj' ? (
           <>
             <FormControl
               isInvalid={false}
-              size={"md"}
+              size={'md'}
               isDisabled={false}
               isRequired={true}
             >
@@ -183,7 +182,7 @@ const CadastrarEmpresasScreen: React.FC = () => {
             </FormControl>
             <FormControl
               isInvalid={false}
-              size={"md"}
+              size={'md'}
               isDisabled={false}
               isRequired={true}
             >
@@ -209,7 +208,7 @@ const CadastrarEmpresasScreen: React.FC = () => {
             </FormControl>
             <FormControl
               isInvalid={false}
-              size={"md"}
+              size={'md'}
               isDisabled={false}
               isRequired={true}
             >
@@ -217,7 +216,11 @@ const CadastrarEmpresasScreen: React.FC = () => {
                 <FormControlLabelText>Cnpj</FormControlLabelText>
               </FormControlLabel>
               <Input>
-                <InputField keyboardType="number-pad" type="text" placeholder="Cnpj" />
+                <InputField
+                  keyboardType="number-pad"
+                  type="text"
+                  placeholder="Cnpj"
+                />
               </Input>
 
               <FormControlHelper>
@@ -235,7 +238,7 @@ const CadastrarEmpresasScreen: React.FC = () => {
             </FormControl>
             <FormControl
               isInvalid={false}
-              size={"md"}
+              size={'md'}
               isDisabled={false}
               isRequired={true}
             >
@@ -261,7 +264,7 @@ const CadastrarEmpresasScreen: React.FC = () => {
             </FormControl>
             <FormControl
               isInvalid={false}
-              size={"md"}
+              size={'md'}
               isDisabled={false}
               isRequired={true}
             >
@@ -286,12 +289,11 @@ const CadastrarEmpresasScreen: React.FC = () => {
               </FormControlError>
             </FormControl>
           </>
-          
         ) : (
           <>
             <FormControl
               isInvalid={false}
-              size={"md"}
+              size={'md'}
               isDisabled={false}
               isRequired={true}
             >
@@ -299,10 +301,7 @@ const CadastrarEmpresasScreen: React.FC = () => {
                 <FormControlLabelText>CPF</FormControlLabelText>
               </FormControlLabel>
               <Input>
-                <InputField
-                  type="text"
-                  placeholder="CPF"
-                />
+                <InputField type="text" placeholder="CPF" />
               </Input>
 
               <FormControlHelper>
@@ -323,13 +322,14 @@ const CadastrarEmpresasScreen: React.FC = () => {
 
         <FormControl
           isInvalid={false}
-          size={"md"}
+          size={'md'}
           isDisabled={false}
           isRequired={true}
         >
           <FormControlLabel>
-            <FormControlLabelText>{tipoEmpresa === 'pj' ? "Data de criação" : "Data de nascimento"}</FormControlLabelText>
-
+            <FormControlLabelText>
+              {tipoEmpresa === 'pj' ? 'Data de criação' : 'Data de nascimento'}
+            </FormControlLabelText>
           </FormControlLabel>
           <Input>
             <InputField
@@ -339,25 +339,28 @@ const CadastrarEmpresasScreen: React.FC = () => {
               value={formatDateString(date)}
               placeholder="data"
             />
-            <Button onPress={() => {
-              DateTimePickerAndroid.open({
-                value: new Date(),
-                mode: "date",
-                onChange: (event, date) => {
-                  if (date) {
-                    setDate(date);
-                  }
-                },
-              });
-            }} >
+            <Button
+              onPress={() => {
+                DateTimePickerAndroid.open({
+                  value: new Date(),
+                  mode: 'date',
+                  onChange: (event, date) => {
+                    if (date) {
+                      setDate(date);
+                    }
+                  },
+                });
+              }}
+            >
               <ButtonIcon as={CalendarDaysIcon} />
             </Button>
           </Input>
 
           <FormControlHelper>
             <FormControlHelperText>
-              {tipoEmpresa === 'pj' ? "Deve ser informada a data de criação da empresa." : "Deve ser informada a data de nascimento."}
-              
+              {tipoEmpresa === 'pj'
+                ? 'Deve ser informada a data de criação da empresa.'
+                : 'Deve ser informada a data de nascimento.'}
             </FormControlHelperText>
           </FormControlHelper>
 
@@ -370,7 +373,7 @@ const CadastrarEmpresasScreen: React.FC = () => {
         </FormControl>
         <Box>
           <Button
-            $active-bgColor={theme === "dark" ? "$purple700" : "$purple500"}
+            $active-bgColor={theme === 'dark' ? '$purple700' : '$purple500'}
             $dark-backgroundColor="$purple500"
             $light-backgroundColor="$purple700"
           >

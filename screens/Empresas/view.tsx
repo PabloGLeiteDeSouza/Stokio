@@ -142,21 +142,17 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation, route }) => {
   }, []);
 
   React.useEffect(() => {
-    setIsStartingPage(true)
+    setIsStartingPage(true);
     setTimeout(() => {
       Start();
     }, 1);
-  }, [isFocused])
+  }, [isFocused]);
 
-  const deletarEmpresa = () => {
-
-  }
+  const deletarEmpresa = () => {};
 
   const editarEmpresa = (empresa: UpdateEmailDto) => {
-    navigation?.navigate('editar-empresa', { empresa: empresa })
-  }
-
-
+    navigation?.navigate('editar-empresa', { empresa: empresa });
+  };
 
   if (isStartingPage) {
     return <LoadingScreen />;
@@ -249,45 +245,48 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation, route }) => {
         return (
           <Box key={i} w="$full" alignItems="center" gap="$2.5" my="$2.5">
             {value.cnpj ? (
-              <HStack gap="$3" >
+              <HStack gap="$3">
                 <Box>
-                  <Text  >Nome Fantasia: {value.nome_fantasia}</Text>
+                  <Text>Nome Fantasia: {value.nome_fantasia}</Text>
                   <Text>Razão Social: {value.razao_social}</Text>
                   <Text>CNPJ: {value.cnpj}</Text>
                 </Box>
                 <Box>
-                  <Button
-                    onPress={editarEmpresa}
-                  >
+                  <Button onPress={editarEmpresa}>
                     <ButtonIcon as={EditIcon} />
                   </Button>
-                  <Button
-                    onPress={deletarEmpresa}
-                  >
+                  <Button onPress={deletarEmpresa}>
                     <ButtonIcon as={TrashIcon} />
                   </Button>
                 </Box>
               </HStack>
             ) : (
-              <HStack px="$3" py="$3" rounded="$md" $light-bgColor='$purple400' $dark-bgColor='$purple700' gap="$3" >
-                <VStack gap="$2" >
-                  <Text><Text fontWeight="$bold" >Nome Completo:</Text> {value.nome_completo}</Text>
+              <HStack
+                px="$3"
+                py="$3"
+                rounded="$md"
+                $light-bgColor="$purple400"
+                $dark-bgColor="$purple700"
+                gap="$3"
+              >
+                <VStack gap="$2">
                   <Text>
-                    <Text fontWeight="$bold" >
-                      Data de Nascimento:
-                    </Text>
-                    {' '}
+                    <Text fontWeight="$bold">Nome Completo:</Text>{' '}
+                    {value.nome_completo}
+                  </Text>
+                  <Text>
+                    <Text fontWeight="$bold">Data de Nascimento:</Text>{' '}
                     {formatStringDate(value.data_de_nascimento)}
                   </Text>
-                  <Text><Text fontWeight="$bold" >CPF:</Text> {value.cpf}</Text>
+                  <Text>
+                    <Text fontWeight="$bold">CPF:</Text> {value.cpf}
+                  </Text>
                 </VStack>
-                <VStack gap="$2" >
+                <VStack gap="$2">
                   <Button>
                     <ButtonIcon as={EditIcon} />
                   </Button>
-                  <Button
-                    action='negative'
-                  >
+                  <Button action="negative">
                     <ButtonIcon as={TrashIcon} />
                   </Button>
                 </VStack>

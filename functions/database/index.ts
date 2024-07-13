@@ -1,9 +1,9 @@
-import openDatabaseAsyncWithAsset from "./getdatabase";
-import readsqlfile from "./readsqlfile";
+import openDatabaseAsyncWithAsset from './getdatabase';
+import readsqlfile from './readsqlfile';
 
 const database = {
-    openDatabaseAsyncWithAsset,
-    readsqlfile,
+  openDatabaseAsyncWithAsset,
+  readsqlfile,
 };
 
 export default database;

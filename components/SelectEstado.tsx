@@ -19,19 +19,18 @@ import {
   AlertCircleIcon,
   FormControlErrorText,
   FormControlHelper,
-  FormControlErrorIcon
-} from "@gluestack-ui/themed";
-import Estados from "$databases/Estados.json";
-
+  FormControlErrorIcon,
+} from '@gluestack-ui/themed';
+import Estados from '$databases/Estados.json';
 
 const SelectEstado: React.FC = () => {
-  const size = "lg" as "sm" | "md" | "lg" | "xl" | undefined,
-    variant = "outline" as "outline" | "rounded" | "underlined";
+  const size = 'lg' as 'sm' | 'md' | 'lg' | 'xl' | undefined,
+    variant = 'outline' as 'outline' | 'rounded' | 'underlined';
 
   return (
     <FormControl
       isInvalid={false}
-      size={"md"}
+      size={'md'}
       isDisabled={false}
       isRequired={true}
     >
@@ -42,8 +41,8 @@ const SelectEstado: React.FC = () => {
         <SelectTrigger size={size} variant={variant}>
           <SelectInput placeholder="Select option" />
           <SelectIcon
-            mr={variant === "underlined" ? 0 : "$3"}
-            ml={variant === "underlined" ? "$3" : 0}
+            mr={variant === 'underlined' ? 0 : '$3'}
+            ml={variant === 'underlined' ? '$3' : 0}
             as={ChevronDownIcon}
           />
         </SelectTrigger>
