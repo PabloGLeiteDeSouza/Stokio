@@ -1,4 +1,5 @@
-import { default_db_errors } from './databse';
+import { db_error_messages, default_db_errors } from './databse';
+import { TypeDatabaseErrors } from './types';
 
 export const DBErros = {
   ErrorsEmail: {
@@ -231,6 +232,12 @@ export const DBErros = {
   },
 };
 
+export const database_errors = {
+  ...db_error_messages
+} as TypeDatabaseErrors
+
+
 export default {
   DBErros,
+  database_errors,
 };

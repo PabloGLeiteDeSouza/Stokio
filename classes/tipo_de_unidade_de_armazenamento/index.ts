@@ -19,13 +19,16 @@ export class TipoDeUnidadeDeArmazenamento {
         'INSERT INTO tipo_de_unidade_de_armazenamento (nome) VALUES ($nome)',
         { $nome: nome },
       );
+      if (!result) {
+        throw new Error()
+      }
       return {
         ...tipo_de_unidade_de_armazenamento,
         id: result.lastInsertRowId,
       };
     } catch (error) {
       console.log(error);
-      return { error: true };
+      throw error;
     }
   }
 

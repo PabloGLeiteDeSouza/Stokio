@@ -63,7 +63,7 @@ import {
 import { Empresa } from '$classes/empresa';
 import LoadingScreen from '$components/LoadingScreen';
 import { useThemeApp } from '$providers/theme';
-import { RootStackParamList } from '$types/index';
+import { RootStackParamList, UpdateEmpresaObject } from '$types/index';
 import { Box, FormControl, ScrollView } from '@gluestack-ui/themed';
 import { RouteProp, useIsFocused } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -73,7 +73,9 @@ import { formatStringDate } from '../../utils';
 import { Ionicons } from '@expo/vector-icons';
 import { useSQLiteContext } from 'expo-sqlite';
 import { EditIcon } from '@gluestack-ui/themed';
+import MessagesWarning, { operations } from 'messages-warnings';
 import { UpdateEmailDto } from '$classes/email/dto/update-email.dto';
+import { UpdateEmpresaDto } from '$classes/empresa/dto/update-empresa.dto';
 type ListarEmpresasScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   'listar-empresas'
@@ -91,7 +93,9 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation, route }) => {
   const db = useSQLiteContext();
   const [valorBusca, setValorBusca] = React.useState('');
   const [haveCompanys, setHaveCompanys] = React.useState(false);
-  const [todasEmpresas, setTodasEmpresas] = React.useState<Array<any>>([]);
+  const [todasEmpresas, setTodasEmpresas] = React.useState<
+    Array<UpdateEmpresaObject>
+  >([]);
   const { theme } = useThemeApp();
   const [buscarEmpresa, setBuscarEmpresa] = React.useState('');
   const [tipoDeBusca, setTipoDeBusca] = React.useState('');
@@ -99,35 +103,58 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation, route }) => {
   async function Start() {
     try {
       const empresas = await new Empresa(db).findAll();
-      setTodasEmpresas(empresas);
+      setTodasEmpresas(empresas as Array<UpdateEmpresaObject>);
       setHaveCompanys(true);
       setIsStartingPage(false);
       return;
     } catch (error) {
       setIsStartingPage(false);
-      Alert.alert('Erro', String(error));
+      setHaveCompanys(false);
+      setTodasEmpresas([]);
     }
   }
   async function busca_empresa(valor: string, tipo: string) {
     try {
       switch (tipo) {
         case 'nome_completo':
-          setTodasEmpresas(await new Empresa(db).findAllByNomeCompleto(valor));
+          setTodasEmpresas(
+            (await new Empresa(db).findAllByNomeCompleto(
+              valor,
+            )) as Array<UpdateEmpresaObject>,
+          );
           break;
         case 'cpf':
-          setTodasEmpresas([await new Empresa(db).findUniqueByCpf(valor)]);
+          setTodasEmpresas([
+            (await new Empresa(db).findUniqueByCpf(
+              valor,
+            )) as UpdateEmpresaObject,
+          ]);
           break;
         case 'nome_fantasia':
-          setTodasEmpresas(await new Empresa(db).findAllByNomeFantasia(valor));
+          setTodasEmpresas(
+            (await new Empresa(db).findAllByNomeFantasia(
+              valor,
+            )) as Array<UpdateEmpresaObject>,
+          );
           break;
         case 'razao_social':
-          setTodasEmpresas(await new Empresa(db).findAllByRazaoSocial(valor));
+          setTodasEmpresas(
+            (await new Empresa(db).findAllByRazaoSocial(
+              valor,
+            )) as Array<UpdateEmpresaObject>,
+          );
           break;
         case 'cnpj':
-          setTodasEmpresas([await new Empresa(db).findUniqueByCnpj(valor)]);
+          setTodasEmpresas([
+            (await new Empresa(db).findUniqueByCnpj(
+              valor,
+            )) as UpdateEmpresaObject,
+          ]);
           break;
         default:
-          setTodasEmpresas(await new Empresa(db).findAll());
+          setTodasEmpresas(
+            (await new Empresa(db).findAll()) as Array<UpdateEmpresaObject>,
+          );
           break;
       }
     } catch (error) {
@@ -148,10 +175,39 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation, route }) => {
     }, 1);
   }, [isFocused]);
 
-  const deletarEmpresa = () => {};
+  const deletarEmpresa = (empresa: UpdateEmpresaObject) => {
+    Alert.alert(
+      'Aviso',
+      MessagesWarning.delete_messages.empresa +
+        (empresa.cnpj ? empresa.nome_fantasia : empresa.nome_completo),
+      [{
+        text: "Confirmar",
+        onPress: async () => {
+          try {
+            await new Empresa(db).delete(empresa.id);
+            Alert.alert('Sucesso', 'Registro apagado com sucesso!')
+            setTimeout(() => {
+              Start();
+            }, 1);
+          } catch (error) {
+            console.error(error);
+            Alert.alert('Erro', (error as Error).message);
+          }
+        },
+      },
+      {
+        text: "Cancelar",
+        onPress: () => {
+          Alert.alert('Aviso', operations.delete_messages.empresa);
+          return;
+        },
+      }
+      ]
+    );
+  };
 
-  const editarEmpresa = (empresa: UpdateEmailDto) => {
-    navigation?.navigate('editar-empresa', { empresa: empresa });
+  const editarEmpresa = (empresa: UpdateEmpresaObject) => {
+    navigation?.navigate('editar-empresas', { empresa: empresa });
   };
 
   if (isStartingPage) {
@@ -245,20 +301,39 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation, route }) => {
         return (
           <Box key={i} w="$full" alignItems="center" gap="$2.5" my="$2.5">
             {value.cnpj ? (
-              <HStack gap="$3">
-                <Box>
-                  <Text>Nome Fantasia: {value.nome_fantasia}</Text>
-                  <Text>Razão Social: {value.razao_social}</Text>
-                  <Text>CNPJ: {value.cnpj}</Text>
-                </Box>
-                <Box>
-                  <Button onPress={editarEmpresa}>
+              <HStack 
+                px="$3"
+                py="$3"
+                rounded="$md"
+                $light-bgColor="$purple400"
+                $dark-bgColor="$purple700"
+                gap="$3"
+              >
+                <VStack gap="$2">
+                  <Text>
+                    <Text fontWeight="$bold">Nome Fantasia:</Text>{' '}
+                    {value.nome_fantasia}
+                  </Text>
+                  <Text>
+                    <Text fontWeight="$bold">Razão Social:</Text>{' '}
+                    {value.razao_social}
+                  </Text>
+                  <Text>
+                    <Text fontWeight="$bold">CNPJ:</Text>{' '}
+                    {value.cnpj}
+                  </Text>
+                </VStack>
+                <VStack gap="$2">
+                  <Button onPress={() => editarEmpresa(value)}>
                     <ButtonIcon as={EditIcon} />
                   </Button>
-                  <Button onPress={deletarEmpresa}>
+                  <Button 
+                    action='negative'
+                    onPress={() => deletarEmpresa(value)}
+                    >
                     <ButtonIcon as={TrashIcon} />
                   </Button>
-                </Box>
+                </VStack>
               </HStack>
             ) : (
               <HStack
@@ -276,17 +351,22 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation, route }) => {
                   </Text>
                   <Text>
                     <Text fontWeight="$bold">Data de Nascimento:</Text>{' '}
-                    {formatStringDate(value.data_de_nascimento)}
+                    {formatStringDate(String(value.data_de_nascimento))}
                   </Text>
                   <Text>
                     <Text fontWeight="$bold">CPF:</Text> {value.cpf}
                   </Text>
                 </VStack>
                 <VStack gap="$2">
-                  <Button>
+                  <Button 
+                    onPress={() => editarEmpresa(value)}
+                  >
                     <ButtonIcon as={EditIcon} />
                   </Button>
-                  <Button action="negative">
+                  <Button 
+                    action='negative' 
+                    onPress={() => deletarEmpresa(value)}
+                  >
                     <ButtonIcon as={TrashIcon} />
                   </Button>
                 </VStack>

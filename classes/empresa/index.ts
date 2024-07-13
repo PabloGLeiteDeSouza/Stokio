@@ -1,8 +1,10 @@
 import * as SQLite from 'expo-sqlite';
 import { CreateEmpresaDto } from './dto/create-empresa.dto';
 import { UpdateEmpresaDto } from './dto/update-empresa.dto';
+import { database_errors } from 'messages-error';
 
 export class Empresa {
+
   private db: SQLite.SQLiteDatabase;
 
   constructor(db: SQLite.SQLiteDatabase) {
@@ -31,6 +33,9 @@ export class Empresa {
           'INSERT INTO empresa (nome_fantasia, razao_social, cnpj, id_endereco) VALUES ($nome_fantasia, $razao_social, $cnpj, $id_endereco)',
           data,
         );
+        if (!result) {
+          throw new Error(database_errors.ErrorsEmpresa.create.database);
+        }
         return { ...empresa, id: result.lastInsertRowId };
       } else {
         const data = {
@@ -43,6 +48,9 @@ export class Empresa {
           'INSERT INTO empresa (nome_completo, data_de_nascimento, cpf, id_endereco) VALUES ($nome_completo, $data_de_nascimento, $cpf, $id_endereco)',
           data,
         );
+        if (!result) {
+          throw new Error(database_errors.ErrorsEmpresa.create.database);
+        }
         return { ...empresa, id: result.lastInsertRowId };
       }
     } catch (error) {
@@ -74,7 +82,7 @@ export class Empresa {
           data,
         );
         if (!result) {
-          return { error: true };
+          throw new Error(database_errors.ErrorsEmpresa.update.database);
         }
         return { ...empresa, id };
       } else {
@@ -89,13 +97,13 @@ export class Empresa {
           data,
         );
         if (!result) {
-          return { error: true };
+          throw new Error(database_errors.ErrorsEmpresa.update.database);
         }
         return { ...empresa, id };
       }
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 
@@ -103,11 +111,10 @@ export class Empresa {
     try {
       const result = await this.db.getAllAsync('SELECT * FROM empresa');
       if (result.length === 0) {
-        throw new Error('Não foi encontrado nenhum registro!');
+        throw new Error(database_errors.ErrorsEmpresa.find.all.database);
       }
       return result;
     } catch (error) {
-      console.error(error);
       throw error;
     }
   }
@@ -119,12 +126,12 @@ export class Empresa {
         { $cpf: `%${cpf}%` },
       );
       if (!result) {
-        throw new Error('Nenhum registro foi encontrado');
+        throw new Error(database_errors.ErrorsEmpresa.find.byCpf.database);
       }
       return result;
     } catch (error) {
       console.error('o que deu errado: ', (error as Error).message);
-      throw new Error((error as Error).message);
+      throw error;
     }
   }
 
@@ -135,14 +142,12 @@ export class Empresa {
         { $nome_completo: `%${nome_completo}%` },
       );
       if (result.length === 0) {
-        throw new Error('Não foram encontrados registros');
+        throw new Error(database_errors.ErrorsEmpresa.find.byNomeCompleto.database);
       }
       return result;
     } catch (error) {
       console.error(error);
-      throw new Error(
-        'Erro ao buscar os registros tente novamente ' + String(error),
-      );
+      throw error;
     }
   }
 
@@ -153,12 +158,12 @@ export class Empresa {
         { $nome_fantasia: `%${nome_fantasia}%` },
       );
       if (result.length === 0) {
-        throw new Error('Não foram encontrados registros');
+        throw new Error(database_errors.ErrorsEmpresa.find.byNomeFantasia.database);
       }
       return result;
     } catch (error) {
       console.error('o que deu errado: ', (error as Error).message);
-      throw new Error((error as Error).message);
+      throw error;
     }
   }
 
@@ -169,14 +174,12 @@ export class Empresa {
         { $razao_social: `%${razao_social}%` },
       );
       if (result.length === 0) {
-        throw new Error('Nao foram encontrados nenhum registro!');
+        throw new Error(database_errors.ErrorsEmpresa.find.byRazaoSocial.database);
       }
       return result;
     } catch (error) {
       console.error(error);
-      throw new Error(
-        'Erro ao buscar os registros tente novamente ' + String(error),
-      );
+      throw error;
     }
   }
 
@@ -187,28 +190,28 @@ export class Empresa {
         { $cnpj: `%${cnpj}%` },
       );
       if (!result) {
-        throw new Error('Nao foi encontrado nenhum registro!');
+        throw new Error(database_errors.ErrorsEmpresa.find.byCnpj.database);
       }
       return result;
     } catch (error) {
       console.error(error);
-      throw new Error('');
+      throw error;
     }
   }
 
   async delete(id: number) {
     try {
       const result = await this.db.runAsync(
-        'DELETE * FROM endereco WHERE id = $id',
+        'DELETE FROM empresa WHERE id = $id',
         { $id: id },
       );
       if (!result) {
-        throw new Error('');
+        throw new Error(database_errors.ErrorsEmpresa.delete.database);
       }
       return { sucess: true };
     } catch (error) {
       console.error(error);
-      throw new Error('');
+      throw error;
     }
   }
 }
