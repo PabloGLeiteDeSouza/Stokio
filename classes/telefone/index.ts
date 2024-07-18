@@ -51,7 +51,7 @@ export class Telefone {
       if (!result) {
         throw new Error(errors.database_errors.ErrorsTelefone.find.allbyIdEmpresa.database);
       }
-      return result;
+      return result as UpdateTelefoneDto[];
     } catch (error) {
       console.error(error);
       throw error;

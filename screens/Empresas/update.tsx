@@ -84,6 +84,7 @@ import { Email } from '$classes/email';
 import { Telefone } from '$classes/telefone';
 import { useSQLiteContext } from 'expo-sqlite';
 import LoadingScreen from '$components/LoadingScreen';
+import { UpdateEnderecoDto } from '$classes/endereco/dto/update-endereco.dto';
 
 const validator = Yup.object().shape({
   tipo_empresa: Yup.string().required(),
@@ -162,7 +163,7 @@ const Update: React.FC<AtualzarEmpresasScreenProps> = ({
     return null;
   }
 
-  const empresas_obj = route.params.empresa;
+  const empresas = route.params.empresa;
   const [isLoading, setIsLoading] = React.useState(true);
   const db = useSQLiteContext();
   const { theme } = useThemeApp();
@@ -187,16 +188,16 @@ const Update: React.FC<AtualzarEmpresasScreenProps> = ({
   });
 
   const [endereco, setEndereco] = React.useState({});
-  const [emails, setEmails] = React.useState([]);
-  const [telefones, setTelefones] = React.useState([]);
+  const [emails, setEmails] = React.useState<Array<any>>([]);
+  const [arrayTelefones, setArrayTelefones] = React.useState<Array<any>>([]);
 
   const loadingPage = async () => {
-    const endereco_obj = await new Endereco(db).findById(empresas_obj.id_endereco);
-    const emails_objs = await new Email(db).findFirstByIdEmpresa(empresas_obj.id);
-    const telefones_objs: UpdateTelefoneDto[] = await new Telefone(db).findByIdEmpresa(empresas_obj.id);
+    const endereco_obj = await new Endereco(db).findById(empresas.id_endereco);
+    const emails_objs = await new Email(db).findFirstByIdEmpresa(empresas.id);
+    const telefones_objs = await new Telefone(db).findByIdEmpresa(empresas.id);
     setEndereco(endereco_obj);
     setEmails([...emails_objs])
-    setTelefones([...telefones_objs])
+    setArrayTelefones([...telefones_objs])
   }
 
   React.useEffect(() => {
@@ -216,22 +217,11 @@ const Update: React.FC<AtualzarEmpresasScreenProps> = ({
         <Formik
           validationSchema={validator}
           initialValues={{
-            tipo_empresa: 'pj' as 'pj' | 'pf',
-            nome_completo: '',
-            cpf: '',
-            data_de_nascimento: new Date(),
-            nome_fantasia: '',
-            razao_social: '',
-            cnpj: '',
-            cep: '',
-            logradouro: '',
-            numero: '',
-            complemento: '',
-            bairro: '',
-            cidade: '',
-            uf: '',
-            emails: [''],
-            telefones: [''],
+            ...empresas,
+            ...endereco as UpdateEnderecoDto,
+            emails: emails,
+            telefones: arrayTelefones,
+            tipo_empresa: empresas.cnpj ? 'pj' : 'pf' as 'pj' | 'pf',
           }}
           onSubmit={async (values) => {
             try {
@@ -240,6 +230,7 @@ const Update: React.FC<AtualzarEmpresasScreenProps> = ({
                   nome_completo: values.nome_completo,
                   cpf: values.cpf,
                   data_de_nascimento: values.data_de_nascimento,
+                  id_endereco: values.id_endereco,
                 };
                 const data_end = {
                   cep: values.cep,
@@ -248,15 +239,11 @@ const Update: React.FC<AtualzarEmpresasScreenProps> = ({
                   complemento: values.complemento,
                   bairro: values.bairro,
                   cidade: values.cidade,
-                  UF: values.uf,
+                  UF: values.UF,
                 };
                 const { emails, telefones } = values;
-                const result_end = await new Endereco(db).create(data_end);
-                console.log('endereço', 'pass');
-                const result_pf = await new Empresa(db).create({
-                  id_endereco: result_end.id,
-                  ...data_pf,
-                });
+                const result_end = await new Endereco(db).update(values.id_endereco, data_end);
+                const result_pf = await new Empresa(db).update(values.id_endereco,{...data_pf,});
                 emails.map(async (value: string) => {
                   try {
                     await new Email(db).create({
