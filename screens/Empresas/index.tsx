@@ -84,6 +84,7 @@ import { AddIcon } from '@gluestack-ui/themed';
 import LoadingScreen from '$components/LoadingScreen';
 import View from './view';
 import Create from './create';
+import Update from './update';
 
 const Stack = createNativeStackNavigator();
 
@@ -102,6 +103,13 @@ const EmpresasScreens: React.FC = () => {
         component={Create}
         options={{
           title: 'Cadastrar Empresas',
+        }}
+      />
+      <Stack.Screen
+        name="editar-empresas"
+        component={Update}
+        options={{
+          title: 'Atualizar Empresas',
         }}
       />
     </Stack.Navigator>

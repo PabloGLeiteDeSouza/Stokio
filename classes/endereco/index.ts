@@ -77,6 +77,19 @@ export class Endereco {
     }
   }
 
+  async findById($id: number) {
+    try {
+      const result = await this.db.getFirstAsync('SELECT * FROM endereco WHERE id = $id', $id);
+      if (!result) {
+        throw new Error(DBErros.ErrorsEndereco.find.byId.database);
+      }
+      return result as UpdateEnderecoDto;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
   async findAllByCep(cep: string) {
     try {
       const result = await this.db.getAllAsync(

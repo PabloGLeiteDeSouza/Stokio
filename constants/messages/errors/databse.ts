@@ -183,7 +183,7 @@ export const db_error_messages = {
       database: 'Não foi possível deletar o telefone tente novamente!',
     },
     find: {
-      findAll: {
+      all: {
         database: 'Não foi possível encontrar nenhum telefone tente novamente!',
       },
       byId: {

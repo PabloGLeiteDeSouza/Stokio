@@ -58,17 +58,17 @@ export class Email {
     }
   }
 
-  async findFirstByIdEmpresa(id_empresa: number) {
+  async findFirstByIdEmpresa($id_empresa: number) {
     try {
-      const db = await this.db;
-      const result = await db.getFirstAsync(
+
+      const result = await this.db.getAllAsync(
         'SELECT * FROM email WHERE id_empresa = $id_empresa',
-        { $id_empresa: id_empresa },
+        { $id_empresa },
       );
       if (!result) {
         return { error: true };
       }
-      return result;
+      return result as UpdateEmailDto[];
     } catch (error) {
       console.error(error);
       return { error: true };

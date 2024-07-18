@@ -1,3 +1,4 @@
+import errors from 'messages-error';
 import { CreateTelefoneDto } from './dto/create-telefone.dto';
 import { UpdateTelefoneDto } from './dto/update-telefone.dto';
 import * as SQLite from 'expo-sqlite';
@@ -12,13 +13,12 @@ export class Telefone {
   async create(Telefone: CreateTelefoneDto) {
     try {
       const { telefone, id_empresa } = Telefone;
-      const db = await this.db;
-      const result = await db.runAsync(
+      const result = await this.db.runAsync(
         'INSERT INTO telefone (telefone, id_empresa) VALUES ($telefone, $id_empresa)',
         { $telefone: telefone, $id_empresa: id_empresa },
       );
       if (!result) {
-        throw new Error('Não foi possível realizar a inserção!');
+        throw new Error(errors.database_errors.ErrorsTelefone.create.database);
       }
       return { ...Telefone, id: result.lastInsertRowId };
     } catch (error) {
@@ -27,14 +27,13 @@ export class Telefone {
     }
   }
 
-  async findById(id: number) {
+  async findById($id: number) {
     try {
-      const db = await this.db;
-      const result = db.getFirstAsync('SELECT * FROM telefone WHERE id = $id', {
-        $id: id,
+      const result = this.db.getFirstAsync('SELECT * FROM telefone WHERE id = $id', {
+        $id,
       });
       if (!result) {
-        throw new Error('Não foi possível realizar a seleção!');
+        throw new Error(errors.database_errors.ErrorsTelefone.find.byId.database);
       }
       return result;
     } catch (error) {
@@ -43,15 +42,14 @@ export class Telefone {
     }
   }
 
-  async findByIdEmpresa(id_empresa: number) {
+  async findByIdEmpresa($id_empresa: number) {
     try {
-      const db = await this.db;
-      const result = await db.getFirstAsync(
+      const result = await this.db.getAllAsync(
         'SELECT * FROM telefone WHERE id_empresa = $id_empresa',
-        { $id_empresa: id_empresa },
+        { $id_empresa },
       );
       if (!result) {
-        throw new Error('Não foi possível realizar a seleção!');
+        throw new Error(errors.database_errors.ErrorsTelefone.find.allbyIdEmpresa.database);
       }
       return result;
     } catch (error) {
@@ -62,10 +60,9 @@ export class Telefone {
 
   async findAll() {
     try {
-      const db = await this.db;
-      const result = await db.getAllAsync('SELECT * FROM telefone');
+      const result = await this.db.getAllAsync('SELECT * FROM telefone');
       if (!result) {
-        throw new Error('Não foi possível realizar a seleção!');
+        throw new Error(errors.database_errors.ErrorsTelefone.find.all.database);
       }
       return result;
     } catch (error) {
@@ -77,14 +74,13 @@ export class Telefone {
   async update(id: number, Telefone: UpdateTelefoneDto) {
     try {
       const { telefone, id_empresa } = Telefone;
-      const db = await this.db;
-      const result = await db.runAsync(
-        'UPDATE telefone SET telefone = $telefone, id_empresa = $id_empresa',
-        { $telefone: telefone, $id_empresa: id_empresa },
+      const result = await this.db.runAsync(
+        'UPDATE telefone SET telefone = $telefone, id_empresa = $id_empresa WHERE id = $id',
+        { $telefone: telefone, $id_empresa: id_empresa, $id: id },
       );
       if (!result) {
         if (!result) {
-          throw new Error('Não foi possível realizar a atualização!');
+          throw new Error(errors.database_errors.ErrorsTelefone.update.database);
         }
       }
       return { ...Telefone, id };
@@ -94,14 +90,16 @@ export class Telefone {
     }
   }
 
-  async delete(id: number) {
+  async delete($id: number) {
     try {
-      const db = await this.db;
-      await db.runAsync('DELETE FROM telefone WHERE id = $id', { $id: id });
+      const result = await this.db.runAsync('DELETE FROM telefone WHERE id = $id', { $id });
+      if(!result){
+        throw new Error(errors.database_errors.ErrorsTelefone.delete.database);
+      }
       return { sucess: true };
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 }
