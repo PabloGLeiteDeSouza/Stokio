@@ -1,6 +1,7 @@
 import * as SQLite from 'expo-sqlite';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
+import errors from 'messages-error';
 
 export class Produto {
   private db: SQLite.SQLiteDatabase;
@@ -25,7 +26,6 @@ export class Produto {
     } = Produto;
 
     try {
-      const db = await this.db;
       if (data_de_validade) {
         const data = {
           $nome: nome,
@@ -40,12 +40,12 @@ export class Produto {
           $tamanho: tamanho,
           $data_de_validade: data_de_validade.toDateString(),
         };
-        const result = await db.runAsync(
+        const result = await this.db.runAsync(
           'INSERT INTO produto (nome, descricao, tipo, id_categoria, codigo_de_barras, id_empresa, preco, quantidade, id_marca, tamanho, data_de_validade ) VALUES ( $nome, $descricao, $tipo, $id_categoria, $codigo_de_barras, $id_empresa, $preco, $quantidade, $id_marca, $tamanho, $data_de_validade )',
           data,
         );
         if (!result) {
-          return { error: true };
+          throw new Error(errors.database_errors.ErrorsProduto.create.database);
         }
         return { id: result.lastInsertRowId, ...Produto };
       }
@@ -61,18 +61,18 @@ export class Produto {
         $id_marca: id_marca,
         $tamanho: tamanho,
       };
-      const result = await db.runAsync(
+      const result = await this.db.runAsync(
         'INSERT INTO produto (nome, descricao, tipo, id_categoria, codigo_de_barras, id_empresa, preco, quantidade, id_marca, tamanho ) VALUES ( $nome, $descricao, $tipo, $id_categoria, $codigo_de_barras, $id_empresa, $preco, $quantidade, $id_marca, $tamanho )',
         data,
       );
 
       if (!result) {
-        return { error: true };
+        throw new Error(errors.database_errors.ErrorsProduto.create.database);
       }
       return { id: result.lastInsertRowId, ...Produto };
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 
@@ -92,83 +92,81 @@ export class Produto {
 
   async findFirstByIdMarca(id_marca: number) {
     try {
-      const db = await this.db;
-      const result = await db.getFirstAsync(
+      const result = await this.db.getFirstAsync(
         'SELECT * FROM produto WHERE id_marca = $id_marca',
         { $id_marca: id_marca },
       );
+      if (!result) {
+        throw new Error(errors.database_errors.ErrorsProduto.find.allbyIdMarca.database);
+      }
       return result;
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 
   async findFirstById(id: number) {
     try {
-      const db = await this.db;
-      const result = await db.getFirstAsync(
+      const result = await this.db.getFirstAsync(
         'SELECT * FROM produto WHERE id = $id',
         { $id: id },
       );
       if (!result) {
-        return { error: true };
+        throw new Error(errors.database_errors.ErrorsProduto.find.allbyIdMarca.database);
       }
       return result;
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 
   async findFirstByName(nome: string) {
     try {
-      const db = await this.db;
-      const result = await db.getFirstAsync(
+      const result = await this.db.getFirstAsync(
         'SELECT * FROM produto WHERE nome = $nome',
         { $nome: nome },
       );
       if (!result) {
-        return { error: true };
+        throw new Error(errors.database_errors.ErrorsProduto.find.byNome.database)
       }
       return result;
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 
   async findFirstByBarCode(codigo_de_barras: string) {
     try {
-      const db = await this.db;
-      const result = await db.getFirstAsync(
+      const result = await this.db.getFirstAsync(
         'SELECT * FROM produto WHERE codigo_de_barras = $codigo_de_barras',
         { $codigo_de_barras: codigo_de_barras },
       );
       if (!result) {
-        return { error: true };
+        throw new Error(errors.database_errors.ErrorsProduto.find.byCodigoDeBarras.database);
       }
       return result;
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 
   async findAllByTipo(tipo: string) {
     try {
-      const db = await this.db;
-      const result = await db.getAllAsync(
+      const result = await this.db.getAllAsync(
         'SELECT * FROM produto WHERE tipo = $tipo',
         { $tipo: tipo },
       );
       if (!result) {
-        return { error: true };
+        throw new Error(errors.database_errors.ErrorsProduto.find.byTipo.database);
       }
       return result;
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 

@@ -4,12 +4,16 @@ import { UpdateCategoroaDto } from './dto/update-categoria.dto';
 import * as SQLite from 'expo-sqlite';
 
 export class Categoria {
-  private db = SQLite.openDatabaseAsync('stock');
+  
+  private db: SQLite.SQLiteDatabase;
+
+  constructor(db: SQLite.SQLiteDatabase){
+    this.db = db;
+  }
 
   async create(categoria: CreateCategotiaDto) {
     try {
-      const db = await this.db;
-      const result = await db.runAsync(
+      const result = await this.db.runAsync(
         'INSERT INTO categoria (nome) VALUES ($nome)',
         { $nome: categoria.nome },
       );
@@ -25,8 +29,7 @@ export class Categoria {
 
   async update(id: number, categoria: UpdateCategoroaDto) {
     try {
-      const db = await this.db;
-      const result = await db.runAsync(
+      const result = await this.db.runAsync(
         'UPDATE categoria SET nome = $nome WHERE id = $id',
         { $id: id, $nome: categoria.nome },
       );
@@ -42,8 +45,7 @@ export class Categoria {
 
   async findFirstById(id: number) {
     try {
-      const db = await this.db;
-      const result = await db.getFirstAsync(
+      const result = await this.db.getFirstAsync(
         'SELECT * FROM categoria WHERE id = $id',
         { $id: id },
       );
@@ -59,8 +61,7 @@ export class Categoria {
 
   async findFirstByName(nome: string) {
     try {
-      const db = await this.db;
-      const result = await db.getFirstAsync(
+      const result = await this.db.getFirstAsync(
         'SELECT * FROM categoria WHERE nome = $nome',
         { $nome: nome },
       );
@@ -76,8 +77,7 @@ export class Categoria {
 
   async findAll() {
     try {
-      const db = await this.db;
-      const result = await db.getAllAsync('SELECT * FROM categoria');
+      const result = await this.db.getAllAsync('SELECT * FROM categoria');
       if (!result) {
         throw new Error(DBErros.ErrorsCategoria.find.all.database);
       }
@@ -90,8 +90,7 @@ export class Categoria {
 
   async delete(id: number) {
     try {
-      const db = await this.db;
-      const result = await db.runAsync('DELETE FROM categoria WHERE id = $id', {
+      const result = await this.db.runAsync('DELETE FROM categoria WHERE id = $id', {
         $id: id,
       });
       if (!result) {

@@ -192,7 +192,7 @@ const Update: React.FC<AtualzarEmpresasScreenProps> = ({
 
   const loadingPage = async () => {
     const endereco_obj = await new Endereco(db).findById(empresas_obj.id_endereco);
-    const emails_objs: UpdateEmailDto[] = await new Email(db).findFirstByIdEmpresa(empresas_obj.id);
+    const emails_objs = await new Email(db).findFirstByIdEmpresa(empresas_obj.id);
     const telefones_objs: UpdateTelefoneDto[] = await new Telefone(db).findByIdEmpresa(empresas_obj.id);
     setEndereco(endereco_obj);
     setEmails([...emails_objs])

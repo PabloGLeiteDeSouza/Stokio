@@ -136,6 +136,9 @@ export const db_error_messages = {
       database: 'Não foi possível deletar a marca tente novamente!',
     },
     find: {
+      all: {
+        database: 'Não foi possível encontrar nenhuma marca tente novamente!',
+      },
       byId: {
         database: 'Não foi possível encontrar a marca tente novamente!',
       },
@@ -155,6 +158,9 @@ export const db_error_messages = {
       database: 'Não foi possível deletar o produto tente novamente!',
     },
     find: {
+      byTipo: {
+        database: 'Não foi possível encontrar o produto tente novamente!',
+      },
       byId: {
         database: 'Não foi possível encontrar o produto tente novamente!',
       },
@@ -208,6 +214,9 @@ export const db_error_messages = {
       database: 'Não foi possível deletar o tipo de unidade de armazenamento tente novamente!',
     },
     find: {
+      all: {
+        database: 'Não foi possível encontrar nenhum tipo de unidade de armazenamento tente novamente!',
+      },
       byId: {
         database: 'Não foi possível encontrar o tipo de unidade de armazenamento tente novamente!',
       },

@@ -71,6 +71,7 @@ export class Empresa {
       } = empresa;
       if (cpf) {
         const data = {
+          $id: id,
           $nome_completo: String(nome_completo),
           $data_de_nascimento: String(data_de_nascimento?.toLocaleDateString()),
           $cpf: String(cpf),
@@ -78,7 +79,7 @@ export class Empresa {
         };
 
         const result = await this.db.runAsync(
-          'UPDATE empresa SET nome_completo = $nome_completo, data_de_nascimento = $data_de_nascimento, cpf = $cpf, id_endereco = $id_endereco',
+          'UPDATE empresa SET nome_completo = $nome_completo, data_de_nascimento = $data_de_nascimento, cpf = $cpf, id_endereco = $id_endereco WHERE id = $id',
           data,
         );
         if (!result) {
@@ -87,13 +88,14 @@ export class Empresa {
         return { ...empresa, id };
       } else {
         const data = {
+          $id: id,
           $nome_fantasia: String(nome_fantasia),
           $razao_social: String(razao_social),
           $cnpj: String(cnpj),
           $id_endereco: id_endereco,
         };
         const result = await this.db.runAsync(
-          'UPDATE empresa SET nome_fantasia = $nome_fantasia, razao_social = $razao_social, cnpj = $cnpj, id_endereco = $id_endereco',
+          'UPDATE empresa SET nome_fantasia = $nome_fantasia, razao_social = $razao_social, cnpj = $cnpj, id_endereco = $id_endereco WHERE id = $id',
           data,
         );
         if (!result) {

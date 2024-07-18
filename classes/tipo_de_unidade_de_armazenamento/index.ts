@@ -54,10 +54,13 @@ export class TipoDeUnidadeDeArmazenamento {
       const result = await this.db.getAllAsync(
         'SELECT * FROM tipo_de_unidade_de_armazenamento',
       );
+      if(!result){
+        throw new Error(errors.database_errors.ErrosTipoUA.find.all.database)
+      }
       return result;
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 
@@ -72,25 +75,28 @@ export class TipoDeUnidadeDeArmazenamento {
         { $nome: nome },
       );
       if (!result) {
-        return { error: true };
+        throw new Error(errors.database_errors.ErrosTipoUA.update.database);
       }
       return { nome, id };
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 
   async delete(id: number) {
     try {
-      await this.db.runAsync(
+      const result = await this.db.runAsync(
         'DELETE * tipo_de_unidade_de_armazenamento FROM id = $id',
         { $id: id },
       );
+      if (!result) {
+        throw new Error(errors.database_errors.ErrosTipoUA.delete.database);
+      }
       return { sucess: true };
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 }
