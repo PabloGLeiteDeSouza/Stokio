@@ -4,7 +4,6 @@ import { UpdateEmpresaDto } from './dto/update-empresa.dto';
 import { database_errors } from 'messages-error';
 
 export class Empresa {
-
   private db: SQLite.SQLiteDatabase;
 
   constructor(db: SQLite.SQLiteDatabase) {
@@ -142,7 +141,9 @@ export class Empresa {
         { $nome_completo: `%${nome_completo}%` },
       );
       if (result.length === 0) {
-        throw new Error(database_errors.ErrorsEmpresa.find.byNomeCompleto.database);
+        throw new Error(
+          database_errors.ErrorsEmpresa.find.byNomeCompleto.database,
+        );
       }
       return result;
     } catch (error) {
@@ -158,7 +159,9 @@ export class Empresa {
         { $nome_fantasia: `%${nome_fantasia}%` },
       );
       if (result.length === 0) {
-        throw new Error(database_errors.ErrorsEmpresa.find.byNomeFantasia.database);
+        throw new Error(
+          database_errors.ErrorsEmpresa.find.byNomeFantasia.database,
+        );
       }
       return result;
     } catch (error) {
@@ -174,7 +177,9 @@ export class Empresa {
         { $razao_social: `%${razao_social}%` },
       );
       if (result.length === 0) {
-        throw new Error(database_errors.ErrorsEmpresa.find.byRazaoSocial.database);
+        throw new Error(
+          database_errors.ErrorsEmpresa.find.byRazaoSocial.database,
+        );
       }
       return result;
     } catch (error) {

@@ -1,3 +1,4 @@
+import { db_error_messages } from '$constants/messages/errors/databse';
 import { CreateTelefoneDto } from './dto/create-telefone.dto';
 import { UpdateTelefoneDto } from './dto/update-telefone.dto';
 import * as SQLite from 'expo-sqlite';
@@ -45,15 +46,14 @@ export class Telefone {
 
   async findByIdEmpresa(id_empresa: number) {
     try {
-      const db = await this.db;
-      const result = await db.getFirstAsync(
+      const result = await this.db.getAllAsync(
         'SELECT * FROM telefone WHERE id_empresa = $id_empresa',
         { $id_empresa: id_empresa },
       );
       if (!result) {
         throw new Error('Não foi possível realizar a seleção!');
       }
-      return result;
+      return result as Array<UpdateTelefoneDto>;
     } catch (error) {
       console.error(error);
       throw error;
@@ -62,32 +62,31 @@ export class Telefone {
 
   async findAll() {
     try {
-      const db = await this.db;
-      const result = await db.getAllAsync('SELECT * FROM telefone');
+      const result = await this.db.getAllAsync('SELECT * FROM telefone');
       if (!result) {
         throw new Error('Não foi possível realizar a seleção!');
       }
-      return result;
+      return result as Array<UpdateTelefoneDto>;
     } catch (error) {
       console.error(error);
       throw error;
     }
   }
 
-  async update(id: number, Telefone: UpdateTelefoneDto) {
+  async update($id: number, Telefone: UpdateTelefoneDto) {
     try {
-      const { telefone, id_empresa } = Telefone;
-      const db = await this.db;
-      const result = await db.runAsync(
-        'UPDATE telefone SET telefone = $telefone, id_empresa = $id_empresa',
-        { $telefone: telefone, $id_empresa: id_empresa },
+      const $telefone = Telefone.telefone,
+        $id_empresa = Telefone.id_empresa;
+      const result = await this.db.runAsync(
+        'UPDATE telefone SET telefone = $telefone, id_empresa = $id_empresa WHERE id = $id',
+        { $telefone, $id_empresa, $id },
       );
       if (!result) {
         if (!result) {
-          throw new Error('Não foi possível realizar a atualização!');
+          throw new Error(db_error_messages.ErrorsTelefone.update.database);
         }
       }
-      return { ...Telefone, id };
+      return { ...Telefone, id: $id };
     } catch (error) {
       console.error(error);
       throw error;

@@ -180,34 +180,35 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation, route }) => {
       'Aviso',
       MessagesWarning.delete_messages.empresa +
         (empresa.cnpj ? empresa.nome_fantasia : empresa.nome_completo),
-      [{
-        text: "Confirmar",
-        onPress: async () => {
-          try {
-            await new Empresa(db).delete(empresa.id);
-            Alert.alert('Sucesso', 'Registro apagado com sucesso!')
-            setTimeout(() => {
-              Start();
-            }, 1);
-          } catch (error) {
-            console.error(error);
-            Alert.alert('Erro', (error as Error).message);
-          }
+      [
+        {
+          text: 'Confirmar',
+          onPress: async () => {
+            try {
+              await new Empresa(db).delete(empresa.id);
+              Alert.alert('Sucesso', 'Registro apagado com sucesso!');
+              setTimeout(() => {
+                Start();
+              }, 1);
+            } catch (error) {
+              console.error(error);
+              Alert.alert('Erro', (error as Error).message);
+            }
+          },
         },
-      },
-      {
-        text: "Cancelar",
-        onPress: () => {
-          Alert.alert('Aviso', operations.delete_messages.empresa);
-          return;
+        {
+          text: 'Cancelar',
+          onPress: () => {
+            Alert.alert('Aviso', operations.delete_messages.empresa);
+            return;
+          },
         },
-      }
-      ]
+      ],
     );
   };
 
   const editarEmpresa = (empresa: UpdateEmpresaObject) => {
-    navigation?.navigate('editar-empresas', { empresa: empresa });
+    navigation?.navigate('atualizar-empresas', { empresa: empresa });
   };
 
   if (isStartingPage) {
@@ -301,7 +302,7 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation, route }) => {
         return (
           <Box key={i} w="$full" alignItems="center" gap="$2.5" my="$2.5">
             {value.cnpj ? (
-              <HStack 
+              <HStack
                 px="$3"
                 py="$3"
                 rounded="$md"
@@ -319,18 +320,17 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation, route }) => {
                     {value.razao_social}
                   </Text>
                   <Text>
-                    <Text fontWeight="$bold">CNPJ:</Text>{' '}
-                    {value.cnpj}
+                    <Text fontWeight="$bold">CNPJ:</Text> {value.cnpj}
                   </Text>
                 </VStack>
                 <VStack gap="$2">
                   <Button onPress={() => editarEmpresa(value)}>
                     <ButtonIcon as={EditIcon} />
                   </Button>
-                  <Button 
-                    action='negative'
+                  <Button
+                    action="negative"
                     onPress={() => deletarEmpresa(value)}
-                    >
+                  >
                     <ButtonIcon as={TrashIcon} />
                   </Button>
                 </VStack>
@@ -358,13 +358,11 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation, route }) => {
                   </Text>
                 </VStack>
                 <VStack gap="$2">
-                  <Button 
-                    onPress={() => editarEmpresa(value)}
-                  >
+                  <Button onPress={() => editarEmpresa(value)}>
                     <ButtonIcon as={EditIcon} />
                   </Button>
-                  <Button 
-                    action='negative' 
+                  <Button
+                    action="negative"
                     onPress={() => deletarEmpresa(value)}
                   >
                     <ButtonIcon as={TrashIcon} />

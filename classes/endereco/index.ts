@@ -70,23 +70,38 @@ export class Endereco {
       if (!result) {
         throw new Error(DBErros.ErrorsEndereco.find.all.database);
       }
-      return result;
+      return result as Array<UpdateEnderecoDto>;
     } catch (error) {
       console.error(error);
       throw error;
     }
   }
 
-  async findAllByCep(cep: string) {
+  async findById($id: number) {
+    try {
+      const result = await this.db.getFirstAsync(
+        'SELECT * FROM endereco WHERE id = $id',
+        { $id },
+      );
+      if (!result) {
+        throw new Error(DBErros.ErrorsEndereco.find.byId.database);
+      }
+      return result as UpdateEnderecoDto;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findAllByCep($cep: string) {
     try {
       const result = await this.db.getAllAsync(
         'SELECT * FROM endereco WHERE cep = $cep',
-        { $cep: cep },
+        { $cep },
       );
       if (!result) {
         throw new Error(DBErros.ErrorsEndereco.find.byCep.database);
       }
-      return result;
+      return result as Array<UpdateEnderecoDto>;
     } catch (error) {
       console.error(error);
       throw error;
@@ -95,14 +110,14 @@ export class Endereco {
 
   async findAllByLogradouro(logradouro: string) {
     try {
-      const result = this.db.getAllAsync(
+      const result = await this.db.getAllAsync(
         'SELECT * FROM endereco WHERE logradouro = $logradouro',
         { $logradouro: logradouro },
       );
       if (!result) {
         throw new Error(DBErros.ErrorsEndereco.find.bylogradouro.database);
       }
-      return result;
+      return result as Array<UpdateEnderecoDto>;
     } catch (error) {
       console.error(error);
       throw error;

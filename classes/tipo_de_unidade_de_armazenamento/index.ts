@@ -20,7 +20,7 @@ export class TipoDeUnidadeDeArmazenamento {
         { $nome: nome },
       );
       if (!result) {
-        throw new Error()
+        throw new Error();
       }
       return {
         ...tipo_de_unidade_de_armazenamento,

@@ -233,9 +233,8 @@ export const DBErros = {
 };
 
 export const database_errors = {
-  ...db_error_messages
-} as TypeDatabaseErrors
-
+  ...db_error_messages,
+} as TypeDatabaseErrors;
 
 export default {
   DBErros,

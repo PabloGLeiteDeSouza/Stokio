@@ -9,18 +9,8 @@ import {
   FormControlErrorText,
   Input,
   InputField,
-  Radio,
-  RadioGroup,
-  RadioIcon,
-  RadioIndicator,
-  RadioLabel,
   Button,
   ButtonText,
-  Checkbox,
-  CheckboxGroup,
-  CheckboxIndicator,
-  CheckboxIcon,
-  CheckboxLabel,
   Textarea,
   TextareaInput,
   Select,
@@ -33,25 +23,6 @@ import {
   SelectDragIndicatorWrapper,
   SelectDragIndicator,
   SelectItem,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  Switch,
-  Modal,
-  ModalBackdrop,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  HStack,
-  VStack,
-  Heading,
-  Center,
-  Icon,
-  CircleIcon,
-  CheckIcon,
   AlertCircleIcon,
   ChevronDownIcon,
   AddIcon,
@@ -73,11 +44,10 @@ import { RootStackParamList } from '$types/index';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { Formik } from 'formik';
-import { Alert, FlatListComponent, GestureResponderEvent } from 'react-native';
+import { Alert, GestureResponderEvent } from 'react-native';
 import * as Yup from 'yup';
-import { ValidateForms } from '../../constants/validations';
-import { FA6Style } from '@expo/vector-icons/build/FontAwesome6';
-import { MaskedTextInput, mask } from 'react-native-mask-text';
+import { ValidateForms } from '$constants/validations';
+import { mask } from 'react-native-mask-text';
 import { Endereco } from '$classes/endereco';
 import { Empresa } from '$classes/empresa';
 import { View } from '@gluestack-ui/themed';
@@ -144,10 +114,7 @@ const validator = Yup.object().shape({
     )
     .required(ValidateForms.required),
 });
-const Create: React.FC<CadastrarEmpresasScreenProps> = ({
-  navigation,
-  route,
-}) => {
+const Create: React.FC<CadastrarEmpresasScreenProps> = ({ navigation }) => {
   const db = useSQLiteContext();
   const { theme } = useThemeApp();
   const [nomeEstado, setNomeEstado] = React.useState('');

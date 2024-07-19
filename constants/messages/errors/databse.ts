@@ -3,8 +3,7 @@ export const default_db_errors = {
   delete: 'Não foi possível deletar!',
   create: 'Não foi possível criar!',
   find: 'Não foi possível encontrar nenhum registro!',
-}
-
+};
 
 export const db_error_messages = {
   ErrorsEmail: {
@@ -44,7 +43,8 @@ export const db_error_messages = {
     },
     find: {
       all: {
-        database: 'Não foi possível encontrar nenhuma categoria tente novamente!',
+        database:
+          'Não foi possível encontrar nenhuma categoria tente novamente!',
       },
       byName: {
         database: 'Não foi possível encontrar a categoria tente novamente!',
@@ -199,43 +199,54 @@ export const db_error_messages = {
   },
   ErrosTipoUA: {
     update: {
-      database: 'Não foi possível atualizar o tipo de unidade de armazenamento tente novamente!',
+      database:
+        'Não foi possível atualizar o tipo de unidade de armazenamento tente novamente!',
     },
     create: {
-      database: 'Não foi possível criar o tipo de unidade de armazenamento tente novamente!',
+      database:
+        'Não foi possível criar o tipo de unidade de armazenamento tente novamente!',
     },
     delete: {
-      database: 'Não foi possível deletar o tipo de unidade de armazenamento tente novamente!',
+      database:
+        'Não foi possível deletar o tipo de unidade de armazenamento tente novamente!',
     },
     find: {
       byId: {
-        database: 'Não foi possível encontrar o tipo de unidade de armazenamento tente novamente!',
+        database:
+          'Não foi possível encontrar o tipo de unidade de armazenamento tente novamente!',
       },
       byNome: {
-        database: 'Não foi possível econtrar o tipo de unidade de armazenamento tente novamente!',
+        database:
+          'Não foi possível econtrar o tipo de unidade de armazenamento tente novamente!',
       },
     },
   },
   ErrorsUA: {
     update: {
-      database: 'Não foi possível atualizar a unidade de armazenamento tente novamente!',
+      database:
+        'Não foi possível atualizar a unidade de armazenamento tente novamente!',
     },
     create: {
-      database: 'Não foi possível criar a unidade de armazenamento tente novamente!',
+      database:
+        'Não foi possível criar a unidade de armazenamento tente novamente!',
     },
     delete: {
-      database: 'Não foi possível deletar a unidade de armazenamento tente novamente!',
+      database:
+        'Não foi possível deletar a unidade de armazenamento tente novamente!',
     },
     find: {
       byId: {
-        database: 'Não foi possível encontrar a unidade de armazenamento tente novamente!',
+        database:
+          'Não foi possível encontrar a unidade de armazenamento tente novamente!',
       },
       byNome: {
-        database: 'Não foi possível encontrar a unidade de armazenamento tente novamente!',
+        database:
+          'Não foi possível encontrar a unidade de armazenamento tente novamente!',
       },
       allbyIdTipoUa: {
-        database: 'Não foi possível encontrar nenhuma unidade de armazenamento tente novamente!',
+        database:
+          'Não foi possível encontrar nenhuma unidade de armazenamento tente novamente!',
       },
     },
   },
-}
+};
