@@ -74,6 +74,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSQLiteContext } from 'expo-sqlite';
 import { EditIcon } from '@gluestack-ui/themed';
 import MessagesWarning, { operations } from 'messages-warnings';
+
 type ListarEmpresasScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   'listar-empresas'
@@ -205,7 +206,7 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation, route }) => {
   };
 
   const editarEmpresa = (empresa: UpdateEmpresaObject) => {
-    navigation?.navigate('atualizar-empresas', { empresa: empresa });
+    navigation?.navigate('editar-empresas', { empresa: empresa });
   };
 
   if (isStartingPage) {
@@ -290,7 +291,7 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation, route }) => {
           <Text>
             Para adicionar mais empresas adicione clicando no botao + abaixo:
           </Text>
-          <Button onPress={() => navigation?.navigate('editar-empresas')}>
+          <Button onPress={() => navigation?.navigate('cadastrar-empresas')}>
             <ButtonIcon as={AddIcon} />
           </Button>
         </Box>

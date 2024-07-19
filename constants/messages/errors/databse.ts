@@ -218,7 +218,8 @@ export const db_error_messages = {
     },
     find: {
       all: {
-        database: 'Não foi possível encontrar nenhum tipo de unidade de armazenamento tente novamente!',
+        database:
+          'Não foi possível encontrar nenhum tipo de unidade de armazenamento tente novamente!',
       },
       byId: {
         database:
@@ -244,6 +245,10 @@ export const db_error_messages = {
         'Não foi possível deletar a unidade de armazenamento tente novamente!',
     },
     find: {
+      all: {
+        database:
+          'Não foi possível encontrar nenhuma unidade de armazenamento tente novamente!',
+      },
       byId: {
         database:
           'Não foi possível encontrar a unidade de armazenamento tente novamente!',

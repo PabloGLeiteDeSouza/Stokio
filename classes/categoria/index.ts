@@ -1,13 +1,12 @@
-import { DBErros } from 'messages-error';
+import MessageErrors from 'messages-error';
 import { CreateCategotiaDto } from './dto/create-categoria.dto';
 import { UpdateCategoroaDto } from './dto/update-categoria.dto';
 import * as SQLite from 'expo-sqlite';
 
 export class Categoria {
-  
   private db: SQLite.SQLiteDatabase;
 
-  constructor(db: SQLite.SQLiteDatabase){
+  constructor(db: SQLite.SQLiteDatabase) {
     this.db = db;
   }
 
@@ -18,7 +17,9 @@ export class Categoria {
         { $nome: categoria.nome },
       );
       if (!result) {
-        throw new Error(DBErros.ErrorsCategoria.create.database);
+        throw new Error(
+          MessageErrors.database_errors.ErrorsCategoria.create.database,
+        );
       }
       return { ...categoria, id: result.lastInsertRowId };
     } catch (error) {
@@ -34,9 +35,11 @@ export class Categoria {
         { $id: id, $nome: categoria.nome },
       );
       if (!result) {
-        throw new Error(DBErros.ErrorsCategoria.update.database);
+        throw new Error(
+          MessageErrors.database_errors.ErrorsCategoria.update.database,
+        );
       }
-      return { ...categoria, id: id };
+      return { ...categoria, id };
     } catch (error) {
       console.error(error);
       throw error;
@@ -50,7 +53,9 @@ export class Categoria {
         { $id: id },
       );
       if (!result) {
-        throw new Error(DBErros.ErrorsCategoria.find.byId.database);
+        throw new Error(
+          MessageErrors.database_errors.ErrorsCategoria.find.byId.database,
+        );
       }
       return result;
     } catch (error) {
@@ -66,7 +71,9 @@ export class Categoria {
         { $nome: nome },
       );
       if (!result) {
-        throw new Error(DBErros.ErrorsCategoria.find.byName.database);
+        throw new Error(
+          MessageErrors.database_errors.ErrorsCategoria.find.byName.database,
+        );
       }
       return result;
     } catch (error) {
@@ -79,7 +86,9 @@ export class Categoria {
     try {
       const result = await this.db.getAllAsync('SELECT * FROM categoria');
       if (!result) {
-        throw new Error(DBErros.ErrorsCategoria.find.all.database);
+        throw new Error(
+          MessageErrors.database_errors.ErrorsCategoria.find.all.database,
+        );
       }
       return result;
     } catch (error) {
@@ -88,13 +97,18 @@ export class Categoria {
     }
   }
 
-  async delete(id: number) {
+  async delete($id: number) {
     try {
-      const result = await this.db.runAsync('DELETE FROM categoria WHERE id = $id', {
-        $id: id,
-      });
+      const result = await this.db.runAsync(
+        'DELETE FROM categoria WHERE id = $id',
+        {
+          $id,
+        },
+      );
       if (!result) {
-        throw new Error(DBErros.ErrorsCategoria.delete.database);
+        throw new Error(
+          MessageErrors.database_errors.ErrorsCategoria.delete.database,
+        );
       }
       return { sucess: true };
     } catch (error) {

@@ -14,14 +14,13 @@ export class TipoDeUnidadeDeArmazenamento {
     tipo_de_unidade_de_armazenamento: CreateTipoDeUnidadeDeArmazenamento,
   ) {
     try {
-      const db = await this.db;
       const { nome } = tipo_de_unidade_de_armazenamento;
-      const result = await db.runAsync(
+      const result = await this.db.runAsync(
         'INSERT INTO tipo_de_unidade_de_armazenamento (nome) VALUES ($nome)',
         { $nome: nome },
       );
       if (!result) {
-        throw new Error()
+        throw new Error(errors.database_errors.ErrosTipoUA.create.database);
       }
       return {
         ...tipo_de_unidade_de_armazenamento,
@@ -39,8 +38,8 @@ export class TipoDeUnidadeDeArmazenamento {
         'SELECT * FROM tipo_de_unidade_de_armazenamento WHERE id = $id',
         { $id: id },
       );
-      if(!result){
-        throw new Error(errors.database_errors.ErrosTipoUA.find.byId.database)
+      if (!result) {
+        throw new Error(errors.database_errors.ErrosTipoUA.find.byId.database);
       }
       return result;
     } catch (error) {
@@ -54,8 +53,8 @@ export class TipoDeUnidadeDeArmazenamento {
       const result = await this.db.getAllAsync(
         'SELECT * FROM tipo_de_unidade_de_armazenamento',
       );
-      if(!result){
-        throw new Error(errors.database_errors.ErrosTipoUA.find.all.database)
+      if (!result) {
+        throw new Error(errors.database_errors.ErrosTipoUA.find.all.database);
       }
       return result;
     } catch (error) {

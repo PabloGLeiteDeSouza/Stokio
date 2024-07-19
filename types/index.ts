@@ -41,6 +41,4 @@ export type ScreenComponentType<
     }>
   | React.ComponentType<{}>;
 
-export type TypeUpdateEmpresasObjectToScreen = {
-  
-}
+export type TypeUpdateEmpresasObjectToScreen = {};

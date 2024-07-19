@@ -11,7 +11,7 @@ export class Endereco {
   }
 
   async create(endereco: CreateEnderecoDto) {
-    const { logradouro, numero, cep, complemento, bairro, cidade, UF } =
+    const { logradouro, numero, cep, complemento, bairro, cidade, uf } =
       endereco;
     const data = {
       $logradouro: logradouro,
@@ -20,11 +20,11 @@ export class Endereco {
       $complemento: complemento,
       $bairro: bairro,
       $cidade: cidade,
-      $UF: UF,
+      $uf: uf,
     };
     try {
       const result = await this.db.runAsync(
-        'INSERT INTO endereco (logradouro, numero, cep, complemento, bairro, cidade, UF) VALUES ($logradouro, $numero, $cep, $complemento, $bairro, $cidade, $UF)',
+        'INSERT INTO endereco (logradouro, numero, cep, complemento, bairro, cidade, uf) VALUES ($logradouro, $numero, $cep, $complemento, $bairro, $cidade, $uf)',
         data,
       );
       if (!result) {
@@ -38,7 +38,7 @@ export class Endereco {
   }
 
   async update(id: number, endereco: UpdateEnderecoDto) {
-    const { logradouro, numero, cep, complemento, bairro, cidade, UF } =
+    const { logradouro, numero, cep, complemento, bairro, cidade, uf } =
       endereco;
     const data = {
       $logradouro: logradouro,
@@ -47,12 +47,12 @@ export class Endereco {
       $complemento: complemento,
       $bairro: bairro,
       $cidade: cidade,
-      $UF: UF,
+      $uf: uf,
       $id: id,
     };
     try {
       const result = await this.db.runAsync(
-        'UPDATE SET logradouro = $logradouro, numero = $numero, cep = $cep, complemento = $complemento, bairro = $bairro, cidade = $cidade, UF = $UF WHERE id = $id',
+        'UPDATE SET logradouro = $logradouro, numero = $numero, cep = $cep, complemento = $complemento, bairro = $bairro, cidade = $cidade, uf = $uf WHERE id = $id',
         data,
       );
       if (!result) {
@@ -80,23 +80,16 @@ export class Endereco {
 
   async findById($id: number) {
     try {
-<<<<<<< HEAD
       const result = await this.db.getFirstAsync(
         'SELECT * FROM endereco WHERE id = $id',
         { $id },
       );
-=======
-      const result = await this.db.getFirstAsync('SELECT * FROM endereco WHERE id = $id',{ $id });
->>>>>>> 58fd03d1cc582dd120e77424d0917cea31779f03
       if (!result) {
         throw new Error(DBErros.ErrorsEndereco.find.byId.database);
       }
       return result as UpdateEnderecoDto;
     } catch (error) {
-<<<<<<< HEAD
-=======
       console.error(error);
->>>>>>> 58fd03d1cc582dd120e77424d0917cea31779f03
       throw error;
     }
   }

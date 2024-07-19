@@ -31,7 +31,7 @@ export class Marca {
     try {
       const results = await this.db.getAllAsync('SELECT * FROM marca');
       if (!results) {
-        throw new Error(errors.database_errors.ErrorsMarca.find.all.database)
+        throw new Error(errors.database_errors.ErrorsMarca.find.all.database);
       }
       return results as CreateMarcaDto[];
     } catch (error) {
@@ -74,10 +74,12 @@ export class Marca {
 
   async delete(id: number) {
     try {
-      const db = await this.db;
-      const result = await db.runAsync('DELETE FROM marca WHERE id = $id', {
-        $id: id,
-      });
+      const result = await this.db.runAsync(
+        'DELETE FROM marca WHERE id = $id',
+        {
+          $id: id,
+        },
+      );
       if (!result) {
         throw new Error(errors.database_errors.ErrorsMarca.delete.database);
       }

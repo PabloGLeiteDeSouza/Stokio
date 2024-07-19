@@ -9,8 +9,8 @@ export class UpdateEnderecoDto extends CreateEnderecoDto {
     complemento: string,
     bairro: string,
     cidade: string,
-    UF: string,
+    uf: string,
   ) {
-    super(logradouro, numero, cep, complemento, bairro, cidade, UF, id);
+    super(logradouro, numero, cep, complemento, bairro, cidade, uf, id);
   }
 }

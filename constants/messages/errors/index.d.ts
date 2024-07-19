@@ -1,6 +1,6 @@
 import type { TypeDatabaseErrors, TypeDBErros } from './types'
 
-declare module "messages-error" {
+declare namespace MessageErrors {
     export const DBErros: TypeDBErros;
     export const database_errors: TypeDatabaseErrors;
 }

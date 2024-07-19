@@ -6,7 +6,7 @@ export class CreateEnderecoDto {
   complemento: string;
   bairro: string;
   cidade: string;
-  UF: string;
+  uf: string;
 
   constructor(
     logradouro: string,
@@ -15,7 +15,7 @@ export class CreateEnderecoDto {
     complemento: string,
     bairro: string,
     cidade: string,
-    UF: string,
+    uf: string,
     id?: number,
   ) {
     this.id = id;
@@ -25,6 +25,6 @@ export class CreateEnderecoDto {
     this.complemento = complemento;
     this.bairro = bairro;
     this.cidade = cidade;
-    this.UF = UF;
+    this.uf = uf;
   }
 }

@@ -29,11 +29,16 @@ export class Telefone {
 
   async findById($id: number) {
     try {
-      const result = this.db.getFirstAsync('SELECT * FROM telefone WHERE id = $id', {
-        $id,
-      });
+      const result = this.db.getFirstAsync(
+        'SELECT * FROM telefone WHERE id = $id',
+        {
+          $id,
+        },
+      );
       if (!result) {
-        throw new Error(errors.database_errors.ErrorsTelefone.find.byId.database);
+        throw new Error(
+          errors.database_errors.ErrorsTelefone.find.byId.database,
+        );
       }
       return result;
     } catch (error) {
@@ -49,7 +54,9 @@ export class Telefone {
         { $id_empresa },
       );
       if (!result) {
-        throw new Error(errors.database_errors.ErrorsTelefone.find.allbyIdEmpresa.database);
+        throw new Error(
+          errors.database_errors.ErrorsTelefone.find.allbyIdEmpresa.database,
+        );
       }
       return result as UpdateTelefoneDto[];
     } catch (error) {
@@ -62,7 +69,9 @@ export class Telefone {
     try {
       const result = await this.db.getAllAsync('SELECT * FROM telefone');
       if (!result) {
-        throw new Error(errors.database_errors.ErrorsTelefone.find.all.database);
+        throw new Error(
+          errors.database_errors.ErrorsTelefone.find.all.database,
+        );
       }
       return result;
     } catch (error) {
@@ -80,7 +89,9 @@ export class Telefone {
       );
       if (!result) {
         if (!result) {
-          throw new Error(errors.database_errors.ErrorsTelefone.update.database);
+          throw new Error(
+            errors.database_errors.ErrorsTelefone.update.database,
+          );
         }
       }
       return { ...Telefone, id };
@@ -92,8 +103,11 @@ export class Telefone {
 
   async delete($id: number) {
     try {
-      const result = await this.db.runAsync('DELETE FROM telefone WHERE id = $id', { $id });
-      if(!result){
+      const result = await this.db.runAsync(
+        'DELETE FROM telefone WHERE id = $id',
+        { $id },
+      );
+      if (!result) {
         throw new Error(errors.database_errors.ErrorsTelefone.delete.database);
       }
       return { sucess: true };

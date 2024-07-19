@@ -177,7 +177,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({ navigation }) => {
                   complemento: values.complemento,
                   bairro: values.bairro,
                   cidade: values.cidade,
-                  UF: values.uf,
+                  uf: values.uf,
                 };
                 const { emails, telefones } = values;
                 const result_end = await new Endereco(db).create(data_end);
@@ -223,7 +223,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({ navigation }) => {
                   complemento: values.complemento,
                   bairro: values.bairro,
                   cidade: values.cidade,
-                  UF: values.uf,
+                  uf: values.uf,
                 };
                 if (!verificarAtributosObjeto(data_end)) {
                   throw new Error('Ainda Existem atributos vazios!');

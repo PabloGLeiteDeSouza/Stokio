@@ -97,7 +97,9 @@ export class Produto {
         { $id_marca: id_marca },
       );
       if (!result) {
-        throw new Error(errors.database_errors.ErrorsProduto.find.allbyIdMarca.database);
+        throw new Error(
+          errors.database_errors.ErrorsProduto.find.allbyIdMarca.database,
+        );
       }
       return result;
     } catch (error) {
@@ -113,7 +115,9 @@ export class Produto {
         { $id: id },
       );
       if (!result) {
-        throw new Error(errors.database_errors.ErrorsProduto.find.allbyIdMarca.database);
+        throw new Error(
+          errors.database_errors.ErrorsProduto.find.allbyIdMarca.database,
+        );
       }
       return result;
     } catch (error) {
@@ -129,7 +133,9 @@ export class Produto {
         { $nome: nome },
       );
       if (!result) {
-        throw new Error(errors.database_errors.ErrorsProduto.find.byNome.database)
+        throw new Error(
+          errors.database_errors.ErrorsProduto.find.byNome.database,
+        );
       }
       return result;
     } catch (error) {
@@ -145,7 +151,9 @@ export class Produto {
         { $codigo_de_barras: codigo_de_barras },
       );
       if (!result) {
-        throw new Error(errors.database_errors.ErrorsProduto.find.byCodigoDeBarras.database);
+        throw new Error(
+          errors.database_errors.ErrorsProduto.find.byCodigoDeBarras.database,
+        );
       }
       return result;
     } catch (error) {
@@ -161,7 +169,9 @@ export class Produto {
         { $tipo: tipo },
       );
       if (!result) {
-        throw new Error(errors.database_errors.ErrorsProduto.find.byTipo.database);
+        throw new Error(
+          errors.database_errors.ErrorsProduto.find.byTipo.database,
+        );
       }
       return result;
     } catch (error) {
@@ -178,12 +188,14 @@ export class Produto {
         { $id_categoria: id_categoria },
       );
       if (!result) {
-        return { error: true };
+        throw new Error(
+          errors.database_errors.ErrorsProduto.find.allbyIdCategoria.database,
+        );
       }
       return result;
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 
@@ -202,7 +214,6 @@ export class Produto {
       data_de_validade,
     } = Produto;
     try {
-      const db = await this.db;
       if (data_de_validade) {
         const data = {
           $id: id,
@@ -218,12 +229,12 @@ export class Produto {
           $tamanho: tamanho,
           $data_de_validade: data_de_validade.toDateString(),
         };
-        const result = await db.runAsync(
+        const result = await this.db.runAsync(
           'UPDATE produto SET nome = $nome, descricao = $descricao, tipo = $tipo, id_categoria = $id_categoria, codigo_de_barras = $codigo_de_barras, id_empresa = $id_empresa, preco = $preco, quantidade = $quantidade, id_marca = $id_marca, tamanho = $tamanho, data_de_validade = $data_de_validade WHERE id = $id',
           data,
         );
         if (!result) {
-          return { error: true };
+          throw new Error(errors.database_errors.ErrorsProduto.update.database);
         }
         return { ...Produto, id };
       } else {
@@ -240,34 +251,38 @@ export class Produto {
           $id_marca: id_marca,
           $tamanho: tamanho,
         };
-        const result = await db.runAsync(
+        const result = await this.db.runAsync(
           'UPDATE produto SET nome = $nome, descricao = $descricao, tipo = $tipo, id_categoria = $id_categoria, codigo_de_barras = $codigo_de_barras, id_empresa = $id_empresa, preco = $preco, quantidade = $quantidade, id_marca = $id_marca, tamanho = $tamanho WHERE id = $id',
           data,
         );
         if (!result) {
-          return { error: true };
+          throw new Error(errors.database_errors.ErrorsProduto.update.database);
         }
         return { ...Produto, id };
       }
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 
   async delete(id: number) {
     try {
-      const db = await this.db;
-      const result = await db.runAsync('DELETE * FROM produto WHERE id = $id', {
-        $id: id,
-      });
+      const result = await this.db.runAsync(
+        'DELETE * FROM produto WHERE id = $id',
+        {
+          $id: id,
+        },
+      );
       if (!result) {
-        return { error: true };
+        if (!result) {
+          throw new Error(errors.database_errors.ErrorsProduto.delete.database);
+        }
       }
       return { sucess: true };
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 }

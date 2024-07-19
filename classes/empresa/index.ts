@@ -1,7 +1,7 @@
 import * as SQLite from 'expo-sqlite';
 import { CreateEmpresaDto } from './dto/create-empresa.dto';
 import { UpdateEmpresaDto } from './dto/update-empresa.dto';
-import { database_errors } from 'messages-error';
+import MessageErrors from 'messages-error';
 
 export class Empresa {
   private db: SQLite.SQLiteDatabase;
@@ -33,13 +33,17 @@ export class Empresa {
           data,
         );
         if (!result) {
-          throw new Error(database_errors.ErrorsEmpresa.create.database);
+          throw new Error(
+            MessageErrors.database_errors.ErrorsEmpresa.create.database,
+          );
         }
         return { ...empresa, id: result.lastInsertRowId };
       } else {
         const data = {
           $nome_completo: String(nome_completo),
-          $data_de_nascimento: String(data_de_nascimento?.toLocaleDateString()),
+          $data_de_nascimento: new Date(
+            String(data_de_nascimento),
+          ).toLocaleDateString(),
           $cpf: String(cpf),
           $id_endereco: Number(id_endereco),
         };
@@ -48,7 +52,9 @@ export class Empresa {
           data,
         );
         if (!result) {
-          throw new Error(database_errors.ErrorsEmpresa.create.database);
+          throw new Error(
+            MessageErrors.database_errors.ErrorsEmpresa.create.database,
+          );
         }
         return { ...empresa, id: result.lastInsertRowId };
       }
@@ -72,7 +78,9 @@ export class Empresa {
         const data = {
           $id: id,
           $nome_completo: String(nome_completo),
-          $data_de_nascimento: String(data_de_nascimento?.toLocaleDateString()),
+          $data_de_nascimento: new Date(
+            String(data_de_nascimento),
+          ).toLocaleDateString(),
           $cpf: String(cpf),
           $id_endereco: id_endereco,
         };
@@ -82,7 +90,9 @@ export class Empresa {
           data,
         );
         if (!result) {
-          throw new Error(database_errors.ErrorsEmpresa.update.database);
+          throw new Error(
+            MessageErrors.database_errors.ErrorsEmpresa.update.database,
+          );
         }
         return { ...empresa, id };
       } else {
@@ -98,7 +108,9 @@ export class Empresa {
           data,
         );
         if (!result) {
-          throw new Error(database_errors.ErrorsEmpresa.update.database);
+          throw new Error(
+            MessageErrors.database_errors.ErrorsEmpresa.update.database,
+          );
         }
         return { ...empresa, id };
       }
@@ -112,7 +124,9 @@ export class Empresa {
     try {
       const result = await this.db.getAllAsync('SELECT * FROM empresa');
       if (result.length === 0) {
-        throw new Error(database_errors.ErrorsEmpresa.find.all.database);
+        throw new Error(
+          MessageErrors.database_errors.ErrorsEmpresa.find.all.database,
+        );
       }
       return result;
     } catch (error) {
@@ -127,7 +141,9 @@ export class Empresa {
         { $cpf: `%${cpf}%` },
       );
       if (!result) {
-        throw new Error(database_errors.ErrorsEmpresa.find.byCpf.database);
+        throw new Error(
+          MessageErrors.database_errors.ErrorsEmpresa.find.byCpf.database,
+        );
       }
       return result;
     } catch (error) {
@@ -144,7 +160,7 @@ export class Empresa {
       );
       if (result.length === 0) {
         throw new Error(
-          database_errors.ErrorsEmpresa.find.byNomeCompleto.database,
+          MessageErrors.database_errors.ErrorsEmpresa.find.byNomeCompleto.database,
         );
       }
       return result;
@@ -162,7 +178,7 @@ export class Empresa {
       );
       if (result.length === 0) {
         throw new Error(
-          database_errors.ErrorsEmpresa.find.byNomeFantasia.database,
+          MessageErrors.database_errors.ErrorsEmpresa.find.byNomeFantasia.database,
         );
       }
       return result;
@@ -180,7 +196,7 @@ export class Empresa {
       );
       if (result.length === 0) {
         throw new Error(
-          database_errors.ErrorsEmpresa.find.byRazaoSocial.database,
+          MessageErrors.database_errors.ErrorsEmpresa.find.byRazaoSocial.database,
         );
       }
       return result;
@@ -197,7 +213,9 @@ export class Empresa {
         { $cnpj: `%${cnpj}%` },
       );
       if (!result) {
-        throw new Error(database_errors.ErrorsEmpresa.find.byCnpj.database);
+        throw new Error(
+          MessageErrors.database_errors.ErrorsEmpresa.find.byCnpj.database,
+        );
       }
       return result;
     } catch (error) {
@@ -213,7 +231,9 @@ export class Empresa {
         { $id: id },
       );
       if (!result) {
-        throw new Error(database_errors.ErrorsEmpresa.delete.database);
+        throw new Error(
+          MessageErrors.database_errors.ErrorsEmpresa.delete.database,
+        );
       }
       return { sucess: true };
     } catch (error) {

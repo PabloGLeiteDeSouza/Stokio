@@ -2,12 +2,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import CodeScannerScreen from '../CodeScannerScreen';
 import ProdutosScreens from '../../screens/Produtos';
-import { FontAwesome, FontAwesome6, MaterialIcons } from '@expo/vector-icons';
-import {
-  NavigationContainer,
-  RouteProp,
-  ThemeProvider,
-} from '@react-navigation/native';
+import { FontAwesome, FontAwesome6 } from '@expo/vector-icons';
+import { NavigationContainer, RouteProp } from '@react-navigation/native';
 import ClientesScreens from '$screens/Clientes';
 import EmpresasScreens from '$screens/Empresas';
 import { useThemeApp } from '$providers/theme';
@@ -124,10 +120,7 @@ interface TabBottomScreenProps {
   route?: TabBottomScreenRouteProp;
 }
 
-const TabBottomScreen: React.FC<TabBottomScreenProps> = ({
-  navigation,
-  route,
-}) => {
+const TabBottomScreen: React.FC<TabBottomScreenProps> = () => {
   return (
     <TabBottom.Navigator>
       <TabBottom.Screen

@@ -1,5 +1,5 @@
 import type { TypeDeleteMessages } from './types';
 
-declare module MessagesWarnings {
+declare namespace MessagesWarnings {
     export const delete_messages: TypeDeleteMessages;
 }
