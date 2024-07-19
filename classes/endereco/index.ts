@@ -37,7 +37,7 @@ export class Endereco {
     }
   }
 
-  async update(endereco: UpdateEnderecoDto) {
+  async update(id: number, endereco: UpdateEnderecoDto) {
     const { logradouro, numero, cep, complemento, bairro, cidade, UF } =
       endereco;
     const data = {
@@ -48,10 +48,11 @@ export class Endereco {
       $bairro: bairro,
       $cidade: cidade,
       $UF: UF,
+      $id: id,
     };
     try {
       const result = await this.db.runAsync(
-        'UPDATE SET logradouro = $logradouro, numero = $numero, cep = $cep, complemento = $complemento, bairro = $bairro, cidade = $cidade, UF = $UF',
+        'UPDATE SET logradouro = $logradouro, numero = $numero, cep = $cep, complemento = $complemento, bairro = $bairro, cidade = $cidade, UF = $UF WHERE id = $id',
         data,
       );
       if (!result) {
@@ -79,15 +80,23 @@ export class Endereco {
 
   async findById($id: number) {
     try {
+<<<<<<< HEAD
       const result = await this.db.getFirstAsync(
         'SELECT * FROM endereco WHERE id = $id',
         { $id },
       );
+=======
+      const result = await this.db.getFirstAsync('SELECT * FROM endereco WHERE id = $id',{ $id });
+>>>>>>> 58fd03d1cc582dd120e77424d0917cea31779f03
       if (!result) {
         throw new Error(DBErros.ErrorsEndereco.find.byId.database);
       }
       return result as UpdateEnderecoDto;
     } catch (error) {
+<<<<<<< HEAD
+=======
+      console.error(error);
+>>>>>>> 58fd03d1cc582dd120e77424d0917cea31779f03
       throw error;
     }
   }
@@ -108,11 +117,11 @@ export class Endereco {
     }
   }
 
-  async findAllByLogradouro(logradouro: string) {
+  async findAllByLogradouro($logradouro: string) {
     try {
       const result = await this.db.getAllAsync(
         'SELECT * FROM endereco WHERE logradouro = $logradouro',
-        { $logradouro: logradouro },
+        { $logradouro },
       );
       if (!result) {
         throw new Error(DBErros.ErrorsEndereco.find.bylogradouro.database);
@@ -140,11 +149,11 @@ export class Endereco {
     }
   }
 
-  async findAllByCidade(cidade: string) {
+  async findAllByCidade($cidade: string) {
     try {
       const result = await this.db.getAllAsync(
         'SELECT * FROM endereco WHERE cidade = $cidade',
-        { $cidade: cidade },
+        { $cidade },
       );
       if (!result) {
         throw new Error(DBErros.ErrorsEndereco.find.byCidade.database);
@@ -156,11 +165,11 @@ export class Endereco {
     }
   }
 
-  async delete(id: number) {
+  async delete($id: number) {
     try {
       const result = await this.db.runAsync(
         'DELETE * FROM endereco WHERE id = $id',
-        { $id: id },
+        { $id },
       );
       if (!result) {
         throw new Error(DBErros.ErrorsEndereco.delete.database);

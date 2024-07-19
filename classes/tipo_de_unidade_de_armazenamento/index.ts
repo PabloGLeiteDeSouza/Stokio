@@ -1,3 +1,4 @@
+import errors from 'messages-error';
 import { CreateTipoDeUnidadeDeArmazenamento } from './dto/create-tipo-de-unidade-de-armazenamento.dto';
 import { UpdateTipoDeUnidadeDeArmazenamentoDto } from './dto/update-tipo-de-unidade-de-armazenamento.dto';
 import * as SQLite from 'expo-sqlite';
@@ -20,7 +21,7 @@ export class TipoDeUnidadeDeArmazenamento {
         { $nome: nome },
       );
       if (!result) {
-        throw new Error();
+        throw new Error()
       }
       return {
         ...tipo_de_unidade_de_armazenamento,
@@ -34,28 +35,32 @@ export class TipoDeUnidadeDeArmazenamento {
 
   async findById(id: number) {
     try {
-      const db = await this.db;
-      const result = await db.getFirstAsync(
+      const result = await this.db.getFirstAsync(
         'SELECT * FROM tipo_de_unidade_de_armazenamento WHERE id = $id',
         { $id: id },
       );
+      if(!result){
+        throw new Error(errors.database_errors.ErrosTipoUA.find.byId.database)
+      }
       return result;
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 
   async findAll() {
     try {
-      const db = await this.db;
-      const result = await db.getAllAsync(
+      const result = await this.db.getAllAsync(
         'SELECT * FROM tipo_de_unidade_de_armazenamento',
       );
+      if(!result){
+        throw new Error(errors.database_errors.ErrosTipoUA.find.all.database)
+      }
       return result;
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 
@@ -64,33 +69,34 @@ export class TipoDeUnidadeDeArmazenamento {
     tipo_de_unidade_de_armazenamento: UpdateTipoDeUnidadeDeArmazenamentoDto,
   ) {
     try {
-      const db = await this.db;
       const { nome } = tipo_de_unidade_de_armazenamento;
-      const result = await db.runAsync(
+      const result = await this.db.runAsync(
         'UPDATE tipo_de_unidade_de_armazenamento SET nome = $nome',
         { $nome: nome },
       );
       if (!result) {
-        return { error: true };
+        throw new Error(errors.database_errors.ErrosTipoUA.update.database);
       }
       return { nome, id };
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 
   async delete(id: number) {
     try {
-      const db = await this.db;
-      await db.runAsync(
+      const result = await this.db.runAsync(
         'DELETE * tipo_de_unidade_de_armazenamento FROM id = $id',
         { $id: id },
       );
+      if (!result) {
+        throw new Error(errors.database_errors.ErrosTipoUA.delete.database);
+      }
       return { sucess: true };
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 }

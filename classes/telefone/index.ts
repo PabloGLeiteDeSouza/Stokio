@@ -1,4 +1,4 @@
-import { db_error_messages } from '$constants/messages/errors/databse';
+import errors from 'messages-error';
 import { CreateTelefoneDto } from './dto/create-telefone.dto';
 import { UpdateTelefoneDto } from './dto/update-telefone.dto';
 import * as SQLite from 'expo-sqlite';
@@ -13,13 +13,12 @@ export class Telefone {
   async create(Telefone: CreateTelefoneDto) {
     try {
       const { telefone, id_empresa } = Telefone;
-      const db = await this.db;
-      const result = await db.runAsync(
+      const result = await this.db.runAsync(
         'INSERT INTO telefone (telefone, id_empresa) VALUES ($telefone, $id_empresa)',
         { $telefone: telefone, $id_empresa: id_empresa },
       );
       if (!result) {
-        throw new Error('Não foi possível realizar a inserção!');
+        throw new Error(errors.database_errors.ErrorsTelefone.create.database);
       }
       return { ...Telefone, id: result.lastInsertRowId };
     } catch (error) {
@@ -28,14 +27,13 @@ export class Telefone {
     }
   }
 
-  async findById(id: number) {
+  async findById($id: number) {
     try {
-      const db = await this.db;
-      const result = db.getFirstAsync('SELECT * FROM telefone WHERE id = $id', {
-        $id: id,
+      const result = this.db.getFirstAsync('SELECT * FROM telefone WHERE id = $id', {
+        $id,
       });
       if (!result) {
-        throw new Error('Não foi possível realizar a seleção!');
+        throw new Error(errors.database_errors.ErrorsTelefone.find.byId.database);
       }
       return result;
     } catch (error) {
@@ -44,16 +42,16 @@ export class Telefone {
     }
   }
 
-  async findByIdEmpresa(id_empresa: number) {
+  async findByIdEmpresa($id_empresa: number) {
     try {
       const result = await this.db.getAllAsync(
         'SELECT * FROM telefone WHERE id_empresa = $id_empresa',
-        { $id_empresa: id_empresa },
+        { $id_empresa },
       );
       if (!result) {
-        throw new Error('Não foi possível realizar a seleção!');
+        throw new Error(errors.database_errors.ErrorsTelefone.find.allbyIdEmpresa.database);
       }
-      return result as Array<UpdateTelefoneDto>;
+      return result as UpdateTelefoneDto[];
     } catch (error) {
       console.error(error);
       throw error;
@@ -64,43 +62,44 @@ export class Telefone {
     try {
       const result = await this.db.getAllAsync('SELECT * FROM telefone');
       if (!result) {
-        throw new Error('Não foi possível realizar a seleção!');
+        throw new Error(errors.database_errors.ErrorsTelefone.find.all.database);
       }
-      return result as Array<UpdateTelefoneDto>;
+      return result;
     } catch (error) {
       console.error(error);
       throw error;
     }
   }
 
-  async update($id: number, Telefone: UpdateTelefoneDto) {
+  async update(id: number, Telefone: UpdateTelefoneDto) {
     try {
-      const $telefone = Telefone.telefone,
-        $id_empresa = Telefone.id_empresa;
+      const { telefone, id_empresa } = Telefone;
       const result = await this.db.runAsync(
         'UPDATE telefone SET telefone = $telefone, id_empresa = $id_empresa WHERE id = $id',
-        { $telefone, $id_empresa, $id },
+        { $telefone: telefone, $id_empresa: id_empresa, $id: id },
       );
       if (!result) {
         if (!result) {
-          throw new Error(db_error_messages.ErrorsTelefone.update.database);
+          throw new Error(errors.database_errors.ErrorsTelefone.update.database);
         }
       }
-      return { ...Telefone, id: $id };
+      return { ...Telefone, id };
     } catch (error) {
       console.error(error);
       throw error;
     }
   }
 
-  async delete(id: number) {
+  async delete($id: number) {
     try {
-      const db = await this.db;
-      await db.runAsync('DELETE FROM telefone WHERE id = $id', { $id: id });
+      const result = await this.db.runAsync('DELETE FROM telefone WHERE id = $id', { $id });
+      if(!result){
+        throw new Error(errors.database_errors.ErrorsTelefone.delete.database);
+      }
       return { sucess: true };
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 }

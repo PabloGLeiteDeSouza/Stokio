@@ -46,7 +46,7 @@ import { RouteProp } from '@react-navigation/native';
 import { Formik } from 'formik';
 import { Alert, GestureResponderEvent } from 'react-native';
 import * as Yup from 'yup';
-import { ValidateForms } from '$constants/validations';
+import { ValidateForms } from '../../constants/validations';
 import { mask } from 'react-native-mask-text';
 import { Endereco } from '$classes/endereco';
 import { Empresa } from '$classes/empresa';

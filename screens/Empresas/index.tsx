@@ -23,13 +23,6 @@ const EmpresasScreens: React.FC = () => {
           title: 'Cadastrar Empresas',
         }}
       />
-      <Stack.Screen
-        name="editar-empresas"
-        component={Update}
-        options={{
-          title: 'Editar Empresas',
-        }}
-      />
     </Stack.Navigator>
   );
 };

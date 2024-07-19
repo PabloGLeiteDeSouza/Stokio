@@ -5,7 +5,7 @@ export class UpdateEmpresaDto extends CreateEmpresaDto {
     id: number,
     id_endereco: number,
     nome_completo?: string,
-    data_de_nascimento?: Date,
+    data_de_nascimento?: Date | string,
     cpf?: string,
     nome_fantasia?: string,
     razao_social?: string,

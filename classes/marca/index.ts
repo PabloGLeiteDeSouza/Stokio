@@ -1,6 +1,7 @@
 import * as SQLite from 'expo-sqlite';
 import { CreateMarcaDto } from './dto/create-marca.dto';
 import { UpdateMarcaDto } from './dto/update-marca.dto';
+import errors from 'messages-error';
 
 export class Marca {
   private db: SQLite.SQLiteDatabase;
@@ -22,56 +23,52 @@ export class Marca {
       return { ...marca, id: result.lastInsertRowId };
     } catch (error) {
       console.error(error);
-      await (await this.db).closeAsync();
       throw error;
     }
   }
 
   async findAll() {
     try {
-      const db = await this.db;
-      const results = await db.getAllAsync('SELECT * FROM marca');
+      const results = await this.db.getAllAsync('SELECT * FROM marca');
       if (!results) {
-        return { error: true };
+        throw new Error(errors.database_errors.ErrorsMarca.find.all.database)
       }
       return results as CreateMarcaDto[];
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 
   async findFirstById(id: number) {
     try {
-      const db = await this.db;
-      const result = await db.getFirstAsync(
+      const result = await this.db.getFirstAsync(
         'SELECT * FROM marca WHERE id = $id',
         { $id: id },
       );
       if (!result) {
-        return { error: true };
+        throw new Error(errors.database_errors.ErrorsMarca.find.byId.database);
       }
       return result as CreateMarcaDto;
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 
   async update(id: number, marca: UpdateMarcaDto) {
     try {
-      const db = await this.db;
-      const result = await db.runAsync(
+      const result = await this.db.runAsync(
         'UPDATE marca SET nome = $nome WHERE id = $id',
         { $id: id, $nome: marca.nome },
       );
       if (!result) {
-        return { error: true };
+        throw new Error(errors.database_errors.ErrorsMarca.update.database);
       }
       return { ...marca, id };
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 
@@ -82,12 +79,12 @@ export class Marca {
         $id: id,
       });
       if (!result) {
-        return { error: true };
+        throw new Error(errors.database_errors.ErrorsMarca.delete.database);
       }
       return { sucess: true };
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 }

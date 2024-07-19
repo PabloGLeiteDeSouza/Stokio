@@ -1,7 +1,6 @@
 import * as SQLite from 'expo-sqlite';
 import { UpdateEmailDto } from './dto/update-email.dto';
 import { CreateEmailDto } from './dto/create-email.dto';
-import { database_errors } from 'messages-error';
 
 export class Email {
   private db: SQLite.SQLiteDatabase;
@@ -17,7 +16,7 @@ export class Email {
         { $email: email.email, $id_empresa: email.id_empresa },
       );
       if (!result) {
-        throw new Error(database_errors.ErrorsEmail.create.database);
+        throw new Error('Não possível executar a inserção tente novamente!');
       }
       return { ...email, id: result.lastInsertRowId };
     } catch (error) {
@@ -33,7 +32,7 @@ export class Email {
         { $email: email.email, $id_empresa: email.id_empresa, $id: id },
       );
       if (!result) {
-        throw new Error(database_errors.ErrorsEmail.update.database);
+        throw new Error('Não foi possível fazer a atualização!');
       }
       return { ...email, id };
     } catch (error) {
@@ -49,7 +48,7 @@ export class Email {
         { $id: id },
       );
       if (!result) {
-        throw new Error(database_errors.ErrorsEmail.find.byId.database);
+        return { error: true };
       }
       return result as UpdateEmailDto;
     } catch (error) {
@@ -58,18 +57,16 @@ export class Email {
     }
   }
 
-  async findAllByIdEmpresa($id_empresa: number) {
+  async findFirstByIdEmpresa(id_empresa: number) {
     try {
       const result = await this.db.getAllAsync(
         'SELECT * FROM email WHERE id_empresa = $id_empresa',
         { $id_empresa },
       );
       if (!result) {
-        throw new Error(
-          database_errors.ErrorsEmail.find.allbyIdEmpresa.database,
-        );
+        return { error: true };
       }
-      return result as Array<UpdateEmailDto>;
+      return result;
     } catch (error) {
       console.error(error);
       throw error;
@@ -83,12 +80,12 @@ export class Email {
         { $email: email },
       );
       if (!result) {
-        return { error: true };
+        throw new Error(errors.database_errors.ErrorsEmail.find.byEmail.database);
       }
       return result as UpdateEmailDto;
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 
@@ -96,7 +93,7 @@ export class Email {
     try {
       const result = await this.db.getAllAsync('SELECT * FROM email');
       if (!result) {
-        return { error: true };
+        throw new Error(errors.database_errors.ErrorsEmail.find.all.database);
       }
       return result;
     } catch (error) {
@@ -107,17 +104,12 @@ export class Email {
 
   async delete(id: number) {
     try {
-      const result = await this.db.runAsync(
-        'DELETE FROM email WHERE id = $id',
-        { $id: id },
-      );
-      if (!result) {
-        throw new Error(database_errors.ErrorsEmail.delete.database);
-      }
+      const db = await this.db;
+      await db.runAsync('DELETE FROM email WHERE id = $id', { $id: id });
       return { sucess: true };
     } catch (error) {
       console.error(error);
-      return error;
+      return { error: true };
     }
   }
 }
