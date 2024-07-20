@@ -29,7 +29,7 @@ export class Email {
   async update(id: number, email: UpdateEmailDto) {
     try {
       const result = await this.db.runAsync(
-        'UPDATE email SET email = $email, id_pessoa = $id_pessoa WHERE id = $id',
+        'UPDATE email SET email = $email, id_empresa = $id_empresa WHERE id = $id',
         { $email: email.email, $id_empresa: email.id_empresa, $id: id },
       );
       if (!result) {

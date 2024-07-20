@@ -40,6 +40,7 @@ export default [
   },
   {
     files: ['**/*.js'],
+    extends: [tseslint.configs.disableTypeChecked],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',

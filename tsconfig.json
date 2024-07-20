@@ -5,6 +5,7 @@
     "paths": {
       "utils": ["./utils"],
       "messages-error": ["./constants/messages/errors"],
+      "messageerrors": ["./constants/messages/errors"],
       "messages-warnings": ["./constants/messages/warnings"],
       "$components/*": ["./components/*"],
       "$screens/*": ["./screens/*"],

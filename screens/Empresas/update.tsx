@@ -200,24 +200,36 @@ const Update: React.FC<EditarEmpresasScreenProps> = ({ navigation, route }) => {
           validationSchema={validator}
           initialValues={{
             tipo_empresa: empresas.cnpj ? 'pj' : ('pf' as 'pj' | 'pf'),
-            ...empresas,
-            ...(OEndereco as UpdateEnderecoDto),
+            id: empresas.id,
+            nome_completo: empresas.nome_completo ? empresas.nome_completo : "",
+            cpf: empresas.cpf ? empresas.cpf : "",
+            data_de_nascimento: empresas.data_de_nascimento ? empresas.data_de_nascimento : "",
+            nome_fantasia: empresas.nome_fantasia ? empresas.nome_fantasia : "",
+            razao_social: empresas.razao_social ? empresas.razao_social : "",
+            cnpj: empresas.cnpj ? empresas.cnpj : "",
+            id_endereco: empresas.id_endereco,
+            cep: (OEndereco as UpdateEnderecoDto).cep,
+            logradouro: (OEndereco as UpdateEnderecoDto).logradouro,
+            numero: (OEndereco as UpdateEnderecoDto).numero,
+            complemento: (OEndereco as UpdateEnderecoDto).complemento,
+            bairro: (OEndereco as UpdateEnderecoDto).bairro,
+            cidade: (OEndereco as UpdateEnderecoDto).cidade,
+            uf: (OEndereco as UpdateEnderecoDto).uf,
             emails: ArrayEmails as Array<UpdateEmailDto>,
             telefones: ArrayTelefones as Array<UpdateTelefoneDto>,
           }}
           onSubmit={async (values) => {
             try {
-              console.log('Atualizou');
               if (values.tipo_empresa === 'pf') {
                 const data_pf = {
                   id: values.id,
                   nome_completo: values.nome_completo,
                   cpf: values.cpf,
                   data_de_nascimento: values.data_de_nascimento,
-                  id_endereco: values.id_endereco,
+                  id_endereco: values.id_endereco as number,
                 };
                 const data_end = {
-                  id: values.id_endereco,
+                  id: values.id_endereco as number,
                   cep: values.cep,
                   logradouro: values.logradouro,
                   numero: Number(values.numero),
@@ -234,9 +246,10 @@ const Update: React.FC<EditarEmpresasScreenProps> = ({ navigation, route }) => {
                     if (value.id === 0) {
                       await new Email(db).create({
                         email: value.email,
-                        id_empresa: data_pf.id,
+                        id_empresa: values.id,
                       });
                     } else {
+                      console.log('Email: ',value)
                       await new Email(db).update(value.id as number, value);
                     }
                   } catch (error) {
@@ -248,7 +261,7 @@ const Update: React.FC<EditarEmpresasScreenProps> = ({ navigation, route }) => {
                     if (value.id === 0) {
                       await new Telefone(db).create({
                         telefone: value.telefone,
-                        id_empresa: data_pf.id,
+                        id_empresa: values.id,
                       });
                     } else {
                       await new Telefone(db).update(value.id as number, value);
@@ -1035,9 +1048,7 @@ const Update: React.FC<EditarEmpresasScreenProps> = ({ navigation, route }) => {
                 <Box>
                   <Button
                     onPress={() => {
-                      console.log('clicou');
                       handleSubmit();
-                      console.log(errors);
                     }}
                     $active-bgColor={
                       theme === 'dark' ? '$purple700' : '$purple500'

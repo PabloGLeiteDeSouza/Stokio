@@ -451,7 +451,7 @@ export type TypeDatabaseErrors = {
       };
     };
   };
-  ErrorsUA: {
+  ErrorsUM: {
     update: {
       database: string;
     };
@@ -471,9 +471,6 @@ export type TypeDatabaseErrors = {
       byNome: {
         database: string;
       };
-      allbyIdTipoUa: {
-        database: string;
-      };
-    };
-  };
+    }
+  }
 };

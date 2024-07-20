@@ -78,8 +78,7 @@ export class Produto {
 
   async findAll() {
     try {
-      const db = await this.db;
-      const result = await db.getAllAsync('SELECT * FROM produto');
+      const result = await this.db.getAllAsync('SELECT * FROM produto');
       if (!result) {
         return { error: true };
       }
@@ -182,8 +181,7 @@ export class Produto {
 
   async findAllByCategory(id_categoria: number) {
     try {
-      const db = await this.db;
-      const result = await db.getAllAsync(
+      const result = await this.db.getAllAsync(
         'SELECT * FROM produto WHERE id_categoria = $id_categoria',
         { $id_categoria: id_categoria },
       );

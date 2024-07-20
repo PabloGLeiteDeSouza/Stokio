@@ -233,6 +233,28 @@ export const DBErros = {
       },
     },
   },
+  ErrorsUm: {
+    update: {
+      database: default_db_errors.update,
+    },
+    create: {
+      database: default_db_errors.create,
+    },
+    delete: {
+      database: default_db_errors.delete,
+    },
+    find: {
+      byId: {
+        database: default_db_errors.find,
+      },
+      all: {
+        database: default_db_errors.find,
+      },
+      byNome: {
+        database: default_db_errors.find,
+      },
+    }
+  }
 };
 
 export const database_errors = {

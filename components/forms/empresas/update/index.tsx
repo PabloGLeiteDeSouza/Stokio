@@ -1,9 +1,9 @@
-import { Box } from '@gluestack-ui/themed'
-import { FormUpdateEmpresasScreenProps } from './types'
-import LoadingScreen from '$components/LoadingScreen'
-import { ScrollView } from '@gluestack-ui/themed'
-import React from 'react'
-import { Formik } from 'formik'
+import { Box } from '@gluestack-ui/themed';
+import { FormUpdateEmpresasScreenProps } from './types';
+import LoadingScreen from '$components/LoadingScreen';
+import { ScrollView } from '@gluestack-ui/themed';
+import React from 'react';
+import { Formik } from 'formik';
 
 const FormUpdateEmpresas: React.FC<FormUpdateEmpresasScreenProps> = ({
   isLoading,
@@ -17,7 +17,7 @@ const FormUpdateEmpresas: React.FC<FormUpdateEmpresasScreenProps> = ({
   }, []);
 
   if (isLoading) {
-    return <LoadingScreen />
+    return <LoadingScreen />;
   }
   if (data.tipo_empresa === 'pf') {
     return (

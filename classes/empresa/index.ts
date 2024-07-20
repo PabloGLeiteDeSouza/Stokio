@@ -2,6 +2,7 @@ import * as SQLite from 'expo-sqlite';
 import { CreateEmpresaDto } from './dto/create-empresa.dto';
 import { UpdateEmpresaDto } from './dto/update-empresa.dto';
 import MessageErrors from 'messages-error';
+import { formatStringDateDB } from 'utils';
 
 export class Empresa {
   private db: SQLite.SQLiteDatabase;
@@ -17,6 +18,7 @@ export class Empresa {
         data_de_nascimento,
         cpf,
         cnpj,
+        ramo,
         id_endereco,
         nome_fantasia,
         razao_social,
@@ -26,10 +28,11 @@ export class Empresa {
           $nome_fantasia: String(nome_fantasia),
           $razao_social: String(razao_social),
           $cnpj: String(cnpj),
+          $ramo: ramo,
           $id_endereco: Number(id_endereco),
         };
         const result = await this.db.runAsync(
-          'INSERT INTO empresa (nome_fantasia, razao_social, cnpj, id_endereco) VALUES ($nome_fantasia, $razao_social, $cnpj, $id_endereco)',
+          'INSERT INTO empresa (nome_fantasia, razao_social, cnpj, ramo, id_endereco) VALUES ($nome_fantasia, $razao_social, $cnpj, $ramo, $id_endereco)',
           data,
         );
         if (!result) {
@@ -45,10 +48,11 @@ export class Empresa {
             String(data_de_nascimento),
           ).toLocaleDateString(),
           $cpf: String(cpf),
+          $ramo: ramo,
           $id_endereco: Number(id_endereco),
         };
         const result = await this.db.runAsync(
-          'INSERT INTO empresa (nome_completo, data_de_nascimento, cpf, id_endereco) VALUES ($nome_completo, $data_de_nascimento, $cpf, $id_endereco)',
+          'INSERT INTO empresa (nome_completo, data_de_nascimento, cpf, ramo, id_endereco) VALUES ($nome_completo, $data_de_nascimento, $cpf, $ramo, $id_endereco)',
           data,
         );
         if (!result) {
@@ -78,13 +82,10 @@ export class Empresa {
         const data = {
           $id: id,
           $nome_completo: String(nome_completo),
-          $data_de_nascimento: new Date(
-            String(data_de_nascimento),
-          ).toLocaleDateString(),
+          $data_de_nascimento: formatStringDateDB(String(data_de_nascimento)),
           $cpf: String(cpf),
           $id_endereco: id_endereco,
         };
-
         const result = await this.db.runAsync(
           'UPDATE empresa SET nome_completo = $nome_completo, data_de_nascimento = $data_de_nascimento, cpf = $cpf, id_endereco = $id_endereco WHERE id = $id',
           data,

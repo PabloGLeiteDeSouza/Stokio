@@ -263,4 +263,26 @@ export const db_error_messages = {
       },
     },
   },
+  ErrorsUM: {
+    update: {
+      database: 'Não foi possível atualizar a unidade de medida tente novamente!',
+    },
+    create: {
+      database: 'Não foi possível criar a unidade de medida tente novamente!',
+    },
+    delete: {
+      database: 'Não foi possível deletar a unidade de medida tente novamente!',
+    },
+    find: {
+      all: {
+        database: 'Não foi possível encontrar nenhuma unidade de medida tente novamente!'
+      },
+      byId: {
+        database: 'Não foi possível encontrar a unidade de medida tente novamente!'
+      },
+      byNome: {
+        database: 'Não foi possível encontrar a unidade de medida tente novamente!'
+      },
+    }
+  }
 };

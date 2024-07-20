@@ -1,4 +1,36 @@
 import {
+  Radio,
+  RadioGroup,
+  RadioIcon,
+  RadioIndicator,
+  RadioLabel,
+  Checkbox,
+  CheckboxGroup,
+  CheckboxIndicator,
+  CheckboxIcon,
+  CheckboxLabel,
+  Slider,
+  SliderTrack,
+  SliderFilledTrack,
+  SliderThumb,
+  Switch,
+  Modal,
+  ModalBackdrop,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  HStack,
+  VStack,
+  Heading,
+  Center,
+  Icon,
+  CircleIcon,
+  CheckIcon,
+} from '@gluestack-ui/themed';
+
+import {
   FormControl,
   FormControlLabel,
   FormControlLabelText,
@@ -92,6 +124,7 @@ const validator = Yup.object().shape({
     is: 'pj',
     then: (yup) => yup.required(ValidateForms.required),
   }),
+  ramo: Yup.string().required(ValidateForms.required),
   cep: Yup.string().required(ValidateForms.required),
   logradouro: Yup.string().required(ValidateForms.required),
   numero: Yup.string()
@@ -126,6 +159,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({ navigation }) => {
     nome_fantasia: false,
     razao_social: false,
     cnpj: false,
+    ramo: false,
     cep: false,
     logradouro: false,
     numero: false,
@@ -152,6 +186,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({ navigation }) => {
             nome_fantasia: '',
             razao_social: '',
             cnpj: '',
+            ramo: '',
             cep: '',
             logradouro: '',
             numero: '',
@@ -169,6 +204,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({ navigation }) => {
                   nome_completo: values.nome_completo,
                   cpf: values.cpf,
                   data_de_nascimento: values.data_de_nascimento,
+                  ramo: values.ramo,
                 };
                 const data_end = {
                   cep: values.cep,
@@ -212,6 +248,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({ navigation }) => {
                   nome_fantasia: values.nome_fantasia,
                   razao_social: values.razao_social,
                   cnpj: values.cnpj,
+                  ramo: values.ramo,
                 };
                 if (!verificarAtributosObjeto(data_pj)) {
                   throw new Error('Ainda Existem atributos vazios!');
@@ -276,10 +313,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({ navigation }) => {
               });
               try {
                 const result = await fetch(
-                  `https://viacep.com.br/ws/${cep.replace(
-                    /[^a-zA-Z0-9 ]/g,
-                    '',
-                  )}/json`,
+                  `https://viacep.com.br/ws/${cep.replace(/[^a-zA-Z0-9 ]/g, '')}/json`,
                 );
                 if (!result.ok) {
                   throw new Error(
@@ -317,7 +351,6 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({ navigation }) => {
                 }
               }
             };
-
             return (
               <>
                 <FormControl
@@ -597,6 +630,38 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({ navigation }) => {
                     </FormControl>
                   </>
                 )}
+                <FormControl
+                  isInvalid={errors.ramo ? true :  false}
+                  size={'md'}
+                  isDisabled={isAllDisabled.ramo}
+                  isRequired={true}
+                >
+                  <FormControlLabel>
+                    <FormControlLabelText>Ramo</FormControlLabelText>
+                  </FormControlLabel>
+                  <Input>
+                    <InputField
+                      type="text"
+                      value={values.ramo}
+                      onChangeText={handleChange('ramo')}
+                      placeholder="Ramo da empresa"
+                    />
+                  </Input>
+
+                  <FormControlHelper>
+                    <FormControlHelperText>
+                      Informe o ramo da sua empresa.
+                    </FormControlHelperText>
+                  </FormControlHelper>
+
+                  <FormControlError>
+                    <FormControlErrorIcon as={AlertCircleIcon} />
+                    <FormControlErrorText>
+                      {errors.ramo}
+                    </FormControlErrorText>
+                  </FormControlError>
+                </FormControl>
+
                 <FormControl
                   isInvalid={errors.cep ? true : false}
                   size={'md'}

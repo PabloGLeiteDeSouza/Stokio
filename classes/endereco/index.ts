@@ -52,7 +52,7 @@ export class Endereco {
     };
     try {
       const result = await this.db.runAsync(
-        'UPDATE SET logradouro = $logradouro, numero = $numero, cep = $cep, complemento = $complemento, bairro = $bairro, cidade = $cidade, uf = $uf WHERE id = $id',
+        'UPDATE endereco SET logradouro = $logradouro, numero = $numero, cep = $cep, complemento = $complemento, bairro = $bairro, cidade = $cidade, uf = $uf WHERE id = $id',
         data,
       );
       if (!result) {
