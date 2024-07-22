@@ -58,6 +58,7 @@ import LoadingScreen from '$components/LoadingScreen';
 import { UpdateEmailDto } from '$classes/email/dto/update-email.dto';
 import { UpdateTelefoneDto } from '$classes/telefone/dto/update-telefone.dto';
 import { UpdateEnderecoDto } from '$classes/endereco/dto/update-endereco.dto';
+import MessagesSuccess from 'messages-success';
 type EditarEmpresasScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   'editar-empresas'
@@ -249,7 +250,6 @@ const Update: React.FC<EditarEmpresasScreenProps> = ({ navigation, route }) => {
                         id_empresa: values.id,
                       });
                     } else {
-                      console.log('Email: ',value)
                       await new Email(db).update(value.id as number, value);
                     }
                   } catch (error) {
@@ -315,6 +315,7 @@ const Update: React.FC<EditarEmpresasScreenProps> = ({ navigation, route }) => {
                     throw error;
                   }
                 });
+                Alert.alert('Sucesso!', MessagesSuccess)
                 navigation?.navigate('listar-empresas');
               }
             } catch (error) {

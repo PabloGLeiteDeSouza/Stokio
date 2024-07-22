@@ -4,6 +4,7 @@
     "strict": true,
     "paths": {
       "utils": ["./utils"],
+      "messages-success": ["constants/messages/MessagesSuccessuccess"],
       "messages-error": ["./constants/messages/errors"],
       "messageerrors": ["./constants/messages/errors"],
       "messages-warnings": ["./constants/messages/warnings"],

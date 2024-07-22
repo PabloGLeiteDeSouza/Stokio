@@ -87,7 +87,7 @@ interface ListarEmpresasScreenProps {
   navigation?: ListarEmpresasScreenNavigationProp;
   route?: ListarEmpresasScreenRouteProp;
 }
-const View: React.FC<ListarEmpresasScreenProps> = ({ navigation, route }) => {
+const View: React.FC<ListarEmpresasScreenProps> = ({ navigation }) => {
   const isFocused = useIsFocused();
   const db = useSQLiteContext();
   const [valorBusca, setValorBusca] = React.useState('');
