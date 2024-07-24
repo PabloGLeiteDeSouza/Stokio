@@ -74,6 +74,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSQLiteContext } from 'expo-sqlite';
 import { EditIcon } from '@gluestack-ui/themed';
 import MessagesWarning, { operations } from 'messages-warnings';
+import SearchEmpresas from '$components/SearchEmpresas';
 
 type ListarEmpresasScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -227,9 +228,10 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation }) => {
             <FormControlLabelText>Buscar Empresa</FormControlLabelText>
           </FormControlLabel>
           <Input>
-            <InputField
-              onChangeText={(text) => setValorBusca(text)}
-              type="text"
+            <SearchEmpresas
+              onChangeValue={(Text) => { setValorBusca(Text); }}
+              value={valorBusca}
+              tipo={tipoDeBusca}
             />
             <Select
               isInvalid={false}
