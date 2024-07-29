@@ -158,6 +158,12 @@ export const db_error_messages = {
       database: 'Não foi possível deletar o produto tente novamente!',
     },
     find: {
+      all: {
+        database: 'Não foi possível encontrar nenhum produto tente novamente!',
+      },
+      allbyIdEmpresa: {
+        database: 'Não foi possível encontrar nenhum produto tente novamente!',
+      },
       byTipo: {
         database: 'Não foi possível encontrar o produto tente novamente!',
       },

@@ -1,3 +1,4 @@
-export const Create: React.FC = () => {
+const Create: React.FC = () => {
   return <></>;
 };
+export default Create;

@@ -150,6 +150,9 @@ export type TypeDBErros = {
       database: string;
     };
     find: {
+      all: {
+        database: string;
+      },
       byId: {
         database: string;
       };
@@ -384,6 +387,12 @@ export type TypeDatabaseErrors = {
       database: string;
     };
     find: {
+      all: {
+        database: string;
+      };
+      allbyIdEmpresa: {
+        database: string;
+      },
       byTipo: {
         database: string;
       };

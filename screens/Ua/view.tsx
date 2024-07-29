@@ -1,3 +1,4 @@
-export const View: React.FC = () => {
+const View: React.FC = () => {
   return <></>;
 };
+export default View;

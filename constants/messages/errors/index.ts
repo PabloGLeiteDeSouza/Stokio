@@ -153,6 +153,9 @@ export const DBErros = {
       database: default_db_errors.delete,
     },
     find: {
+      all: {
+        database: default_db_errors.find,
+      },
       byId: {
         database: default_db_errors.find,
       },
