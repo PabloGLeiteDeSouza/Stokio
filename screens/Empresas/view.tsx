@@ -229,7 +229,9 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation }) => {
           </FormControlLabel>
           <Input>
             <SearchEmpresas
-              onChangeValue={(Text) => { setValorBusca(Text); }}
+              onChangeValue={(Text) => {
+                setValorBusca(Text);
+              }}
               value={valorBusca}
               tipo={tipoDeBusca}
             />

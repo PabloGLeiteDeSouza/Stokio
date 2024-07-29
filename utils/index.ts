@@ -60,5 +60,5 @@ export default {
   verificarAtributosObjeto,
   verificarArray,
   formatStringDateDB,
-  formatDateStringDB
+  formatDateStringDB,
 };

@@ -41,7 +41,25 @@ export class TipoDeUnidadeDeArmazenamento {
       if (!result) {
         throw new Error(errors.database_errors.ErrosTipoUA.find.byId.database);
       }
-      return result;
+      return result as UpdateTipoDeUnidadeDeArmazenamentoDto;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async findByNome($nome: string) {
+    try {
+      const result = await this.db.getFirstAsync(
+        'SELECT * FROM tipo_de_unidade_de_armazenamento WHERE npme = $nome',
+        { $nome },
+      );
+      if (!result) {
+        throw new Error(
+          errors.database_errors.ErrosTipoUA.find.byNome.database,
+        );
+      }
+      return result as UpdateTipoDeUnidadeDeArmazenamentoDto;
     } catch (error) {
       console.error(error);
       throw error;
@@ -56,7 +74,7 @@ export class TipoDeUnidadeDeArmazenamento {
       if (!result) {
         throw new Error(errors.database_errors.ErrosTipoUA.find.all.database);
       }
-      return result;
+      return result as Array<UpdateTipoDeUnidadeDeArmazenamentoDto>;
     } catch (error) {
       console.error(error);
       throw error;

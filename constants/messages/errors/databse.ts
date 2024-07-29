@@ -158,6 +158,12 @@ export const db_error_messages = {
       database: 'Não foi possível deletar o produto tente novamente!',
     },
     find: {
+      all: {
+        database: 'Não foi possível encontrar nenhum produto tente novamente!',
+      },
+      allbyIdEmpresa: {
+        database: 'Não foi possível encontrar nenhum produto tente novamente!',
+      },
       byTipo: {
         database: 'Não foi possível encontrar o produto tente novamente!',
       },
@@ -265,7 +271,8 @@ export const db_error_messages = {
   },
   ErrorsUM: {
     update: {
-      database: 'Não foi possível atualizar a unidade de medida tente novamente!',
+      database:
+        'Não foi possível atualizar a unidade de medida tente novamente!',
     },
     create: {
       database: 'Não foi possível criar a unidade de medida tente novamente!',
@@ -275,14 +282,17 @@ export const db_error_messages = {
     },
     find: {
       all: {
-        database: 'Não foi possível encontrar nenhuma unidade de medida tente novamente!'
+        database:
+          'Não foi possível encontrar nenhuma unidade de medida tente novamente!',
       },
       byId: {
-        database: 'Não foi possível encontrar a unidade de medida tente novamente!'
+        database:
+          'Não foi possível encontrar a unidade de medida tente novamente!',
       },
       byNome: {
-        database: 'Não foi possível encontrar a unidade de medida tente novamente!'
+        database:
+          'Não foi possível encontrar a unidade de medida tente novamente!',
       },
-    }
-  }
+    },
+  },
 };

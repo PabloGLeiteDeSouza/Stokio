@@ -7,13 +7,16 @@ export type RootStackParamList = {
   'listar-produtos'?: { code?: string; result?: boolean };
   'listar-empresas'?: {};
   'listar-ua'?: {};
-  'listar-clientes'?: {};
-  'cadastrar-clientes'?: {};
+  'listar-tipo-ua'?: {};
+  'listar-clientes'?: { id?: string };
+  'cadastrar-clientes'?: { nome?: string };
   'cadastrar-empresas'?: {};
   'cadastrar-ua'?: {};
+  'cadastrar-tipo-ua'?: {};
   'editar-produtos'?: {};
   'editar-empresas'?: { empresa: UpdateEmpresaObject };
   'editar-ua'?: {};
+  'editar-tipo-ua'?: {};
   'tab-bottom'?: {};
   'auth-screen'?: {};
 };

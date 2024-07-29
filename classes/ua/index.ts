@@ -41,7 +41,7 @@ export class UnidadeDeArmazenamento {
       if (!result) {
         throw new Error(errors.database_errors.ErrorsUA.find.all.database);
       }
-      return result;
+      return result as Array<UpdateUnidadeDeArmazenamentoDto>;
     } catch (error) {
       console.error(error);
       throw error;
@@ -57,7 +57,7 @@ export class UnidadeDeArmazenamento {
       if (!result) {
         throw new Error(errors.database_errors.ErrorsUA.find.byId.database);
       }
-      return result;
+      return result as UpdateUnidadeDeArmazenamentoDto;
     } catch (error) {
       console.error(error);
       throw error;
@@ -73,7 +73,23 @@ export class UnidadeDeArmazenamento {
       if (!result) {
         throw new Error(errors.database_errors.ErrorsUA.find.byNome.database);
       }
-      return result;
+      return result as UpdateUnidadeDeArmazenamentoDto;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async findAllByName($nome: string) {
+    try {
+      const result = await this.db.getFirstAsync(
+        'SELECT * FROM unidade_de_armazenamento WHERE nome = %$nome%',
+        { $nome },
+      );
+      if (!result) {
+        throw new Error(errors.database_errors.ErrorsUA.find.all.database);
+      }
+      return result as Array<UpdateUnidadeDeArmazenamentoDto>;
     } catch (error) {
       console.error(error);
       throw error;

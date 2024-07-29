@@ -202,12 +202,14 @@ const Update: React.FC<EditarEmpresasScreenProps> = ({ navigation, route }) => {
           initialValues={{
             tipo_empresa: empresas.cnpj ? 'pj' : ('pf' as 'pj' | 'pf'),
             id: empresas.id,
-            nome_completo: empresas.nome_completo ? empresas.nome_completo : "",
-            cpf: empresas.cpf ? empresas.cpf : "",
-            data_de_nascimento: empresas.data_de_nascimento ? empresas.data_de_nascimento : "",
-            nome_fantasia: empresas.nome_fantasia ? empresas.nome_fantasia : "",
-            razao_social: empresas.razao_social ? empresas.razao_social : "",
-            cnpj: empresas.cnpj ? empresas.cnpj : "",
+            nome_completo: empresas.nome_completo ? empresas.nome_completo : '',
+            cpf: empresas.cpf ? empresas.cpf : '',
+            data_de_nascimento: empresas.data_de_nascimento
+              ? empresas.data_de_nascimento
+              : '',
+            nome_fantasia: empresas.nome_fantasia ? empresas.nome_fantasia : '',
+            razao_social: empresas.razao_social ? empresas.razao_social : '',
+            cnpj: empresas.cnpj ? empresas.cnpj : '',
             id_endereco: empresas.id_endereco,
             cep: (OEndereco as UpdateEnderecoDto).cep,
             logradouro: (OEndereco as UpdateEnderecoDto).logradouro,
@@ -315,7 +317,7 @@ const Update: React.FC<EditarEmpresasScreenProps> = ({ navigation, route }) => {
                     throw error;
                   }
                 });
-                Alert.alert('Sucesso!', MessagesSuccess)
+                Alert.alert('Sucesso!', MessagesSuccess);
                 navigation?.navigate('listar-empresas');
               }
             } catch (error) {

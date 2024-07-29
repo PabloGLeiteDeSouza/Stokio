@@ -80,18 +80,18 @@ export class Produto {
     try {
       const result = await this.db.getAllAsync('SELECT * FROM produto');
       if (!result) {
-        return { error: true };
+        throw new Error(errors.database_errors.ErrorsEmpresa.find.all.database);
       }
-      return result;
+      return result as Array<UpdateProdutoDto>;
     } catch (error) {
       console.error(error);
-      return { error: true };
+      throw error;
     }
   }
 
   async findFirstByIdMarca(id_marca: number) {
     try {
-      const result = await this.db.getFirstAsync(
+      const result = await this.db.getAllAsync(
         'SELECT * FROM produto WHERE id_marca = $id_marca',
         { $id_marca: id_marca },
       );
@@ -100,7 +100,7 @@ export class Produto {
           errors.database_errors.ErrorsProduto.find.allbyIdMarca.database,
         );
       }
-      return result;
+      return result as Array<UpdateProdutoDto>;
     } catch (error) {
       console.error(error);
       throw error;
@@ -136,7 +136,7 @@ export class Produto {
           errors.database_errors.ErrorsProduto.find.byNome.database,
         );
       }
-      return result;
+      return result as UpdateProdutoDto;
     } catch (error) {
       console.error(error);
       throw error;
@@ -154,7 +154,7 @@ export class Produto {
           errors.database_errors.ErrorsProduto.find.byCodigoDeBarras.database,
         );
       }
-      return result;
+      return result as UpdateProdutoDto;
     } catch (error) {
       console.error(error);
       throw error;
@@ -173,6 +173,24 @@ export class Produto {
         );
       }
       return result;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async findAllByIdEmpresa($id_empresa: number) {
+    try {
+      const result = await this.db.getAllAsync(
+        'SELECT * FROM produto WHERE id_empresa = $id_empresa',
+        { $id_empresa },
+      );
+      if (!result) {
+        throw new Error(
+          errors.database_errors.ErrorsProduto.find.allbyIdEmpresa.database,
+        );
+      }
+      return result as Array<UpdateProdutoDto>;
     } catch (error) {
       console.error(error);
       throw error;

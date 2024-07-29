@@ -1,36 +1,4 @@
 import {
-  Radio,
-  RadioGroup,
-  RadioIcon,
-  RadioIndicator,
-  RadioLabel,
-  Checkbox,
-  CheckboxGroup,
-  CheckboxIndicator,
-  CheckboxIcon,
-  CheckboxLabel,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  Switch,
-  Modal,
-  ModalBackdrop,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  HStack,
-  VStack,
-  Heading,
-  Center,
-  Icon,
-  CircleIcon,
-  CheckIcon,
-} from '@gluestack-ui/themed';
-
-import {
   FormControl,
   FormControlLabel,
   FormControlLabelText,
@@ -631,7 +599,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({ navigation }) => {
                   </>
                 )}
                 <FormControl
-                  isInvalid={errors.ramo ? true :  false}
+                  isInvalid={errors.ramo ? true : false}
                   size={'md'}
                   isDisabled={isAllDisabled.ramo}
                   isRequired={true}
@@ -656,9 +624,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({ navigation }) => {
 
                   <FormControlError>
                     <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      {errors.ramo}
-                    </FormControlErrorText>
+                    <FormControlErrorText>{errors.ramo}</FormControlErrorText>
                   </FormControlError>
                 </FormControl>
 

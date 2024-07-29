@@ -5,13 +5,14 @@ import tsPlugin from '@typescript-eslint/eslint-plugin';
 import prettierPlugin from 'eslint-plugin-prettier';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import tseslint from 'typescript-eslint';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const compat = new FlatCompat();
 
-export default [
+export default tseslint.config(
   {
     files: ['**/*.ts', '**/*.tsx'],
     ignores: ['.eslintrc.js'],
@@ -53,4 +54,4 @@ export default [
   ...compat.extends('plugin:@typescript-eslint/recommended'),
   ...compat.extends('plugin:prettier/recommended'),
   ...compat.extends('prettier'),
-];
+);
