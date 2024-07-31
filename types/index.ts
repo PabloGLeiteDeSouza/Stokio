@@ -1,24 +1,37 @@
-import { UpdateUnidadeDeArmazenamentoDto } from '$classes/ua/dto/update-ua.dto';
 import { ParamListBase, RouteProp } from '@react-navigation/native';
 
 export type RootStackParamList = {
   'cadastrar-produtos'?: { code?: string; result?: boolean };
   'code-scanner'?: { screen: string; type: string };
-  'listar-produtos'?: { code?: string; result?: boolean };
-  'listar-empresas'?: {};
-  'listar-ua'?: {};
-  'listar-tipo-ua'?: {};
-  'listar-clientes'?: { id?: string };
+  'listar-produtos'?: { code?: string };
+  'listar-empresas'?: object;
+  'listar-ua'?: object;
+  'listar-tipo-ua'?: object;
+  'listar-um'?: object;
+  'listar-categoria'?: object;
+  'listar-tipo'?: object;
+  'listar-marca'?: object;
+  'listar-vendas'?: object;
+  'listar-clientes'?: object;
   'cadastrar-clientes'?: { nome?: string };
-  'cadastrar-empresas'?: {};
-  'cadastrar-ua'?: {};
-  'cadastrar-tipo-ua'?: {};
-  'editar-produtos'?: {};
+  'cadastrar-empresas'?: object;
+  'cadastrar-categoria'?: object;
+  'cadastrar-marca'?: object;
+  'cadastrar-tipo-produto'?: object;
+  'cadastrar-ua'?: object;
+  'cadastrar-tipo-ua'?: object;
+  'cadastrar-um'?: object;
+  'editar-produtos'?: object;
   'editar-empresas'?: { empresa: UpdateEmpresaObject };
-  'editar-ua'?: {};
-  'editar-tipo-ua'?: {};
-  'tab-bottom'?: {};
-  'auth-screen'?: {};
+  'editar-ua'?: object;
+  'editar-um'?: object;
+  'editar-categoria'?: object;
+  'editar-marca'?: object;
+  'editar-tipo-produto'?: object;
+  v;
+  'editar-tipo-ua'?: object;
+  'tab-bottom'?: object;
+  'auth-screen'?: object;
 };
 
 export type UpdateEmpresaObject = {
@@ -40,8 +53,8 @@ export type ScreenComponentType<
 > =
   | React.ComponentType<{
       route: RouteProp<ParamList, RouteName>;
-      navigation: any;
+      navigation: unknown;
     }>
-  | React.ComponentType<{}>;
+  | React.ComponentType<object>;
 
-export type TypeUpdateEmpresasObjectToScreen = {};
+export type TypeUpdateEmpresasObjectToScreen = object;

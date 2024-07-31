@@ -1,6 +1,6 @@
 import MessageErrors from 'messages-error';
-import { CreateCategotiaDto } from './dto/create-categoria.dto';
-import { UpdateCategoroaDto } from './dto/update-categoria.dto';
+import { CreateCategoriaDto } from './dto/create-categoria.dto';
+import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 import * as SQLite from 'expo-sqlite';
 
 export class Categoria {
@@ -10,7 +10,7 @@ export class Categoria {
     this.db = db;
   }
 
-  async create(categoria: CreateCategotiaDto) {
+  async create(categoria: CreateCategoriaDto) {
     try {
       const result = await this.db.runAsync(
         'INSERT INTO categoria (nome) VALUES ($nome)',
@@ -28,7 +28,7 @@ export class Categoria {
     }
   }
 
-  async update(id: number, categoria: UpdateCategoroaDto) {
+  async update(id: number, categoria: UpdateCategoriaDto) {
     try {
       const result = await this.db.runAsync(
         'UPDATE categoria SET nome = $nome WHERE id = $id',
@@ -57,7 +57,7 @@ export class Categoria {
           MessageErrors.database_errors.ErrorsCategoria.find.byId.database,
         );
       }
-      return result;
+      return result as UpdateCategoriaDto;
     } catch (error) {
       console.error(error);
       throw error;
@@ -75,7 +75,7 @@ export class Categoria {
           MessageErrors.database_errors.ErrorsCategoria.find.byName.database,
         );
       }
-      return result;
+      return result as UpdateCategoriaDto;
     } catch (error) {
       console.error(error);
       throw error;
@@ -90,7 +90,7 @@ export class Categoria {
           MessageErrors.database_errors.ErrorsCategoria.find.all.database,
         );
       }
-      return result;
+      return result as Array<UpdateCategoriaDto>;
     } catch (error) {
       console.error(error);
       throw error;

@@ -37,7 +37,7 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation, route }) => {
   >([]);
   const [paramSearch, setParamSearch] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(true);
-  const [temEmpresas, setTemEmpresas] = React.useState(true);
+  const [haveItems, setHaveItems] = React.useState(true);
   const { theme } = useThemeApp();
   const db = useSQLiteContext();
 

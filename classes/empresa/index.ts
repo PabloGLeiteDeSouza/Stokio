@@ -3,6 +3,7 @@ import { CreateEmpresaDto } from './dto/create-empresa.dto';
 import { UpdateEmpresaDto } from './dto/update-empresa.dto';
 import MessageErrors from 'messages-error';
 import { formatStringDateDB } from 'utils';
+import { UpdateUmDto } from '$classes/um/dto/update-um.dto';
 
 export class Empresa {
   private db: SQLite.SQLiteDatabase;
@@ -129,24 +130,24 @@ export class Empresa {
           MessageErrors.database_errors.ErrorsEmpresa.find.all.database,
         );
       }
-      return result;
+      return result as Array<UpdateUmDto>;
     } catch (error) {
       throw error;
     }
   }
 
-  async findUniqueByCpf(cpf: string): Promise<any> {
+  async findUniqueByCpf(cpf: string): Promise<UpdateUmDto> {
     try {
       const result = await this.db.getFirstAsync(
-        'SELECT * FROM empresa WHERE cpf LIKE $cpf',
-        { $cpf: `%${cpf}%` },
+        'SELECT * FROM empresa WHERE cpf = $cpf',
+        { $cpf: `${cpf}` },
       );
       if (!result) {
         throw new Error(
           MessageErrors.database_errors.ErrorsEmpresa.find.byCpf.database,
         );
       }
-      return result;
+      return result as UpdateUmDto;
     } catch (error) {
       console.error('o que deu errado: ', (error as Error).message);
       throw error;
@@ -164,7 +165,7 @@ export class Empresa {
           MessageErrors.database_errors.ErrorsEmpresa.find.byNomeCompleto.database,
         );
       }
-      return result;
+      return result as Array<UpdateUmDto>;
     } catch (error) {
       console.error(error);
       throw error;
@@ -182,7 +183,7 @@ export class Empresa {
           MessageErrors.database_errors.ErrorsEmpresa.find.byNomeFantasia.database,
         );
       }
-      return result;
+      return result as Array<UpdateUmDto>;
     } catch (error) {
       console.error('o que deu errado: ', (error as Error).message);
       throw error;
@@ -200,7 +201,7 @@ export class Empresa {
           MessageErrors.database_errors.ErrorsEmpresa.find.byRazaoSocial.database,
         );
       }
-      return result;
+      return result as Array<UpdateUmDto>;
     } catch (error) {
       console.error(error);
       throw error;
@@ -211,14 +212,14 @@ export class Empresa {
     try {
       const result = await this.db.getFirstAsync(
         'SELECT * FROM empresa WHERE cnpj LIKE $cnpj',
-        { $cnpj: `%${cnpj}%` },
+        { $cnpj: `${cnpj}` },
       );
       if (!result) {
         throw new Error(
           MessageErrors.database_errors.ErrorsEmpresa.find.byCnpj.database,
         );
       }
-      return result;
+      return result as UpdateUmDto;
     } catch (error) {
       console.error(error);
       throw error;
