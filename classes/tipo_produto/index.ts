@@ -3,7 +3,7 @@ import * as SQLite from 'expo-sqlite';
 import { CreateTipoProdutoDto } from './dto/create-tipo-de-produto.dto';
 import { UpdateTipoDeProdutoDto } from './dto/update-tipo-de-produto.dto';
 
-export class TipoDeUnidadeDeArmazenamento {
+export class TipoDeProduto {
   private db: SQLite.SQLiteDatabase;
 
   constructor(db: SQLite.SQLiteDatabase) {
@@ -18,7 +18,9 @@ export class TipoDeUnidadeDeArmazenamento {
         { $nome: nome },
       );
       if (!result) {
-        throw new Error(errors.database_errors.ErrosTipoUA.create.database);
+        throw new Error(
+          errors.database_errors.ErrosTipoProduto.create.database,
+        );
       }
       return {
         ...tipo_de_produto,
@@ -37,7 +39,9 @@ export class TipoDeUnidadeDeArmazenamento {
         { $id: id },
       );
       if (!result) {
-        throw new Error(errors.database_errors.ErrosTipoUA.find.byId.database);
+        throw new Error(
+          errors.database_errors.ErrosTipoProduto.find.byId.database,
+        );
       }
       return result as UpdateTipoDeProdutoDto;
     } catch (error) {
@@ -54,7 +58,7 @@ export class TipoDeUnidadeDeArmazenamento {
       );
       if (!result) {
         throw new Error(
-          errors.database_errors.ErrosTipoUA.find.byNome.database,
+          errors.database_errors.ErrosTipoProduto.find.byNome.database,
         );
       }
       return result as UpdateTipoDeProdutoDto;
@@ -68,7 +72,9 @@ export class TipoDeUnidadeDeArmazenamento {
     try {
       const result = await this.db.getAllAsync('SELECT * FROM tipo_de_produto');
       if (!result) {
-        throw new Error(errors.database_errors.ErrosTipoUA.find.all.database);
+        throw new Error(
+          errors.database_errors.ErrosTipoProduto.find.all.database,
+        );
       }
       return result as Array<UpdateTipoDeProdutoDto>;
     } catch (error) {
@@ -85,7 +91,9 @@ export class TipoDeUnidadeDeArmazenamento {
         { $nome: nome },
       );
       if (!result) {
-        throw new Error(errors.database_errors.ErrosTipoUA.update.database);
+        throw new Error(
+          errors.database_errors.ErrosTipoProduto.update.database,
+        );
       }
       return { nome, id };
     } catch (error) {
@@ -101,7 +109,9 @@ export class TipoDeUnidadeDeArmazenamento {
         { $id: id },
       );
       if (!result) {
-        throw new Error(errors.database_errors.ErrosTipoUA.delete.database);
+        throw new Error(
+          errors.database_errors.ErrosTipoProduto.delete.database,
+        );
       }
       return { sucess: true };
     } catch (error) {

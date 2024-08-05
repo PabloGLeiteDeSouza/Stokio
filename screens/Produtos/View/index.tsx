@@ -1,6 +1,9 @@
+import { Categoria } from '$classes/categoria';
 import { Empresa } from '$classes/empresa';
+import { Marca } from '$classes/marca';
 import { Produto } from '$classes/produto';
 import { UpdateProdutoDto } from '$classes/produto/dto/update-produto.dto';
+import { TipoDeProduto } from '$classes/tipo_produto';
 import LoadingScreen from '$components/LoadingScreen';
 import { useThemeApp } from '$providers/theme';
 import { RootStackParamList } from '$types/index';
@@ -37,7 +40,15 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation, route }) => {
   >([]);
   const [paramSearch, setParamSearch] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(true);
-  const [haveItems, setHaveItems] = React.useState(true);
+  const [haveAllDeps, setHaveAllDeps] = React.useState({
+    empresa: false,
+    tipo: false,
+    categoria: false,
+    marca: false,
+    um: false,
+    ua: false,
+  });
+
   const { theme } = useThemeApp();
   const db = useSQLiteContext();
 
@@ -102,8 +113,36 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation, route }) => {
   React.useEffect(() => {
     async function start() {
       try {
-        await new Empresa(db).findAll();
-        await getProdutos('all');
+        setIsLoading(true);
+        const empresa = await new Empresa(db).findAll();
+        if (empresa) {
+          setHaveAllDeps({
+            ...haveAllDeps,
+            empresa: empresa.length > 0,
+          });
+        }
+        const tipo = await new TipoDeProduto(db).findAll();
+        if (tipo) {
+          setHaveAllDeps({
+            ...haveAllDeps,
+            tipo: tipo.length > 0,
+          });
+        }
+        const categoria = await new Categoria(db).findAll();
+        if (categoria) {
+          setHaveAllDeps({
+            ...haveAllDeps,
+            categoria: categoria.length > 0,
+          });
+        }
+        const marca = await new Marca(db).findAll();
+        if (marca) {
+          setHaveAllDeps({
+            ...haveAllDeps,
+            marca: marca.length > 0,
+          });
+        }
+        setIsLoading(false);
       } catch (error) {
         Alert.alert('Erro', (error as Error).message);
         throw error;
@@ -123,7 +162,7 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation, route }) => {
 
   return (
     <>
-      {haveProducts ? (
+      {products.length > 0 ? (
         <ScrollView>
           <Box></Box>
         </ScrollView>
@@ -131,7 +170,20 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation, route }) => {
         <Box w="$full" h="$full" alignItems="center" justifyContent="center">
           <Box gap={10}>
             <Text size="xl" textAlign="center">
-              Não há produtos cadastrados
+              Não há{' '}
+              {!haveAllDeps.categoria
+                ? 'categorias cadastradas'
+                : !haveAllDeps.empresa
+                  ? 'empresas cadastradas'
+                  : !haveAllDeps.marca
+                    ? 'marcas cadastradas'
+                    : !haveAllDeps.tipo
+                      ? 'tipos de produtos cadastrados'
+                      : !haveAllDeps.ua
+                        ? 'unidades de armazenamento cadastradas'
+                        : !haveAllDeps.um
+                          ? 'unidades de medida cadastradas'
+                          : 'produtos cadastrados'}
             </Text>
             <Button
               $active-bgColor={theme === 'dark' ? '$purple700' : '$purple500'}
@@ -140,7 +192,19 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation, route }) => {
               gap={10}
               onPress={() =>
                 navigation?.navigate(
-                  temEmpresas ? 'cadastrar-produtos' : 'cadastrar-empresas',
+                  {!haveAllDeps.categoria
+                    ? 'screens-categoria'
+                    : !haveAllDeps.empresa
+                      ? 'empresas cadastradas'
+                      : !haveAllDeps.marca
+                        ? 'marcas cadastradas'
+                        : !haveAllDeps.tipo
+                          ? 'tipos de produtos cadastrados'
+                          : !haveAllDeps.ua
+                            ? 'unidades de armazenamento cadastradas'
+                            : !haveAllDeps.um
+                              ? 'unidades de medida cadastradas'
+                              : 'produtos cadastrados'}
                 )
               }
             >

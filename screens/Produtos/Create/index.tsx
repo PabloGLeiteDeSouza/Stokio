@@ -81,6 +81,8 @@ import { Categoria } from '$classes/categoria';
 import { Um } from '$classes/um';
 import { UnidadeDeArmazenamento } from '$classes/ua';
 import { Alert } from 'react-native';
+import { UpdateTipoDeProdutoDto } from '$classes/tipo_produto/dto/update-tipo-de-produto.dto';
+import { TipoDeProduto } from '$classes/tipo_produto';
 type CadastrarProdutosScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   'cadastrar-produtos'
@@ -130,12 +132,12 @@ type CadastrarProdutosState = {
 };
 
 type DadosDB = {
-  empresas: Array<UpdateEmpresaDto | unknown>;
-  marcas: Array<UpdateMarcaDto | unknown>;
-  categorias: Array<UpdateCategoriaDto | unknown>;
-  unidades_de_medida: Array<UpdateUmDto | unknown>;
-  unidades_de_armazenamento: Array<UpdateUnidadeDeArmazenamentoDto | unknown>;
-  tipo_produto: Array<>;
+  empresas: Array<UpdateEmpresaDto>;
+  marcas: Array<UpdateMarcaDto>;
+  categorias: Array<UpdateCategoriaDto>;
+  unidades_de_medida: Array<UpdateUmDto>;
+  unidades_de_armazenamento: Array<UpdateUnidadeDeArmazenamentoDto>;
+  tipo_produto: Array<UpdateTipoDeProdutoDto>;
 };
 
 const Create: React.FC<CadastrarProdutosScreenProps> = ({
@@ -210,12 +212,14 @@ const Create: React.FC<CadastrarProdutosScreenProps> = ({
             unidade_de_armazenamento: true,
           });
         }
+        const tipos_produto = await new TipoDeProduto(db).findAll();
         setDadosdb({
           empresas: dados_empresas,
           marcas: dados_marcas,
           categorias: dados_categorias,
           unidades_de_medida: dados_unidades_de_medida,
           unidades_de_armazenamento: dados_unidades_de_armazenamento,
+          tipo_produto: tipos_produto,
         });
         setIsLoading(false);
       } catch (error) {
@@ -472,7 +476,13 @@ const Create: React.FC<CadastrarProdutosScreenProps> = ({
                         <SelectDragIndicatorWrapper>
                           <SelectDragIndicator />
                         </SelectDragIndicatorWrapper>
-                        {dadosdb.tipo}
+                        {dadosdb.tipo_produto.map((tipo, i) => (
+                          <SelectItem
+                            key={i}
+                            label={tipo.nome}
+                            value={String(tipo.id)}
+                          />
+                        ))}
                         <SelectItem label="UX Research" value="UX Research" />
                       </SelectContent>
                     </SelectPortal>

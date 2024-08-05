@@ -295,4 +295,29 @@ export const db_error_messages = {
       },
     },
   },
+  ErrosTipoProduto: {
+    update: {
+      database: 'Não foi possível atualizar o tipo de produto tente novamente!',
+    },
+    create: {
+      database: 'Não foi possível criar o tipo de produto tente novamente!',
+    },
+    delete: {
+      database: 'Não foi possível deletar o tipo de produto tente novamente!',
+    },
+    find: {
+      all: {
+        database:
+          'Não foi possível encontrar nenhuma unidade de produto tente novamente!',
+      },
+      byId: {
+        database:
+          'Não foi possível encontrar o tipo de produto tente novamente!',
+      },
+      byNome: {
+        database:
+          'Não foi possível encontrar o tipo de produto tente novamente!',
+      },
+    },
+  },
 };

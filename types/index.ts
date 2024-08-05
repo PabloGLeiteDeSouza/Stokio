@@ -1,6 +1,12 @@
 import { ParamListBase, RouteProp } from '@react-navigation/native';
 
 export type RootStackParamList = {
+  'screens-produtos'?: object;
+  'screens-categorias'?: object;
+  'screens-empresas'?: object;
+  'screens-marcas'?: object;
+  'screens-uas'?: object;
+  'screens-tipos-uas'?: object;
   'cadastrar-produtos'?: { code?: string; result?: boolean };
   'code-scanner'?: { screen: string; type: string };
   'listar-produtos'?: { code?: string };
@@ -28,7 +34,6 @@ export type RootStackParamList = {
   'editar-categoria'?: object;
   'editar-marca'?: object;
   'editar-tipo-produto'?: object;
-  v;
   'editar-tipo-ua'?: object;
   'tab-bottom'?: object;
   'auth-screen'?: object;

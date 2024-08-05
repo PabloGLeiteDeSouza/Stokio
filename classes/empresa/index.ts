@@ -3,7 +3,6 @@ import { CreateEmpresaDto } from './dto/create-empresa.dto';
 import { UpdateEmpresaDto } from './dto/update-empresa.dto';
 import MessageErrors from 'messages-error';
 import { formatStringDateDB } from 'utils';
-import { UpdateUmDto } from '$classes/um/dto/update-um.dto';
 
 export class Empresa {
   private db: SQLite.SQLiteDatabase;
@@ -130,13 +129,13 @@ export class Empresa {
           MessageErrors.database_errors.ErrorsEmpresa.find.all.database,
         );
       }
-      return result as Array<UpdateUmDto>;
+      return result as Array<UpdateEmpresaDto>;
     } catch (error) {
       throw error;
     }
   }
 
-  async findUniqueByCpf(cpf: string): Promise<UpdateUmDto> {
+  async findUniqueByCpf(cpf: string): Promise<UpdateEmpresaDto> {
     try {
       const result = await this.db.getFirstAsync(
         'SELECT * FROM empresa WHERE cpf = $cpf',
@@ -147,7 +146,7 @@ export class Empresa {
           MessageErrors.database_errors.ErrorsEmpresa.find.byCpf.database,
         );
       }
-      return result as UpdateUmDto;
+      return result as UpdateEmpresaDto;
     } catch (error) {
       console.error('o que deu errado: ', (error as Error).message);
       throw error;
@@ -165,7 +164,7 @@ export class Empresa {
           MessageErrors.database_errors.ErrorsEmpresa.find.byNomeCompleto.database,
         );
       }
-      return result as Array<UpdateUmDto>;
+      return result as Array<UpdateEmpresaDto>;
     } catch (error) {
       console.error(error);
       throw error;
@@ -183,7 +182,7 @@ export class Empresa {
           MessageErrors.database_errors.ErrorsEmpresa.find.byNomeFantasia.database,
         );
       }
-      return result as Array<UpdateUmDto>;
+      return result as Array<UpdateEmpresaDto>;
     } catch (error) {
       console.error('o que deu errado: ', (error as Error).message);
       throw error;
@@ -201,7 +200,7 @@ export class Empresa {
           MessageErrors.database_errors.ErrorsEmpresa.find.byRazaoSocial.database,
         );
       }
-      return result as Array<UpdateUmDto>;
+      return result as Array<UpdateEmpresaDto>;
     } catch (error) {
       console.error(error);
       throw error;
@@ -219,7 +218,7 @@ export class Empresa {
           MessageErrors.database_errors.ErrorsEmpresa.find.byCnpj.database,
         );
       }
-      return result as UpdateUmDto;
+      return result as UpdateEmpresaDto;
     } catch (error) {
       console.error(error);
       throw error;

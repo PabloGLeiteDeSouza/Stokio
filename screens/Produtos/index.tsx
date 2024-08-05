@@ -4,6 +4,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import View from './View';
 import Update from './Update';
 import Create from './Create';
+import ScreensCategoria from './Categoria';
+import ScreensMarca from './Marca';
+import ScreensTipo from './Tipo';
 
 const Stack = createNativeStackNavigator();
 
@@ -29,9 +32,9 @@ const ProdutosScreens: React.FC = () => {
         component={Update}
         options={{ title: 'Editar Produtos' }}
       />
-      <Stack.Screen name="screens-categorias" />
-      <Stack.Screen name="screens-marcas" />
-      <Stack.Screen name="scrrens-" />
+      <Stack.Screen name="screens-categorias" component={ScreensCategoria} />
+      <Stack.Screen name="screens-marcas" component={ScreensMarca} />
+      <Stack.Screen name="scrrens-tipo-produto" component={ScreensTipo} />
     </Stack.Navigator>
   );
 };

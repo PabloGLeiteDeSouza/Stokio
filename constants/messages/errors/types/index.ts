@@ -507,4 +507,26 @@ export type TypeDatabaseErrors = {
       };
     };
   };
+  ErrosTipoProduto: {
+    update: {
+      database: string;
+    };
+    create: {
+      database: string;
+    };
+    delete: {
+      database: string;
+    };
+    find: {
+      all: {
+        database: string;
+      };
+      byId: {
+        database: string;
+      };
+      byNome: {
+        database: string;
+      };
+    };
+  };
 };
