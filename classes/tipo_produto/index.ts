@@ -12,10 +12,10 @@ export class TipoDeProduto {
 
   async create(tipo_de_produto: CreateTipoProdutoDto) {
     try {
-      const { nome } = tipo_de_produto;
+      const { nome, descricao } = tipo_de_produto;
       const result = await this.db.runAsync(
-        'INSERT INTO tipo_de_produto (nome) VALUES ($nome)',
-        { $nome: nome },
+        'INSERT INTO tipo_de_produto (nome, descricao) VALUES ($nome, $descricao)',
+        { $nome: nome, $descricao: descricao },
       );
       if (!result) {
         throw new Error(
@@ -53,7 +53,7 @@ export class TipoDeProduto {
   async findByNome($nome: string) {
     try {
       const result = await this.db.getFirstAsync(
-        'SELECT * FROM tipo_de_produto WHERE npme = $nome',
+        'SELECT * FROM tipo_de_produto WHERE nome = $nome',
         { $nome },
       );
       if (!result) {

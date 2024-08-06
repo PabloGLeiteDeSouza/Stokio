@@ -155,3 +155,31 @@ CREATE TABLE IF NOT EXISTS "unidades_de_medida" (
 	id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 	nome TEXT NOT NULL
 );
+
+
+CREATE TABLE "produto" (
+"id" INTEGER NOT NULL,
+"nome" TEXT NOT NULL,
+"descricao" TEXT,
+"valor" INTEGER NOT NULL,
+"tamanho" INTEGER NOT NULL,
+"quantidade" INTEGER NOT NULL,
+"id_unidade_de_armazenamento" INTEGER NOT NULL,
+"id_unidades_de_medida" INTEGER NOT NULL,
+"id_categoria" INTEGER NOT NULL,
+"id_marca" INTEGER NOT NULL,
+"id_tipo_de_produto" INTEGER NOT NULL,
+PRIMARY KEY ("id"),
+FOREIGN KEY ("id_marca") REFERENCES "marca" ("id") ON UPDATE NO ACTION ON DELETE NO ACTION,
+FOREIGN KEY ("id_categoria") REFERENCES "categoria" ("id") ON UPDATE NO ACTION ON DELETE NO ACTION,
+FOREIGN KEY ("id_unidades_de_medida") REFERENCES "unidades_de_medida" ("id") ON UPDATE NO ACTION ON DELETE NO ACTION,
+FOREIGN KEY ("id_unidade_de_armazenamento") REFERENCES "unidade_de_armazenamento" ("id") ON UPDATE NO ACTION ON DELETE NO ACTION,
+		FOREIGN KEY ("id_tipo_de_produto") REFERENCES "tipo_de_produto" ("id") ON UPDATE NO ACTION ON DELETE NO ACTION
+	
+);
+
+CREATE INDEX IF NOT EXISTS "idx_id_marca" ON "produto" ("id_marca");
+CREATE INDEX IF NOT EXISTS "idx_id_categoria_in_produto" ON "produto" ("id_categoria");
+CREATE INDEX IF NOT EXISTS "idx_id_unidade_de_armazenamento_in_produto" ON "produto" ("id_unidade_de_armazenamento");
+CREATE INDEX IF NOT EXISTS "idx_id_unidades_de_medida_in_produto" ON "produto" ("id_unidades_de_medida");
+CREATE INDEX IF NOT EXISTS "idx_id_tipo_de_produto" ON "produto" ("id_tipo_de_produto");

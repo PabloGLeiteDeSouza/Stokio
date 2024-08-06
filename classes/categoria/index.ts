@@ -13,8 +13,8 @@ export class Categoria {
   async create(categoria: CreateCategoriaDto) {
     try {
       const result = await this.db.runAsync(
-        'INSERT INTO categoria (nome) VALUES ($nome)',
-        { $nome: categoria.nome },
+        'INSERT INTO categoria (nome, descricao) VALUES ($nome, $descricao)',
+        { $nome: categoria.nome, $descricao: categoria.descricao },
       );
       if (!result) {
         throw new Error(
@@ -31,8 +31,8 @@ export class Categoria {
   async update(id: number, categoria: UpdateCategoriaDto) {
     try {
       const result = await this.db.runAsync(
-        'UPDATE categoria SET nome = $nome WHERE id = $id',
-        { $id: id, $nome: categoria.nome },
+        'UPDATE categoria SET nome = $nome, descricao = $descricao WHERE id = $id',
+        { $id: id, $nome: categoria.nome, $descricao: categoria.descricao },
       );
       if (!result) {
         throw new Error(

@@ -1,3 +1,60 @@
+import {
+  FormControl,
+  FormControlLabel,
+  FormControlLabelText,
+  FormControlHelper,
+  FormControlHelperText,
+  FormControlError,
+  FormControlErrorIcon,
+  FormControlErrorText,
+  Input,
+  InputField,
+  Radio,
+  RadioGroup,
+  RadioIcon,
+  RadioIndicator,
+  RadioLabel,
+  Checkbox,
+  CheckboxGroup,
+  CheckboxIndicator,
+  CheckboxIcon,
+  CheckboxLabel,
+  Textarea,
+  TextareaInput,
+  Select,
+  SelectTrigger,
+  SelectInput,
+  SelectIcon,
+  SelectPortal,
+  SelectBackdrop,
+  SelectContent,
+  SelectDragIndicatorWrapper,
+  SelectDragIndicator,
+  SelectItem,
+  Slider,
+  SliderTrack,
+  SliderFilledTrack,
+  SliderThumb,
+  Switch,
+  Modal,
+  ModalBackdrop,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  HStack,
+  VStack,
+  Heading,
+  Center,
+  Icon,
+  CircleIcon,
+  CheckIcon,
+  AlertCircleIcon,
+  ChevronDownIcon,
+  SearchIcon,
+} from '@gluestack-ui/themed';
+
 import { Categoria } from '$classes/categoria';
 import { Empresa } from '$classes/empresa';
 import { Marca } from '$classes/marca';
@@ -16,7 +73,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useSQLiteContext } from 'expo-sqlite';
 import React from 'react';
 import { Alert } from 'react-native';
-
 type ListarProdutosScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   'listar-produtos'
@@ -25,19 +81,13 @@ type ListarProdutosScreenRouteProp = RouteProp<
   RootStackParamList,
   'listar-produtos'
 >;
-
 interface ListarProdutosScreenProps {
   navigation?: ListarProdutosScreenNavigationProp;
   route?: ListarProdutosScreenRouteProp;
 }
-
-const View: React.FC<ListarProdutosScreenProps> = ({ navigation, route }) => {
+const View: React.FC<ListarProdutosScreenProps> = ({ navigation }) => {
   const onFocused = useIsFocused();
-
-  const [haveProducts, setHaveProducts] = React.useState(false);
-  const [products, setProdutcts] = React.useState<
-    Array<UpdateProdutoDto | unknown>
-  >([]);
+  const [products, setProdutcts] = React.useState<Array<UpdateProdutoDto>>([]);
   const [paramSearch, setParamSearch] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(true);
   const [haveAllDeps, setHaveAllDeps] = React.useState({
@@ -48,10 +98,8 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation, route }) => {
     um: false,
     ua: false,
   });
-
   const { theme } = useThemeApp();
   const db = useSQLiteContext();
-
   const getProdutos = async (
     type:
       | 'all'
@@ -65,43 +113,36 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation, route }) => {
     switch (type) {
       case 'all':
         const produtos = await new Produto(db).findAll();
-        setHaveProducts(produtos.length > 0);
         setProdutcts(produtos);
         break;
       case 'codigo_de_barras':
         const produto = await new Produto(db).findFirstByBarCode(paramSearch);
-        setHaveProducts(produto !== null);
         setProdutcts([produto]);
         break;
       case 'categoria':
         const produtosCategoria = await new Produto(db).findAllByCategory(
           Number(paramSearch),
         );
-        setHaveProducts(produtosCategoria.length > 0);
         setProdutcts(produtosCategoria);
         break;
       case 'empresa':
         const produtosEmpresa = await new Produto(db).findAllByIdEmpresa(
           Number(paramSearch),
         );
-        setHaveProducts(produtosEmpresa.length > 0);
         setProdutcts(produtosEmpresa);
         break;
       case 'marca':
         const produtosMarca = await new Produto(db).findFirstByIdMarca(
           Number(paramSearch),
         );
-        setHaveProducts(produtosMarca.length > 0);
         setProdutcts(produtosMarca);
         break;
       case 'tipo':
         const produtosTipo = await new Produto(db).findAllByTipo(paramSearch);
-        setHaveProducts(produtosTipo.length > 0);
         setProdutcts(produtosTipo);
         break;
       case 'nome':
         const produtosNome = await new Produto(db).findFirstByName(paramSearch);
-        setHaveProducts(produtosNome ? true : false);
         setProdutcts([produtosNome]);
         break;
     }
@@ -109,7 +150,6 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation, route }) => {
       setIsLoading(false);
     }
   };
-
   React.useEffect(() => {
     async function start() {
       try {
@@ -150,21 +190,63 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation, route }) => {
     }
     start();
   }, []);
-
   React.useEffect(() => {
     setIsLoading(true);
     getProdutos('all');
   }, [onFocused]);
-
   if (isLoading) {
     return <LoadingScreen />;
   }
-
   return (
     <>
       {products.length > 0 ? (
         <ScrollView>
-          <Box></Box>
+          <Box>
+            <Box>
+              <FormControl
+                isInvalid={false}
+                size={'md'}
+                isDisabled={false}
+                isRequired={true}
+              >
+                <FormControlLabel>
+                  <FormControlLabelText>Buscar</FormControlLabelText>
+                </FormControlLabel>
+                <Input>
+                  <InputField
+                    type="password"
+                    defaultValue="12345"
+                    placeholder="password"
+                    value={paramSearch}
+                    onChangeText={(text) => setParamSearch(text)}
+                  />
+                  <Button>
+                    <ButtonIcon as={SearchIcon} />
+                  </Button>
+                </Input>
+              </FormControl>
+            </Box>
+            <Box>
+              {products.map((itens, i) => (
+                <Box key={i}>
+                  <HStack>
+                    <VStack>
+                      <Text>Nome:</Text>
+                      <Text>{itens.nome}</Text>
+                    </VStack>
+                    <VStack>
+                      <Text>Preço:</Text>
+                      <Text>{itens.preco}</Text>
+                    </VStack>
+                    <VStack>
+                      <Text>Descrição:</Text>
+                      <Text>{itens.descricao}</Text>
+                    </VStack>
+                  </HStack>
+                </Box>
+              ))}
+            </Box>
+          </Box>
         </ScrollView>
       ) : (
         <Box w="$full" h="$full" alignItems="center" justifyContent="center">
@@ -192,24 +274,36 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation, route }) => {
               gap={10}
               onPress={() =>
                 navigation?.navigate(
-                  {!haveAllDeps.categoria
-                    ? 'screens-categoria'
+                  !haveAllDeps.categoria
+                    ? 'screens-categorias'
                     : !haveAllDeps.empresa
-                      ? 'empresas cadastradas'
+                      ? 'screens-empresas'
                       : !haveAllDeps.marca
-                        ? 'marcas cadastradas'
+                        ? 'screens-marcas'
                         : !haveAllDeps.tipo
-                          ? 'tipos de produtos cadastrados'
+                          ? 'screens-tipos-produtos'
                           : !haveAllDeps.ua
-                            ? 'unidades de armazenamento cadastradas'
+                            ? 'screens-uas'
                             : !haveAllDeps.um
-                              ? 'unidades de medida cadastradas'
-                              : 'produtos cadastrados'}
+                              ? 'screens-ums'
+                              : 'cadastrar-produtos',
                 )
               }
             >
               <ButtonText>
-                {temEmpresas ? 'Cadastrar Produtos' : 'Cadastrar Empresas'}
+                {!haveAllDeps.categoria
+                  ? 'Cadastrar Categoria'
+                  : !haveAllDeps.empresa
+                    ? 'Cadastrar Empresas'
+                    : !haveAllDeps.marca
+                      ? 'Cadastrar marca'
+                      : !haveAllDeps.tipo
+                        ? 'Cadastrar Tipo'
+                        : !haveAllDeps.ua
+                          ? 'Cadastrar Unidade de Armazenamento'
+                          : !haveAllDeps.um
+                            ? 'Cadastrar Unidades de Medidas'
+                            : 'Cadastrar Produtos'}
               </ButtonText>
               <ButtonIcon
                 color="$white"
@@ -224,5 +318,4 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation, route }) => {
     </>
   );
 };
-
 export default View;

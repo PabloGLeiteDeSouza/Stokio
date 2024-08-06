@@ -19,7 +19,7 @@ interface AuthScreenProps {
   route?: AuthScreenRouteProp;
 }
 
-const AuthScreen: React.FC<AuthScreenProps> = ({ navigation, route }) => {
+const AuthScreen: React.FC<AuthScreenProps> = ({ navigation }) => {
   const autenticar = async () => {
     try {
       const result = await Auth();

@@ -32,9 +32,21 @@ const ProdutosScreens: React.FC = () => {
         component={Update}
         options={{ title: 'Editar Produtos' }}
       />
-      <Stack.Screen name="screens-categorias" component={ScreensCategoria} />
-      <Stack.Screen name="screens-marcas" component={ScreensMarca} />
-      <Stack.Screen name="scrrens-tipo-produto" component={ScreensTipo} />
+      <Stack.Screen
+        name="screens-categorias"
+        component={ScreensCategoria}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="screens-marcas"
+        component={ScreensMarca}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="scrrens-tipo-produto"
+        component={ScreensTipo}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 };

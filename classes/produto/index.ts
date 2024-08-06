@@ -172,7 +172,7 @@ export class Produto {
           errors.database_errors.ErrorsProduto.find.byTipo.database,
         );
       }
-      return result;
+      return result as Array<UpdateProdutoDto>;
     } catch (error) {
       console.error(error);
       throw error;
@@ -208,7 +208,7 @@ export class Produto {
           errors.database_errors.ErrorsProduto.find.allbyIdCategoria.database,
         );
       }
-      return result;
+      return result as Array<UpdateProdutoDto>;
     } catch (error) {
       console.error(error);
       throw error;
