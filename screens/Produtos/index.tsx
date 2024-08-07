@@ -43,7 +43,7 @@ const ProdutosScreens: React.FC = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="scrrens-tipo-produto"
+        name="screens-tipos-produtos"
         component={ScreensTipo}
         options={{ headerShown: false }}
       />

@@ -91,12 +91,12 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation }) => {
   const [paramSearch, setParamSearch] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(true);
   const [haveAllDeps, setHaveAllDeps] = React.useState({
-    empresa: false,
-    tipo: false,
-    categoria: false,
-    marca: false,
-    um: false,
-    ua: false,
+    empresa: true,
+    tipo: true,
+    categoria: true,
+    marca: true,
+    um: true,
+    ua: true,
   });
   const { theme } = useThemeApp();
   const db = useSQLiteContext();
@@ -150,50 +150,62 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation }) => {
       setIsLoading(false);
     }
   };
-  React.useEffect(() => {
-    async function start() {
-      try {
-        setIsLoading(true);
-        const empresa = await new Empresa(db).findAll();
-        if (empresa) {
-          setHaveAllDeps({
-            ...haveAllDeps,
-            empresa: empresa.length > 0,
-          });
-        }
-        const tipo = await new TipoDeProduto(db).findAll();
-        if (tipo) {
-          setHaveAllDeps({
-            ...haveAllDeps,
-            tipo: tipo.length > 0,
-          });
-        }
-        const categoria = await new Categoria(db).findAll();
-        if (categoria) {
-          setHaveAllDeps({
-            ...haveAllDeps,
-            categoria: categoria.length > 0,
-          });
-        }
-        const marca = await new Marca(db).findAll();
-        if (marca) {
-          setHaveAllDeps({
-            ...haveAllDeps,
-            marca: marca.length > 0,
-          });
-        }
+
+  async function start() {
+    try {
+      setIsLoading(true);
+      const empresa = await new Empresa(db).findAll();
+      if (!empresa || empresa.length < 1) {
+        setHaveAllDeps({
+          ...haveAllDeps,
+          empresa: false,
+        });
         setIsLoading(false);
-      } catch (error) {
-        Alert.alert('Erro', (error as Error).message);
-        throw error;
+        return;
       }
+      const categoria = await new Categoria(db).findAll();
+      if (!categoria || categoria.length < 1) {
+        setHaveAllDeps({
+          ...haveAllDeps,
+          categoria: false,
+        });
+        setIsLoading(false);
+        return;
+      }
+      const tipo = await new TipoDeProduto(db).findAll();
+      if (!tipo || tipo.length < 1) {
+        setHaveAllDeps({
+          ...haveAllDeps,
+          tipo: false,
+        });
+        setIsLoading(false);
+        return;
+      }
+      const marca = await new Marca(db).findAll();
+      if (!marca || marca.length < 1) {
+        setHaveAllDeps({
+          ...haveAllDeps,
+          marca: false,
+        });
+        setIsLoading(false);
+        return;
+      }
+      setIsLoading(false);
+    } catch (error) {
+      Alert.alert('Erro', (error as Error).message);
+      throw error;
     }
+  }
+
+  React.useEffect(() => {
     start();
   }, []);
+
   React.useEffect(() => {
     setIsLoading(true);
-    getProdutos('all');
+    start();
   }, [onFocused]);
+
   if (isLoading) {
     return <LoadingScreen />;
   }

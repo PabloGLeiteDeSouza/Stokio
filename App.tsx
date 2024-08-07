@@ -21,6 +21,7 @@ export default function App() {
         ).exists
       ) {
         await FileSystem.downloadAsync(
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
           Asset.fromModule(require('$assets/databases/stock.db')).uri,
           `${FileSystem.documentDirectory}SQLite/stock.db`,
         );

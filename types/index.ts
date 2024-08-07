@@ -1,3 +1,4 @@
+import { UpdateCategoriaDto } from '$classes/categoria/dto/update-categoria.dto';
 import { ParamListBase, RouteProp } from '@react-navigation/native';
 
 export type RootStackParamList = {
@@ -23,7 +24,7 @@ export type RootStackParamList = {
   'listar-clientes'?: object;
   'cadastrar-clientes'?: { nome?: string };
   'cadastrar-empresas'?: object;
-  'cadastrar-categoria'?: object;
+  'cadastrar-categoria'?: { categoria: UpdateCategoriaDto };
   'cadastrar-marca'?: object;
   'cadastrar-tipo-produto'?: object;
   'cadastrar-ua'?: object;

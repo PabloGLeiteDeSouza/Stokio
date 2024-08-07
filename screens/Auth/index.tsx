@@ -1,12 +1,13 @@
-import { useStorage } from '$providers/storage';
 import { RootStackParamList } from '$types/index';
-import { Box, Button, ButtonText, Text } from '@gluestack-ui/themed';
+import { Box, Button, ButtonText, Text, VStack } from '@gluestack-ui/themed';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import * as LocalAuthentication from 'expo-local-authentication';
 import React from 'react';
 import { Platform } from 'react-native';
 import { Auth } from '../../functions/Auth';
+import { Image } from '@gluestack-ui/themed';
+import { Asset } from 'expo-asset';
 
 type AuthScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -37,12 +38,18 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ navigation }) => {
 
   return (
     <Box w="$full" h="$full" justifyContent="center" alignItems="center">
-      <Box>
-        <Text>Realizar a authenticação:</Text>
-        <Button onPress={autenticar}>
+      <VStack alignItems="center" gap="$5">
+        <Image
+          rounded="$2xl"
+          alt="Logo Stokio"
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          source={{ uri: Asset.fromModule(require('$assets/icon.png')).uri }}
+        />
+        <Text size="3xl">Realizar a authenticação</Text>
+        <Button rounded="$3xl" h="$12" px="$24" onPress={autenticar}>
           <ButtonText>Autenticar-se</ButtonText>
         </Button>
-      </Box>
+      </VStack>
     </Box>
   );
 };

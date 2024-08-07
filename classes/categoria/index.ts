@@ -64,6 +64,24 @@ export class Categoria {
     }
   }
 
+  async findAllByName(nome: string) {
+    try {
+      const result = await this.db.getAllAsync(
+        'SELECT * FROM categoria WHERE nome LIKE %$nome%',
+        { $nome: nome },
+      );
+      if (!result) {
+        throw new Error(
+          MessageErrors.database_errors.ErrorsCategoria.find.all.database,
+        );
+      }
+      return result as UpdateCategoriaDto[];
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
   async findFirstByName(nome: string) {
     try {
       const result = await this.db.getFirstAsync(

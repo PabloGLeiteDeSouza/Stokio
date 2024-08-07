@@ -2,56 +2,10 @@ import {
   FormControl,
   FormControlLabel,
   FormControlLabelText,
-  FormControlHelper,
-  FormControlHelperText,
-  FormControlError,
-  FormControlErrorIcon,
-  FormControlErrorText,
   Input,
   InputField,
-  Radio,
-  RadioGroup,
-  RadioIcon,
-  RadioIndicator,
-  RadioLabel,
-  Checkbox,
-  CheckboxGroup,
-  CheckboxIndicator,
-  CheckboxIcon,
-  CheckboxLabel,
-  Textarea,
-  TextareaInput,
-  Select,
-  SelectTrigger,
-  SelectInput,
-  SelectIcon,
-  SelectPortal,
-  SelectBackdrop,
-  SelectContent,
-  SelectDragIndicatorWrapper,
-  SelectDragIndicator,
-  SelectItem,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  Switch,
-  Modal,
-  ModalBackdrop,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  VStack,
-  Heading,
-  Center,
-  Icon,
-  CircleIcon,
-  CheckIcon,
-  AlertCircleIcon,
-  ChevronDownIcon,
   SearchIcon,
+  EditIcon,
 } from '@gluestack-ui/themed';
 
 import { Categoria } from '$classes/categoria';
@@ -69,7 +23,7 @@ import {
   Text,
   TrashIcon,
 } from '@gluestack-ui/themed';
-import { RouteProp } from '@react-navigation/native';
+import { RouteProp, useIsFocused } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useSQLiteContext } from 'expo-sqlite';
 import React from 'react';
@@ -86,46 +40,75 @@ interface ListarCategoriasScreenProps {
   navigation?: ListarCategoriasScreenNavigationProp;
   route?: ListarCategoriasScreenRouteProp;
 }
+
 const View: React.FC<ListarCategoriasScreenProps> = ({ navigation }) => {
   const db = useSQLiteContext();
+  const focused = useIsFocused();
   const [isLoading, setIsLoading] = React.useState(true);
   const [categorys, setCategorys] = React.useState<Array<UpdateCategoriaDto>>(
     [],
   );
-  const [buscar, setBuscar] = React.useState("");
-  React.useEffect(() => {
-    async function Start() {
-      try {
-        const categorias = await new Categoria(db).findAll();
-        if (categorias) {
-          setCategorys(categorias);
-        } else {
-          setCategorys([]);
-        }
-        setIsLoading(false);
-        return;
-      } catch (error) {
-        Alert.alert('Erro', (error as Error).message);
-        setIsLoading(false);
+  async function Start() {
+    try {
+      const categorias = await new Categoria(db).findAll();
+      if (categorias) {
+        setCategorys(categorias);
+      } else {
+        setCategorys([]);
       }
+      setIsLoading(false);
+      return;
+    } catch (error) {
+      Alert.alert('Erro', (error as Error).message);
+      setIsLoading(false);
     }
+  }
+
+  const [buscar, setBuscar] = React.useState('');
+  React.useEffect(() => {
     Start();
   }, []);
+
+  React.useEffect(() => {
+    Start();
+  }, [focused]);
+
   if (isLoading) {
     return <LoadingScreen />;
   }
 
-  const searchCategoria = async () => {
-    
-  }
+  const searchCategoria = async (search: string) => {
+    try {
+      const data = await new Categoria(db).findAllByName(search);
+      if (data.length < 1) {
+        throw new Error('Não foi possível encontrar nenhuma categoria!');
+      }
+      setCategorys(data);
+    } catch (error) {
+      Alert.alert('Erro', (error as Error).message);
+      console.error(error);
+      throw error;
+    }
+  };
 
+  const deletar_categoria = async (categoria: UpdateCategoriaDto) => {
+    try {
+      await new Categoria(db).delete(categoria.id as number);
+      Alert.alert('Sucesso', 'Categoria deletada com sucesso!');
+      setCategorys(categorys.filter((cat) => cat.id !== categoria.id));
+    } catch (error) {
+      Alert.alert('Erro', (error as Error).message);
+      console.error(error);
+      throw error;
+    }
+  };
 
   return (
     <>
       {categorys.length > 0 ? (
         <ScrollView>
-          <Box>
-            <Box>
+          <Box mt="$5" gap="$5" alignItems="center" mb="$10">
+            <Box mb="$5" w="$4/5" gap="$5">
               <FormControl
                 isInvalid={false}
                 size={'md'}
@@ -133,36 +116,78 @@ const View: React.FC<ListarCategoriasScreenProps> = ({ navigation }) => {
                 isRequired={true}
               >
                 <FormControlLabel>
-                  <FormControlLabelText>Buscar:</FormControlLabelText>
+                  <FormControlLabelText>Buscar</FormControlLabelText>
                 </FormControlLabel>
                 <Input>
                   <InputField
                     value={buscar}
-                    onChange={(text) => setBuscar(text)}
+                    onChangeText={(text) => setBuscar(text)}
                     type="text"
                     placeholder="Informe o nome da categoria"
                   />
+                  <Button onPress={() => searchCategoria(buscar)}>
+                    <ButtonIcon as={SearchIcon} />
+                  </Button>
                 </Input>
-                <Button
-                  onPress={}
-                >
-                  <ButtonIcon as={SearchIcon} />
-                </Button>
               </FormControl>
+              <Button
+                onPress={() => navigation?.navigate('cadastrar-categoria')}
+              >
+                <ButtonIcon as={AddIcon} />
+                <ButtonText>Adicionar Categorias</ButtonText>
+              </Button>
             </Box>
             {categorys.map((categoria) => (
-              <Box key={categoria.id} mb={2}>
-                <HStack>
+              <Box
+                w="$4/5"
+                p="$5"
+                rounded="$lg"
+                $dark-bgColor="$purple800"
+                $light-bgColor="$purple300"
+                key={categoria.id}
+              >
+                <HStack gap="$5" justifyContent="space-between">
                   <Box>
-                    <Text size="xl" mb={1}>
+                    <Text size="2xl" mb={1}>
                       {categoria.nome}
                     </Text>
+                    <Text size="md">{categoria.descricao}</Text>
                   </Box>
-                  <Box>
-                    <Button action="primary">
-                      <ButtonIcon as={AddIcon} />
+                  <Box gap="$2">
+                    <Button
+                      onPress={() => {
+                        navigation?.navigate('editar-categoria', { categoria });
+                      }}
+                      action="primary"
+                    >
+                      <ButtonIcon as={EditIcon} />
                     </Button>
-                    <Button action="negative">
+                    <Button
+                      onPress={() => {
+                        Alert.alert(
+                          'Aviso',
+                          'Você deseja mesmo deletar a categoria: ' +
+                            categoria.nome +
+                            '?',
+                          [
+                            {
+                              text: 'Sim',
+                              onPress: async () => {
+                                await deletar_categoria(categoria);
+                              },
+                            },
+                            {
+                              text: 'Não',
+                              style: 'cancel',
+                              onPress: () => {
+                                Alert.alert('Retorno', 'Operação cancelada!');
+                              },
+                            },
+                          ],
+                        );
+                      }}
+                      action="negative"
+                    >
                       <ButtonIcon as={TrashIcon} />
                     </Button>
                   </Box>

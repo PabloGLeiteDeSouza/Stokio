@@ -62,7 +62,6 @@ const Create: React.FC<CadastrarCategoriasScreenProps> = ({ navigation }) => {
             descricao: '',
           }}
           onSubmit={async (values) => {
-            console.log('teste');
             try {
               const result = await new Categoria(db).create(values);
               if (result) {
