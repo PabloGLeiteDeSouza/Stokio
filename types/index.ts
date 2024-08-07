@@ -24,7 +24,7 @@ export type RootStackParamList = {
   'listar-clientes'?: object;
   'cadastrar-clientes'?: { nome?: string };
   'cadastrar-empresas'?: object;
-  'cadastrar-categoria'?: { categoria: UpdateCategoriaDto };
+  'cadastrar-categoria'?: object;
   'cadastrar-marca'?: object;
   'cadastrar-tipo-produto'?: object;
   'cadastrar-ua'?: object;
@@ -34,7 +34,7 @@ export type RootStackParamList = {
   'editar-empresas'?: { empresa: UpdateEmpresaObject };
   'editar-ua'?: object;
   'editar-um'?: object;
-  'editar-categoria'?: object;
+  'editar-categoria'?: { categoria: UpdateCategoriaDto };
   'editar-marca'?: object;
   'editar-tipo-produto'?: object;
   'editar-tipo-ua'?: object;
