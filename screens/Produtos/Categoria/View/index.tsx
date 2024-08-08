@@ -147,7 +147,7 @@ const View: React.FC<ListarCategoriasScreenProps> = ({ navigation }) => {
                 key={categoria.id}
               >
                 <HStack gap="$5" justifyContent="space-between">
-                  <Box>
+                  <Box w="$2/3">
                     <Text size="2xl" mb={1}>
                       {categoria.nome}
                     </Text>

@@ -67,8 +67,8 @@ export class Categoria {
   async findAllByName(nome: string) {
     try {
       const result = await this.db.getAllAsync(
-        'SELECT * FROM categoria WHERE nome LIKE %$nome%',
-        { $nome: nome },
+        'SELECT * FROM categoria WHERE nome LIKE $nome',
+        { $nome: `%${nome}%` },
       );
       if (!result) {
         throw new Error(

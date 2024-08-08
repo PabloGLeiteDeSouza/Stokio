@@ -91,12 +91,12 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation }) => {
   const [paramSearch, setParamSearch] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(true);
   const [haveAllDeps, setHaveAllDeps] = React.useState({
-    empresa: true,
-    tipo: true,
-    categoria: true,
-    marca: true,
-    um: true,
-    ua: true,
+    empresa: false,
+    tipo: false,
+    categoria: false,
+    marca: false,
+    um: false,
+    ua: false,
   });
   const { theme } = useThemeApp();
   const db = useSQLiteContext();
@@ -155,41 +155,41 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation }) => {
     try {
       setIsLoading(true);
       const empresa = await new Empresa(db).findAll();
-      if (!empresa || empresa.length < 1) {
-        setHaveAllDeps({
-          ...haveAllDeps,
-          empresa: false,
-        });
-        setIsLoading(false);
-        return;
-      }
       const categoria = await new Categoria(db).findAll();
       if (!categoria || categoria.length < 1) {
-        setHaveAllDeps({
-          ...haveAllDeps,
-          categoria: false,
-        });
         setIsLoading(false);
         return;
       }
-      const tipo = await new TipoDeProduto(db).findAll();
-      if (!tipo || tipo.length < 1) {
-        setHaveAllDeps({
-          ...haveAllDeps,
-          tipo: false,
-        });
+      setHaveAllDeps({
+        ...haveAllDeps,
+        categoria: true,
+      });
+      if (!empresa || empresa.length < 1) {
         setIsLoading(false);
         return;
       }
+      setHaveAllDeps({
+        ...haveAllDeps,
+        empresa: true,
+      });
       const marca = await new Marca(db).findAll();
       if (!marca || marca.length < 1) {
-        setHaveAllDeps({
-          ...haveAllDeps,
-          marca: false,
-        });
         setIsLoading(false);
         return;
       }
+      setHaveAllDeps({
+        ...haveAllDeps,
+        marca: true,
+      });
+      const tipo = await new TipoDeProduto(db).findAll();
+      if (!tipo || tipo.length < 1) {
+        setIsLoading(false);
+        return;
+      }
+      setHaveAllDeps({
+        ...haveAllDeps,
+        tipo: true,
+      });
       setIsLoading(false);
     } catch (error) {
       Alert.alert('Erro', (error as Error).message);

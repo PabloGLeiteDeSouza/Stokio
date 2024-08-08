@@ -10,58 +10,20 @@ import {
   FormControlErrorText,
   Input,
   InputField,
-  Radio,
-  RadioGroup,
-  RadioIcon,
-  RadioIndicator,
-  RadioLabel,
   Button,
   ButtonText,
-  Checkbox,
-  CheckboxGroup,
-  CheckboxIndicator,
-  CheckboxIcon,
-  CheckboxLabel,
   Textarea,
   TextareaInput,
-  Select,
-  SelectTrigger,
-  SelectInput,
-  SelectIcon,
-  SelectPortal,
-  SelectBackdrop,
-  SelectContent,
-  SelectDragIndicatorWrapper,
-  SelectDragIndicator,
-  SelectItem,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  Switch,
-  Modal,
-  ModalBackdrop,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  HStack,
-  VStack,
-  Heading,
-  Center,
-  Icon,
-  CircleIcon,
-  CheckIcon,
   AlertCircleIcon,
-  ChevronDownIcon,
 } from '@gluestack-ui/themed';
 import { RootStackParamList } from '$types/index';
 import { Box, Text } from '@gluestack-ui/themed';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Formik } from 'formik';
-import { GestureResponderEvent } from 'react-native';
+import { Alert, GestureResponderEvent } from 'react-native';
+import { Categoria } from '$classes/categoria';
+import { useSQLiteContext } from 'expo-sqlite';
 type EditarCategoriasScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   'editar-categoria'
@@ -79,19 +41,41 @@ const Update: React.FC<EditarCategoriasScreenProps> = ({
   route,
 }) => {
   if (!route || !route.params || !route.params?.categoria) {
-    return navigation?.goBack();
+    navigation?.goBack();
+    return null;
   }
+  const db = useSQLiteContext();
   const categoria = route.params.categoria;
   return (
-    <Box>
-      <Text>Atualize os dados da categoria</Text>
-      <Box>
+    <Box justifyContent="center" alignItems="center">
+      <Box my="$8" w="$full" alignItems="center" justifyContent="center">
+        <Text size="2xl">Atualize os dados da categoria</Text>
+      </Box>
+      <Box
+        mx="$8"
+        rounded="$lg"
+        p="$5"
+        $dark-bgColor="$purple900"
+        $light-bgColor="$purple600"
+      >
         <Formik
           initialValues={{
             ...categoria,
           }}
-          onSubmit={() => {
-            console.log('Form submitted');
+          onSubmit={async (values) => {
+            try {
+              const dados = await new Categoria(db).update(
+                Number(values.id),
+                values,
+              );
+              if (!dados) {
+                throw new Error('Não foi possível atualizar a categoria!');
+              }
+              Alert.alert('Sucesso', 'Categoria Atualizada com Sucesso!');
+              return navigation?.navigate('listar-categoria');
+            } catch (error) {
+              Alert.alert('Erro', (error as Error).message);
+            }
           }}
         >
           {({ values, handleChange, handleSubmit, errors }) => {

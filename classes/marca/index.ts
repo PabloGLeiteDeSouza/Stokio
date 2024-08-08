@@ -12,8 +12,7 @@ export class Marca {
 
   async create(marca: CreateMarcaDto) {
     try {
-      const db = await this.db;
-      const result = await db.runAsync(
+      const result = await this.db.runAsync(
         'INSERT INTO marca (nome) VALUES ($nome)',
         { $nome: marca.nome },
       );
