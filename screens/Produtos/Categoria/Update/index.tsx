@@ -47,17 +47,13 @@ const Update: React.FC<EditarCategoriasScreenProps> = ({
   const db = useSQLiteContext();
   const categoria = route.params.categoria;
   return (
-    <Box justifyContent="center" alignItems="center">
-      <Box my="$8" w="$full" alignItems="center" justifyContent="center">
-        <Text size="2xl">Atualize os dados da categoria</Text>
+    <Box w="$full" h="$full" display="flex" alignItems="center">
+      <Box pt="$5">
+        <Text textAlign="center" size="2xl">
+          Atualize os dados da categoria
+        </Text>
       </Box>
-      <Box
-        mx="$8"
-        rounded="$lg"
-        p="$5"
-        $dark-bgColor="$purple900"
-        $light-bgColor="$purple600"
-      >
+      <Box mt="$5" w="$2/3" gap="$6">
         <Formik
           initialValues={{
             ...categoria,

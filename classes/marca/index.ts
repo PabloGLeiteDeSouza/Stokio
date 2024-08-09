@@ -39,11 +39,29 @@ export class Marca {
     }
   }
 
-  async findFirstById(id: number) {
+  async findFirstbyNome($nome: string) {
+    try {
+      const result = await this.db.getFirstAsync(
+        'SELECT * FROM marca WHERE nome = $nome',
+        { $nome },
+      );
+      if (!result) {
+        throw new Error(
+          errors.database_errors.ErrorsMarca.find.byNome.database,
+        );
+      }
+      return result as CreateMarcaDto;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async findFirstById($id: number) {
     try {
       const result = await this.db.getFirstAsync(
         'SELECT * FROM marca WHERE id = $id',
-        { $id: id },
+        { $id },
       );
       if (!result) {
         throw new Error(errors.database_errors.ErrorsMarca.find.byId.database);

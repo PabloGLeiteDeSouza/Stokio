@@ -54,13 +54,7 @@ import {
   ChevronDownIcon,
   SearchIcon,
 } from '@gluestack-ui/themed';
-
-import { Categoria } from '$classes/categoria';
-import { Empresa } from '$classes/empresa';
-import { Marca } from '$classes/marca';
-import { Produto } from '$classes/produto';
 import { UpdateProdutoDto } from '$classes/produto/dto/update-produto.dto';
-import { TipoDeProduto } from '$classes/tipo_produto';
 import LoadingScreen from '$components/LoadingScreen';
 import { useThemeApp } from '$providers/theme';
 import { RootStackParamList } from '$types/index';
@@ -73,6 +67,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useSQLiteContext } from 'expo-sqlite';
 import React from 'react';
 import { Alert } from 'react-native';
+import start from './functions/start';
 type ListarProdutosScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   'listar-produtos'
@@ -92,118 +87,19 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation }) => {
   const [isLoading, setIsLoading] = React.useState(true);
   const [haveAllDeps, setHaveAllDeps] = React.useState({
     empresa: false,
-    tipo: false,
     categoria: false,
     marca: false,
+    tipo: false,
     um: false,
     ua: false,
   });
+
   const { theme } = useThemeApp();
   const db = useSQLiteContext();
-  const getProdutos = async (
-    type:
-      | 'all'
-      | 'nome'
-      | 'codigo_de_barras'
-      | 'categoria'
-      | 'marca'
-      | 'tipo'
-      | 'empresa',
-  ) => {
-    switch (type) {
-      case 'all':
-        const produtos = await new Produto(db).findAll();
-        setProdutcts(produtos);
-        break;
-      case 'codigo_de_barras':
-        const produto = await new Produto(db).findFirstByBarCode(paramSearch);
-        setProdutcts([produto]);
-        break;
-      case 'categoria':
-        const produtosCategoria = await new Produto(db).findAllByCategory(
-          Number(paramSearch),
-        );
-        setProdutcts(produtosCategoria);
-        break;
-      case 'empresa':
-        const produtosEmpresa = await new Produto(db).findAllByIdEmpresa(
-          Number(paramSearch),
-        );
-        setProdutcts(produtosEmpresa);
-        break;
-      case 'marca':
-        const produtosMarca = await new Produto(db).findFirstByIdMarca(
-          Number(paramSearch),
-        );
-        setProdutcts(produtosMarca);
-        break;
-      case 'tipo':
-        const produtosTipo = await new Produto(db).findAllByTipo(paramSearch);
-        setProdutcts(produtosTipo);
-        break;
-      case 'nome':
-        const produtosNome = await new Produto(db).findFirstByName(paramSearch);
-        setProdutcts([produtosNome]);
-        break;
-    }
-    if (isLoading) {
-      setIsLoading(false);
-    }
-  };
-
-  async function start() {
-    try {
-      setIsLoading(true);
-      const empresa = await new Empresa(db).findAll();
-      const categoria = await new Categoria(db).findAll();
-      if (!categoria || categoria.length < 1) {
-        setIsLoading(false);
-        return;
-      }
-      setHaveAllDeps({
-        ...haveAllDeps,
-        categoria: true,
-      });
-      if (!empresa || empresa.length < 1) {
-        setIsLoading(false);
-        return;
-      }
-      setHaveAllDeps({
-        ...haveAllDeps,
-        empresa: true,
-      });
-      const marca = await new Marca(db).findAll();
-      if (!marca || marca.length < 1) {
-        setIsLoading(false);
-        return;
-      }
-      setHaveAllDeps({
-        ...haveAllDeps,
-        marca: true,
-      });
-      const tipo = await new TipoDeProduto(db).findAll();
-      if (!tipo || tipo.length < 1) {
-        setIsLoading(false);
-        return;
-      }
-      setHaveAllDeps({
-        ...haveAllDeps,
-        tipo: true,
-      });
-      setIsLoading(false);
-    } catch (error) {
-      Alert.alert('Erro', (error as Error).message);
-      throw error;
-    }
-  }
-
-  React.useEffect(() => {
-    start();
-  }, []);
 
   React.useEffect(() => {
     setIsLoading(true);
-    start();
+    start(setProdutcts, setIsLoading, setHaveAllDeps, db, haveAllDeps, Alert);
   }, [onFocused]);
 
   if (isLoading) {
@@ -226,9 +122,8 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation }) => {
                 </FormControlLabel>
                 <Input>
                   <InputField
-                    type="password"
-                    defaultValue="12345"
-                    placeholder="password"
+                    type="text"
+                    placeholder="Buscar..."
                     value={paramSearch}
                     onChangeText={(text) => setParamSearch(text)}
                   />
@@ -265,19 +160,19 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation }) => {
           <Box gap={10}>
             <Text size="xl" textAlign="center">
               Não há{' '}
-              {!haveAllDeps.categoria
-                ? 'categorias cadastradas'
-                : !haveAllDeps.empresa
-                  ? 'empresas cadastradas'
-                  : !haveAllDeps.marca
-                    ? 'marcas cadastradas'
-                    : !haveAllDeps.tipo
-                      ? 'tipos de produtos cadastrados'
-                      : !haveAllDeps.ua
-                        ? 'unidades de armazenamento cadastradas'
-                        : !haveAllDeps.um
-                          ? 'unidades de medida cadastradas'
-                          : 'produtos cadastrados'}
+              {haveAllDeps.empresa
+                ? haveAllDeps.categoria
+                  ? haveAllDeps.marca
+                    ? haveAllDeps.tipo
+                      ? haveAllDeps.ua
+                        ? haveAllDeps.um
+                          ? 'produtos cadastrados'
+                          : 'unidades de medida cadastradas'
+                        : 'unidades de armazenamento cadastradas'
+                      : 'tipos de produtos cadastrados'
+                    : 'marcas de produtos cadastradas'
+                  : 'categorias cadastradas'
+                : 'empresas cadastradas'}
             </Text>
             <Button
               $active-bgColor={theme === 'dark' ? '$purple700' : '$purple500'}
@@ -286,10 +181,10 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation }) => {
               gap={10}
               onPress={() =>
                 navigation?.navigate(
-                  !haveAllDeps.categoria
-                    ? 'screens-categorias'
-                    : !haveAllDeps.empresa
-                      ? 'screens-empresas'
+                  !haveAllDeps.empresa
+                    ? 'screens-empresas'
+                    : !haveAllDeps.categoria
+                      ? 'screens-categorias'
                       : !haveAllDeps.marca
                         ? 'screens-marcas'
                         : !haveAllDeps.tipo
