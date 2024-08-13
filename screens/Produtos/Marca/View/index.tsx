@@ -24,23 +24,32 @@ import start from './functions/start';
 import { Alert } from 'react-native';
 import search from './functions/search';
 import { ListarMarcasScreenProps } from './interfaces';
+import { useIsFocused } from '@react-navigation/native';
+
 const View: React.FC<ListarMarcasScreenProps> = ({ navigation }) => {
   const db = useSQLiteContext();
+  const isFocused = useIsFocused();
   const [marca, setMarca] = React.useState<Array<UpdateMarcaDto>>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [buscar, setBuscar] = React.useState('');
   React.useEffect(() => {
     start(db, setMarca, setIsLoading, Alert);
   }, []);
+
+  React.useEffect(() => {
+    setIsLoading(true);
+    start(db, setMarca, setIsLoading, Alert);
+  }, [isFocused]);
+
   if (isLoading) {
     return <LoadingScreen />;
   }
   return (
-    <ScrollView>
-      <Box>
-        {marca.length > 1 ? (
-          <Box>
-            <Box>
+    <>
+      {marca.length > 0 ? (
+        <ScrollView>
+          <Box w="$full" h="$full" alignItems="center">
+            <Box w="$4/5" my="$5">
               <FormControl
                 isInvalid={false}
                 size={'md'}
@@ -67,49 +76,77 @@ const View: React.FC<ListarMarcasScreenProps> = ({ navigation }) => {
                 </Input>
               </FormControl>
             </Box>
-            <Box>
-              <Box>
-                {marca.map((item, index) => (
-                  <Box key={index}>
-                    <HStack>
-                      <VStack>
-                        <Text>{item.nome}</Text>
-                      </VStack>
-                      <VStack>
-                        <Button
-                          onPress={async () => {
-                            navigation?.navigate('editar-marca');
-                          }}
-                        >
-                          <ButtonIcon as={EditIcon} />
-                        </Button>
-                        <Button action="negative">
-                          <ButtonIcon as={TrashIcon} />
-                        </Button>
-                      </VStack>
-                    </HStack>
-                  </Box>
-                ))}
-              </Box>
-            </Box>
-          </Box>
-        ) : (
-          <Box>
-            <Box>
-              <Text>Marca não encontrada</Text>
+            <Box w="$4/5" mb="$5">
               <Button
-                onPress={async () => {
-                  navigation?.navigate('cadastrar-marca');
-                }}
+                gap="$2"
+                onPress={() => navigation?.navigate('cadastrar-marca')}
               >
                 <ButtonIcon as={AddIcon} />
-                <ButtonText>Cadastrar Marca</ButtonText>
+                <ButtonText>Adicionar Marcas</ButtonText>
               </Button>
             </Box>
+            <Box gap="$8">
+              {marca.map((item, index) => (
+                <Box
+                  w="$4/5"
+                  p="$5"
+                  rounded="$lg"
+                  $dark-bgColor="$purple800"
+                  $light-bgColor="$purple300"
+                  key={index}
+                >
+                  <HStack w="$full" justifyContent="space-between">
+                    <VStack w="$3/4">
+                      <Text size="2xl">{item.nome}</Text>
+                      <Text size="sm">{item.descricao}</Text>
+                    </VStack>
+                    <VStack gap="$2.5">
+                      <Button
+                        onPress={async () => {
+                          navigation?.navigate('editar-marca');
+                        }}
+                      >
+                        <ButtonIcon as={EditIcon} />
+                      </Button>
+                      <Button action="negative">
+                        <ButtonIcon as={TrashIcon} />
+                      </Button>
+                    </VStack>
+                  </HStack>
+                </Box>
+              ))}
+            </Box>
           </Box>
-        )}
-      </Box>
-    </ScrollView>
+        </ScrollView>
+      ) : (
+        <Box
+          w="$full"
+          h="$full"
+          justifyContent="center"
+          alignItems="center"
+          gap="$5"
+        >
+          <Box
+            w="$full"
+            justifyContent="center"
+            alignItems="center"
+            flexDirection="column"
+            gap="$3.5"
+          >
+            <Text size="2xl">Marca não encontrada</Text>
+            <Button
+              w="$2/3"
+              onPress={async () => {
+                navigation?.navigate('cadastrar-marca');
+              }}
+            >
+              <ButtonIcon as={AddIcon} />
+              <ButtonText>Cadastrar Marca</ButtonText>
+            </Button>
+          </Box>
+        </Box>
+      )}
+    </>
   );
 };
 export default View;

@@ -13,8 +13,8 @@ export class Marca {
   async create(marca: CreateMarcaDto) {
     try {
       const result = await this.db.runAsync(
-        'INSERT INTO marca (nome) VALUES ($nome)',
-        { $nome: marca.nome },
+        'INSERT INTO marca (nome, descricao) VALUES ($nome, $descricao)',
+        { $nome: marca.nome, $descricao: String(marca.descricao) },
       );
       if (!result) {
         throw new Error('Não foi possível inserir os dados tente novamente!');

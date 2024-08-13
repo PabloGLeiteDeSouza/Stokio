@@ -9,7 +9,7 @@ const ScreensMarca: React.FC = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="visualizar-marca"
+        name="listar-marca"
         component={View}
         options={{ title: 'Visualizar Marcas' }}
       />
@@ -19,7 +19,7 @@ const ScreensMarca: React.FC = () => {
         options={{ title: 'Cadastrar Marcas' }}
       />
       <Stack.Screen
-        name="atualizar-marca"
+        name="editar-marca"
         component={Update}
         options={{ title: 'Atualizar Marcas' }}
       />

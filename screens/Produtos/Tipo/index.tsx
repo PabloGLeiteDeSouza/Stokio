@@ -9,9 +9,9 @@ const ScreensTipo: React.FC = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="visualizar-tipo"
+        name="listar-tipo-produto"
         component={View}
-        options={{ title: 'Visualizar Tipo' }}
+        options={{ title: 'Visualizar Tipos de Produtos' }}
       />
       <Stack.Screen
         name="cadastrar-tipo"

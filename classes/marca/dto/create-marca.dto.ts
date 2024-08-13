@@ -1,9 +1,11 @@
 export class CreateMarcaDto {
   id?: number;
   nome: string;
+  descricao?: string;
 
-  constructor(nome: string, id?: number) {
+  constructor(nome: string, descricao?: string, id?: number) {
     this.id = id;
     this.nome = nome;
+    this.descricao = descricao;
   }
 }

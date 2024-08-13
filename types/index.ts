@@ -18,7 +18,7 @@ export type RootStackParamList = {
   'listar-tipo-ua'?: object;
   'listar-um'?: object;
   'listar-categoria'?: object;
-  'listar-tipo'?: object;
+  'listar-tipo-produto'?: object;
   'listar-marca'?: object;
   'listar-vendas'?: object;
   'listar-clientes'?: object;

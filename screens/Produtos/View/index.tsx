@@ -53,6 +53,7 @@ import {
   AlertCircleIcon,
   ChevronDownIcon,
   SearchIcon,
+  AddIcon,
 } from '@gluestack-ui/themed';
 import { UpdateProdutoDto } from '$classes/produto/dto/update-produto.dto';
 import LoadingScreen from '$components/LoadingScreen';
