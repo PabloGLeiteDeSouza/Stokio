@@ -14,12 +14,12 @@ const ScreensTipo: React.FC = () => {
         options={{ title: 'Visualizar Tipos de Produtos' }}
       />
       <Stack.Screen
-        name="cadastrar-tipo"
+        name="cadastrar-tipo-produto"
         component={Create}
         options={{ title: 'Cadastrar Tipo de Produto' }}
       />
       <Stack.Screen
-        name="atualizar-tipo"
+        name="atualizar-tipo-produto"
         component={Update}
         options={{ title: 'Atualizar Tipo de Produto' }}
       />

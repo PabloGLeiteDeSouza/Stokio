@@ -1,4 +1,5 @@
 import { UpdateCategoriaDto } from '$classes/categoria/dto/update-categoria.dto';
+import { UpdateTipoDeProdutoDto } from '$classes/tipo_produto/dto/update-tipo-de-produto.dto';
 import { ParamListBase, RouteProp } from '@react-navigation/native';
 
 export type RootStackParamList = {
@@ -36,7 +37,7 @@ export type RootStackParamList = {
   'editar-um'?: object;
   'editar-categoria'?: { categoria: UpdateCategoriaDto };
   'editar-marca'?: object;
-  'editar-tipo-produto'?: object;
+  'editar-tipo-produto'?: { tipo_de_produto: UpdateTipoDeProdutoDto };
   'editar-tipo-ua'?: object;
   'tab-bottom'?: object;
   'auth-screen'?: object;
