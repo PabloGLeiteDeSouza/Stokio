@@ -60,7 +60,13 @@ import {
 
 import { Box, ScrollView } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
-const Create: React.FC = () => {
+import { CadastrarTiposDeProdutosProp } from './interfaces';
+import { criarTipo } from './functions';
+import { useSQLiteContext } from 'expo-sqlite';
+import { Alert } from 'react-native';
+const Create: React.FC<CadastrarTiposDeProdutosProp> = ({navigation}) => {
+  const db = useSQLiteContext();
+
   return (
     <ScrollView>
       <Box>
@@ -69,7 +75,9 @@ const Create: React.FC = () => {
             nome: '',
             descricao: '',
           }}
-          onSubmit={}
+          onSubmit={(values, formikHelpers) =>
+            criarTipo(values, formikHelpers, db, navigation, Alert);
+          }
         >
           {({ values, handleChange, handleBlur, handleSubmit }) => {
             return (
@@ -84,11 +92,7 @@ const Create: React.FC = () => {
                     <FormControlLabelText>Nome</FormControlLabelText>
                   </FormControlLabel>
                   <Input>
-                    <InputField
-                      type="text"
-                      
-                      placeholder="password"
-                    />
+                    <InputField type="text" placeholder="password" />
                   </Input>
 
                   <FormControlHelper>
