@@ -10,63 +10,20 @@ import {
   FormControlErrorText,
   Input,
   InputField,
-  Radio,
-  RadioGroup,
-  RadioIcon,
-  RadioIndicator,
-  RadioLabel,
   Button,
   ButtonText,
-  Checkbox,
-  CheckboxGroup,
-  CheckboxIndicator,
-  CheckboxIcon,
-  CheckboxLabel,
   Textarea,
   TextareaInput,
-  Select,
-  SelectTrigger,
-  SelectInput,
-  SelectIcon,
-  SelectPortal,
-  SelectBackdrop,
-  SelectContent,
-  SelectDragIndicatorWrapper,
-  SelectDragIndicator,
-  SelectItem,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  Switch,
-  Modal,
-  ModalBackdrop,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  HStack,
-  VStack,
-  Heading,
-  Text,
-  Center,
-  Icon,
-  CircleIcon,
-  CheckIcon,
   AlertCircleIcon,
-  ChevronDownIcon,
 } from '@gluestack-ui/themed';
-
 import { Box, ScrollView } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import { CadastrarTiposDeProdutosProp } from './interfaces';
 import { criarTipo } from './functions';
 import { useSQLiteContext } from 'expo-sqlite';
-import { Alert } from 'react-native';
-const Create: React.FC<CadastrarTiposDeProdutosProp> = ({navigation}) => {
+import { Alert, GestureResponderEvent } from 'react-native';
+const Create: React.FC<CadastrarTiposDeProdutosProp> = ({ navigation }) => {
   const db = useSQLiteContext();
-
   return (
     <ScrollView>
       <Box>
@@ -76,10 +33,10 @@ const Create: React.FC<CadastrarTiposDeProdutosProp> = ({navigation}) => {
             descricao: '',
           }}
           onSubmit={(values, formikHelpers) =>
-            criarTipo(values, formikHelpers, db, navigation, Alert);
+            criarTipo(values, formikHelpers, db, navigation, Alert)
           }
         >
-          {({ values, handleChange, handleBlur, handleSubmit }) => {
+          {({ handleChange, handleSubmit, errors }) => {
             return (
               <Box>
                 <FormControl
@@ -92,22 +49,62 @@ const Create: React.FC<CadastrarTiposDeProdutosProp> = ({navigation}) => {
                     <FormControlLabelText>Nome</FormControlLabelText>
                   </FormControlLabel>
                   <Input>
-                    <InputField type="text" placeholder="password" />
+                    <InputField
+                      onChangeText={handleChange('nome')}
+                      type="text"
+                      placeholder="Nome"
+                    />
                   </Input>
 
                   <FormControlHelper>
                     <FormControlHelperText>
-                      Must be atleast 6 characters.
+                      Informe um nome.
+                    </FormControlHelperText>
+                  </FormControlHelper>
+
+                  <FormControlError>
+                    <FormControlErrorIcon as={AlertCircleIcon} />
+                    <FormControlErrorText>{errors.nome}</FormControlErrorText>
+                  </FormControlError>
+                </FormControl>
+                <FormControl
+                  isInvalid={false}
+                  size={'md'}
+                  isDisabled={false}
+                  isRequired={true}
+                >
+                  <FormControlLabel>
+                    <FormControlLabelText>Descricao</FormControlLabelText>
+                  </FormControlLabel>
+                  <Textarea>
+                    <TextareaInput
+                      onChangeText={handleChange('descricao')}
+                      placeholder="Descricao"
+                    />
+                  </Textarea>
+
+                  <FormControlHelper>
+                    <FormControlHelperText>
+                      Informe uma descricao.
                     </FormControlHelperText>
                   </FormControlHelper>
 
                   <FormControlError>
                     <FormControlErrorIcon as={AlertCircleIcon} />
                     <FormControlErrorText>
-                      Atleast 6 characters are required.
+                      {errors.descricao}
                     </FormControlErrorText>
                   </FormControlError>
                 </FormControl>
+                <Button
+                  onPress={
+                    handleSubmit as unknown as (
+                      event: GestureResponderEvent,
+                    ) => void
+                  }
+                >
+                  <ButtonText>Cadastrar</ButtonText>
+                </Button>
               </Box>
             );
           }}

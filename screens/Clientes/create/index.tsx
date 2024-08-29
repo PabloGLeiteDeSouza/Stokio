@@ -64,7 +64,7 @@ import { useThemeApp } from '$providers/theme';
 import { FontAwesome6, MaterialIcons } from '@expo/vector-icons';
 import SelectEstado from '$components/SelectEstado';
 
-const CadastrarClientesScreen: React.FC = () => {
+const Create: React.FC = () => {
   const { theme } = useThemeApp();
 
   return (
@@ -522,4 +522,4 @@ const CadastrarClientesScreen: React.FC = () => {
     </ScrollView>
   );
 };
-export default CadastrarClientesScreen;
+export default Create;

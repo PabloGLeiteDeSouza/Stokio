@@ -80,7 +80,7 @@ import { Marca } from '$classes/marca';
 import { Categoria } from '$classes/categoria';
 import { Um } from '$classes/um';
 import { UnidadeDeArmazenamento } from '$classes/ua';
-import { Alert } from 'react-native';
+import { Alert, GestureResponderEvent } from 'react-native';
 import { UpdateTipoDeProdutoDto } from '$classes/tipo_produto/dto/update-tipo-de-produto.dto';
 import { TipoDeProduto } from '$classes/tipo_produto';
 type CadastrarProdutosScreenNavigationProp = StackNavigationProp<
@@ -324,7 +324,7 @@ const Create: React.FC<CadastrarProdutosScreenProps> = ({
           }}
           onSubmit={() => {}}
         >
-          {({ values, handleChange, setFieldValue }) => {
+          {({ values, handleChange, handleSubmit, setFieldValue }) => {
             React.useEffect(() => {
               if (route?.params?.code) {
                 setFieldValue('codigo_de_barras', route.params.code);
@@ -832,6 +832,11 @@ const Create: React.FC<CadastrarProdutosScreenProps> = ({
                 {/* Box Botão cadastrar */}
                 <Box mb="$5">
                   <Button
+                    onPress={
+                      handleSubmit as unknown as (
+                        event: GestureResponderEvent,
+                      ) => void
+                    }
                     $active-bgColor={
                       theme === 'dark' ? '$purple700' : '$purple500'
                     }

@@ -16,6 +16,7 @@ import { AuthScreen } from '$screens/Auth';
 import * as SplashScreen from 'expo-splash-screen';
 import { Auth } from '../../functions/Auth';
 import { UaScreens } from '$screens/Ua';
+import VendasScreens from '$screens/Vendas';
 
 const TabBottom = createBottomTabNavigator();
 
@@ -134,12 +135,32 @@ const TabBottomScreen: React.FC<TabBottomScreenProps> = () => {
         }}
       />
       <TabBottom.Screen
+        name="vendas-screens"
+        component={VendasScreens}
+        options={{
+          headerShown: false,
+          title: 'Vendas',
+          tabBarIcon: (props) => (
+            <FontAwesome name="shopping-cart" {...props} />
+          ),
+        }}
+      />
+      <TabBottom.Screen
         name="empresas-screens"
         component={EmpresasScreens}
         options={{
           title: 'Empresas',
           headerShown: false,
           tabBarIcon: (props) => <FontAwesome6 name="building" {...props} />,
+        }}
+      />
+      <TabBottom.Screen
+        name="clientes-screens"
+        component={ClientesScreens}
+        options={{
+          title: 'Clientes',
+          headerShown: false,
+          tabBarIcon: (props) => <FontAwesome name="user" {...props} />,
         }}
       />
       <TabBottom.Screen

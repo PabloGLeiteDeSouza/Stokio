@@ -10,6 +10,8 @@ export type RootStackParamList = {
   'screens-marcas'?: object;
   'screens-uas'?: object;
   'screens-ums'?: object;
+  'screens-vendas'?: object;
+  'item-venda-screens'?: object;
   'screens-tipos-uas'?: object;
   'cadastrar-produtos'?: { code?: string; result?: boolean };
   'code-scanner'?: { screen: string; type: string };
@@ -52,6 +54,7 @@ export type UpdateEmpresaObject = {
   nome_fantasia?: string;
   razao_social?: string;
   cnpj?: string;
+  id_ramo: number;
 };
 
 export type ScreensScanCode = 'cadastrar-produtos' | 'listar-produtos';

@@ -1,21 +1,8 @@
-import {
-  Box,
-  Button,
-  ButtonIcon,
-  ButtonText,
-  ScrollView,
-  Text,
-} from '@gluestack-ui/themed';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
-import CadastrarClientesScreen from './Cadastrar';
-import { Ionicons } from '@expo/vector-icons';
-import { RouteProp } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../types';
-import { useThemeApp } from '$providers/theme';
 import View from './view';
 import Create from './create';
+import Update from './update';
 
 const Stack = createNativeStackNavigator();
 
@@ -31,6 +18,11 @@ const ClientesScreens: React.FC = () => {
         name="cadastrar-clientes"
         component={Create}
         options={{ title: 'Cadastrar Clientes' }}
+      />
+      <Stack.Screen
+        name="editar-clientes"
+        component={Update}
+        options={{ title: 'Editar Clientes' }}
       />
     </Stack.Navigator>
   );
