@@ -718,9 +718,7 @@ const Update: React.FC<EditarEmpresasScreenProps> = ({ navigation, route }) => {
 
                   <FormControlError>
                     <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      {errors.ramo}
-                    </FormControlErrorText>
+                    <FormControlErrorText>{errors.ramo}</FormControlErrorText>
                   </FormControlError>
                 </FormControl>
                 <FormControl

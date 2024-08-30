@@ -320,4 +320,27 @@ export const db_error_messages = {
       },
     },
   },
+  ErrorsRamo: {
+    update: {
+      database: 'Não foi possível atualizar o ramo tente novamente!',
+    },
+    create: {
+      database: 'Não foi possível criar o ramo tente novamente!',
+    },
+    delete: {
+      database: 'Não foi possível deletar o ramo tente novamente!',
+    },
+    find: {
+      all: {
+        database:
+          'Não foi possível encontrar nenhuma unidade de ramo tente novamente!',
+      },
+      byId: {
+        database: 'Não foi possível encontrar o ramo tente novamente!',
+      },
+      byNome: {
+        database: 'Não foi possível encontrar o ramo tente novamente!',
+      },
+    },
+  },
 };
