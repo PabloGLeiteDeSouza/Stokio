@@ -4,7 +4,6 @@ import * as SplashScreen from 'expo-splash-screen';
 import View from './View';
 import Update from './Update';
 import Create from './Create';
-import ScreensCategoria from './Categoria';
 import ScreensMarca from './Marca';
 import ScreensTipo from './Tipo';
 
@@ -31,11 +30,6 @@ const ProdutosScreens: React.FC = () => {
         name="editar-produtos"
         component={Update}
         options={{ title: 'Editar Produtos' }}
-      />
-      <Stack.Screen
-        name="screens-categorias"
-        component={ScreensCategoria}
-        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="screens-marcas"

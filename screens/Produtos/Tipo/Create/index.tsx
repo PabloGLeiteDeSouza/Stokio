@@ -22,23 +22,31 @@ import { CadastrarTiposDeProdutosProp } from './interfaces';
 import { criarTipo } from './functions';
 import { useSQLiteContext } from 'expo-sqlite';
 import { Alert, GestureResponderEvent } from 'react-native';
+import { Text } from '@gluestack-ui/themed';
 const Create: React.FC<CadastrarTiposDeProdutosProp> = ({ navigation }) => {
   const db = useSQLiteContext();
   return (
     <ScrollView>
-      <Box>
+      <Box
+        mt="$5"
+        w="$full"
+        alignItems="center"
+        justifyContent="center"
+        gap="$5"
+      >
+        <Box w="$full" justifyContent="center" alignItems="center">
+          <Text size="2xl">Cadastre um tipo de produto abaixo:</Text>
+        </Box>
         <Formik
           initialValues={{
             nome: '',
             descricao: '',
           }}
-          onSubmit={(values, formikHelpers) =>
-            criarTipo(values, formikHelpers, db, navigation, Alert)
-          }
+          onSubmit={(values) => criarTipo(values, db, navigation, Alert)}
         >
           {({ handleChange, handleSubmit, errors }) => {
             return (
-              <Box>
+              <Box w="$3/4" gap="$5">
                 <FormControl
                   isInvalid={false}
                   size={'md'}

@@ -46,4 +46,9 @@ export const ConfigTheme = {
   } as Theme,
 };
 
-export default { ColorsDarkMode, ColorsLightMode, ConfigTheme };
+export const ColorsCards = {
+  bgColorLight: config.tokens.colors.blueGray200,
+  bgColorDark: config.tokens.colors.blueGray800,
+};
+
+export default { ColorsDarkMode, ColorsLightMode, ConfigTheme, ColorsCards };

@@ -72,6 +72,7 @@ import Start from './functions/start';
 import { Alert } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import { ListarTiposDeProdutosProps } from './interfaces';
+import { ColorsCards } from '$constants/colors';
 const View: React.FC<ListarTiposDeProdutosProps> = ({ navigation }) => {
   const db = useSQLiteContext();
   const isFocused = useIsFocused();
@@ -81,7 +82,10 @@ const View: React.FC<ListarTiposDeProdutosProps> = ({ navigation }) => {
   React.useEffect(() => {
     Start(db, setTipo, setIsLoading, Alert);
   }, [Start]);
-  React.useEffect(() => {}, [isFocused]);
+  React.useEffect(() => {
+    setIsLoading(true);
+    Start(db, setTipo, setIsLoading, Alert);
+  }, [isFocused]);
   if (isLoading) {
     return <LoadingScreen />;
   }
@@ -89,9 +93,11 @@ const View: React.FC<ListarTiposDeProdutosProps> = ({ navigation }) => {
     <>
       {tipo.length > 0 ? (
         <ScrollView>
-          <Box>
-            <Box justifyContent="center">
-              <Text size="2xl">Tipos de Produtos</Text>
+          <Box w="$full" alignItems="center" mt="$5">
+            <Box w="$2/3" gap="$5">
+              <Text size="2xl" textAlign="center">
+                Tipos de Produtos
+              </Text>
               <Box>
                 <FormControl
                   isInvalid={false}
@@ -113,9 +119,13 @@ const View: React.FC<ListarTiposDeProdutosProps> = ({ navigation }) => {
                 </FormControl>
               </Box>
             </Box>
-            <Box>
+            <Box w="$full" alignItems="center">
               {tipo.map((item, index) => (
-                <Box key={index}>
+                <Box
+                  $light-bgColor={ColorsCards.bgColorLight}
+                  $dark-bgColor={ColorsCards.bgColorDark}
+                  key={index}
+                >
                   <HStack>
                     <VStack>
                       <Box>
@@ -147,7 +157,7 @@ const View: React.FC<ListarTiposDeProdutosProps> = ({ navigation }) => {
           <Box w="$full" h="$full" alignItems="center" justifyContent="center">
             <Box w="$3/4" gap="$5">
               <Text textAlign="center" size="2xl">
-                Não há tipos de produtos cadastrados.
+                Nnehum tipo de produto encontrado
               </Text>
               <Button
                 onPress={() => navigation?.navigate('cadastrar-tipo-produto')}

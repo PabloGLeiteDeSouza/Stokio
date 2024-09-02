@@ -71,18 +71,16 @@ import { Formik } from 'formik';
 import LoadingScreen from '$components/LoadingScreen';
 import { UpdateEmpresaDto } from '$classes/empresa/dto/update-empresa.dto';
 import { UpdateMarcaDto } from '$classes/marca/dto/update-marca.dto';
-import { UpdateCategoriaDto } from '$classes/categoria/dto/update-categoria.dto';
 import { UpdateUnidadeDeArmazenamentoDto } from '$classes/ua/dto/update-ua.dto';
 import { UpdateUmDto } from '$classes/um/dto/update-um.dto';
 import { Empresa } from '$classes/empresa';
 import { useSQLiteContext } from 'expo-sqlite';
 import { Marca } from '$classes/marca';
-import { Categoria } from '$classes/categoria';
+import { TipoDeProduto } from '$classes/tipo_produto';
 import { Um } from '$classes/um';
 import { UnidadeDeArmazenamento } from '$classes/ua';
 import { Alert, GestureResponderEvent } from 'react-native';
 import { UpdateTipoDeProdutoDto } from '$classes/tipo_produto/dto/update-tipo-de-produto.dto';
-import { TipoDeProduto } from '$classes/tipo_produto';
 type CadastrarProdutosScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   'cadastrar-produtos'
@@ -95,46 +93,11 @@ interface CadastrarProdutosScreenProps {
   navigation?: CadastrarProdutosScreenNavigationProp;
   route?: CadastrarProdutosScreennRouteProp;
 }
-type CadastrarProdutosAction = {
-  type:
-    | 'alt_edt_qtd_unidades'
-    | 'alt_codigo'
-    | 'alt_nome'
-    | 'tipo_produto'
-    | 'alt_unidades'
-    | 'alt_quantidade'
-    | 'alt_tipo_quantidade'
-    | 'alt_valor'
-    | 'alt_empresa'
-    | 'alt_categoria';
-  qtd_unidades_is_edt?: boolean;
-  codigo?: string;
-  nome?: string;
-  tipo?: string;
-  unidades?: number;
-  quantidade?: number;
-  tipo_quantidade?: string;
-  valor?: string;
-  empresa?: number;
-  categoria?: number;
-};
-type CadastrarProdutosState = {
-  qtd_unidades_is_edt: boolean;
-  codigo: string;
-  nome: string;
-  tipo: string;
-  unidades: number;
-  quantidade: number;
-  tipo_quantidade: string;
-  valor: string;
-  empresa: number;
-  categoria: number;
-};
 
 type DadosDB = {
   empresas: Array<UpdateEmpresaDto>;
   marcas: Array<UpdateMarcaDto>;
-  categorias: Array<UpdateCategoriaDto>;
+  tipos_de_produtos: Array<UpdateTipoDeProdutoDto>;
   unidades_de_medida: Array<UpdateUmDto>;
   unidades_de_armazenamento: Array<UpdateUnidadeDeArmazenamentoDto>;
   tipo_produto: Array<UpdateTipoDeProdutoDto>;
@@ -155,7 +118,7 @@ const Create: React.FC<CadastrarProdutosScreenProps> = ({
   const [verifyExists, setVerifyExists] = React.useState({
     empresa: false,
     marca: false,
-    categoria: false,
+    tipo_de_produto: false,
     unidade_de_medida: false,
     unidade_de_armazenamento: false,
   });
@@ -166,7 +129,7 @@ const Create: React.FC<CadastrarProdutosScreenProps> = ({
   const [dadosdb, setDadosdb] = React.useState<DadosDB>({
     empresas: [],
     marcas: [],
-    categorias: [],
+    tipos_de_produtos: [],
     unidades_de_medida: [],
     unidades_de_armazenamento: [],
     tipo_produto: [],
@@ -190,11 +153,11 @@ const Create: React.FC<CadastrarProdutosScreenProps> = ({
             marca: true,
           });
         }
-        const dados_categorias = await new Categoria(db).findAll();
-        if (dados_categorias) {
+        const dados_tipos = await new TipoDeProduto(db).findAll();
+        if (dados_tipos) {
           setVerifyExists({
             ...verifyExists,
-            categoria: true,
+            tipo_de_produto: true,
           });
         }
         const dados_unidades_de_medida = await new Um(db).findAll();
@@ -216,7 +179,7 @@ const Create: React.FC<CadastrarProdutosScreenProps> = ({
         setDadosdb({
           empresas: dados_empresas,
           marcas: dados_marcas,
-          categorias: dados_categorias,
+          tipos_de_produtos: dados_tipos,
           unidades_de_medida: dados_unidades_de_medida,
           unidades_de_armazenamento: dados_unidades_de_armazenamento,
           tipo_produto: tipos_produto,
@@ -235,623 +198,619 @@ const Create: React.FC<CadastrarProdutosScreenProps> = ({
     return <LoadingScreen />;
   }
 
-  if (!verifyExists.categoria) {
+  if (
+    verifyExists.empresa &&
+    verifyExists.marca &&
+    verifyExists.tipo_de_produto &&
+    verifyExists.unidade_de_armazenamento &&
+    verifyExists.unidade_de_medida
+  ) {
     return (
-      <Box h="$full" w="$full" alignItems="center" justifyContent="center">
-        <Box>
-          <Text>Não há categorias cadastradas.</Text>
-          <Text>Cadastre uma antes de cadastrar um produto.</Text>
-          <Button onPress={() => navigation?.navigate('cadastrar-categoria')}>
-            <ButtonText>Cadastrar Categoria</ButtonText>
-          </Button>
-        </Box>
-      </Box>
-    );
-  }
-  if (!verifyExists.empresa) {
-    return (
-      <Box h="$full" w="$full" alignItems="center" justifyContent="center">
-        <Box>
-          <Text>Não há categorias cadastradas.</Text>
-          <Text>Cadastre uma antes de cadastrar um produto.</Text>
-          <Button onPress={() => navigation?.navigate('cadastrar-empresas')}>
-            <ButtonText>Cadastrar Categoria</ButtonText>
-          </Button>
-        </Box>
-      </Box>
-    );
-  }
-  if (!verifyExists.marca) {
-    return (
-      <Box h="$full" w="$full" alignItems="center" justifyContent="center">
-        <Box>
-          <Text>Não há categorias cadastradas.</Text>
-          <Text>Cadastre uma antes de cadastrar um produto.</Text>
-          <Button onPress={() => navigation?.navigate('cadastrar-marca')}>
-            <ButtonText>Cadastrar Categoria</ButtonText>
-          </Button>
-        </Box>
-      </Box>
-    );
-  }
-  if (!verifyExists.unidade_de_armazenamento) {
-    return (
-      <Box h="$full" w="$full" alignItems="center" justifyContent="center">
-        <Box>
-          <Text>Não há categorias cadastradas.</Text>
-          <Text>Cadastre uma antes de cadastrar um produto.</Text>
-          <Button onPress={() => navigation?.navigate('cadastrar-ua')}>
-            <ButtonText>Cadastrar Categoria</ButtonText>
-          </Button>
-        </Box>
-      </Box>
-    );
-  }
-  if (!verifyExists.unidade_de_medida) {
-    return (
-      <Box h="$full" w="$full" alignItems="center" justifyContent="center">
-        <Box>
-          <Text>Não há categorias cadastradas.</Text>
-          <Text>Cadastre uma antes de cadastrar um produto.</Text>
-          <Button onPress={() => navigation?.navigate('cadastrar-um')}>
-            <ButtonText>Cadastrar Categoria</ButtonText>
-          </Button>
-        </Box>
-      </Box>
-    );
-  }
-
-  return (
-    <ScrollView>
-      <Box mx="$10" mt="$6" gap="$5">
-        <Text size="xl">Insira os dados do produto:</Text>
-        <Formik
-          initialValues={{
-            codigo_de_barras: '',
-            nome: '',
-            descricao: '',
-            tipo: '',
-            categoria: '',
-            marca: '',
-            empresa: '',
-            quantidade: '0',
-            tamanho: '0',
-            unidade_de_medida: '',
-            valor: '0,00',
-            data_de_validade: new Date(),
-            unidade_de_armazenamento: '',
-            qtd_unidades_is_edt: false,
-          }}
-          onSubmit={() => {}}
-        >
-          {({ values, handleChange, handleSubmit, setFieldValue }) => {
-            React.useEffect(() => {
-              if (route?.params?.code) {
-                setFieldValue('codigo_de_barras', route.params.code);
-              }
-              return () => {};
-            }, [route?.params?.code]);
-            return (
-              <Box>
-                {/* Código de barras */}
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>Código</FormControlLabelText>
-                  </FormControlLabel>
-                  <Input w="$full">
-                    <InputField
-                      type="text"
-                      value={values.codigo_de_barras}
-                      onChangeText={handleChange('codigo_de_barras')}
-                      placeholder="Código de barras"
-                    />
-                    <Button
-                      onPress={() =>
-                        navigation?.navigate('code-scanner', {
-                          screen: 'cadastrar-produtos',
-                          type: 'scan',
-                        })
-                      }
-                    >
-                      <ButtonIcon
-                        as={(props: object) => {
-                          return <FontAwesome6 name="barcode" {...props} />;
-                        }}
-                      />
-                    </Button>
-                  </Input>
-
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Informe o código de barras ou escaneie clicando no botão.
-                    </FormControlHelperText>
-                  </FormControlHelper>
-
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      O código de barras é obrigatório.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-
-                {/*  */}
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>Nome do produto</FormControlLabelText>
-                  </FormControlLabel>
-                  <Input w="$full">
-                    <InputField
-                      type="text"
-                      placeholder="Nome do Produto"
-                      onChangeText={handleChange('nome')}
-                    />
-                  </Input>
-
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Insira o nome do produto a ser cadastrado.
-                    </FormControlHelperText>
-                  </FormControlHelper>
-
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      O nome é um campo obrigatório.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>
-                      Descição do Produto
-                    </FormControlLabelText>
-                  </FormControlLabel>
+      <ScrollView>
+        <Box mx="$10" mt="$6" gap="$5">
+          <Text size="xl">Insira os dados do produto:</Text>
+          <Formik
+            initialValues={{
+              codigo_de_barras: '',
+              nome: '',
+              descricao: '',
+              tipo: '',
+              categoria: '',
+              marca: '',
+              empresa: '',
+              quantidade: '0',
+              tamanho: '0',
+              unidade_de_medida: '',
+              valor: '0,00',
+              data_de_validade: new Date(),
+              unidade_de_armazenamento: '',
+              qtd_unidades_is_edt: false,
+            }}
+            onSubmit={() => {}}
+          >
+            {({ values, handleChange, handleSubmit, setFieldValue }) => {
+              React.useEffect(() => {
+                if (route?.params?.code) {
+                  setFieldValue('codigo_de_barras', route.params.code);
+                }
+                return () => {};
+              }, [route?.params?.code]);
+              return (
+                <Box>
+                  {/* Código de barras */}
                   <FormControl
-                    as={Textarea}
-                    size={'lg'}
                     isInvalid={false}
+                    size={'md'}
                     isDisabled={false}
-                    mx="$2"
+                    isRequired={true}
                   >
-                    <InputField
-                      as={Textarea}
-                      onChangeText={handleChange('descricao')}
-                      placeholder="Your text goes here..."
-                    />
+                    <FormControlLabel>
+                      <FormControlLabelText>Código</FormControlLabelText>
+                    </FormControlLabel>
+                    <Input w="$full">
+                      <InputField
+                        type="text"
+                        value={values.codigo_de_barras}
+                        onChangeText={handleChange('codigo_de_barras')}
+                        placeholder="Código de barras"
+                      />
+                      <Button
+                        onPress={() =>
+                          navigation?.navigate('code-scanner', {
+                            screen: 'cadastrar-produtos',
+                            type: 'scan',
+                          })
+                        }
+                      >
+                        <ButtonIcon
+                          as={(props: object) => {
+                            return <FontAwesome6 name="barcode" {...props} />;
+                          }}
+                        />
+                      </Button>
+                    </Input>
+
+                    <FormControlHelper>
+                      <FormControlHelperText>
+                        Informe o código de barras ou escaneie clicando no
+                        botão.
+                      </FormControlHelperText>
+                    </FormControlHelper>
+
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        O código de barras é obrigatório.
+                      </FormControlErrorText>
+                    </FormControlError>
                   </FormControl>
 
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Informe a descrição do produto.
-                    </FormControlHelperText>
-                  </FormControlHelper>
-
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      A descrição não pode ser vazia.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-
-                {/* Tipo de produto */}
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>Tipo de produto</FormControlLabelText>
-                  </FormControlLabel>
-                  <Select
+                  {/*  */}
+                  <FormControl
                     isInvalid={false}
+                    size={'md'}
                     isDisabled={false}
-                    onValueChange={handleChange('tipo_de_produto')}
+                    isRequired={true}
                   >
-                    <SelectTrigger size={'lg'} variant={'outline'}>
-                      <SelectInput placeholder="Select option" />
-                      <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
-                    </SelectTrigger>
-                    <SelectPortal>
-                      <SelectBackdrop />
-                      <SelectContent>
-                        <SelectDragIndicatorWrapper>
-                          <SelectDragIndicator />
-                        </SelectDragIndicatorWrapper>
-                        {dadosdb.tipo_produto.map((tipo, i) => (
-                          <SelectItem
-                            key={i}
-                            label={tipo.nome}
-                            value={String(tipo.id)}
-                          />
-                        ))}
-                        <SelectItem label="UX Research" value="UX Research" />
-                      </SelectContent>
-                    </SelectPortal>
-                  </Select>
-
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      O tipo de produto ex: Colônia, Refil, Toalha e etc...
-                    </FormControlHelperText>
-                  </FormControlHelper>
-
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-
-                {/* Quantidade em unidades de medida ml l m cm g mg */}
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>Quantidade</FormControlLabelText>
-                  </FormControlLabel>
-                  <Input>
-                    <InputField
-                      type="text"
-                      defaultValue=""
-                      placeholder="Quantidade em gramas ex: 1mg"
-                    />
-                  </Input>
-
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Must be atleast 6 characters.
-                    </FormControlHelperText>
-                  </FormControlHelper>
-
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-
-                {/* Checkbox enable or disable manual digitation */}
-
-                <Checkbox
-                  m="$2"
-                  size={'md'}
-                  isInvalid={false}
-                  isIndeterminate
-                  aria-label="Label 1"
-                  value="Label 1"
-                  accessibilityLabel="Checkbox"
-                  isChecked={values.qtd_unidades_is_edt}
-                  onChange={(isSelected) => {
-                    setFieldValue('qtd_unidades_is_edt', isSelected);
-                  }}
-                  nativeID="checkbox-1"
-                >
-                  <CheckboxIndicator mr="$2">
-                    <CheckboxIcon as={CheckIcon} />
-                  </CheckboxIndicator>
-                  <CheckboxLabel>Editar quantidade de unidades</CheckboxLabel>
-                </Checkbox>
-
-                {/*  */}
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>
-                      Quantidade em unidades
-                    </FormControlLabelText>
-                  </FormControlLabel>
-                  <Input w="$full">
-                    <Button
-                      onPress={() => {
-                        setQauntidade(quantidade === 0 ? 0 : quantidade - 1);
-                      }}
-                      backgroundColor="$red600"
-                    >
-                      <ButtonIcon
-                        as={(props: object) => (
-                          <FontAwesome6 name="minus" {...props} />
-                        )}
+                    <FormControlLabel>
+                      <FormControlLabelText>
+                        Nome do produto
+                      </FormControlLabelText>
+                    </FormControlLabel>
+                    <Input w="$full">
+                      <InputField
+                        type="text"
+                        placeholder="Nome do Produto"
+                        onChangeText={handleChange('nome')}
                       />
-                    </Button>
-                    <InputField
-                      editable={values.qtd_unidades_is_edt}
-                      keyboardType="numeric"
-                      textAlign="center"
-                      type="text"
-                      onChangeText={(text) => {
-                        setQauntidade(Number(text.replace(/\D/g, '')));
-                      }}
-                      value={String(quantidade)}
-                      placeholder="Quantidade"
-                    />
-                    <Button
-                      onPress={() => setQauntidade(quantidade + 1)}
-                      backgroundColor="$primary500"
+                    </Input>
+
+                    <FormControlHelper>
+                      <FormControlHelperText>
+                        Insira o nome do produto a ser cadastrado.
+                      </FormControlHelperText>
+                    </FormControlHelper>
+
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        O nome é um campo obrigatório.
+                      </FormControlErrorText>
+                    </FormControlError>
+                  </FormControl>
+
+                  <FormControl
+                    isInvalid={false}
+                    size={'md'}
+                    isDisabled={false}
+                    isRequired={true}
+                  >
+                    <FormControlLabel>
+                      <FormControlLabelText>
+                        Descição do Produto
+                      </FormControlLabelText>
+                    </FormControlLabel>
+                    <FormControl
+                      as={Textarea}
+                      size={'lg'}
+                      isInvalid={false}
+                      isDisabled={false}
+                      mx="$2"
                     >
-                      <ButtonIcon
-                        as={(props: object) => (
-                          <FontAwesome6 name="add" {...props} />
-                        )}
+                      <InputField
+                        as={Textarea}
+                        onChangeText={handleChange('descricao')}
+                        placeholder="Your text goes here..."
                       />
-                    </Button>
-                  </Input>
+                    </FormControl>
 
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Informe a quantidade do produto.
-                    </FormControlHelperText>
-                  </FormControlHelper>
+                    <FormControlHelper>
+                      <FormControlHelperText>
+                        Informe a descrição do produto.
+                      </FormControlHelperText>
+                    </FormControlHelper>
 
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      A quantidade é um valor obrigatório.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        A descrição não pode ser vazia.
+                      </FormControlErrorText>
+                    </FormControlError>
+                  </FormControl>
 
-                {/*  */}
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>Valor</FormControlLabelText>
-                  </FormControlLabel>
-                  <Input w="$full">
-                    <Box
-                      px="$5"
-                      backgroundColor="$trueGray300"
-                      h="$full"
-                      justifyContent="center"
-                      alignItems="center"
+                  {/* Tipo de produto */}
+                  <FormControl
+                    isInvalid={false}
+                    size={'md'}
+                    isDisabled={false}
+                    isRequired={true}
+                  >
+                    <FormControlLabel>
+                      <FormControlLabelText>
+                        Tipo de produto
+                      </FormControlLabelText>
+                    </FormControlLabel>
+                    <Select
+                      isInvalid={false}
+                      isDisabled={false}
+                      onValueChange={handleChange('tipo_de_produto')}
                     >
-                      <Text color="$black">
-                        <Text fontSize="$xl" color="$black">
-                          R
+                      <SelectTrigger size={'lg'} variant={'outline'}>
+                        <SelectInput placeholder="Select option" />
+                        <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
+                      </SelectTrigger>
+                      <SelectPortal>
+                        <SelectBackdrop />
+                        <SelectContent>
+                          <SelectDragIndicatorWrapper>
+                            <SelectDragIndicator />
+                          </SelectDragIndicatorWrapper>
+                          {dadosdb.tipo_produto.map((tipo, i) => (
+                            <SelectItem
+                              key={i}
+                              label={tipo.nome}
+                              value={String(tipo.id)}
+                            />
+                          ))}
+                          <SelectItem label="UX Research" value="UX Research" />
+                        </SelectContent>
+                      </SelectPortal>
+                    </Select>
+
+                    <FormControlHelper>
+                      <FormControlHelperText>
+                        O tipo de produto ex: Colônia, Refil, Toalha e etc...
+                      </FormControlHelperText>
+                    </FormControlHelper>
+
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        Atleast 6 characters are required.
+                      </FormControlErrorText>
+                    </FormControlError>
+                  </FormControl>
+
+                  {/* Quantidade em unidades de medida ml l m cm g mg */}
+                  <FormControl
+                    isInvalid={false}
+                    size={'md'}
+                    isDisabled={false}
+                    isRequired={true}
+                  >
+                    <FormControlLabel>
+                      <FormControlLabelText>Quantidade</FormControlLabelText>
+                    </FormControlLabel>
+                    <Input>
+                      <InputField
+                        type="text"
+                        defaultValue=""
+                        placeholder="Quantidade em gramas ex: 1mg"
+                      />
+                    </Input>
+
+                    <FormControlHelper>
+                      <FormControlHelperText>
+                        Must be atleast 6 characters.
+                      </FormControlHelperText>
+                    </FormControlHelper>
+
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        Atleast 6 characters are required.
+                      </FormControlErrorText>
+                    </FormControlError>
+                  </FormControl>
+
+                  {/* Checkbox enable or disable manual digitation */}
+
+                  <Checkbox
+                    m="$2"
+                    size={'md'}
+                    isInvalid={false}
+                    isIndeterminate
+                    aria-label="Label 1"
+                    value="Label 1"
+                    accessibilityLabel="Checkbox"
+                    isChecked={values.qtd_unidades_is_edt}
+                    onChange={(isSelected) => {
+                      setFieldValue('qtd_unidades_is_edt', isSelected);
+                    }}
+                    nativeID="checkbox-1"
+                  >
+                    <CheckboxIndicator mr="$2">
+                      <CheckboxIcon as={CheckIcon} />
+                    </CheckboxIndicator>
+                    <CheckboxLabel>Editar quantidade de unidades</CheckboxLabel>
+                  </Checkbox>
+
+                  {/*  */}
+                  <FormControl
+                    isInvalid={false}
+                    size={'md'}
+                    isDisabled={false}
+                    isRequired={true}
+                  >
+                    <FormControlLabel>
+                      <FormControlLabelText>
+                        Quantidade em unidades
+                      </FormControlLabelText>
+                    </FormControlLabel>
+                    <Input w="$full">
+                      <Button
+                        onPress={() => {
+                          setQauntidade(quantidade === 0 ? 0 : quantidade - 1);
+                        }}
+                        backgroundColor="$red600"
+                      >
+                        <ButtonIcon
+                          as={(props: object) => (
+                            <FontAwesome6 name="minus" {...props} />
+                          )}
+                        />
+                      </Button>
+                      <InputField
+                        editable={values.qtd_unidades_is_edt}
+                        keyboardType="numeric"
+                        textAlign="center"
+                        type="text"
+                        onChangeText={(text) => {
+                          setQauntidade(Number(text.replace(/\D/g, '')));
+                        }}
+                        value={String(quantidade)}
+                        placeholder="Quantidade"
+                      />
+                      <Button
+                        onPress={() => setQauntidade(quantidade + 1)}
+                        backgroundColor="$primary500"
+                      >
+                        <ButtonIcon
+                          as={(props: object) => (
+                            <FontAwesome6 name="add" {...props} />
+                          )}
+                        />
+                      </Button>
+                    </Input>
+
+                    <FormControlHelper>
+                      <FormControlHelperText>
+                        Informe a quantidade do produto.
+                      </FormControlHelperText>
+                    </FormControlHelper>
+
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        A quantidade é um valor obrigatório.
+                      </FormControlErrorText>
+                    </FormControlError>
+                  </FormControl>
+
+                  {/*  */}
+                  <FormControl
+                    isInvalid={false}
+                    size={'md'}
+                    isDisabled={false}
+                    isRequired={true}
+                  >
+                    <FormControlLabel>
+                      <FormControlLabelText>Valor</FormControlLabelText>
+                    </FormControlLabel>
+                    <Input w="$full">
+                      <Box
+                        px="$5"
+                        backgroundColor="$trueGray300"
+                        h="$full"
+                        justifyContent="center"
+                        alignItems="center"
+                      >
+                        <Text color="$black">
+                          <Text fontSize="$xl" color="$black">
+                            R
+                          </Text>
+                          $
                         </Text>
-                        $
-                      </Text>
-                    </Box>
-                    <InputField
-                      type="text"
-                      value={values.valor}
-                      keyboardType="number-pad"
-                      onChangeText={handleChange('valor')}
-                      onEndEditing={() => {
-                        setFieldValue(
-                          'valor',
-                          parseFloat(
-                            Number(values.valor.replace(',', '.')).toString(),
-                          )
-                            .toFixed(2)
-                            .replace('.', ','),
-                        );
-                      }}
-                      placeholder="R$XXX,XX"
-                    />
-                  </Input>
+                      </Box>
+                      <InputField
+                        type="text"
+                        value={values.valor}
+                        keyboardType="number-pad"
+                        onChangeText={handleChange('valor')}
+                        onEndEditing={() => {
+                          setFieldValue(
+                            'valor',
+                            parseFloat(
+                              Number(values.valor.replace(',', '.')).toString(),
+                            )
+                              .toFixed(2)
+                              .replace('.', ','),
+                          );
+                        }}
+                        placeholder="R$XXX,XX"
+                      />
+                    </Input>
 
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Insira o valor do produto.
-                    </FormControlHelperText>
-                  </FormControlHelper>
+                    <FormControlHelper>
+                      <FormControlHelperText>
+                        Insira o valor do produto.
+                      </FormControlHelperText>
+                    </FormControlHelper>
 
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      O Valor é um campo obrigatório.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        O Valor é um campo obrigatório.
+                      </FormControlErrorText>
+                    </FormControlError>
+                  </FormControl>
 
-                {/*  Selecione a empresa desejada */}
-                <FormControl w="$full">
-                  <FormControlLabel>
-                    <FormControlHelperText>
-                      Selecione a empresa
-                    </FormControlHelperText>
-                  </FormControlLabel>
-                  <Select
-                    isInvalid={false}
-                    w={'$full'}
-                    onValueChange={handleChange('empresa')}
-                  >
-                    <SelectTrigger size={'md'} variant={'outline'}>
-                      <SelectInput placeholder="Selecione uma empresa" />
-                      <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
-                    </SelectTrigger>
-                    <SelectPortal>
-                      <SelectBackdrop />
-                      <SelectContent>
-                        <SelectDragIndicatorWrapper>
-                          <SelectDragIndicator />
-                        </SelectDragIndicatorWrapper>
-                        {teste.map((item) => (
+                  {/*  Selecione a empresa desejada */}
+                  <FormControl w="$full">
+                    <FormControlLabel>
+                      <FormControlHelperText>
+                        Selecione a empresa
+                      </FormControlHelperText>
+                    </FormControlLabel>
+                    <Select
+                      isInvalid={false}
+                      w={'$full'}
+                      onValueChange={handleChange('empresa')}
+                    >
+                      <SelectTrigger size={'md'} variant={'outline'}>
+                        <SelectInput placeholder="Selecione uma empresa" />
+                        <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
+                      </SelectTrigger>
+                      <SelectPortal>
+                        <SelectBackdrop />
+                        <SelectContent>
+                          <SelectDragIndicatorWrapper>
+                            <SelectDragIndicator />
+                          </SelectDragIndicatorWrapper>
+                          {teste.map((item) => (
+                            <SelectItem
+                              key={item.id}
+                              label={item.name}
+                              value={item.id.toString()}
+                            />
+                          ))}
+                        </SelectContent>
+                      </SelectPortal>
+                    </Select>
+                    <FormControlHelper>
+                      <FormControlHelperText>
+                        Selecione a empresa desejada.
+                      </FormControlHelperText>
+                    </FormControlHelper>
+
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        Selecine uma empresa o campo é obrigatório.
+                      </FormControlErrorText>
+                    </FormControlError>
+                  </FormControl>
+
+                  {/* Select Categoria */}
+                  <FormControl w="$full">
+                    <FormControlLabel>
+                      <FormControlHelperText>Categoria</FormControlHelperText>
+                    </FormControlLabel>
+                    <Select
+                      onValueChange={handleChange('categoria')}
+                      isInvalid={false}
+                      w={'$full'}
+                      isDisabled={false}
+                    >
+                      <SelectTrigger size={'md'} variant={'outline'}>
+                        <SelectInput placeholder="Select option" />
+                        <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
+                      </SelectTrigger>
+                      <SelectPortal>
+                        <SelectBackdrop />
+                        <SelectContent>
+                          <SelectDragIndicatorWrapper>
+                            <SelectDragIndicator />
+                          </SelectDragIndicatorWrapper>
+                          <SelectItem label="UX Research" value="UX Research" />
                           <SelectItem
-                            key={item.id}
-                            label={item.name}
-                            value={item.id.toString()}
+                            label="Web Development"
+                            value="Web Development"
                           />
-                        ))}
-                      </SelectContent>
-                    </SelectPortal>
-                  </Select>
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Selecione a empresa desejada.
-                    </FormControlHelperText>
-                  </FormControlHelper>
+                          <SelectItem
+                            label="Cross Platform Development Process"
+                            value="Cross Platform Development Process"
+                          />
+                          <SelectItem
+                            label="UI Designing"
+                            value="UI Designing"
+                            isDisabled={true}
+                          />
+                          <SelectItem
+                            label="Backend Development"
+                            value="Backend Development"
+                          />
+                        </SelectContent>
+                      </SelectPortal>
+                    </Select>
+                    <FormControlHelper>
+                      <FormControlHelperText>
+                        Insira o valor do produto.
+                      </FormControlHelperText>
+                    </FormControlHelper>
 
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Selecine uma empresa o campo é obrigatório.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        O Valor é um campo obrigatório.
+                      </FormControlErrorText>
+                    </FormControlError>
+                  </FormControl>
 
-                {/* Select Categoria */}
-                <FormControl w="$full">
-                  <FormControlLabel>
-                    <FormControlHelperText>Categoria</FormControlHelperText>
-                  </FormControlLabel>
-                  <Select
-                    onValueChange={handleChange('categoria')}
-                    isInvalid={false}
-                    w={'$full'}
-                    isDisabled={false}
-                  >
-                    <SelectTrigger size={'md'} variant={'outline'}>
-                      <SelectInput placeholder="Select option" />
-                      <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
-                    </SelectTrigger>
-                    <SelectPortal>
-                      <SelectBackdrop />
-                      <SelectContent>
-                        <SelectDragIndicatorWrapper>
-                          <SelectDragIndicator />
-                        </SelectDragIndicatorWrapper>
-                        <SelectItem label="UX Research" value="UX Research" />
-                        <SelectItem
-                          label="Web Development"
-                          value="Web Development"
-                        />
-                        <SelectItem
-                          label="Cross Platform Development Process"
-                          value="Cross Platform Development Process"
-                        />
-                        <SelectItem
-                          label="UI Designing"
-                          value="UI Designing"
-                          isDisabled={true}
-                        />
-                        <SelectItem
-                          label="Backend Development"
-                          value="Backend Development"
-                        />
-                      </SelectContent>
-                    </SelectPortal>
-                  </Select>
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Insira o valor do produto.
-                    </FormControlHelperText>
-                  </FormControlHelper>
+                  {/* Select */}
+                  <FormControl w="$full">
+                    <FormControlLabel>
+                      <FormControlHelperText>AAA</FormControlHelperText>
+                    </FormControlLabel>
+                    <Select isInvalid={false} w={'$full'} isDisabled={false}>
+                      <SelectTrigger size={'md'} variant={'outline'}>
+                        <SelectInput placeholder="Select option" />
+                        <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
+                      </SelectTrigger>
+                      <SelectPortal>
+                        <SelectBackdrop />
+                        <SelectContent>
+                          <SelectDragIndicatorWrapper>
+                            <SelectDragIndicator />
+                          </SelectDragIndicatorWrapper>
+                          <SelectItem label="UX Research" value="UX Research" />
+                          <SelectItem
+                            label="Web Development"
+                            value="Web Development"
+                          />
+                          <SelectItem
+                            label="Cross Platform Development Process"
+                            value="Cross Platform Development Process"
+                          />
+                          <SelectItem
+                            label="UI Designing"
+                            value="UI Designing"
+                            isDisabled={true}
+                          />
+                          <SelectItem
+                            label="Backend Development"
+                            value="Backend Development"
+                          />
+                        </SelectContent>
+                      </SelectPortal>
+                    </Select>
+                    <FormControlHelper>
+                      <FormControlHelperText>
+                        Insira o valor do produto.
+                      </FormControlHelperText>
+                    </FormControlHelper>
 
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      O Valor é um campo obrigatório.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        O Valor é um campo obrigatório.
+                      </FormControlErrorText>
+                    </FormControlError>
+                  </FormControl>
 
-                {/* Select */}
-                <FormControl w="$full">
-                  <FormControlLabel>
-                    <FormControlHelperText>AAA</FormControlHelperText>
-                  </FormControlLabel>
-                  <Select isInvalid={false} w={'$full'} isDisabled={false}>
-                    <SelectTrigger size={'md'} variant={'outline'}>
-                      <SelectInput placeholder="Select option" />
-                      <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
-                    </SelectTrigger>
-                    <SelectPortal>
-                      <SelectBackdrop />
-                      <SelectContent>
-                        <SelectDragIndicatorWrapper>
-                          <SelectDragIndicator />
-                        </SelectDragIndicatorWrapper>
-                        <SelectItem label="UX Research" value="UX Research" />
-                        <SelectItem
-                          label="Web Development"
-                          value="Web Development"
-                        />
-                        <SelectItem
-                          label="Cross Platform Development Process"
-                          value="Cross Platform Development Process"
-                        />
-                        <SelectItem
-                          label="UI Designing"
-                          value="UI Designing"
-                          isDisabled={true}
-                        />
-                        <SelectItem
-                          label="Backend Development"
-                          value="Backend Development"
-                        />
-                      </SelectContent>
-                    </SelectPortal>
-                  </Select>
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Insira o valor do produto.
-                    </FormControlHelperText>
-                  </FormControlHelper>
-
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      O Valor é um campo obrigatório.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-
-                {/* Box Botão cadastrar */}
-                <Box mb="$5">
-                  <Button
-                    onPress={
-                      handleSubmit as unknown as (
-                        event: GestureResponderEvent,
-                      ) => void
-                    }
-                    $active-bgColor={
-                      theme === 'dark' ? '$purple700' : '$purple500'
-                    }
-                    $dark-backgroundColor="$purple500"
-                    $light-backgroundColor="$purple700"
-                  >
-                    <ButtonText>Cadastrar</ButtonText>
-                  </Button>
+                  {/* Box Botão cadastrar */}
+                  <Box mb="$5">
+                    <Button
+                      onPress={
+                        handleSubmit as unknown as (
+                          event: GestureResponderEvent,
+                        ) => void
+                      }
+                      $active-bgColor={
+                        theme === 'dark' ? '$purple700' : '$purple500'
+                      }
+                      $dark-backgroundColor="$purple500"
+                      $light-backgroundColor="$purple700"
+                    >
+                      <ButtonText>Cadastrar</ButtonText>
+                    </Button>
+                  </Box>
                 </Box>
-              </Box>
+              );
+            }}
+          </Formik>
+        </Box>
+      </ScrollView>
+    );
+  }
+  return (
+    <Box>
+      <Box>
+        <Text>
+          {!verifyExists.empresa
+            ? 'Não há empresas cadastradas!'
+            : !verifyExists.marca
+              ? 'Não há marcas cadastradas!'
+              : !verifyExists.tipo_de_produto
+                ? 'Não há tipos de produto cadastrados!'
+                : !verifyExists.unidade_de_armazenamento
+                  ? 'Não há unidades de armazenamento cadastradas!'
+                  : verifyExists.unidade_de_medida
+                    ? 'Não há unidades de medida cadastradas!'
+                    : ''}
+        </Text>
+        <Button
+          onPress={() => {
+            navigation?.navigate(
+              !verifyExists.empresa
+                ? 'screens-empresas'
+                : !verifyExists.marca
+                  ? 'screens-marcas'
+                  : !verifyExists.tipo_de_produto
+                    ? 'screens-tipos-produtos'
+                    : !verifyExists.unidade_de_armazenamento
+                      ? 'screens-uas'
+                      : 'screens-ums',
             );
           }}
-        </Formik>
+        >
+          <ButtonText>
+            {' '}
+            {!verifyExists.empresa
+              ? 'Cadastrar Empresas'
+              : !verifyExists.marca
+                ? 'Cadastrar Marcas'
+                : !verifyExists.tipo_de_produto
+                  ? 'Cadastrar Tipos de Produto'
+                  : !verifyExists.unidade_de_armazenamento
+                    ? 'Cadastrar Unidades de Armazenamento'
+                    : verifyExists.unidade_de_medida
+                      ? 'Cadastrar Unidades de medida'
+                      : ''}
+          </ButtonText>
+        </Button>
       </Box>
-    </ScrollView>
+    </Box>
   );
 };
 export default Create;

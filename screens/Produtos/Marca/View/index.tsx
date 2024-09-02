@@ -13,6 +13,8 @@ import {
   AddIcon,
   TrashIcon,
   EditIcon,
+  Heading,
+  Image,
 } from '@gluestack-ui/themed';
 
 import { UpdateMarcaDto } from '$classes/marca/dto/update-marca.dto';
@@ -25,6 +27,8 @@ import { Alert } from 'react-native';
 import search from './functions/search';
 import { ListarMarcasScreenProps } from './interfaces';
 import { useIsFocused } from '@react-navigation/native';
+import { Card } from '@gluestack-ui/themed';
+import CardCustom from '$components/Card';
 
 const View: React.FC<ListarMarcasScreenProps> = ({ navigation }) => {
   const db = useSQLiteContext();
@@ -126,6 +130,11 @@ const View: React.FC<ListarMarcasScreenProps> = ({ navigation }) => {
           alignItems="center"
           gap="$5"
         >
+          <CardCustom>
+            <Heading>
+              <Text size="2xl">Nenhuma marca encontrada</Text>
+            </Heading>
+          </CardCustom>
           <Box
             w="$full"
             justifyContent="center"
@@ -133,7 +142,7 @@ const View: React.FC<ListarMarcasScreenProps> = ({ navigation }) => {
             flexDirection="column"
             gap="$3.5"
           >
-            <Text size="2xl">Marca não encontrada</Text>
+            <Text size="2xl">Nenhuma marca encontrada</Text>
             <Button
               w="$2/3"
               onPress={async () => {

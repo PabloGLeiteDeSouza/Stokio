@@ -88,7 +88,6 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation }) => {
   const [isLoading, setIsLoading] = React.useState(true);
   const [haveAllDeps, setHaveAllDeps] = React.useState({
     empresa: false,
-    categoria: false,
     marca: false,
     tipo: false,
     um: false,
@@ -162,17 +161,15 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation }) => {
             <Text size="xl" textAlign="center">
               Não há{' '}
               {haveAllDeps.empresa
-                ? haveAllDeps.categoria
-                  ? haveAllDeps.marca
-                    ? haveAllDeps.tipo
-                      ? haveAllDeps.ua
-                        ? haveAllDeps.um
-                          ? 'produtos cadastrados'
-                          : 'unidades de medida cadastradas'
-                        : 'unidades de armazenamento cadastradas'
-                      : 'tipos de produtos cadastrados'
-                    : 'marcas de produtos cadastradas'
-                  : 'categorias cadastradas'
+                ? haveAllDeps.marca
+                  ? haveAllDeps.tipo
+                    ? haveAllDeps.ua
+                      ? haveAllDeps.um
+                        ? 'produtos cadastrados'
+                        : 'unidades de medida cadastradas'
+                      : 'unidades de armazenamento cadastradas'
+                    : 'tipos de produtos cadastrados'
+                  : 'marcas de produtos cadastradas'
                 : 'empresas cadastradas'}
             </Text>
             <Button
@@ -184,34 +181,30 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation }) => {
                 navigation?.navigate(
                   !haveAllDeps.empresa
                     ? 'screens-empresas'
-                    : !haveAllDeps.categoria
-                      ? 'screens-categorias'
-                      : !haveAllDeps.marca
-                        ? 'screens-marcas'
-                        : !haveAllDeps.tipo
-                          ? 'screens-tipos-produtos'
-                          : !haveAllDeps.ua
-                            ? 'screens-uas'
-                            : !haveAllDeps.um
-                              ? 'screens-ums'
-                              : 'cadastrar-produtos',
+                    : !haveAllDeps.marca
+                      ? 'screens-marcas'
+                      : !haveAllDeps.tipo
+                        ? 'screens-tipos-produtos'
+                        : !haveAllDeps.ua
+                          ? 'screens-uas'
+                          : !haveAllDeps.um
+                            ? 'screens-ums'
+                            : 'cadastrar-produtos',
                 )
               }
             >
               <ButtonText>
-                {!haveAllDeps.categoria
-                  ? 'Cadastrar Categoria'
-                  : !haveAllDeps.empresa
-                    ? 'Cadastrar Empresas'
-                    : !haveAllDeps.marca
-                      ? 'Cadastrar marca'
-                      : !haveAllDeps.tipo
-                        ? 'Cadastrar Tipo'
-                        : !haveAllDeps.ua
-                          ? 'Cadastrar Unidade de Armazenamento'
-                          : !haveAllDeps.um
-                            ? 'Cadastrar Unidades de Medidas'
-                            : 'Cadastrar Produtos'}
+                {!haveAllDeps.empresa
+                  ? 'Cadastrar Empresas'
+                  : !haveAllDeps.marca
+                    ? 'Cadastrar marca'
+                    : !haveAllDeps.tipo
+                      ? 'Cadastrar Tipo'
+                      : !haveAllDeps.ua
+                        ? 'Cadastrar Unidade de Armazenamento'
+                        : !haveAllDeps.um
+                          ? 'Cadastrar Unidades de Medidas'
+                          : 'Cadastrar Produtos'}
               </ButtonText>
               <ButtonIcon
                 color="$white"

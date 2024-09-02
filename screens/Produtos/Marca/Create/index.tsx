@@ -25,7 +25,7 @@ import { CadastrarMarcasScreenProps } from './interfaces';
 import * as Yup from 'yup';
 
 const validationSchema = Yup.object().shape({
-  nome: Yup.string().required(),
+  nome: Yup.string().required('O nome não pode ser vázio!'),
   descicao: Yup.string(),
 });
 
@@ -36,7 +36,7 @@ const Create: React.FC<CadastrarMarcasScreenProps> = ({ navigation }) => {
     <Box w="$full" h="$full" display="flex" alignItems="center">
       <Box pt="$5">
         <Text textAlign="center" size="2xl">
-          Cadastre uma categoria de produto abaixo:
+          Cadastre uma marca de um produto abaixo:
         </Text>
       </Box>
       <Box mt="$5" w="$2/3" gap="$6">
@@ -84,7 +84,7 @@ const Create: React.FC<CadastrarMarcasScreenProps> = ({ navigation }) => {
 
                 <FormControlHelper>
                   <FormControlHelperText>
-                    Informe o nome da categoria.
+                    Informe o nome da marca.
                   </FormControlHelperText>
                 </FormControlHelper>
 
