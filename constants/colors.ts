@@ -25,8 +25,8 @@ export const ConfigTheme = {
   dark: {
     dark: true,
     colors: {
-      background: config.tokens.colors.backgroundDark900,
-      card: config.tokens.colors.backgroundDark800,
+      background: config.tokens.colors.backgroundDark950,
+      card: config.tokens.colors.backgroundDark900,
       border: config.tokens.colors.borderDark50,
       notification: config.tokens.colors.purple600,
       primary: config.tokens.colors.purple600,

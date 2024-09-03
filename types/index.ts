@@ -36,7 +36,7 @@ export type RootStackParamList = {
   'editar-produtos'?: object;
   'editar-empresas'?: { empresa: UpdateEmpresaObject };
   'editar-ua'?: object;
-  'editar-um'?: object;
+  'editar-um'?: { um: Unidadedeme };
   'editar-categoria'?: { categoria: UpdateCategoriaDto };
   'editar-marca'?: object;
   'editar-tipo-produto'?: { tipo_de_produto: UpdateTipoDeProdutoDto };

@@ -319,6 +319,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({ navigation }) => {
                 }
               }
             };
+
             return (
               <>
                 <FormControl

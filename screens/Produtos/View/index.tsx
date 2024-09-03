@@ -54,6 +54,7 @@ import {
   ChevronDownIcon,
   SearchIcon,
   AddIcon,
+  Card,
 } from '@gluestack-ui/themed';
 import { UpdateProdutoDto } from '$classes/produto/dto/update-produto.dto';
 import LoadingScreen from '$components/LoadingScreen';
@@ -135,22 +136,15 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation }) => {
             </Box>
             <Box>
               {products.map((itens, i) => (
-                <Box key={i}>
+                <Card key={i}>
                   <HStack>
                     <VStack>
-                      <Text>Nome:</Text>
-                      <Text>{itens.nome}</Text>
-                    </VStack>
-                    <VStack>
-                      <Text>Preço:</Text>
+                      <Heading>{itens.nome}</Heading>
                       <Text>{itens.preco}</Text>
-                    </VStack>
-                    <VStack>
-                      <Text>Descrição:</Text>
                       <Text>{itens.descricao}</Text>
                     </VStack>
                   </HStack>
-                </Box>
+                </Card>
               ))}
             </Box>
           </Box>

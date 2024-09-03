@@ -5,8 +5,9 @@ import { CardCustonColorsBg } from '$constants/styles/cards';
 const CardCustom: React.FC<CardProps> = ({ variant, ...props }) => {
   return (
     <HStack
+      m="$2.5"
       {...props}
-      p={5}
+      p="$5"
       rounded={'$md'}
       $light-bgColor={
         variant === 'primary'

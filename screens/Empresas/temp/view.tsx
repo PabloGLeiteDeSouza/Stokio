@@ -69,7 +69,7 @@ import { RouteProp, useIsFocused } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { Alert } from 'react-native';
-import { formatStringDate } from '../../utils';
+import { formatStringDate } from '../../../utils';
 import { Ionicons } from '@expo/vector-icons';
 import { useSQLiteContext } from 'expo-sqlite';
 import { EditIcon } from '@gluestack-ui/themed';
