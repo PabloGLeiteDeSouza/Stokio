@@ -177,7 +177,7 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation }) => {
     }, 1);
   }, [isFocused]);
 
-  const deletarEmpresa = (empresa: UpdateEmpresaObject) => {
+  const deletarEmpresa = (empresa: UpdateCliente) => {
     Alert.alert(
       'Aviso',
       MessagesWarning.delete_messages.empresa +
@@ -305,38 +305,40 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation }) => {
       </Box>
       {todasEmpresas.map((value, i) => {
         return (
-          <Box key={i} w="$full" alignItems="center" gap="$2.5" my="$2.5">
+          <Box key={i} w="$full" alignItems="center" gap="$2.5" mt="$8">
             {value.cnpj ? (
-              <HStack
-                px="$3"
-                py="$3"
-                rounded="$md"
-                $light-bgColor="$purple400"
-                $dark-bgColor="$purple700"
-                gap="$3"
-              >
-                <VStack gap="$2">
-                  <Heading>Nome fantasia: {value.nome_fantasia}</Heading>
-                  <Text>
-                    <Text fontWeight="$bold">Razão Social:</Text>{' '}
-                    {value.razao_social}
-                  </Text>
-                  <Text>
-                    <Text fontWeight="$bold">CNPJ:</Text> {value.cnpj}
-                  </Text>
-                </VStack>
-                <VStack gap="$2">
-                  <Button onPress={() => editarEmpresa(value)}>
-                    <ButtonIcon as={EditIcon} />
-                  </Button>
-                  <Button
-                    action="negative"
-                    onPress={() => deletarEmpresa(value)}
-                  >
-                    <ButtonIcon as={TrashIcon} />
-                  </Button>
-                </VStack>
-              </HStack>
+              <Card>
+                <HStack
+                  px="$3"
+                  py="$3"
+                  rounded="$md"
+                  $light-bgColor="$purple400"
+                  $dark-bgColor="$purple700"
+                  gap="$3"
+                >
+                  <VStack gap="$2">
+                    <Heading>Nome fantasia: {value.nome_fantasia}</Heading>
+                    <Text>
+                      <Text fontWeight="$bold">Razão Social:</Text>{' '}
+                      {value.razao_social}
+                    </Text>
+                    <Text>
+                      <Text fontWeight="$bold">CNPJ:</Text> {value.cnpj}
+                    </Text>
+                  </VStack>
+                  <VStack gap="$2">
+                    <Button onPress={() => editarEmpresa(value)}>
+                      <ButtonIcon as={EditIcon} />
+                    </Button>
+                    <Button
+                      action="negative"
+                      onPress={() => deletarEmpresa(value)}
+                    >
+                      <ButtonIcon as={TrashIcon} />
+                    </Button>
+                  </VStack>
+                </HStack>
+              </Card>
             ) : (
               <Card borderRadius="$lg" variant="elevated">
                 <HStack gap="$3">
