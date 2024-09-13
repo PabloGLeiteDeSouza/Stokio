@@ -178,6 +178,7 @@ const TabBottomScreen: React.FC<TabBottomScreenProps> = () => {
         component={ConfigurationsScreen}
         options={{
           title: 'Configurações',
+          tabBarIcon: (props) => <FontAwesome6 name="gears" {...props} />,
         }}
       />
     </TabBottom.Navigator>
