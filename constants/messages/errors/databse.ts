@@ -343,4 +343,9 @@ export const db_error_messages = {
       },
     },
   },
+  ErrorsCliente: {
+    update: {
+      database: '',
+    },
+  },
 };
