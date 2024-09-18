@@ -31,26 +31,28 @@ export const db_error_messages = {
       },
     },
   },
-  ErrorsCategoria: {
+  ErrorsTipoProduto: {
     update: {
-      database: 'Não foi possível atualizar a categoria tente novamente!',
+      database: 'Não foi possível atualizar o tipo do produto tente novamente!',
     },
     create: {
-      database: 'Não foi possível criar a categoria tente novamente!',
+      database: 'Não foi possível criar o tipo do produto tente novamente!',
     },
     delete: {
-      database: 'Não foi possível deletar a categoria tente novamente!',
+      database: 'Não foi possível deletar o tipo do produto tente novamente!',
     },
     find: {
       all: {
         database:
-          'Não foi possível encontrar nenhuma categoria tente novamente!',
+          'Não foi possível encontrar nenhum tipo do produto tente novamente!',
       },
       byName: {
-        database: 'Não foi possível encontrar a categoria tente novamente!',
+        database:
+          'Não foi possível encontrar o tipo do produto tente novamente!',
       },
       byId: {
-        database: 'Não foi possível encontrar a categoria tente novamente!',
+        database:
+          'Não foi possível encontrar o tipo do produto tente novamente!',
       },
     },
   },
@@ -345,7 +347,72 @@ export const db_error_messages = {
   },
   ErrorsCliente: {
     update: {
-      database: '',
+      database: 'Não foi possível atualizar o cliente tente novamente!',
+    },
+    create: {
+      database: 'Não foi possível criar o cliente tente novamente!',
+    },
+    delete: {
+      database: 'Não foi possível deletar o cliente tente novamente!',
+    },
+    find: {
+      all: {
+        database: 'Não foi possível encontrar nenhum cliente tente novamente!',
+      },
+      byId: {
+        database: 'Não foi possível encontrar o cliente tente novamente!',
+      },
+      byIdPessoa: {
+        database: 'Não foi possível encontrar o cliente tente novamente!',
+      },
+    },
+  },
+  ErrorsVenda: {
+    update: {
+      database: 'Não foi possível atualizar a venda tente novamente!',
+    },
+    create: {
+      database: 'Não foi possível criar a venda tente novamente!',
+    },
+    delete: {
+      database: 'Não foi possível deletar a venda tente novamente!',
+    },
+    find: {
+      all: {
+        database: 'Não foi possível encontrar nenhuma venda tente novamente!',
+      },
+      byId: {
+        database: 'Não foi possível encontrar a venda tente novamente!',
+      },
+      allByIdCliente: {
+        database: 'Não foi possível encontrar nenhuma venda tente novamente!',
+      },
+      allByIdEmpresa: {
+        database: 'Não foi possível encontrar nenhuma venda tente novamente!',
+      },
+    },
+  },
+  ErrorsItensVenda: {
+    update: {
+      database: 'Não foi possível atualizar o item da venda tente novamente!',
+    },
+    create: {
+      database: 'Não foi possível criar o item de venda tente novamente!',
+    },
+    delete: {
+      database: 'Não foi possível deletar o item de venda tente novamente!',
+    },
+    find: {
+      all: {
+        database: 'Não foi possível encontrar o item de venda tente novamente!',
+      },
+      byId: {
+        database: 'Não foi possível encontrar o item de venda tente novamente!',
+      },
+      allByIdVenda: {
+        database:
+          'Não foi possível encontrar nenhum item de venda tente novamente!',
+      },
     },
   },
 };
