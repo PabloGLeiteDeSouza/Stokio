@@ -1,7 +1,6 @@
 import { Box, ScrollView, Text } from '@gluestack-ui/themed';
 
 const ConfigurationsScreen: React.FC = () => {
-
   return (
     <ScrollView>
       <Box h="$full" w="$full">
