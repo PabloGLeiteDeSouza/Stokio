@@ -414,51 +414,6 @@ export const db_error_messages = {
           'Não foi possível encontrar nenhum item de venda tente novamente!',
       },
     },
-    create: {
-      database: '',
-    },
-    delete: {
-      database: '',
-    },
-    disable: {
-      database: '',
-    },
-    find: {
-      all: {
-        database: '',
-      },
-      byId: {
-        database: '',
-      },
-      byIdPessoa: {
-        database: '',
-      },
-    },
-  },
-  ErrorsVenda: {
-    update: {
-      database: '',
-    },
-    create: {
-      database: '',
-    },
-    delete: {
-      database: '',
-    },
-    disable: {
-      database: '',
-    },
-    find: {
-      all: {
-        database: '',
-      },
-      byId: {
-        database: '',
-      },
-      byIdPessoa: {
-        database: '',
-      },
-    },
   },
   ErrorsItemVenda: {
     update: {
