@@ -347,5 +347,75 @@ export const db_error_messages = {
     update: {
       database: '',
     },
+    create: {
+      database: '',
+    },
+    delete: {
+      database: '',
+    },
+    disable: {
+      database: '',
+    },
+    find: {
+      all: {
+        database: '',
+      },
+      byId: {
+        database: '',
+      },
+      byIdPessoa: {
+        database: '',
+      },
+    },
+  },
+  ErrorsVenda: {
+    update: {
+      database: '',
+    },
+    create: {
+      database: '',
+    },
+    delete: {
+      database: '',
+    },
+    disable: {
+      database: '',
+    },
+    find: {
+      all: {
+        database: '',
+      },
+      byId: {
+        database: '',
+      },
+      byIdPessoa: {
+        database: '',
+      },
+    },
+  },
+  ErrorsItemVenda: {
+    update: {
+      database: '',
+    },
+    create: {
+      database: '',
+    },
+    delete: {
+      database: '',
+    },
+    disable: {
+      database: '',
+    },
+    find: {
+      all: {
+        database: '',
+      },
+      byId: {
+        database: '',
+      },
+      byIdPessoa: {
+        database: '',
+      },
+    },
   },
 };
