@@ -23,6 +23,49 @@ export default async function existem_registros(db: SQLiteDatabase) {
       venda = await db.getAllAsync('SELECT * FROM venda'),
       tipo_produto = await db.getAllAsync('SELECT * FROM tipo_produto');
 
+    if (cliente.length > 0) {
+      return true;
+    }
+    if (email.length > 0) {
+      return true;
+    }
+    if (empresa.length > 0) {
+      return true;
+    }
+    if (item_venda.length > 0) {
+      return true;
+    }
+    if (marca.length > 0) {
+      return true;
+    }
+    if (pessoa.length > 0) {
+      return true;
+    }
+    if (produto.length > 0) {
+      return true;
+    }
+    if (ramo.length > 0) {
+      return true;
+    }
+    if (telefone.length > 0) {
+      return true;
+    }
+    if (tipo_de_unidade_de_armazenamento.length > 0) {
+      return true;
+    }
+    if (unidade_de_armazenamento.length > 0) {
+      return true;
+    }
+    if (unidade_de_medida.length > 0) {
+      return true;
+    }
+    if (venda.length > 0) {
+      return true;
+    }
+    if (tipo_produto.length > 0) {
+      return true;
+    }
+    return false;
   } catch (error) {
     return false;
   }

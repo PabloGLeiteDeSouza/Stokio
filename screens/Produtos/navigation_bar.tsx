@@ -31,7 +31,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ navigation }) => {
         $dark-bgColor="$purple900"
       >
         <Box>
-          <Button 
+          <Button
             $light-bgColor="$purple600"
             $dark-bgColor="$purple900"
             rounded="$full"
@@ -41,7 +41,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ navigation }) => {
           </Button>
         </Box>
         <Box>
-          <Button 
+          <Button
             $light-bgColor="$purple600"
             $dark-bgColor="$purple900"
             rounded="$full"
@@ -51,7 +51,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ navigation }) => {
           </Button>
         </Box>
         <Box>
-          <Button 
+          <Button
             $light-bgColor="$purple600"
             $dark-bgColor="$purple900"
             rounded="$full"

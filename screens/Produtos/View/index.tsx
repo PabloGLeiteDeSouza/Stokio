@@ -101,14 +101,7 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation }) => {
 
   React.useEffect(() => {
     setIsLoading(true);
-    start(
-      setProdutcts,
-      setIsLoading,
-      setHaveAllDeps,
-      db,
-      haveAllDeps,
-      Alert,
-    );
+    start(setProdutcts, setIsLoading, setHaveAllDeps, db, haveAllDeps, Alert);
   }, [onFocused]);
 
   if (isLoading) {

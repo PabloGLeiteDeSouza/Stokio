@@ -8,7 +8,6 @@ import { Um } from '$classes/um';
 import { SQLiteDatabase } from 'expo-sqlite';
 import { AlertStatic } from 'react-native';
 
-
 async function start(
   setProdutcts: React.Dispatch<React.SetStateAction<Array<UpdateProdutoDto>>>,
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,

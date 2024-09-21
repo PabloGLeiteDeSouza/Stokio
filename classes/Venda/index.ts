@@ -1,45 +1,54 @@
 import MessageErrors from 'messages-error';
-import { CreateCategoriaDto } from './dto/create-categoria.dto';
-import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 import * as SQLite from 'expo-sqlite';
+import { CreateVendaDto } from './dto/create-venda.dto';
+import { UpdateVendaDto } from './dto/update-venda.dto';
 
-export class Categoria {
+export class Venda {
   private db: SQLite.SQLiteDatabase;
 
   constructor(db: SQLite.SQLiteDatabase) {
     this.db = db;
   }
 
-  async create(categoria: CreateCategoriaDto) {
+  async create(venda: CreateVendaDto) {
     try {
       const result = await this.db.runAsync(
-        'INSERT INTO categoria (nome, descricao) VALUES ($nome, $descricao)',
-        { $nome: categoria.nome, $descricao: categoria.descricao },
+        'INSERT INTO venda (valor, data, id_cliente) VALUES ($valor, $data, $id_cliente)',
+        {
+          $valor: venda.valor.toString(),
+          $data: venda.data.toLocaleDateString(),
+          $id_cliente: venda.id_cliente.toString(),
+        },
       );
       if (!result) {
         throw new Error(
-          MessageErrors.database_errors.ErrorsCategoria.create.database,
+          MessageErrors.database_errors.ErrorsVenda.create.database,
         );
       }
-      return { ...categoria, id: result.lastInsertRowId };
+      return { ...venda, id: result.lastInsertRowId };
     } catch (error) {
       console.error(error);
       throw error;
     }
   }
 
-  async update(id: number, categoria: UpdateCategoriaDto) {
+  async update(venda: UpdateVendaDto) {
     try {
       const result = await this.db.runAsync(
-        'UPDATE categoria SET nome = $nome, descricao = $descricao WHERE id = $id',
-        { $id: id, $nome: categoria.nome, $descricao: categoria.descricao },
+        'UPDATE venda SET valor = $valor, data = $data, id_cliente = $id_cliente WHERE id = $id',
+        {
+          $id: venda.id.toString(),
+          $valor: venda.valor.toString(),
+          $data: venda.data.toLocaleDateString(),
+          $id_cliente: venda.id_cliente.toString(),
+        },
       );
       if (!result) {
         throw new Error(
-          MessageErrors.database_errors.ErrorsCategoria.update.database,
+          MessageErrors.database_errors.ErrorsVenda.update.database,
         );
       }
-      return { ...categoria, id };
+      return { ...venda };
     } catch (error) {
       console.error(error);
       throw error;
@@ -49,51 +58,34 @@ export class Categoria {
   async findFirstById(id: number) {
     try {
       const result = await this.db.getFirstAsync(
-        'SELECT * FROM categoria WHERE id = $id',
+        'SELECT * FROM venda WHERE id = $id',
         { $id: id },
       );
       if (!result) {
         throw new Error(
-          MessageErrors.database_errors.ErrorsCategoria.find.byId.database,
+          MessageErrors.database_errors.ErrorsVenda.find.byId.database,
         );
       }
-      return result as UpdateCategoriaDto;
+      return result as UpdateVendaDto;
     } catch (error) {
       console.error(error);
       throw error;
     }
   }
 
-  async findAllByName(nome: string) {
+  async findAllByIdCliente(id_cliente: number, order?: 'ASC' | 'DESC') {
     try {
+      const ord = order ? order : 'ASC';
       const result = await this.db.getAllAsync(
-        'SELECT * FROM categoria WHERE nome LIKE $nome',
-        { $nome: `%${nome}%` },
+        'SELECT * FROM venda WHERE id_cliente = $id_cliente ORDER BY id_cliente $ord',
+        { $id_cliente: id_cliente.toString(), $ord: ord },
       );
       if (!result) {
         throw new Error(
-          MessageErrors.database_errors.ErrorsCategoria.find.all.database,
+          MessageErrors.database_errors.ErrorsVenda.find.all.database,
         );
       }
-      return result as UpdateCategoriaDto[];
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }
-
-  async findFirstByName(nome: string) {
-    try {
-      const result = await this.db.getFirstAsync(
-        'SELECT * FROM categoria WHERE nome = $nome',
-        { $nome: nome },
-      );
-      if (!result) {
-        throw new Error(
-          MessageErrors.database_errors.ErrorsCategoria.find.byName.database,
-        );
-      }
-      return result as UpdateCategoriaDto;
+      return result as UpdateVendaDto[];
     } catch (error) {
       console.error(error);
       throw error;
@@ -102,13 +94,13 @@ export class Categoria {
 
   async findAll() {
     try {
-      const result = await this.db.getAllAsync('SELECT * FROM categoria');
+      const result = await this.db.getAllAsync('SELECT * FROM venda');
       if (!result) {
         throw new Error(
-          MessageErrors.database_errors.ErrorsCategoria.find.all.database,
+          MessageErrors.database_errors.ErrorsVenda.find.all.database,
         );
       }
-      return result as Array<UpdateCategoriaDto>;
+      return result as Array<UpdateVendaDto>;
     } catch (error) {
       console.error(error);
       throw error;
@@ -125,7 +117,7 @@ export class Categoria {
       );
       if (!result) {
         throw new Error(
-          MessageErrors.database_errors.ErrorsCategoria.delete.database,
+          MessageErrors.database_errors.ErrorsVenda.delete.database,
         );
       }
       return { sucess: true };

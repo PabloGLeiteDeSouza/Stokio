@@ -12,32 +12,35 @@ export class Um {
 
   async create(um: CreateUmDto) {
     try {
-      const { nome } = um;
       const result = await this.db.runAsync(
-        'INSERT INTO unidade_de_medida (nome) VALUES ($nome)',
-        { $nome: nome },
+        'INSERT INTO unidade_de_medida (nome, valor, descricao) VALUES ($nome, $valor, $descricao)',
+        { $nome: um.nome, $valor: um.valor, $descricao: um.descricao },
       );
       if (!result) {
         throw new Error(MessageErrors.database_errors.ErrorsUM.create.database);
       }
-      return { nome, id: result.lastInsertRowId };
+      return { ...um, id: result.lastInsertRowId };
     } catch (error) {
       console.error(error);
       throw error;
     }
   }
 
-  async update($id: number, um: UpdateUmDto) {
+  async update(um: UpdateUmDto) {
     try {
-      const { nome } = um;
       const result = await this.db.runAsync(
-        'UPDATE unidade_de_medida SET nome = $nome WHERE id = $id',
-        { $id, $nome: nome },
+        'UPDATE unidade_de_medida SET nome = $nome, valor = $valor, descricao = $descricao WHERE id = $id',
+        {
+          $id: um.id,
+          $nome: um.nome,
+          $valor: um.valor,
+          $descricao: um.descricao,
+        },
       );
       if (!result) {
         throw new Error(MessageErrors.database_errors.ErrorsUM.update.database);
       }
-      return { nome, id: $id };
+      return { ...um };
     } catch (error) {
       console.error(error);
       throw error;

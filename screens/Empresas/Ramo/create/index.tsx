@@ -61,7 +61,7 @@ import { Formik } from 'formik';
 import { GestureResponderEvent } from 'react-native';
 const Create: React.FC = () => {
   return (
-    <Box>
+    <Box w="$full" justifyContent="center" alignItems="center">
       <Text>Cadastrar Ramo</Text>
       <Box>
         <Formik
@@ -70,7 +70,7 @@ const Create: React.FC = () => {
             descricao: '',
           }}
         >
-          {({ values, handleChange, handleSubmit }) => {
+          {({ values, handleChange, handleSubmit, errors }) => {
             return (
               <Box>
                 <FormControl
@@ -92,15 +92,13 @@ const Create: React.FC = () => {
 
                   <FormControlHelper>
                     <FormControlHelperText>
-                      Must be atleast 6 characters.
+                      Informe um nome para o ramo.
                     </FormControlHelperText>
                   </FormControlHelper>
 
                   <FormControlError>
                     <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
+                    <FormControlErrorText>{errors.nome}</FormControlErrorText>
                   </FormControlError>
                 </FormControl>
                 <FormControl

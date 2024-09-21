@@ -33,12 +33,12 @@ export class ItemVenda {
     }
   }
 
-  async update(id: number, item_de_venda: UpdateItemVendaDto) {
+  async update(item_de_venda: UpdateItemVendaDto) {
     try {
       const result = await this.db.runAsync(
         'UPDATE item_de_venda SET quantidade = $quantidade, valor = $valor, id_venda = $id_venda, id_produto = $id_produto WHERE id = $id',
         {
-          $id: id,
+          $id: item_de_venda.id,
           $quantidade: item_de_venda.quantidade,
           $valor: item_de_venda.valor,
           $id_venda: item_de_venda.id_venda,
@@ -50,7 +50,7 @@ export class ItemVenda {
           MessageErrors.database_errors.ErrorsItemVenda.update.database,
         );
       }
-      return { ...item_de_venda, id };
+      return { ...item_de_venda };
     } catch (error) {
       console.error(error);
       throw error;
@@ -75,15 +75,15 @@ export class ItemVenda {
     }
   }
 
-  async findAllByName(nome: string) {
+  async findAllByidVenda(id_venda: number) {
     try {
       const result = await this.db.getAllAsync(
-        'SELECT * FROM categoria WHERE nome LIKE $nome',
-        { $nome: `%${nome}%` },
+        'SELECT * FROM item_de_venda WHERE id_venda = $id_venda',
+        { $id_venda: id_venda },
       );
       if (!result) {
         throw new Error(
-          MessageErrors.database_errors.ErrorsItemVenda.find.all.database,
+          MessageErrors.database_errors.ErrorsItemVenda.find.allByIdVenda.database,
         );
       }
       return result as Array<UpdateItemVendaDto>;
@@ -93,11 +93,11 @@ export class ItemVenda {
     }
   }
 
-  async findAllByIdProduto(nome: string) {
+  async findAllByIdProduto(id_produto: number) {
     try {
       const result = await this.db.getFirstAsync(
-        'SELECT * FROM categoria WHERE nome = $nome',
-        { $nome: nome },
+        'SELECT * FROM item_de_venda WHERE id_produto = $id_produto',
+        { $id_produto: id_produto },
       );
       if (!result) {
         throw new Error(
@@ -113,10 +113,10 @@ export class ItemVenda {
 
   async findAll() {
     try {
-      const result = await this.db.getAllAsync('SELECT * FROM categoria');
+      const result = await this.db.getAllAsync('SELECT * FROM item_de_venda');
       if (!result) {
         throw new Error(
-          MessageErrors.database_errors.ErrorsTipoProduto.find.all.database,
+          MessageErrors.database_errors.ErrorsItemVenda.find.all.database,
         );
       }
       return result as Array<UpdateItemVendaDto>;
@@ -129,7 +129,7 @@ export class ItemVenda {
   async delete($id: number) {
     try {
       const result = await this.db.runAsync(
-        'DELETE FROM categoria WHERE id = $id',
+        'DELETE FROM item_de_venda WHERE id = $id',
         {
           $id,
         },

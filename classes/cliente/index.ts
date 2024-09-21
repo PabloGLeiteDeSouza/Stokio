@@ -11,7 +11,22 @@ export class Cliente {
   }
 
   async create(cliente: CreateClienteDto) {
-
+    try {
+      const data = await this.db.runAsync(
+        'INSERT into cliente ( id_pessoa, limite, status ) VALUES ( $id_pessoa, $limite, $status )',
+        {
+          $id_pessoa: String(cliente.id_pessoa),
+          $limite: String(cliente.limite),
+          $status: String(Number(cliente.status)),
+        },
+      );
+      if (!data) {
+        throw new Error(errors.database_errors.ErrorsCliente.update.database);
+      }
+      return { ...cliente, id: data.lastInsertRowId };
+    } catch (error) {
+      throw error;
+    }
   }
 
   async update(cliente: UpdateClienteDto) {
@@ -25,9 +40,10 @@ export class Cliente {
           $status: String(Number(cliente.status)),
         },
       );
-      if(!data){
-        throw new Error(errors.database_errors.)
+      if (!data) {
+        throw new Error(errors.database_errors.ErrorsCliente.update.database);
       }
+      return { ...cliente };
     } catch (error) {
       throw error;
     }

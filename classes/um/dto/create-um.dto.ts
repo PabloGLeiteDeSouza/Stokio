@@ -1,8 +1,11 @@
 export class CreateUmDto {
-  id?: number;
   nome: string;
-  constructor(nome: string, id?: number) {
+  valor: string;
+  descricao: string;
+
+  constructor(nome: string, valor: string, descricao: string) {
     this.nome = nome;
-    this.id = id;
+    this.valor = valor;
+    this.descricao = descricao;
   }
 }
