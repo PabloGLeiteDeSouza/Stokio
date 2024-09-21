@@ -3,6 +3,7 @@ import React from 'react';
 import View from './view';
 import Create from './create';
 import Update from './update';
+import ScreensRamo from './Ramo';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +29,13 @@ const EmpresasScreens: React.FC = () => {
         component={Update}
         options={{
           title: 'Editar Empresas',
+        }}
+      />
+      <Stack.Screen
+        name="screens-ramos"
+        component={ScreensRamo}
+        options={{
+          headerShown: false,
         }}
       />
     </Stack.Navigator>

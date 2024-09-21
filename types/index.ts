@@ -1,5 +1,6 @@
 import { UpdateCategoriaDto } from '$classes/categoria/dto/update-categoria.dto';
 import { UpdateTipoDeProdutoDto } from '$classes/tipo_produto/dto/update-tipo-de-produto.dto';
+import { UpdateUmDto } from '$classes/um/dto/update-um.dto';
 import { ParamListBase, RouteProp } from '@react-navigation/native';
 
 export type RootStackParamList = {
@@ -11,8 +12,9 @@ export type RootStackParamList = {
   'screens-uas'?: object;
   'screens-ums'?: object;
   'screens-vendas'?: object;
-  'item-venda-screens'?: object;
   'screens-tipos-uas'?: object;
+  'screens-ramos'?: object;
+  'item-venda-screens'?: object;
   'cadastrar-produtos'?: { code?: string; result?: boolean };
   'code-scanner'?: { screen: string; type: string };
   'listar-produtos'?: { code?: string };
@@ -36,13 +38,14 @@ export type RootStackParamList = {
   'editar-produtos'?: object;
   'editar-empresas'?: { empresa: UpdateEmpresaObject };
   'editar-ua'?: object;
-  'editar-um'?: { um: Unidadedeme };
+  'editar-um'?: { um: UpdateUmDto };
   'editar-categoria'?: { categoria: UpdateCategoriaDto };
   'editar-marca'?: object;
   'editar-tipo-produto'?: { tipo_de_produto: UpdateTipoDeProdutoDto };
   'editar-tipo-ua'?: object;
   'tab-bottom'?: object;
   'auth-screen'?: object;
+  configuracoes?: object;
 };
 
 export type UpdateEmpresaObject = {

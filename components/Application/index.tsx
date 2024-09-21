@@ -127,7 +127,7 @@ const TabBottomScreen: React.FC<TabBottomScreenProps> = () => {
   return (
     <TabBottom.Navigator>
       <TabBottom.Screen
-        name="produtos-screens"
+        name="screens-produtos"
         component={ProdutosScreens}
         options={{
           headerShown: false,
@@ -136,7 +136,7 @@ const TabBottomScreen: React.FC<TabBottomScreenProps> = () => {
         }}
       />
       <TabBottom.Screen
-        name="vendas-screens"
+        name="screens-vendas"
         component={VendasScreens}
         options={{
           headerShown: false,
@@ -147,7 +147,7 @@ const TabBottomScreen: React.FC<TabBottomScreenProps> = () => {
         }}
       />
       <TabBottom.Screen
-        name="empresas-screens"
+        name="screens-empresas"
         component={EmpresasScreens}
         options={{
           title: 'Empresas',
@@ -156,7 +156,7 @@ const TabBottomScreen: React.FC<TabBottomScreenProps> = () => {
         }}
       />
       <TabBottom.Screen
-        name="clientes-screens"
+        name="screens-clientes"
         component={ClientesScreens}
         options={{
           title: 'Clientes',
@@ -165,7 +165,7 @@ const TabBottomScreen: React.FC<TabBottomScreenProps> = () => {
         }}
       />
       <TabBottom.Screen
-        name="ua-screens"
+        name="screens-ua"
         component={UaScreens}
         options={{
           title: 'Unidades de Armazenamento',

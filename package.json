@@ -12,7 +12,7 @@
   "dependencies": {
     "@eslint/eslintrc": "^3.1.0",
     "@expo/html-elements": "latest",
-    "@expo/vector-icons": "latest",
+    "@expo/vector-icons": "^14.0.3",
     "@gluestack-style/react": "latest",
     "@gluestack-ui/config": "latest",
     "@gluestack-ui/themed": "latest",
@@ -30,7 +30,7 @@
     "expo-asset": "~10.0.10",
     "expo-auth-session": "^5.4.0",
     "expo-calendar": "^13.0.5",
-    "expo-camera": "^15.0.15",
+    "expo-camera": "^15.0.16",
     "expo-crypto": "^13.0.2",
     "expo-document-picker": "^12.0.2",
     "expo-file-system": "17.0.1",

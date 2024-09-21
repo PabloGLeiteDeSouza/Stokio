@@ -6,6 +6,7 @@ import Update from './Update';
 import Create from './Create';
 import ScreensMarca from './Marca';
 import ScreensTipo from './Tipo';
+import ScreensUm from './Um';
 
 const Stack = createNativeStackNavigator();
 
@@ -39,6 +40,11 @@ const ProdutosScreens: React.FC = () => {
       <Stack.Screen
         name="screens-tipos-produtos"
         component={ScreensTipo}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="screns-ums"
+        component={ScreensUm}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

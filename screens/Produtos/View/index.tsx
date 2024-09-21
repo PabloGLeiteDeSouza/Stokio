@@ -70,6 +70,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 import React from 'react';
 import { Alert } from 'react-native';
 import start from './functions/start';
+import NavigationBar from '../navigation_bar';
 type ListarProdutosScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   'listar-produtos'
@@ -100,7 +101,14 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation }) => {
 
   React.useEffect(() => {
     setIsLoading(true);
-    start(setProdutcts, setIsLoading, setHaveAllDeps, db, haveAllDeps, Alert);
+    start(
+      setProdutcts,
+      setIsLoading,
+      setHaveAllDeps,
+      db,
+      haveAllDeps,
+      Alert,
+    );
   }, [onFocused]);
 
   if (isLoading) {
@@ -148,6 +156,9 @@ const View: React.FC<ListarProdutosScreenProps> = ({ navigation }) => {
               ))}
             </Box>
           </Box>
+          <NavigationBar
+            navigation={navigation as ListarProdutosScreenNavigationProp}
+          />
         </ScrollView>
       ) : (
         <Box w="$full" h="$full" alignItems="center" justifyContent="center">
