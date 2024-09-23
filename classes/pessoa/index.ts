@@ -1,5 +1,7 @@
 import { SQLiteDatabase } from 'expo-sqlite';
 import { CreatePessoaDto } from './dto/create-pessoa.dto';
+import errors from 'messages-error';
+import { UpdatePessoaDto } from './dto/update-pessoa.dto';
 
 export class Pessoa {
   db: SQLiteDatabase;
@@ -29,9 +31,32 @@ export class Pessoa {
 
   async update() {}
 
-  async findUnique() {}
+  async findById(id: number) {
+    try {
+      const data = await this.db.getFirstAsync(
+        'SELECT * FROM pessoa WHERE id = $id',
+        { $id: id },
+      );
+      if (!data) {
+        throw new Error(errors.database_errors.ErrorsPessoa.find.all.database);
+      }
+      return data as UpdatePessoaDto;
+    } catch (error) {
+      throw error;
+    }
+  }
 
-  async findAll() {}
+  async findAll() {
+    try {
+      const data = await this.db.getAllAsync('SELECT * FROM pessoa');
+      if (data.length < 1) {
+        throw new Error(errors.database_errors.ErrorsPessoa.find.all.database);
+      }
+      return data as Array<UpdatePessoaDto>;
+    } catch (error) {
+      throw error;
+    }
+  }
 
   async findAllByNome() {}
 

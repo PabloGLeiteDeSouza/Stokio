@@ -64,10 +64,8 @@ import {
 import { Empresa } from '$classes/empresa';
 import LoadingScreen from '$components/LoadingScreen';
 import { useThemeApp } from '$providers/theme';
-import { RootStackParamList, UpdateEmpresaObject } from '$types/index';
 import { Box, FormControl, ScrollView } from '@gluestack-ui/themed';
-import { RouteProp, useIsFocused } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { useIsFocused } from '@react-navigation/native';
 import React from 'react';
 import { Alert } from 'react-native';
 import { formatStringDate } from '../../../utils';
@@ -76,20 +74,11 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { EditIcon } from '@gluestack-ui/themed';
 import MessagesWarning, { operations } from 'messages-warnings';
 import SearchEmpresas from '$components/SearchEmpresas';
+import { UpdateClienteDto } from '$classes/cliente/dto/update-cliente.dto';
+import { ListarClientesScreenProps } from '../interfaces';
+import { Pessoa } from '$classes/pessoa';
 
-type ListarEmpresasScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'listar-empresas'
->;
-type ListarEmpresasScreenRouteProp = RouteProp<
-  RootStackParamList,
-  'listar-empresas'
->;
-interface ListarEmpresasScreenProps {
-  navigation?: ListarEmpresasScreenNavigationProp;
-  route?: ListarEmpresasScreenRouteProp;
-}
-const View: React.FC<ListarEmpresasScreenProps> = ({ navigation }) => {
+const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
   const isFocused = useIsFocused();
   const db = useSQLiteContext();
   const [valorBusca, setValorBusca] = React.useState('');
@@ -177,39 +166,44 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation }) => {
     }, 1);
   }, [isFocused]);
 
-  const deletarEmpresa = (empresa: UpdateCliente) => {
-    Alert.alert(
-      'Aviso',
-      MessagesWarning.delete_messages.empresa +
-        (empresa.cnpj ? empresa.nome_fantasia : empresa.nome_completo),
-      [
-        {
-          text: 'Confirmar',
-          onPress: async () => {
-            try {
-              await new Empresa(db).delete(empresa.id);
-              Alert.alert('Sucesso', 'Registro apagado com sucesso!');
-              setTimeout(() => {
-                Start();
-              }, 1);
-            } catch (error) {
-              console.error(error);
-              Alert.alert('Erro', (error as Error).message);
-            }
+  const deletarCliente = async (cliente: UpdateClienteDto) => {
+    try {
+      const pessoa = await new Pessoa(db).findById(cliente.id_pessoa);
+      Alert.alert(
+        'Aviso',
+        MessagesWarning.delete_messages.cliente +
+          `${pessoa.nome} cujo cpf e ${pessoa.cpf}`,
+        [
+          {
+            text: 'Confirmar',
+            onPress: async () => {
+              try {
+                await new Empresa(db).delete(empresa.id);
+                Alert.alert('Sucesso', 'Registro apagado com sucesso!');
+                setTimeout(() => {
+                  Start();
+                }, 1);
+              } catch (error) {
+                console.error(error);
+                Alert.alert('Erro', (error as Error).message);
+              }
+            },
           },
-        },
-        {
-          text: 'Cancelar',
-          onPress: () => {
-            Alert.alert('Aviso', operations.delete_messages.empresa);
-            return;
+          {
+            text: 'Cancelar',
+            onPress: () => {
+              Alert.alert('Aviso', operations.delete_messages.empresa);
+              return;
+            },
           },
-        },
-      ],
-    );
+        ],
+      );
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const editarEmpresa = (cliente: UpdateEmpresaObject) => {
+  const editarCliente = (cliente: UpdateClienteDto) => {
     navigation?.navigate('editar-clientes', { cliente: cliente });
   };
 
@@ -327,12 +321,12 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation }) => {
                     </Text>
                   </VStack>
                   <VStack gap="$2">
-                    <Button onPress={() => editarEmpresa(value)}>
+                    <Button onPress={() => editarCliente(value)}>
                       <ButtonIcon as={EditIcon} />
                     </Button>
                     <Button
                       action="negative"
-                      onPress={() => deletarEmpresa(value)}
+                      onPress={() => deletarCliente(value)}
                     >
                       <ButtonIcon as={TrashIcon} />
                     </Button>
@@ -374,16 +368,16 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation }) => {
     <Box w="$full" h="$full" alignItems="center" justifyContent="center">
       <Box gap={10}>
         <Text size="xl" textAlign="center">
-          Não há Empresas cadastradas
+          Não há Cleintes cadastrados
         </Text>
         <Button
           $active-bgColor={theme === 'dark' ? '$purple700' : '$purple500'}
           $dark-backgroundColor="$purple500"
           $light-backgroundColor="$purple700"
           gap={10}
-          onPress={() => navigation?.navigate('cadastrar-empresas')}
+          onPress={() => navigation?.navigate('cadastrar-clientes')}
         >
-          <ButtonText>Cadastrar Empresas</ButtonText>
+          <ButtonText>Cadastrar Clientes</ButtonText>
           <ButtonIcon
             color="$white"
             as={() => <Ionicons name="add-circle" size={15} color="white" />}

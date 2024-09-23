@@ -6,6 +6,8 @@ import {
   Text,
   VStack,
 } from '@gluestack-ui/themed';
+import exportDatabase from './functions/export_database';
+import importDatabase from './functions/import_database';
 
 const ConfigurationsScreen: React.FC = () => {
   return (
@@ -16,12 +18,12 @@ const ConfigurationsScreen: React.FC = () => {
         </Text>
         <VStack gap="$5">
           <Box>
-            <Button>
+            <Button onPress={exportDatabase}>
               <ButtonText>Exportar dados</ButtonText>
             </Button>
           </Box>
           <Box>
-            <Button>
+            <Button onPress={importDatabase}>
               <ButtonText>Importar dados</ButtonText>
             </Button>
           </Box>

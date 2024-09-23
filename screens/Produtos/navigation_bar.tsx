@@ -1,5 +1,4 @@
 import { RootStackParamList } from '$types/index';
-import { Text } from '@gluestack-ui/themed';
 import { Box, Button, ButtonText, HStack } from '@gluestack-ui/themed';
 import { StackNavigationProp } from '@react-navigation/stack';
 

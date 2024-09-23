@@ -58,21 +58,41 @@ import {
 } from '@gluestack-ui/themed';
 import { Box, Text } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
-import { GestureResponderEvent } from 'react-native';
-const Create: React.FC = () => {
+import { Alert, GestureResponderEvent } from 'react-native';
+import { useSQLiteContext } from 'expo-sqlite';
+import { Ramo } from '$classes/ramo';
+import { CadastrarRamosScreenProps } from '../interfaces';
+
+const Create: React.FC<CadastrarRamosScreenProps> = ({ navigation }) => {
+  const db = useSQLiteContext();
+
+  const onSubmit = async (values: { nome: string; descricao: string }) => {
+    try {
+      await new Ramo(db).create(values);
+      Alert.alert('Sucesso', 'Ramo criado com sucesso!');
+      navigation?.navigate('listar-ramos');
+    } catch (error) {
+      Alert.alert('Erro', (error as Error).message);
+      throw error;
+    }
+  };
+
   return (
     <Box w="$full" justifyContent="center" alignItems="center">
-      <Text>Cadastrar Ramo</Text>
+      <Box my="$5">
+        <Text size="3xl">Cadastrar Ramo</Text>
+      </Box>
       <Box>
         <Formik
           initialValues={{
             nome: '',
             descricao: '',
           }}
+          onSubmit={onSubmit}
         >
           {({ values, handleChange, handleSubmit, errors }) => {
             return (
-              <Box>
+              <Box gap="$5">
                 <FormControl
                   isInvalid={false}
                   size={'md'}

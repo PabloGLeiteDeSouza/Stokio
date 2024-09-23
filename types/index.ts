@@ -1,4 +1,6 @@
 import { UpdateCategoriaDto } from '$classes/categoria/dto/update-categoria.dto';
+import { UpdateClienteDto } from '$classes/cliente/dto/update-cliente.dto';
+import { UpdateRamoDto } from '$classes/ramo/dto/update-ramo.dto';
 import { UpdateTipoDeProdutoDto } from '$classes/tipo_produto/dto/update-tipo-de-produto.dto';
 import { UpdateUmDto } from '$classes/um/dto/update-um.dto';
 import { ParamListBase, RouteProp } from '@react-navigation/native';
@@ -27,6 +29,7 @@ export type RootStackParamList = {
   'listar-marca'?: object;
   'listar-vendas'?: object;
   'listar-clientes'?: object;
+  'listar-ramos'?: object;
   'cadastrar-clientes'?: { nome?: string };
   'cadastrar-empresas'?: object;
   'cadastrar-categoria'?: object;
@@ -35,6 +38,7 @@ export type RootStackParamList = {
   'cadastrar-ua'?: object;
   'cadastrar-tipo-ua'?: object;
   'cadastrar-um'?: object;
+  'cadastrar-ramo'?: object;
   'editar-produtos'?: object;
   'editar-empresas'?: { empresa: UpdateEmpresaObject };
   'editar-ua'?: object;
@@ -43,6 +47,8 @@ export type RootStackParamList = {
   'editar-marca'?: object;
   'editar-tipo-produto'?: { tipo_de_produto: UpdateTipoDeProdutoDto };
   'editar-tipo-ua'?: object;
+  'editar-ramo'?: { ramo: UpdateRamoDto };
+  'editar-clientes'?: { cliente: UpdateClienteDto };
   'tab-bottom'?: object;
   'auth-screen'?: object;
   configuracoes?: object;

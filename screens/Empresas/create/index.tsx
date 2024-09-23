@@ -148,6 +148,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({ navigation }) => {
           validationSchema={validator}
           initialValues={{
             tipo_empresa: 'pj' as 'pj' | 'pf',
+            id_pessoa: '',
             nome_completo: '',
             cpf: '',
             data_de_nascimento: new Date(),

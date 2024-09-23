@@ -1,4 +1,6 @@
-const Update: React.FC = () => {
+import { AtualizarClientesScreenProps } from "../interfaces";
+
+const Update: React.FC<AtualizarClientesScreenProps> = () => {
   return <></>;
 };
 
