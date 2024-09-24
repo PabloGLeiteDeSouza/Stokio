@@ -77,21 +77,64 @@ import SearchEmpresas from '$components/SearchEmpresas';
 import { UpdateClienteDto } from '$classes/cliente/dto/update-cliente.dto';
 import { ListarClientesScreenProps } from '../interfaces';
 import { Pessoa } from '$classes/pessoa';
+import { Cliente } from '$classes/cliente';
+import { Telefone } from '$classes/telefone';
+import { Email } from '$classes/email';
+import { Endereco } from '$classes/endereco';
+import { UpdateEnderecoDto } from '$classes/endereco/dto/update-endereco.dto';
+import { UpdateTelefoneDto } from '$classes/telefone/dto/update-telefone.dto';
+import { UpdateEmailDto } from '$classes/email/dto/update-email.dto';
 
 const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
   const isFocused = useIsFocused();
   const db = useSQLiteContext();
   const [valorBusca, setValorBusca] = React.useState('');
   const [haveCompanys, setHaveCompanys] = React.useState(false);
-  const [todasEmpresas, setTodasEmpresas] = React.useState<
-    Array<UpdateEmpresaObject>
+  const [todosClientes, setTodos] = React.useState<
+    Array<{
+      endereco: UpdateEnderecoDto;
+      telefones: UpdateTelefoneDto[];
+      emails: UpdateEmailDto[];
+      id: number;
+      id_pessoa: number;
+      limite: number;
+      status: boolean;
+      nome: string;
+      data_de_nascimento: Date;
+      cpf: string;
+    }>
   >([]);
   const { theme } = useThemeApp();
   const [tipoDeBusca, setTipoDeBusca] = React.useState('');
   const [isStartingPage, setIsStartingPage] = React.useState(true);
   async function Start() {
     try {
-      const empresas = await new Empresa(db).findAll();
+      const cli = await new Cliente(db).findAll();
+      const clientes = await Promise.all(
+        cli.map(async (cliente) => {
+          try {
+            const pessoa = await new Pessoa(db).findById(cliente.id_pessoa);
+            const telefones = await new Telefone(db).findByIdPessoa(
+              cliente.id_pessoa,
+            );
+            const emails = await new Email(db).findAllByIdPessoa(
+              cliente.id_pessoa,
+            );
+            const endereco = await new Endereco(db).findUniqueByIdPessoa(
+              cliente.id_pessoa,
+            );
+            return {
+              ...pessoa,
+              ...cliente,
+              endereco,
+              telefones,
+              emails,
+            };
+          } catch (error) {
+            throw error;
+          }
+        }),
+      );
       setTodasEmpresas(empresas as unknown as Array<UpdateEmpresaObject>);
       setHaveCompanys(true);
       setIsStartingPage(false);
@@ -297,7 +340,7 @@ const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
           </Button>
         </Box>
       </Box>
-      {todasEmpresas.map((value, i) => {
+      {todosClientes.map((value, i) => {
         return (
           <Box key={i} w="$full" alignItems="center" gap="$2.5" mt="$8">
             {value.cnpj ? (
@@ -311,7 +354,7 @@ const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
                   gap="$3"
                 >
                   <VStack gap="$2">
-                    <Heading>Nome fantasia: {value.nome_fantasia}</Heading>
+                    <Heading>Nome: {value.nome}</Heading>
                     <Text>
                       <Text fontWeight="$bold">Razão Social:</Text>{' '}
                       {value.razao_social}

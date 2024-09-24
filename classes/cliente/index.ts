@@ -53,7 +53,17 @@ export class Cliente {
 
   async findUniqueByNome() {}
 
-  async findAll() {}
+  async findAll() {
+    try {
+      const data = await this.db.getAllAsync('SELECT * FROM Cliente');
+      if (!data) {
+        throw new Error(errors.database_errors.ErrorsCliente.find.all.database);
+      }
+      return data as Array<UpdateClienteDto>;
+    } catch (error) {
+      throw error;
+    }
+  }
 
   async delete() {}
 

@@ -47,7 +47,7 @@ export class Telefone {
     }
   }
 
-  async findByIdEmpresa($id_empresa: number) {
+  async findByIdPessoa($id_empresa: number) {
     try {
       const result = await this.db.getAllAsync(
         'SELECT * FROM telefone WHERE id_empresa = $id_empresa',
@@ -82,10 +82,10 @@ export class Telefone {
 
   async update(id: number, Telefone: UpdateTelefoneDto) {
     try {
-      const { telefone, id_empresa } = Telefone;
+      const { telefone, id_pessoa } = Telefone;
       const result = await this.db.runAsync(
-        'UPDATE telefone SET telefone = $telefone, id_empresa = $id_empresa WHERE id = $id',
-        { $telefone: telefone, $id_empresa: id_empresa, $id: id },
+        'UPDATE telefone SET telefone = $telefone, id_empresa = $id_pessoa WHERE id = $id',
+        { $telefone: telefone, $id_pessoa: id_pessoa, $id: id },
       );
       if (!result) {
         if (!result) {
