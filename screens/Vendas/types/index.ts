@@ -2,28 +2,28 @@ import { RootStackParamList } from '$types/index';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-export type ListarRamosScreenNavigationProp = StackNavigationProp<
+export type ListarVendasScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
-  'listar-marca'
+  'listar-venda'
 >;
-export type ListarRamosScreenRouteProp = RouteProp<
+export type ListarVendasScreenRouteProp = RouteProp<
   RootStackParamList,
-  'listar-marca'
+  'listar-venda'
 >;
-export type CadastrarRamossScreenNavigationProp = StackNavigationProp<
+export type CadastrarVendasScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
-  'cadastrar-marca'
+  'cadastrar-venda'
 >;
-export type CadastrarRamosScreenRouteProp = RouteProp<
+export type CadastrarVendasScreenRouteProp = RouteProp<
   RootStackParamList,
-  'cadastrar-marca'
+  'cadastrar-venda'
 >;
 
-export type AtualizarRamossScreenNavigationProp = StackNavigationProp<
+export type AtualizarVendasScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
-  'editar-marca'
+  'editar-venda'
 >;
-export type AtualizarRamosScreenRouteProp = RouteProp<
+export type AtualizarVendasScreenRouteProp = RouteProp<
   RootStackParamList,
-  'editar-marca'
+  'editar-venda'
 >;

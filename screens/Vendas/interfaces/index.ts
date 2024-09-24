@@ -1,23 +1,23 @@
 import {
-  ListarRamosScreenNavigationProp,
-  ListarRamosScreenRouteProp,
-  AtualizarRamossScreenNavigationProp,
-  AtualizarRamosScreenRouteProp,
-  CadastrarRamossScreenNavigationProp,
-  CadastrarRamosScreenRouteProp,
+  AtualizarVendasScreenNavigationProp,
+  AtualizarVendasScreenRouteProp,
+  CadastrarVendasScreenRouteProp,
+  CadastrarVendasScreenNavigationProp,
+  ListarVendasScreenNavigationProp,
+  ListarVendasScreenRouteProp,
 } from '../types';
 
-export interface ListarRamosScreenProps {
-  navigation?: ListarRamosScreenNavigationProp;
-  route?: ListarRamosScreenRouteProp;
+export interface ListarVendasScreenProps {
+  navigation?: ListarVendasScreenNavigationProp;
+  route?: ListarVendasScreenRouteProp;
 }
 
-export interface CadastrarRamosScreenProps {
-  navigation?: CadastrarRamossScreenNavigationProp;
-  route?: CadastrarRamosScreenRouteProp;
+export interface CadastrarVendasScreenProps {
+  navigation?: CadastrarVendasScreenNavigationProp;
+  route?: CadastrarVendasScreenRouteProp;
 }
 
-export interface AtualizarRamosScreenProps {
-  navigation?: AtualizarRamossScreenNavigationProp;
-  route?: AtualizarRamosScreenRouteProp;
+export interface AtualizarVendasScreenProps {
+  navigation?: AtualizarVendasScreenNavigationProp;
+  route?: AtualizarVendasScreenRouteProp;
 }

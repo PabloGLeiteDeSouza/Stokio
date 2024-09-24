@@ -1,7 +1,10 @@
 import { CreateTelefoneDto } from './create-telefone.dto';
 
 export class UpdateTelefoneDto extends CreateTelefoneDto {
-  constructor(id: number, telefone: string, id_empresa: number) {
-    super(telefone, id_empresa, id);
+  id: number;
+
+  constructor(id: number, telefone: string, id_pessoa: number) {
+    super(telefone, id_pessoa);
+    this.id = id;
   }
 }

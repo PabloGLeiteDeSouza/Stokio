@@ -30,6 +30,8 @@ export type RootStackParamList = {
   'listar-vendas'?: object;
   'listar-clientes'?: object;
   'listar-ramos'?: object;
+  'listar-venda'?: object;
+  'listar-item-venda'?: object;
   'cadastrar-clientes'?: { nome?: string };
   'cadastrar-empresas'?: object;
   'cadastrar-categoria'?: object;
@@ -39,6 +41,8 @@ export type RootStackParamList = {
   'cadastrar-tipo-ua'?: object;
   'cadastrar-um'?: object;
   'cadastrar-ramo'?: object;
+  'cadastrar-venda'?: object;
+  'cadastrar-item-venda'?: object;
   'editar-produtos'?: object;
   'editar-empresas'?: { empresa: UpdateEmpresaObject };
   'editar-ua'?: object;
@@ -49,6 +53,8 @@ export type RootStackParamList = {
   'editar-tipo-ua'?: object;
   'editar-ramo'?: { ramo: UpdateRamoDto };
   'editar-clientes'?: { cliente: UpdateClienteDto };
+  'editar-venda'?: object;
+  'editar-venda-item'?: object;
   'tab-bottom'?: object;
   'auth-screen'?: object;
   configuracoes?: object;

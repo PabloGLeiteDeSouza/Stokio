@@ -1,11 +1,9 @@
 export class CreateTelefoneDto {
-  id?: number;
   telefone: string;
-  id_empresa: number;
+  id_pessoa: number;
 
-  constructor(telefone: string, id_empresa: number, id?: number) {
-    this.id = id;
+  constructor(telefone: string, id_pessoa: number) {
     this.telefone = telefone;
-    this.id_empresa = id_empresa;
+    this.id_pessoa = id_pessoa;
   }
 }

@@ -11,8 +11,16 @@ export class Endereco {
   }
 
   async create(endereco: CreateEnderecoDto) {
-    const { logradouro, numero, cep, complemento, bairro, cidade, uf } =
-      endereco;
+    const {
+      logradouro,
+      numero,
+      cep,
+      complemento,
+      bairro,
+      cidade,
+      uf,
+      id_pessoa,
+    } = endereco;
     const data = {
       $logradouro: logradouro,
       $numero: numero,
@@ -21,10 +29,11 @@ export class Endereco {
       $bairro: bairro,
       $cidade: cidade,
       $uf: uf,
+      $id_pessoa: id_pessoa,
     };
     try {
       const result = await this.db.runAsync(
-        'INSERT INTO endereco (logradouro, numero, cep, complemento, bairro, cidade, uf) VALUES ($logradouro, $numero, $cep, $complemento, $bairro, $cidade, $uf)',
+        'INSERT INTO endereco (logradouro, numero, cep, complemento, bairro, cidade, uf, id_pessoa ) VALUES ( $logradouro, $numero, $cep, $complemento, $bairro, $cidade, $uf, $id_pessoa )',
         data,
       );
       if (!result) {
@@ -37,9 +46,17 @@ export class Endereco {
     }
   }
 
-  async update(id: number, endereco: UpdateEnderecoDto) {
-    const { logradouro, numero, cep, complemento, bairro, cidade, uf } =
-      endereco;
+  async update(endereco: UpdateEnderecoDto) {
+    const {
+      logradouro,
+      numero,
+      cep,
+      complemento,
+      bairro,
+      cidade,
+      uf,
+      id_pessoa,
+    } = endereco;
     const data = {
       $logradouro: logradouro,
       $numero: numero,
@@ -48,17 +65,18 @@ export class Endereco {
       $bairro: bairro,
       $cidade: cidade,
       $uf: uf,
-      $id: id,
+      $id: endereco.id,
+      $id_pessoa: id_pessoa,
     };
     try {
       const result = await this.db.runAsync(
-        'UPDATE endereco SET logradouro = $logradouro, numero = $numero, cep = $cep, complemento = $complemento, bairro = $bairro, cidade = $cidade, uf = $uf WHERE id = $id',
+        'UPDATE endereco SET logradouro = $logradouro, numero = $numero, cep = $cep, complemento = $complemento, bairro = $bairro, cidade = $cidade, uf = $uf, id_pessoa = $id_pessoa WHERE id = $id',
         data,
       );
       if (!result) {
         throw new Error(DBErros.ErrorsEndereco.update.database);
       }
-      return { ...endereco, id: result.lastInsertRowId };
+      return endereco;
     } catch (error) {
       console.error(error);
       throw error;
@@ -104,6 +122,22 @@ export class Endereco {
         throw new Error(DBErros.ErrorsEndereco.find.byCep.database);
       }
       return result as Array<UpdateEnderecoDto>;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async findUniqueById($id_pessoa: number) {
+    try {
+      const result = await this.db.getFirstAsync(
+        'SELECT * FROM endereco WHERE id_pessoa = $id_pessoa',
+        { $id_pessoa },
+      );
+      if (!result) {
+        throw new Error(DBErros.ErrorsEndereco.find.byCep.database);
+      }
+      return result as UpdateEnderecoDto;
     } catch (error) {
       console.error(error);
       throw error;

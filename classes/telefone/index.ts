@@ -12,10 +12,10 @@ export class Telefone {
 
   async create(Telefone: CreateTelefoneDto) {
     try {
-      const { telefone, id_empresa } = Telefone;
+      const { telefone, id_pessoa } = Telefone;
       const result = await this.db.runAsync(
-        'INSERT INTO telefone (telefone, id_empresa) VALUES ($telefone, $id_empresa)',
-        { $telefone: telefone, $id_empresa: id_empresa },
+        'INSERT INTO telefone (telefone, id_pessoa) VALUES ($telefone, $id_pessoa)',
+        { $telefone: telefone, $id_pessoa: id_pessoa },
       );
       if (!result) {
         throw new Error(errors.database_errors.ErrorsTelefone.create.database);

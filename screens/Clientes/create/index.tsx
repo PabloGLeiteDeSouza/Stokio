@@ -1,4 +1,5 @@
 import React from 'react';
+import Estados from '$databases/Estados.json';
 import {
   FormControl,
   FormControlLabel,
@@ -10,18 +11,11 @@ import {
   FormControlErrorText,
   Input,
   InputField,
-  Radio,
-  RadioGroup,
-  RadioIcon,
-  RadioIndicator,
-  RadioLabel,
   Button,
   ButtonText,
   Checkbox,
-  CheckboxGroup,
   CheckboxIndicator,
   CheckboxIcon,
-  CheckboxLabel,
   Textarea,
   TextareaInput,
   Select,
@@ -34,11 +28,6 @@ import {
   SelectDragIndicatorWrapper,
   SelectDragIndicator,
   SelectItem,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  Switch,
   Modal,
   ModalBackdrop,
   ModalContent,
@@ -46,33 +35,40 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
-  HStack,
   VStack,
   Heading,
   Text,
-  Center,
   Icon,
-  CircleIcon,
   CheckIcon,
   AlertCircleIcon,
   ChevronDownIcon,
   Card,
+  ButtonIcon,
 } from '@gluestack-ui/themed';
 
 import { ScrollView } from '@gluestack-ui/themed';
 import { Box } from '@gluestack-ui/themed';
 import { useThemeApp } from '$providers/theme';
-import { FontAwesome6, MaterialIcons } from '@expo/vector-icons';
-import SelectEstado from '$components/SelectEstado';
 import { Pessoa } from '$classes/pessoa';
 import { useSQLiteContext } from 'expo-sqlite';
-import { Alert } from 'react-native';
+import { Alert, GestureResponderEvent } from 'react-native';
 import { UpdatePessoaDto } from '$classes/pessoa/dto/update-pessoa.dto';
 import { RootStackParamList } from '$types/index';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
-import { Formik, FormikHelpers } from 'formik';
+import { Formik } from 'formik';
 import { CloseIcon } from '@gluestack-ui/themed';
+import { mask } from 'react-native-mask-text';
+import { AddIcon } from '@gluestack-ui/themed';
+import { RemoveIcon } from '@gluestack-ui/themed';
+import { formatDateString } from 'utils';
+import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+import { CalendarDaysIcon } from '@gluestack-ui/themed';
+import { View } from '@gluestack-ui/themed';
+import { Cliente } from '$classes/cliente';
+import { Endereco } from '$classes/endereco';
+import { Telefone } from '$classes/telefone';
+import { Email } from '$classes/email';
 
 type CadastrarProdutosScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -88,11 +84,12 @@ interface CadastrarClientesScreenProps {
   route?: CadastrarProdutosScreennRouteProp;
 }
 
-const Create: React.FC<CadastrarClientesScreenProps> = () => {
+const Create: React.FC<CadastrarClientesScreenProps> = ({ navigation }) => {
   const db = useSQLiteContext();
   const { theme } = useThemeApp();
   const [pessoas, setPessoas] = React.useState<Array<UpdatePessoaDto>>([]);
   const [showModalPessoas, setShowModalPessoas] = React.useState(false);
+  const [cadastrarNovaPessoa, setCadastrarNovaPessoa] = React.useState(false);
   const refModalPesoas = React.useRef(null);
 
   React.useEffect(() => {
@@ -107,25 +104,91 @@ const Create: React.FC<CadastrarClientesScreenProps> = () => {
     }
     start();
   }, []);
+  const [nomeEstado, setNomeEstado] = React.useState('');
+  const onSubmit = async (values: {
+    id_pessoa: string;
+    nome: string;
+    data_de_nascimento: Date;
+    cpf: string;
+    cep: string;
+    logradouro: string;
+    numero: string;
+    complemento: string;
+    bairro: string;
+    cidade: string;
+    uf: string;
+    telefones: string[];
+    emails: string[];
+    saldo: string;
+    status: boolean;
+  }) => {
+    try {
+      const { id_pessoa, ...vls } = values;
+      if (id_pessoa !== '') {
+        const cliente = {
+          limite: Number(vls.saldo),
+          status: vls.status,
+          id_pessoa: Number(id_pessoa),
+        };
+        await new Cliente(db).create(cliente);
+        Alert.alert('Sucesso', 'Cliente criado com sucesso!');
+        navigation?.navigate('listar-clientes');
+      } else {
+        const {
+          bairro,
+          cep,
+          cidade,
+          complemento,
+          logradouro,
+          numero,
+          uf,
+          emails,
+          saldo,
+          status,
+          telefones,
+          ...people
+        } = values;
+        const pessoa = await new Pessoa(db).create(people);
+        const address = {
+          cep,
+          logradouro,
+          complemento,
+          numero: Number(numero),
+          bairro,
+          cidade,
+          uf,
+          id_pessoa: pessoa.id,
+        };
+        await new Endereco(db).create(address);
+        telefones.map(async (tel) => {
+          await new Telefone(db).create({
+            telefone: tel,
+            id_pessoa: pessoa.id,
+          });
+        });
+        emails.map(async (email) => {
+          await new Email(db).create({ email, id_pessoa: pessoa.id });
+        });
+        await new Cliente(db).create({
+          id_pessoa: pessoa.id,
+          limite: Number(saldo),
+          status,
+        });
+        Alert.alert('Sucesso', 'Cliente criado com sucesso!');
+        navigation?.navigate('listar-clientes');
+      }
+    } catch (error) {}
+  };
 
-  const onSubmit = async (
-    values: {
-      id_pessoa: string;
-      nome: string;
-      data_de_nascimento: Date;
-      cpf: string;
-      saldo: string;
-      status: boolean;
-    },
-    formikHelpers: FormikHelpers<{
-      id_pessoa: string;
-      nome: string;
-      data_de_nascimento: Date;
-      cpf: string;
-      saldo: string;
-      status: boolean;
-    }>,
-  ) => {};
+  const [isAllDisabled, setIsAllDisabled] = React.useState({
+    cep: false,
+    logradouro: false,
+    numero: false,
+    complemento: false,
+    bairro: false,
+    cidade: false,
+    uf: false,
+  });
 
   return (
     <ScrollView>
@@ -146,24 +209,67 @@ const Create: React.FC<CadastrarClientesScreenProps> = () => {
             bairro: '',
             cidade: '',
             uf: '',
+            telefones: [''],
+            emails: [''],
             saldo: '',
-            telefones: [],
-            emails: [],
             status: true,
           }}
           onSubmit={onSubmit}
         >
-          {({
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            setFieldValue,
-            values,
-            errors,
-          }) => {
+          {({ handleChange, handleSubmit, setFieldValue, values, errors }) => {
+            const busca_cep = async (cep: string) => {
+              setIsAllDisabled({
+                ...isAllDisabled,
+                logradouro: true,
+                complemento: true,
+                bairro: true,
+                uf: true,
+                cidade: true,
+              });
+              try {
+                const result = await fetch(
+                  `https://viacep.com.br/ws/${cep.replace(/[^a-zA-Z0-9 ]/g, '')}/json`,
+                );
+                if (!result.ok) {
+                  throw new Error(
+                    'Erro ao realizar a validacao tente novamente',
+                  );
+                }
+                const data = await result.json();
+                setFieldValue('logradouro', data.logradouro);
+                setFieldValue('complemento', data.complemento);
+                setFieldValue('bairro', data.bairro);
+                setFieldValue('cidade', data.localidade);
+                setFieldValue('uf', data.uf);
+                const nome = Estados.find((est) => est.sigla == data.uf)?.nome;
+                setNomeEstado(nome ? nome : data.uf);
+                console.log(data);
+                setIsAllDisabled({
+                  ...isAllDisabled,
+                  logradouro: true,
+                  complemento: false,
+                  bairro: true,
+                  uf: true,
+                  cidade: true,
+                });
+              } catch (error) {
+                if (error) {
+                  setIsAllDisabled({
+                    ...isAllDisabled,
+                    logradouro: false,
+                    complemento: false,
+                    bairro: false,
+                    uf: false,
+                    cidade: false,
+                  });
+                  Alert.alert('Erro', (error as Error).message);
+                }
+              }
+            };
+
             return (
               <>
-                {pessoas.length >= 1 ? (
+                {pessoas.length >= 1 && !cadastrarNovaPessoa ? (
                   <>
                     <Box>
                       {values.id_pessoa === '' ? (
@@ -279,7 +385,7 @@ const Create: React.FC<CadastrarClientesScreenProps> = () => {
                               </ModalFooter>
                             </ModalContent>
                           </Modal>
-                          <Button onPress={() => setPessoas([])}>
+                          <Button onPress={() => setCadastrarNovaPessoa(true)}>
                             <ButtonText>Cadastrar nova pessoa</ButtonText>
                           </Button>
                         </>
@@ -305,429 +411,516 @@ const Create: React.FC<CadastrarClientesScreenProps> = () => {
                   </>
                 ) : (
                   <>
+                    {/* Nome Completo */}
                     <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>Nome Completo</FormControlLabelText>
-                  </FormControlLabel>
-                  <Input>
-                    <InputField
-                      type="text"
-                      placeholder="Nome Completo do Cliente"
-                    />
-                  </Input>
+                      isInvalid={errors.nome ? true : false}
+                      size={'md'}
+                      isDisabled={false}
+                      isRequired={true}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>
+                          Nome Completo
+                        </FormControlLabelText>
+                      </FormControlLabel>
+                      <Input>
+                        <InputField
+                          type="text"
+                          placeholder="Nome Completo do Cliente"
+                          onChangeText={handleChange('nome')}
+                        />
+                      </Input>
 
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Informe o nome completo do cliente.
-                    </FormControlHelperText>
-                  </FormControlHelper>
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          Informe o nome completo do cliente.
+                        </FormControlHelperText>
+                      </FormControlHelper>
 
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      O nome comnpleto é obrigatório.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>
-                      Data de nascimento
-                    </FormControlLabelText>
-                  </FormControlLabel>
-                  <Input>
-                    <InputField
-                      type="password"
-                      defaultValue="12345"
-                      placeholder="password"
-                    />
-                  </Input>
+                      <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
+                          {errors.nome}
+                        </FormControlErrorText>
+                      </FormControlError>
+                    </FormControl>
 
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Must be atleast 6 characters.
-                    </FormControlHelperText>
-                  </FormControlHelper>
+                    {/* Data de nascimento */}
+                    <FormControl
+                      isInvalid={errors.data_de_nascimento ? true : false}
+                      size={'md'}
+                      isDisabled={false}
+                      isRequired={true}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>
+                          Data de nascimento
+                        </FormControlLabelText>
+                      </FormControlLabel>
+                      <Input>
+                        <InputField
+                          editable={false}
+                          readOnly={true}
+                          type="text"
+                          value={formatDateString(values.data_de_nascimento)}
+                          placeholder="data"
+                        />
+                        <Button
+                          onPress={() => {
+                            DateTimePickerAndroid.open({
+                              value: new Date(),
+                              mode: 'date',
+                              onChange: (event, date) => {
+                                if (date) {
+                                  setFieldValue('data_de_nascimento', date);
+                                }
+                              },
+                            });
+                          }}
+                        >
+                          <ButtonIcon as={CalendarDaysIcon} />
+                        </Button>
+                      </Input>
 
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>CPF</FormControlLabelText>
-                  </FormControlLabel>
-                  <Input>
-                    <InputField
-                      type="password"
-                      defaultValue="12345"
-                      placeholder="password"
-                    />
-                  </Input>
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          Deve ser informada a data de nascimento.
+                        </FormControlHelperText>
+                      </FormControlHelper>
 
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Must be atleast 6 characters.
-                    </FormControlHelperText>
-                  </FormControlHelper>
+                      <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
+                          {errors.data_de_nascimento as string}
+                        </FormControlErrorText>
+                      </FormControlError>
+                    </FormControl>
 
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
+                    {/* CPF */}
+                    <FormControl
+                      isInvalid={errors.cpf ? true : false}
+                      size={'md'}
+                      isDisabled={false}
+                      isRequired={true}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>CPF</FormControlLabelText>
+                      </FormControlLabel>
+                      <Input>
+                        <InputField
+                          keyboardType="number-pad"
+                          value={values.cpf}
+                          onChangeText={(text) =>
+                            setFieldValue('cpf', mask(text, '999.999.999-99'))
+                          }
+                          type="text"
+                          placeholder="CPF"
+                        />
+                      </Input>
+
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          Informe o CPF do vendedor autonomo.
+                        </FormControlHelperText>
+                      </FormControlHelper>
+
+                      <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
+                          {errors.cpf}
+                        </FormControlErrorText>
+                      </FormControlError>
+                    </FormControl>
+
+                    {/* Cep */}
+                    <FormControl
+                      isInvalid={errors.cep ? true : false}
+                      size={'md'}
+                      isDisabled={isAllDisabled.cep}
+                      isRequired={true}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>Cep</FormControlLabelText>
+                      </FormControlLabel>
+                      <Input>
+                        <InputField
+                          value={mask(values.cep, '99.999-999')}
+                          keyboardType="number-pad"
+                          type="text"
+                          placeholder="ex: 12.123-321"
+                          onChangeText={handleChange('cep')}
+                          onBlur={() => {
+                            busca_cep(values.cep);
+                          }}
+                        />
+                      </Input>
+
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          Informe o cep de sua empresa.
+                        </FormControlHelperText>
+                      </FormControlHelper>
+
+                      <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
+                          {errors.cep}
+                        </FormControlErrorText>
+                      </FormControlError>
+                    </FormControl>
+
+                    {/* Logradouro */}
+                    <FormControl
+                      isInvalid={errors.logradouro ? true : false}
+                      size={'md'}
+                      isDisabled={isAllDisabled.logradouro}
+                      isRequired={true}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>Logradouro</FormControlLabelText>
+                      </FormControlLabel>
+                      <Input>
+                        <InputField
+                          value={values.logradouro}
+                          onChangeText={handleChange('logradouro')}
+                          type="text"
+                          placeholder="ex: Rua José Canóvas"
+                        />
+                      </Input>
+
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          Informe o logradouro de sua empresa.
+                        </FormControlHelperText>
+                      </FormControlHelper>
+
+                      <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
+                          {errors.logradouro}
+                        </FormControlErrorText>
+                      </FormControlError>
+                    </FormControl>
+
+                    {/* Numero */}
+                    <FormControl
+                      isInvalid={errors.numero ? true : false}
+                      size={'md'}
+                      isDisabled={isAllDisabled.numero}
+                      isRequired={true}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>Número</FormControlLabelText>
+                      </FormControlLabel>
+                      <Input>
+                        <InputField
+                          keyboardType="number-pad"
+                          value={values.numero}
+                          onChangeText={handleChange('numero')}
+                          type="text"
+                          placeholder="ex: 123"
+                        />
+                      </Input>
+
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          Informe o número do endereço.
+                        </FormControlHelperText>
+                      </FormControlHelper>
+
+                      <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
+                          {errors.numero}
+                        </FormControlErrorText>
+                      </FormControlError>
+                    </FormControl>
+
+                    {/* Complemento */}
+                    <FormControl
+                      size={'md'}
+                      isDisabled={isAllDisabled.complemento}
+                      isRequired={false}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>Complemento</FormControlLabelText>
+                      </FormControlLabel>
+                      <View as={Textarea}>
+                        <TextareaInput
+                          value={values.complemento}
+                          onChangeText={handleChange('complemento')}
+                          placeholder="Informe o complemento do seu endereco aqui."
+                        />
+                      </View>
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          Informe o complemento do endereço.
+                        </FormControlHelperText>
+                      </FormControlHelper>
+                    </FormControl>
+
+                    {/* Bairro */}
+                    <FormControl
+                      isInvalid={errors.bairro ? true : false}
+                      size={'md'}
+                      isDisabled={isAllDisabled.bairro}
+                      isRequired={true}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>Bairro</FormControlLabelText>
+                      </FormControlLabel>
+                      <Input>
+                        <InputField
+                          value={values.bairro}
+                          onChangeText={handleChange('bairro')}
+                          type="text"
+                          placeholder="ex: Tucanos"
+                        />
+                      </Input>
+
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          Informe o nome do bairro do endereço.
+                        </FormControlHelperText>
+                      </FormControlHelper>
+
+                      <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
+                          {errors.bairro}
+                        </FormControlErrorText>
+                      </FormControlError>
+                    </FormControl>
+
+                    {/* Cidade */}
+                    <FormControl
+                      isInvalid={errors.cidade ? true : false}
+                      size={'md'}
+                      isDisabled={isAllDisabled.cidade}
+                      isRequired={true}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>Cidade</FormControlLabelText>
+                      </FormControlLabel>
+                      <Input>
+                        <InputField
+                          value={values.cidade}
+                          onChangeText={handleChange('cidadde')}
+                          type="text"
+                          placeholder="ex: Araras"
+                        />
+                      </Input>
+
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          {errors.cidade}
+                        </FormControlHelperText>
+                      </FormControlHelper>
+
+                      <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
+                          {errors.cidade}
+                        </FormControlErrorText>
+                      </FormControlError>
+                    </FormControl>
+
+                    {/* UF */}
+                    <FormControl
+                      isInvalid={errors.uf ? true : false}
+                      size={'md'}
+                      isDisabled={isAllDisabled.uf}
+                      isRequired={true}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>Estados</FormControlLabelText>
+                      </FormControlLabel>
+                      <Select
+                        isInvalid={errors.uf ? true : false}
+                        isDisabled={isAllDisabled.uf}
+                        onValueChange={(value) => {
+                          const nome = Estados.find(
+                            (est) => est.sigla == value,
+                          )?.nome;
+                          setFieldValue('uf', value);
+                          setNomeEstado(nome ? nome : value);
+                        }}
+                        selectedValue={nomeEstado}
+                      >
+                        <SelectTrigger size={'lg'} variant={'outline'}>
+                          <SelectInput placeholder="Select option" />
+                          <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
+                        </SelectTrigger>
+                        <SelectPortal>
+                          <SelectBackdrop />
+                          <SelectContent>
+                            <SelectDragIndicatorWrapper>
+                              <SelectDragIndicator />
+                            </SelectDragIndicatorWrapper>
+                            <ScrollView w="$full">
+                              {Estados.map((estado) => (
+                                <SelectItem
+                                  key={estado.id}
+                                  value={estado.sigla}
+                                  label={estado.nome}
+                                  isPressed={values.uf === estado.sigla}
+                                />
+                              ))}
+                            </ScrollView>
+                          </SelectContent>
+                        </SelectPortal>
+                      </Select>
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          Selecione o estado correspondente.
+                        </FormControlHelperText>
+                      </FormControlHelper>
+
+                      <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>{errors.uf}</FormControlErrorText>
+                      </FormControlError>
+                    </FormControl>
+
+                    {/* Telefones */}
+                    {values.telefones.map((value, i) => (
+                      <FormControl
+                        key={i}
+                        isInvalid={
+                          errors.telefones && errors.telefones[i] ? true : false
+                        }
+                        size={'md'}
+                        isDisabled={false}
+                        isRequired={true}
+                      >
+                        <FormControlLabel>
+                          <FormControlLabelText>
+                            Telefone {i + 1}
+                          </FormControlLabelText>
+                        </FormControlLabel>
+                        <Input>
+                          <InputField
+                            type="text"
+                            keyboardType="numeric"
+                            value={value}
+                            placeholder="ex: +55 99 99999-9999"
+                            onChangeText={(text) => {
+                              const valor = values.telefones;
+                              valor[i] = mask(text, '+55 (99) 99999-9999');
+                              setFieldValue('telefones', valor);
+                            }}
+                          />
+                        </Input>
+
+                        <FormControlHelper>
+                          <FormControlHelperText>
+                            Informe um telefone.
+                          </FormControlHelperText>
+                        </FormControlHelper>
+
+                        <FormControlError>
+                          <FormControlErrorIcon as={AlertCircleIcon} />
+                          <FormControlErrorText>
+                            {errors.telefones && errors.telefones[i]
+                              ? errors.telefones[i]
+                              : null}
+                          </FormControlErrorText>
+                        </FormControlError>
+                      </FormControl>
+                    ))}
+                    <Button
+                      action="positive"
+                      onPress={() =>
+                        setFieldValue('telefones', [...values.telefones, ''])
+                      }
+                    >
+                      <ButtonIcon as={AddIcon} />
+                    </Button>
+                    <Button
+                      action="negative"
+                      onPress={() => {
+                        if (values.telefones.length > 1) {
+                          setFieldValue('telefones', [
+                            ...values.telefones.slice(0, -1),
+                          ]);
+                        } else {
+                          Alert.alert('Erro', 'Não há o que ser removido!');
+                        }
+                      }}
+                    >
+                      <ButtonIcon as={RemoveIcon} />
+                    </Button>
+
+                    {/* Emails */}
+                    {values.emails.map((value, i) => (
+                      <FormControl
+                        key={i}
+                        isInvalid={
+                          errors.emails && errors.emails[i] ? true : false
+                        }
+                        size={'md'}
+                        isDisabled={false}
+                        isRequired={true}
+                      >
+                        <FormControlLabel>
+                          <FormControlLabelText>
+                            E-mail {i + 1}
+                          </FormControlLabelText>
+                        </FormControlLabel>
+                        <Input>
+                          <InputField
+                            type="text"
+                            value={value}
+                            placeholder="ex: teste@teste.com"
+                            onChangeText={(text) => {
+                              const valor = values.emails;
+                              valor[i] = text;
+                              setFieldValue('emails', valor);
+                            }}
+                          />
+                        </Input>
+
+                        <FormControlHelper>
+                          <FormControlHelperText>
+                            Informe Um E-mail.
+                          </FormControlHelperText>
+                        </FormControlHelper>
+
+                        <FormControlError>
+                          <FormControlErrorIcon as={AlertCircleIcon} />
+                          <FormControlErrorText>
+                            {errors.emails && errors.emails[i]
+                              ? errors.emails[i]
+                              : null}
+                          </FormControlErrorText>
+                        </FormControlError>
+                      </FormControl>
+                    ))}
+                    <Button
+                      action="positive"
+                      onPress={() =>
+                        setFieldValue('emails', [...values.emails, ''])
+                      }
+                    >
+                      <ButtonIcon as={AddIcon} />
+                    </Button>
+                    <Button
+                      action="negative"
+                      onPress={() => {
+                        if (values.emails.length > 1) {
+                          setFieldValue('emails', [
+                            ...values.emails.slice(0, -1),
+                          ]);
+                        } else {
+                          Alert.alert('Erro', 'Não há o que ser removido!');
+                        }
+                      }}
+                    >
+                      <ButtonIcon as={RemoveIcon} />
+                    </Button>
                   </>
                 )}
-                
-                {}
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>
-                      <FontAwesome6 name="whatsapp" /> Telefone
-                    </FormControlLabelText>
-                  </FormControlLabel>
-                  <Input>
-                    <InputField type="text" placeholder="(xx) xxxxx-xxxx" />
-                  </Input>
 
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Insira o número de telefone e whatsapp do cliente.
-                    </FormControlHelperText>
-                  </FormControlHelper>
-
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>
-                      <MaterialIcons name="email" /> Email
-                    </FormControlLabelText>
-                  </FormControlLabel>
-                  <Input>
-                    <InputField type="text" placeholder="Email" />
-                  </Input>
-
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Insira o email do cliente.
-                    </FormControlHelperText>
-                  </FormControlHelper>
-
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>Cep</FormControlLabelText>
-                  </FormControlLabel>
-                  <Input>
-                    <InputField
-                      type="password"
-                      defaultValue="12345"
-                      placeholder="password"
-                    />
-                  </Input>
-
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Must be atleast 6 characters.
-                    </FormControlHelperText>
-                  </FormControlHelper>
-
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>Rua</FormControlLabelText>
-                  </FormControlLabel>
-                  <Input>
-                    <InputField
-                      type="password"
-                      defaultValue="12345"
-                      placeholder="password"
-                    />
-                  </Input>
-
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Must be atleast 6 characters.
-                    </FormControlHelperText>
-                  </FormControlHelper>
-
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>Número</FormControlLabelText>
-                  </FormControlLabel>
-                  <Input>
-                    <InputField
-                      type="password"
-                      defaultValue="12345"
-                      placeholder="password"
-                    />
-                  </Input>
-
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Must be atleast 6 characters.
-                    </FormControlHelperText>
-                  </FormControlHelper>
-
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>Bairro</FormControlLabelText>
-                  </FormControlLabel>
-                  <Input>
-                    <InputField
-                      type="password"
-                      defaultValue="12345"
-                      placeholder="password"
-                    />
-                  </Input>
-
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Must be atleast 6 characters.
-                    </FormControlHelperText>
-                  </FormControlHelper>
-
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>Cidade</FormControlLabelText>
-                  </FormControlLabel>
-                  <Input>
-                    <InputField
-                      type="password"
-                      defaultValue="12345"
-                      placeholder="password"
-                    />
-                  </Input>
-
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Must be atleast 6 characters.
-                    </FormControlHelperText>
-                  </FormControlHelper>
-
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-                <SelectEstado />
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>UF</FormControlLabelText>
-                  </FormControlLabel>
-                  <Input>
-                    <InputField
-                      type="password"
-                      defaultValue="12345"
-                      placeholder="password"
-                    />
-                  </Input>
-
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Must be atleast 6 characters.
-                    </FormControlHelperText>
-                  </FormControlHelper>
-
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>Password</FormControlLabelText>
-                  </FormControlLabel>
-                  <Input>
-                    <InputField
-                      type="password"
-                      defaultValue="12345"
-                      placeholder="password"
-                    />
-                  </Input>
-
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Must be atleast 6 characters.
-                    </FormControlHelperText>
-                  </FormControlHelper>
-
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>Password</FormControlLabelText>
-                  </FormControlLabel>
-                  <Input>
-                    <InputField
-                      type="password"
-                      defaultValue="12345"
-                      placeholder="password"
-                    />
-                  </Input>
-
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Must be atleast 6 characters.
-                    </FormControlHelperText>
-                  </FormControlHelper>
-
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>
-                      Limite de compra
-                    </FormControlLabelText>
-                  </FormControlLabel>
-                  <Input>
-                    <InputField
-                      type="text"
-                      placeholder="Limite de compra por cliente"
-                    />
-                  </Input>
-
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Must be atleast 6 characters.
-                    </FormControlHelperText>
-                  </FormControlHelper>
-
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
                 <Box>
                   <Button
                     $active-bgColor={
@@ -735,6 +928,11 @@ const Create: React.FC<CadastrarClientesScreenProps> = () => {
                     }
                     $dark-backgroundColor="$purple500"
                     $light-backgroundColor="$purple700"
+                    onPress={
+                      handleSubmit as unknown as (
+                        event: GestureResponderEvent,
+                      ) => void
+                    }
                   >
                     <ButtonText>Cadastrar</ButtonText>
                   </Button>

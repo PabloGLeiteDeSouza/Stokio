@@ -5,7 +5,7 @@ export const formatStringDate = (data: string) => {
   const ano = date.getFullYear().toString().padStart(4, '0');
   return `${dia + '/' + mes + '/' + ano}`;
 };
-export function verificarAtributosObjeto(obj: any) {
+export function verificarAtributosObjeto(obj: object) {
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {
       if (obj[key] === null || obj[key] === undefined || obj[key] === '') {
@@ -16,7 +16,7 @@ export function verificarAtributosObjeto(obj: any) {
   return true;
 }
 
-export function verificarArray(array: Array<any>) {
+export function verificarArray(array: Array<unknown>) {
   // Verifica se o array está vazio
   if (array.length === 0) {
     return false;

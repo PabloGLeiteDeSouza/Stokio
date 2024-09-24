@@ -1,4 +1,4 @@
-import { AtualizarClientesScreenProps } from "../interfaces";
+import { AtualizarClientesScreenProps } from '../interfaces';
 
 const Update: React.FC<AtualizarClientesScreenProps> = () => {
   return <></>;

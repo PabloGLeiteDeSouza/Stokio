@@ -1,7 +1,10 @@
 import { CreateEmailDto } from './create-email.dto';
 
 export class UpdateEmailDto extends CreateEmailDto {
-  constructor(id: number, email: string, id_empresa: number) {
-    super(email, id_empresa, id);
+  id: number;
+
+  constructor(id: number, email: string, id_pessoa: number) {
+    super(email, id_pessoa);
+    this.id = id;
   }
 }

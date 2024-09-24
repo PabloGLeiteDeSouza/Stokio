@@ -13,8 +13,8 @@ export class Email {
   async create(email: CreateEmailDto) {
     try {
       const result = await this.db.runAsync(
-        'INSERT INTO email (email, id_empresa) VALUES ($email, $id_empresa)',
-        { $email: email.email, $id_empresa: email.id_empresa },
+        'INSERT INTO email (email, id_pessoa) VALUES ($email, $id_pessoa)',
+        { $email: email.email, $id_pessoa: email.id_pessoa },
       );
       if (!result) {
         throw new Error('Não possível executar a inserção tente novamente!');
@@ -29,8 +29,8 @@ export class Email {
   async update(id: number, email: UpdateEmailDto) {
     try {
       const result = await this.db.runAsync(
-        'UPDATE email SET email = $email, id_empresa = $id_empresa WHERE id = $id',
-        { $email: email.email, $id_empresa: email.id_empresa, $id: id },
+        'UPDATE email SET email = $email, id_pessoa = $id_pessoa WHERE id = $id',
+        { $email: email.email, $id_pessoa: email.id_pessoa, $id: id },
       );
       if (!result) {
         throw new Error('Não foi possível fazer a atualização!');
@@ -60,11 +60,11 @@ export class Email {
     }
   }
 
-  async findAllByIdEmpresa($id_empresa: number) {
+  async findAllByIdPessoa($id_pessoa: number) {
     try {
       const result = await this.db.getAllAsync(
-        'SELECT * FROM email WHERE id_empresa = $id_empresa',
-        { $id_empresa },
+        'SELECT * FROM email WHERE id_pessoa = $id_pessoa',
+        { $id_pessoa },
       );
       if (!result) {
         throw new Error(
