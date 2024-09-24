@@ -51,8 +51,6 @@ export class Cliente {
 
   async findUnique() {}
 
-  async findUniqueByNome() {}
-
   async findAll() {
     try {
       const data = await this.db.getAllAsync('SELECT * FROM Cliente');
@@ -60,6 +58,23 @@ export class Cliente {
         throw new Error(errors.database_errors.ErrorsCliente.find.all.database);
       }
       return data as Array<UpdateClienteDto>;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findByIdPessoa($id_pessoa: number){
+    try {
+      const data = await this.db.getFirstAsync(
+        'SELECT * FROM Cliente WHERE id_pessoa = $id_pessoa',
+        { $id_pessoa },
+      );
+      if (!data) {
+        throw new Error(
+          errors.database_errors.ErrorsCliente.find.byIdPessoa.database,
+        );
+      }
+      return data as UpdateClienteDto;
     } catch (error) {
       throw error;
     }

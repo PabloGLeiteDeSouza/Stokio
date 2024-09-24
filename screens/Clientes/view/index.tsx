@@ -91,8 +91,7 @@ const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
   const db = useSQLiteContext();
   const [valorBusca, setValorBusca] = React.useState('');
   const [todosClientes, setTodosClientes] = React.useState<
-    | Array<ClientesObject>
-    | Array<never>
+    Array<ClientesObject> | Array<never>
   >([]);
   const { theme } = useThemeApp();
   const [tipoDeBusca, setTipoDeBusca] = React.useState('');
@@ -133,62 +132,70 @@ const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
       setTodosClientes([]);
     }
   }
-  // async function busca_empresa(valor: string, tipo: string) {
-  //   try {
-  //     switch (tipo) {
-  //       case 'nome_completo':
-  //         setTodasEmpresas(
-  //           (await new Empresa(db).findAllByNomeCompleto(
-  //             valor,
-  //           )) as unknown as Array<UpdateEmpresaObject>,
-  //         );
-  //         break;
-  //       case 'cpf':
-  //         setTodasEmpresas([
-  //           (await new Empresa(db).findUniqueByCpf(
-  //             valor,
-  //           )) as unknown as UpdateEmpresaObject,
-  //         ]);
-  //         break;
-  //       case 'nome_fantasia':
-  //         setTodasEmpresas(
-  //           (await new Empresa(db).findAllByNomeFantasia(
-  //             valor,
-  //           )) as unknown as Array<UpdateEmpresaObject>,
-  //         );
-  //         break;
-  //       case 'razao_social':
-  //         setTodasEmpresas(
-  //           (await new Empresa(db).findAllByRazaoSocial(
-  //             valor,
-  //           )) as unknown as Array<UpdateEmpresaObject>,
-  //         );
-  //         break;
-  //       case 'cnpj':
-  //         setTodasEmpresas([
-  //           (await new Empresa(db).findUniqueByCnpj(
-  //             valor,
-  //           )) as unknown as UpdateEmpresaObject,
-  //         ]);
-  //         break;
-  //       default:
-  //         setTodasEmpresas(
-  //           (await new Empresa(
-  //             db,
-  //           ).findAll()) as unknown as Array<UpdateEmpresaObject>,
-  //         );
-  //         break;
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //     Alert.alert('Erro', (error as Error).message);
-  //   }
-  // }
+  async function buscar_cliente(valor: string, tipo: string) {
+    try {
+      if (tipo === 'nome_completo') {
+        const pss = await new Pessoa(db).findAllByNome(valor);
+        setTodosClientes(
+          await Promise.all(
+            pss.map(async (ps) => {
+              try {
+                const cliente = await new Cliente(db).findByIdPessoa(ps.id);
+                const telefones = await new Telefone(db).findByIdPessoa(ps.id);
+                const emails = await new Email(db).findAllByIdPessoa(ps.id);
+                const endereco = await new Endereco(db).findUniqueByIdPessoa(
+                  ps.id,
+                );
+                return {
+                  ...ps,
+                  ...cliente,
+                  endereco,
+                  telefones,
+                  emails,
+                };
+              } catch (error) {
+                throw error;
+              }
+            }),
+          ),
+        );
+      } else if (tipo === 'cpf') {
+        const pss = [await new Pessoa(db).findUniqueByCPF(valor)];
+
+        setTodosClientes(
+          await Promise.all(
+            pss.map(async (ps) => {
+              try {
+                const cliente = await new Cliente(db).findByIdPessoa(ps.id);
+                const telefones = await new Telefone(db).findByIdPessoa(ps.id);
+                const emails = await new Email(db).findAllByIdPessoa(ps.id);
+                const endereco = await new Endereco(db).findUniqueByIdPessoa(
+                  ps.id,
+                );
+                return {
+                  ...ps,
+                  ...cliente,
+                  endereco,
+                  telefones,
+                  emails,
+                };
+              } catch (error) {
+                throw error;
+              }
+            }),
+          ),
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Erro', (error as Error).message);
+    }
+  }
 
   React.useEffect(() => {
-    // setTimeout(() => {
-    //   Start();
-    // }, 1);
+    setTimeout(() => {
+      Start();
+    }, 1);
   }, []);
 
   React.useEffect(() => {
@@ -310,7 +317,7 @@ const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
             <Button
               onPress={() => {
                 setIsStartingPage(true);
-                setTimeout(() => busca_empresa(valorBusca, tipoDeBusca), 1);
+                setTimeout(() => buscar_cliente(valorBusca, tipoDeBusca), 1);
                 setIsStartingPage(false);
               }}
             >

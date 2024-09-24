@@ -29,7 +29,25 @@ export class Pessoa {
     }
   }
 
-  async update() {}
+  async update(pessoa: UpdatePessoaDto) {
+    try {
+      const data = await this.db.runAsync(
+        'UPDATE pessoa SET nome = $nome, data_de_nascimento = $data_de_nascimento, cpf = $cpf WHERE id = $id',
+        {
+          $id: pessoa.id,
+          $nome: pessoa.nome,
+          $data_de_nascimento: pessoa.data_de_nascimento.toLocaleDateString(),
+          $cpf: pessoa.cpf,
+        },
+      );
+      if (data.changes < 1) {
+        throw new Error(errors.database_errors.ErrorsPessoa.update.database);
+      }
+      return { ...pessoa };
+    } catch (error) {
+      throw error;
+    }
+  }
 
   async findById(id: number) {
     try {
@@ -58,15 +76,71 @@ export class Pessoa {
     }
   }
 
-  async findAllByNome() {}
+  async findAllByNome($nome: string) {
+    try {
+      const data = await this.db.getAllAsync(
+        'SELECT * FROM pessoa WHERE nome LIKE $nome',
+        { $nome: `%${$nome}%` },
+      );
+      if (data.length < 1) {
+        throw new Error(errors.database_errors.ErrorsPessoa.find.all.database);
+      }
+      return data as Array<UpdatePessoaDto>;
+    } catch (error) {
+      throw error;
+    }
+  }
 
-  async findAllByDataDeNascimento() {}
+  async findAllByDataDeNascimento($data_de_nascimento: Date) {
+    try {
+      const data = await this.db.getAllAsync(
+        'SELECT * FROM pessoa WHERE data_de_nascimento = $data_de_nascimento',
+        { $data_de_nascimento: $data_de_nascimento.toLocaleDateString() },
+      );
+      if (data.length < 1) {
+        throw new Error(errors.database_errors.ErrorsPessoa.find.all.database);
+      }
+      return data as Array<UpdatePessoaDto>;
+    } catch (error) {
+      throw error;
+    }
+  }
 
-  async findUniqueByNome() {}
+  async findUniqueByNome($nome: string) {
+    try {
+      const data = await this.db.getFirstAsync(
+        'SELECT * FROM pessoa WHERE nome = $nome',
+        { $nome },
+      );
+      if (!data) {
+        throw new Error(errors.database_errors.ErrorsPessoa.find.byId.database);
+      }
+      return data as UpdatePessoaDto;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findUniqueByCPF($cpf: string) {
+    try {
+      const data = await this.db.getFirstAsync(
+        'SELECT * FROM pessoa WHERE cpf = $cpf',
+        { $cpf },
+      );
+      if (!data) {
+        throw new Error(errors.database_errors.ErrorsPessoa.find.byId.database);
+      }
+      return data as UpdatePessoaDto;
+    } catch (error) {
+      throw error;
+    }
+  }
 
   async delete($id: number) {
     try {
-      const data = await this.db.runAsync('DELETE FROM pessoa WHERE id = $id', { $id });
+      const data = await this.db.runAsync('DELETE FROM pessoa WHERE id = $id', {
+        $id,
+      });
       if (!data) {
         throw new Error(errors.database_errors.ErrorsPessoa.delete.database);
       }
@@ -75,6 +149,4 @@ export class Pessoa {
       throw error;
     }
   }
-
-  async disable() {}
 }
