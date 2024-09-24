@@ -47,11 +47,11 @@ export class Telefone {
     }
   }
 
-  async findByIdPessoa($id_empresa: number) {
+  async findByIdPessoa($id_pessoa: number) {
     try {
       const result = await this.db.getAllAsync(
-        'SELECT * FROM telefone WHERE id_empresa = $id_empresa',
-        { $id_empresa },
+        'SELECT * FROM telefone WHERE id_pessoa = $id_pessoa',
+        { $id_pessoa },
       );
       if (!result) {
         throw new Error(

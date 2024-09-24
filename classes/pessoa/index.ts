@@ -64,7 +64,17 @@ export class Pessoa {
 
   async findUniqueByNome() {}
 
-  async delete() {}
+  async delete($id: number) {
+    try {
+      const data = await this.db.runAsync('DELETE FROM pessoa WHERE id = $id', { $id });
+      if (!data) {
+        throw new Error(errors.database_errors.ErrorsPessoa.delete.database);
+      }
+      return { sucess: true };
+    } catch (error) {
+      throw error;
+    }
+  }
 
   async disable() {}
 }

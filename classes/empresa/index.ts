@@ -3,6 +3,7 @@ import { CreateEmpresaDto } from './dto/create-empresa.dto';
 import { UpdateEmpresaDto } from './dto/update-empresa.dto';
 import MessageErrors from 'messages-error';
 import { formatStringDateDB } from 'utils';
+import errors from 'messages-error';
 
 export class Empresa {
   private db: SQLite.SQLiteDatabase;
@@ -239,6 +240,21 @@ export class Empresa {
       return { sucess: true };
     } catch (error) {
       console.error(error);
+      throw error;
+    }
+  }
+
+  async findAllByIdPessoa($id_pessoa: number) {
+    try {
+      const result = await this.db.getAllAsync(
+        'SELECT * FROM empresa WHERE id_pessoa = $id_pessoa',
+        { $id_pessoa },
+      );
+      if (result.length < 1) {
+        throw new Error(errors.database_errors.ErrorsEmpresa.find.all.database);
+      }
+      return result as Array<UpdateEmpresaDto>;
+    } catch (error) {
       throw error;
     }
   }

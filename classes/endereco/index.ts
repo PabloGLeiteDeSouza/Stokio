@@ -128,7 +128,7 @@ export class Endereco {
     }
   }
 
-  async findUniqueById($id_pessoa: number) {
+  async findUniqueByIdPessoa($id_pessoa: number) {
     try {
       const result = await this.db.getFirstAsync(
         'SELECT * FROM endereco WHERE id_pessoa = $id_pessoa',
@@ -204,21 +204,6 @@ export class Endereco {
       return { sucess: true };
     } catch (error) {
       console.error(error);
-      throw error;
-    }
-  }
-
-  async findUniqueByIdPessoa($id_pessoa: number) {
-    try {
-      const result = await this.db.getFirstAsync(
-        'SELECT * FROM endereco WHERE id_pessoa = $id_pessoa',
-        { $id_pessoa },
-      );
-      if (!result) {
-        throw new Error(DBErros.ErrorsEndereco.find.byId.database);
-      }
-      return result as UpdateEnderecoDto;
-    } catch (error) {
       throw error;
     }
   }

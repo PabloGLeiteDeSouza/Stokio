@@ -65,7 +65,20 @@ export class Cliente {
     }
   }
 
-  async delete() {}
+  async delete($id: number) {
+    try {
+      const data = await this.db.runAsync(
+        'DELETE FROM Cliente WHERE id = $id',
+        { $id },
+      );
+      if (!data) {
+        throw new Error(errors.database_errors.ErrorsCliente.delete.database);
+      }
+      return { status: true };
+    } catch (error) {
+      throw error;
+    }
+  }
 
   async disable() {}
 }

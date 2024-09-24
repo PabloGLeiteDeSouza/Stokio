@@ -147,7 +147,7 @@ const Create: React.FC<CadastrarClientesScreenProps> = ({ navigation }) => {
           status,
           telefones,
           ...people
-        } = values;
+        } = vls;
         const pessoa = await new Pessoa(db).create(people);
         const address = {
           cep,

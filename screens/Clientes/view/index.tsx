@@ -84,25 +84,15 @@ import { Endereco } from '$classes/endereco';
 import { UpdateEnderecoDto } from '$classes/endereco/dto/update-endereco.dto';
 import { UpdateTelefoneDto } from '$classes/telefone/dto/update-telefone.dto';
 import { UpdateEmailDto } from '$classes/email/dto/update-email.dto';
+import { ClientesObject } from '../types';
 
 const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
   const isFocused = useIsFocused();
   const db = useSQLiteContext();
   const [valorBusca, setValorBusca] = React.useState('');
-  const [haveCompanys, setHaveCompanys] = React.useState(false);
-  const [todosClientes, setTodos] = React.useState<
-    Array<{
-      endereco: UpdateEnderecoDto;
-      telefones: UpdateTelefoneDto[];
-      emails: UpdateEmailDto[];
-      id: number;
-      id_pessoa: number;
-      limite: number;
-      status: boolean;
-      nome: string;
-      data_de_nascimento: Date;
-      cpf: string;
-    }>
+  const [todosClientes, setTodosClientes] = React.useState<
+    | Array<ClientesObject>
+    | Array<never>
   >([]);
   const { theme } = useThemeApp();
   const [tipoDeBusca, setTipoDeBusca] = React.useState('');
@@ -135,71 +125,70 @@ const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
           }
         }),
       );
-      setTodasEmpresas(empresas as unknown as Array<UpdateEmpresaObject>);
-      setHaveCompanys(true);
+      setTodosClientes(clientes);
       setIsStartingPage(false);
       return;
     } catch (error) {
       setIsStartingPage(false);
-      setHaveCompanys(false);
-      setTodasEmpresas([]);
+      setTodosClientes([]);
     }
   }
-  async function busca_empresa(valor: string, tipo: string) {
-    try {
-      switch (tipo) {
-        case 'nome_completo':
-          setTodasEmpresas(
-            (await new Empresa(db).findAllByNomeCompleto(
-              valor,
-            )) as unknown as Array<UpdateEmpresaObject>,
-          );
-          break;
-        case 'cpf':
-          setTodasEmpresas([
-            (await new Empresa(db).findUniqueByCpf(
-              valor,
-            )) as unknown as UpdateEmpresaObject,
-          ]);
-          break;
-        case 'nome_fantasia':
-          setTodasEmpresas(
-            (await new Empresa(db).findAllByNomeFantasia(
-              valor,
-            )) as unknown as Array<UpdateEmpresaObject>,
-          );
-          break;
-        case 'razao_social':
-          setTodasEmpresas(
-            (await new Empresa(db).findAllByRazaoSocial(
-              valor,
-            )) as unknown as Array<UpdateEmpresaObject>,
-          );
-          break;
-        case 'cnpj':
-          setTodasEmpresas([
-            (await new Empresa(db).findUniqueByCnpj(
-              valor,
-            )) as unknown as UpdateEmpresaObject,
-          ]);
-          break;
-        default:
-          setTodasEmpresas(
-            (await new Empresa(
-              db,
-            ).findAll()) as unknown as Array<UpdateEmpresaObject>,
-          );
-          break;
-      }
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Erro', (error as Error).message);
-    }
-  }
+  // async function busca_empresa(valor: string, tipo: string) {
+  //   try {
+  //     switch (tipo) {
+  //       case 'nome_completo':
+  //         setTodasEmpresas(
+  //           (await new Empresa(db).findAllByNomeCompleto(
+  //             valor,
+  //           )) as unknown as Array<UpdateEmpresaObject>,
+  //         );
+  //         break;
+  //       case 'cpf':
+  //         setTodasEmpresas([
+  //           (await new Empresa(db).findUniqueByCpf(
+  //             valor,
+  //           )) as unknown as UpdateEmpresaObject,
+  //         ]);
+  //         break;
+  //       case 'nome_fantasia':
+  //         setTodasEmpresas(
+  //           (await new Empresa(db).findAllByNomeFantasia(
+  //             valor,
+  //           )) as unknown as Array<UpdateEmpresaObject>,
+  //         );
+  //         break;
+  //       case 'razao_social':
+  //         setTodasEmpresas(
+  //           (await new Empresa(db).findAllByRazaoSocial(
+  //             valor,
+  //           )) as unknown as Array<UpdateEmpresaObject>,
+  //         );
+  //         break;
+  //       case 'cnpj':
+  //         setTodasEmpresas([
+  //           (await new Empresa(db).findUniqueByCnpj(
+  //             valor,
+  //           )) as unknown as UpdateEmpresaObject,
+  //         ]);
+  //         break;
+  //       default:
+  //         setTodasEmpresas(
+  //           (await new Empresa(
+  //             db,
+  //           ).findAll()) as unknown as Array<UpdateEmpresaObject>,
+  //         );
+  //         break;
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //     Alert.alert('Erro', (error as Error).message);
+  //   }
+  // }
+
   React.useEffect(() => {
-    setTimeout(() => {
-      Start();
-    }, 1);
+    // setTimeout(() => {
+    //   Start();
+    // }, 1);
   }, []);
 
   React.useEffect(() => {
@@ -209,7 +198,7 @@ const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
     }, 1);
   }, [isFocused]);
 
-  const deletarCliente = async (cliente: UpdateClienteDto) => {
+  const deletarCliente = async (cliente: ClientesObject) => {
     try {
       const pessoa = await new Pessoa(db).findById(cliente.id_pessoa);
       Alert.alert(
@@ -221,7 +210,20 @@ const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
             text: 'Confirmar',
             onPress: async () => {
               try {
-                await new Empresa(db).delete(empresa.id);
+                await new Cliente(db).delete(cliente.id);
+                await new Endereco(db).delete(cliente.endereco.id);
+                cliente.telefones.map(async (telefone) => {
+                  await new Telefone(db).delete(telefone.id);
+                });
+                cliente.emails.map(async (email) => {
+                  await new Email(db).delete(email.id);
+                });
+                const empresa = await new Empresa(db).findAllByIdPessoa(
+                  cliente.id_pessoa,
+                );
+                if (empresa.length < 1) {
+                  await new Pessoa(db).delete(cliente.id_pessoa);
+                }
                 Alert.alert('Sucesso', 'Registro apagado com sucesso!');
                 setTimeout(() => {
                   Start();
@@ -254,7 +256,7 @@ const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
     return <LoadingScreen />;
   }
 
-  return haveCompanys ? (
+  return todosClientes.length > 0 ? (
     <ScrollView>
       <Box w="$full" px="$5">
         <FormControl
@@ -301,21 +303,6 @@ const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
                     label="CPF"
                     value="cpf"
                     isPressed={tipoDeBusca === 'cpf'}
-                  />
-                  <SelectItem
-                    label="Nome Fantasia"
-                    value="nome_fantasia"
-                    isPressed={tipoDeBusca === 'nome_fantasia'}
-                  />
-                  <SelectItem
-                    label="Razao Social"
-                    value="razao_social"
-                    isPressed={tipoDeBusca === 'razao_social'}
-                  />
-                  <SelectItem
-                    label="CNPJ"
-                    value="cnpj"
-                    isPressed={tipoDeBusca === 'cnpj'}
                   />
                 </SelectContent>
               </SelectPortal>
@@ -380,7 +367,7 @@ const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
               <Card borderRadius="$lg" variant="elevated">
                 <HStack gap="$3">
                   <VStack gap="$2">
-                    <Heading>Nome Completo: {value.nome_completo}</Heading>
+                    <Heading>Nome Completo: {value.nome}</Heading>
                     <Text>
                       <Text fontWeight="$bold">Data de Nascimento:</Text>{' '}
                       {formatStringDate(String(value.data_de_nascimento))}
@@ -390,12 +377,12 @@ const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
                     </Text>
                   </VStack>
                   <VStack gap="$2">
-                    <Button onPress={() => editarEmpresa(value)}>
+                    <Button onPress={() => editarCliente(value)}>
                       <ButtonIcon as={EditIcon} />
                     </Button>
                     <Button
                       action="negative"
-                      onPress={() => deletarEmpresa(value)}
+                      onPress={() => deletarCliente(value)}
                     >
                       <ButtonIcon as={TrashIcon} />
                     </Button>
