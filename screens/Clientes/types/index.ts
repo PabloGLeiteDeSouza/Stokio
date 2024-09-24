@@ -7,28 +7,28 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 export type ListarClientesScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
-  'listar-marca'
+  'listar-clientes'
 >;
 export type ListarClientesScreenRouteProp = RouteProp<
   RootStackParamList,
-  'listar-marca'
+  'listar-clientes'
 >;
 export type CadastrarClientesScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
-  'cadastrar-marca'
+  'cadastrar-clientes'
 >;
 export type CadastrarClientesScreenRouteProp = RouteProp<
   RootStackParamList,
-  'cadastrar-marca'
+  'cadastrar-clientes'
 >;
 
 export type AtualizarClientesScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
-  'editar-marca'
+  'editar-clientes'
 >;
 export type AtualizarClientesScreenRouteProp = RouteProp<
   RootStackParamList,
-  'editar-marca'
+  'editar-clientes'
 >;
 
 export type ClientesObject = {

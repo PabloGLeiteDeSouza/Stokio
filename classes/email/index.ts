@@ -26,16 +26,16 @@ export class Email {
     }
   }
 
-  async update(id: number, email: UpdateEmailDto) {
+  async update(email: UpdateEmailDto) {
     try {
       const result = await this.db.runAsync(
         'UPDATE email SET email = $email, id_pessoa = $id_pessoa WHERE id = $id',
-        { $email: email.email, $id_pessoa: email.id_pessoa, $id: id },
+        { $email: email.email, $id_pessoa: email.id_pessoa, $id: email.id },
       );
       if (!result) {
         throw new Error('Não foi possível fazer a atualização!');
       }
-      return { ...email, id };
+      return { ...email };
     } catch (error) {
       console.error(error);
       throw error;

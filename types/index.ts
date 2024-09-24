@@ -3,6 +3,7 @@ import { UpdateClienteDto } from '$classes/cliente/dto/update-cliente.dto';
 import { UpdateRamoDto } from '$classes/ramo/dto/update-ramo.dto';
 import { UpdateTipoDeProdutoDto } from '$classes/tipo_produto/dto/update-tipo-de-produto.dto';
 import { UpdateUmDto } from '$classes/um/dto/update-um.dto';
+import { ClientesObject } from '$screens/Clientes/types';
 import { ParamListBase, RouteProp } from '@react-navigation/native';
 
 export type RootStackParamList = {
@@ -52,7 +53,7 @@ export type RootStackParamList = {
   'editar-tipo-produto'?: { tipo_de_produto: UpdateTipoDeProdutoDto };
   'editar-tipo-ua'?: object;
   'editar-ramo'?: { ramo: UpdateRamoDto };
-  'editar-clientes'?: { cliente: UpdateClienteDto };
+  'editar-clientes'?: { cliente: ClientesObject };
   'editar-venda'?: object;
   'editar-venda-item'?: object;
   'tab-bottom'?: object;

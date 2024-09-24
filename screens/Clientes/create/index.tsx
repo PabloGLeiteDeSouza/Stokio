@@ -1,3 +1,21 @@
+import {
+  Radio,
+  RadioGroup,
+  RadioIcon,
+  RadioIndicator,
+  RadioLabel,
+  CheckboxGroup,
+  CheckboxLabel,
+  Slider,
+  SliderTrack,
+  SliderFilledTrack,
+  SliderThumb,
+  Switch,
+  HStack,
+  Center,
+  CircleIcon,
+} from '@gluestack-ui/themed';
+
 import React from 'react';
 import Estados from '$databases/Estados.json';
 import {
@@ -45,7 +63,6 @@ import {
   Card,
   ButtonIcon,
 } from '@gluestack-ui/themed';
-
 import { ScrollView } from '@gluestack-ui/themed';
 import { Box } from '@gluestack-ui/themed';
 import { useThemeApp } from '$providers/theme';
@@ -69,7 +86,6 @@ import { Cliente } from '$classes/cliente';
 import { Endereco } from '$classes/endereco';
 import { Telefone } from '$classes/telefone';
 import { Email } from '$classes/email';
-
 type CadastrarProdutosScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   'cadastrar-clientes'
@@ -78,12 +94,10 @@ type CadastrarProdutosScreennRouteProp = RouteProp<
   RootStackParamList,
   'cadastrar-clientes'
 >;
-
 interface CadastrarClientesScreenProps {
   navigation?: CadastrarProdutosScreenNavigationProp;
   route?: CadastrarProdutosScreennRouteProp;
 }
-
 const Create: React.FC<CadastrarClientesScreenProps> = ({ navigation }) => {
   const db = useSQLiteContext();
   const { theme } = useThemeApp();
@@ -91,12 +105,15 @@ const Create: React.FC<CadastrarClientesScreenProps> = ({ navigation }) => {
   const [showModalPessoas, setShowModalPessoas] = React.useState(false);
   const [cadastrarNovaPessoa, setCadastrarNovaPessoa] = React.useState(false);
   const refModalPesoas = React.useRef(null);
-
   React.useEffect(() => {
     async function start() {
       try {
         const ps = await new Pessoa(db).findAll();
-        setPessoas(ps);
+        const cli = await new Cliente(db).findAll();
+        const peaoples = ps.filter((p) => {
+          return !cli.some((c) => c.id_pessoa === p.id);
+        });
+        setPessoas(peaoples);
       } catch (error) {
         Alert.alert((error as Error).message);
         throw error;
@@ -167,7 +184,10 @@ const Create: React.FC<CadastrarClientesScreenProps> = ({ navigation }) => {
           });
         });
         emails.map(async (email) => {
-          await new Email(db).create({ email, id_pessoa: pessoa.id });
+          await new Email(db).create({
+            email,
+            id_pessoa: pessoa.id,
+          });
         });
         await new Cliente(db).create({
           id_pessoa: pessoa.id,
@@ -179,7 +199,6 @@ const Create: React.FC<CadastrarClientesScreenProps> = ({ navigation }) => {
       }
     } catch (error) {}
   };
-
   const [isAllDisabled, setIsAllDisabled] = React.useState({
     cep: false,
     logradouro: false,
@@ -189,11 +208,10 @@ const Create: React.FC<CadastrarClientesScreenProps> = ({ navigation }) => {
     cidade: false,
     uf: false,
   });
-
   return (
     <ScrollView>
       <Box my="$6" mx="$10" gap="$5">
-        <Text textAlign="center" size="xl">
+        <Text textAlign="center" size="3xl">
           Informe os dados do cliente
         </Text>
         <Formik
@@ -266,14 +284,13 @@ const Create: React.FC<CadastrarClientesScreenProps> = ({ navigation }) => {
                 }
               }
             };
-
             return (
               <>
                 {pessoas.length >= 1 && !cadastrarNovaPessoa ? (
                   <>
                     <Box>
                       {values.id_pessoa === '' ? (
-                        <>
+                        <Box gap="$5">
                           <Box>
                             <Button
                               onPress={() => setShowModalPessoas(true)}
@@ -286,6 +303,7 @@ const Create: React.FC<CadastrarClientesScreenProps> = ({ navigation }) => {
                             isOpen={showModalPessoas}
                             onClose={() => setShowModalPessoas(false)}
                             finalFocusRef={refModalPesoas}
+                            size="lg"
                           >
                             <ModalBackdrop />
                             <ModalContent>
@@ -297,13 +315,13 @@ const Create: React.FC<CadastrarClientesScreenProps> = ({ navigation }) => {
                                   <Icon as={CloseIcon} />
                                 </ModalCloseButton>
                               </ModalHeader>
-                              <ModalBody>
-                                <ScrollView>
-                                  <Box gap="$5">
+                              <ScrollView>
+                                <ModalBody h="$96">
+                                  <Box gap="$5" my="$10">
                                     {pessoas.map((item, index) => (
                                       <Card>
-                                        <VStack key={index}>
-                                          <Box>
+                                        <HStack space="xl" key={index}>
+                                          <Box justifyContent="center">
                                             <Checkbox
                                               size="md"
                                               value={item.id.toString()}
@@ -351,15 +369,17 @@ const Create: React.FC<CadastrarClientesScreenProps> = ({ navigation }) => {
                                               Data de Nascimento
                                             </Text>
                                             <Text>
-                                              {item.data_de_nascimento.toLocaleDateString()}
+                                              {new Date(
+                                                item.data_de_nascimento,
+                                              ).toLocaleDateString()}
                                             </Text>
                                           </Box>
-                                        </VStack>
+                                        </HStack>
                                       </Card>
                                     ))}
                                   </Box>
-                                </ScrollView>
-                              </ModalBody>
+                                </ModalBody>
+                              </ScrollView>
                               <ModalFooter>
                                 <Button
                                   variant="outline"
@@ -388,24 +408,28 @@ const Create: React.FC<CadastrarClientesScreenProps> = ({ navigation }) => {
                           <Button onPress={() => setCadastrarNovaPessoa(true)}>
                             <ButtonText>Cadastrar nova pessoa</ButtonText>
                           </Button>
-                        </>
+                        </Box>
                       ) : (
-                        <>
-                          <Box>
-                            <Text>Nome:</Text>
-                            <Text>{values.nome}</Text>
+                        <Box gap="$5">
+                          <Box w="$full" alignItems="center">
+                            <Text size="2xl">Cliente selecionado:</Text>
                           </Box>
-                          <Box>
-                            <Text>Data de Nascimento:</Text>
-                            <Text>
-                              {values.data_de_nascimento.toLocaleDateString()}
-                            </Text>
-                          </Box>
-                          <Box>
-                            <Text>CPF:</Text>
-                            <Text>{values.cpf}</Text>
-                          </Box>
-                        </>
+                          <Card gap="$2">
+                            <Box>
+                              <Heading>{values.nome}</Heading>
+                            </Box>
+                            <Box gap="$2">
+                              <Text>Data de Nascimento:</Text>
+                              <Text>
+                                {values.data_de_nascimento.toLocaleDateString()}
+                              </Text>
+                            </Box>
+                            <Box gap="$2">
+                              <Text>CPF:</Text>
+                              <Text>{values.cpf}</Text>
+                            </Box>
+                          </Card>
+                        </Box>
                       )}
                     </Box>
                   </>
@@ -920,6 +944,48 @@ const Create: React.FC<CadastrarClientesScreenProps> = ({ navigation }) => {
                     </Button>
                   </>
                 )}
+
+                <FormControl
+                  isInvalid={false}
+                  size={'md'}
+                  isDisabled={false}
+                  isRequired={true}
+                >
+                  <FormControlLabel>
+                    <FormControlLabelText>Limite</FormControlLabelText>
+                  </FormControlLabel>
+                  <Input>
+                    <Box
+                      h="$full"
+                      justifyContent="center"
+                      px="$3"
+                      $light-bgColor="$backgroundLight300"
+                      $dark-bgColor="$backgroundDark700"
+                    >
+                      <Text size="xl">
+                        R<Text>$</Text>
+                      </Text>
+                    </Box>
+                    <InputField
+                      type="text"
+                      defaultValue="1000"
+                      placeholder=""
+                    />
+                  </Input>
+
+                  <FormControlHelper>
+                    <FormControlHelperText>
+                      Must be atleast 6 characters.
+                    </FormControlHelperText>
+                  </FormControlHelper>
+
+                  <FormControlError>
+                    <FormControlErrorIcon as={AlertCircleIcon} />
+                    <FormControlErrorText>
+                      Atleast 6 characters are required.
+                    </FormControlErrorText>
+                  </FormControlError>
+                </FormControl>
 
                 <Box>
                   <Button

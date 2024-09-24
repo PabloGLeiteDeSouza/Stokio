@@ -1,27 +1,9 @@
 import {
   FormControlLabel,
   FormControlLabelText,
-  FormControlHelper,
-  FormControlHelperText,
-  FormControlError,
-  FormControlErrorIcon,
-  FormControlErrorText,
   Input,
-  InputField,
-  Radio,
-  RadioGroup,
-  RadioIcon,
-  RadioIndicator,
-  RadioLabel,
   Button,
   ButtonText,
-  Checkbox,
-  CheckboxGroup,
-  CheckboxIndicator,
-  CheckboxIcon,
-  CheckboxLabel,
-  Textarea,
-  TextareaInput,
   Select,
   SelectTrigger,
   SelectInput,
@@ -32,27 +14,10 @@ import {
   SelectDragIndicatorWrapper,
   SelectDragIndicator,
   SelectItem,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  Switch,
-  Modal,
-  ModalBackdrop,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
   HStack,
   VStack,
   Heading,
   Text,
-  Center,
-  Icon,
-  CircleIcon,
-  CheckIcon,
-  AlertCircleIcon,
   ChevronDownIcon,
   ButtonIcon,
   SearchIcon,
@@ -74,16 +39,12 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { EditIcon } from '@gluestack-ui/themed';
 import MessagesWarning, { operations } from 'messages-warnings';
 import SearchEmpresas from '$components/SearchEmpresas';
-import { UpdateClienteDto } from '$classes/cliente/dto/update-cliente.dto';
 import { ListarClientesScreenProps } from '../interfaces';
 import { Pessoa } from '$classes/pessoa';
 import { Cliente } from '$classes/cliente';
 import { Telefone } from '$classes/telefone';
 import { Email } from '$classes/email';
 import { Endereco } from '$classes/endereco';
-import { UpdateEnderecoDto } from '$classes/endereco/dto/update-endereco.dto';
-import { UpdateTelefoneDto } from '$classes/telefone/dto/update-telefone.dto';
-import { UpdateEmailDto } from '$classes/email/dto/update-email.dto';
 import { ClientesObject } from '../types';
 
 const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
@@ -255,7 +216,7 @@ const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
     }
   };
 
-  const editarCliente = (cliente: UpdateClienteDto) => {
+  const editarCliente = (cliente: ClientesObject) => {
     navigation?.navigate('editar-clientes', { cliente: cliente });
   };
 
@@ -329,42 +290,44 @@ const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
           <Text>
             Para adicionar mais empresas adicione clicando no botao + abaixo:
           </Text>
-          <Button onPress={() => navigation?.navigate('cadastrar-empresas')}>
+          <Button onPress={() => navigation?.navigate('cadastrar-clientes')}>
             <ButtonIcon as={AddIcon} />
           </Button>
         </Box>
       </Box>
-      {todosClientes.map((value, i) => {
-        return (
-          <Box key={i} w="$full" alignItems="center" gap="$2.5" mt="$8">
-            <Card borderRadius="$lg" variant="elevated">
-              <HStack gap="$3">
-                <VStack gap="$2">
-                  <Heading>Nome Completo: {value.nome}</Heading>
-                  <Text>
-                    <Text fontWeight="$bold">Data de Nascimento:</Text>{' '}
-                    {formatStringDate(String(value.data_de_nascimento))}
-                  </Text>
-                  <Text>
-                    <Text fontWeight="$bold">CPF:</Text> {value.cpf}
-                  </Text>
-                </VStack>
-                <VStack gap="$2">
-                  <Button onPress={() => editarCliente(value)}>
-                    <ButtonIcon as={EditIcon} />
-                  </Button>
-                  <Button
-                    action="negative"
-                    onPress={() => deletarCliente(value)}
-                  >
-                    <ButtonIcon as={TrashIcon} />
-                  </Button>
-                </VStack>
-              </HStack>
-            </Card>
-          </Box>
-        );
-      })}
+      <Box w="$full" mb="$8">
+        {todosClientes.map((value, i) => {
+          return (
+            <Box key={i} w="$full" alignItems="center" gap="$2.5" mt="$8">
+              <Card size="lg" borderRadius="$lg" variant="elevated">
+                <HStack gap="$3">
+                  <VStack gap="$2">
+                    <Heading>Nome Completo: {value.nome}</Heading>
+                    <Text>
+                      <Text fontWeight="$bold">Data de Nascimento:</Text>{' '}
+                      {formatStringDate(String(value.data_de_nascimento))}
+                    </Text>
+                    <Text>
+                      <Text fontWeight="$bold">CPF:</Text> {value.cpf}
+                    </Text>
+                  </VStack>
+                  <VStack gap="$2">
+                    <Button onPress={() => editarCliente(value)}>
+                      <ButtonIcon as={EditIcon} />
+                    </Button>
+                    <Button
+                      action="negative"
+                      onPress={() => deletarCliente(value)}
+                    >
+                      <ButtonIcon as={TrashIcon} />
+                    </Button>
+                  </VStack>
+                </HStack>
+              </Card>
+            </Box>
+          );
+        })}
+      </Box>
     </ScrollView>
   ) : (
     <Box w="$full" h="$full" alignItems="center" justifyContent="center">

@@ -19,7 +19,7 @@ export class TipoDeProduto {
       );
       if (!result) {
         throw new Error(
-          errors.database_errors.ErrosTipoProduto.create.database,
+          errors.database_errors.ErrorsTipoProduto.create.database,
         );
       }
       return {
@@ -40,7 +40,7 @@ export class TipoDeProduto {
       );
       if (!result) {
         throw new Error(
-          errors.database_errors.ErrosTipoProduto.find.byId.database,
+          errors.database_errors.ErrorsTipoProduto.find.byId.database,
         );
       }
       return result as UpdateTipoDeProdutoDto;
@@ -58,7 +58,7 @@ export class TipoDeProduto {
       );
       if (!result) {
         throw new Error(
-          errors.database_errors.ErrosTipoProduto.find.byNome.database,
+          errors.database_errors.ErrorsTipoProduto.find.byName.database,
         );
       }
       return result as UpdateTipoDeProdutoDto;
@@ -73,7 +73,7 @@ export class TipoDeProduto {
       const result = await this.db.getAllAsync('SELECT * FROM tipo_de_produto');
       if (!result) {
         throw new Error(
-          errors.database_errors.ErrosTipoProduto.find.all.database,
+          errors.database_errors.ErrorsTipoProduto.find.all.database,
         );
       }
       return result as Array<UpdateTipoDeProdutoDto>;
@@ -92,7 +92,7 @@ export class TipoDeProduto {
       );
       if (!result) {
         throw new Error(
-          errors.database_errors.ErrosTipoProduto.update.database,
+          errors.database_errors.ErrorsTipoProduto.update.database,
         );
       }
       return { nome, id };
@@ -110,7 +110,7 @@ export class TipoDeProduto {
       );
       if (!result) {
         throw new Error(
-          errors.database_errors.ErrosTipoProduto.delete.database,
+          errors.database_errors.ErrorsTipoProduto.delete.database,
         );
       }
       return { sucess: true };

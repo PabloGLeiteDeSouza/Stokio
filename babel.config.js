@@ -27,6 +27,7 @@ module.exports = function (api) {
             $providers: './providers',
             $classes: './classes',
             $constants: './constants',
+            $utils: './utils',
             'messages-success': './constants/messages/MessagesSuccess',
             'messages-error': './constants/messages/errors',
             messageerrors: './constants/messages/errors',

@@ -54,6 +54,10 @@ import { View } from '@gluestack-ui/themed';
 import { Email } from '$classes/email';
 import { Telefone } from '$classes/telefone';
 import { useSQLiteContext } from 'expo-sqlite';
+import { UpdateRamoDto } from '$classes/ramo/dto/update-ramo.dto';
+import { Ramo } from '$classes/ramo';
+import { UpdatePessoaDto } from '$classes/pessoa/dto/update-pessoa.dto';
+import { Pessoa } from '$classes/pessoa';
 type CadastrarEmpresasScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   'cadastrar-empresas'
@@ -119,6 +123,13 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({ navigation }) => {
   const db = useSQLiteContext();
   const { theme } = useThemeApp();
   const [nomeEstado, setNomeEstado] = React.useState('');
+  const [ramos, setRamos] = React.useState<
+    Array<UpdateRamoDto> | Array<unknown>
+  >([]);
+  const [pessoas, setPessoas] = React.useState<
+    Array<UpdatePessoaDto> | Array<unknown>
+  >([]);
+  const [createPessoa, setCreatePessoa] = React.useState(false);
   const [isAllDisabled, setIsAllDisabled] = React.useState({
     tipo_empresa: false,
     nome_completo: false,
@@ -138,6 +149,23 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({ navigation }) => {
     emails: [false],
     telefones: [false],
   });
+
+  React.useEffect(() => {
+    async function StartScreen() {
+        try {
+          const rm = await new Ramo(db).findAll();
+          const ps = await new Pessoa(db).findAll();
+          setRamos(rm);
+          setPessoas(ps);
+        } catch (error) {
+          Alert.alert('Erro', (error as Error).message);
+        }
+    }
+    StartScreen();
+  }, [])
+
+
+
   return (
     <ScrollView>
       <Box mx="$10" my="$5" gap="$5">
@@ -155,7 +183,9 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({ navigation }) => {
             nome_fantasia: '',
             razao_social: '',
             cnpj: '',
+            id_ramo: '',
             ramo: '',
+            descricao_ramo: '',
             cep: '',
             logradouro: '',
             numero: '',
@@ -374,6 +404,17 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({ navigation }) => {
                     </FormControlErrorText>
                   </FormControlError>
                 </FormControl>
+
+                { pessoas.length > 0 && !createPessoa ? (
+                  <>
+                    gs-FOr
+                  </>
+                ) : (
+                  <>
+
+                  </>
+                )}
+
                 {values.tipo_empresa === 'pj' ? (
                   <>
                     <FormControl

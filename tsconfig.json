@@ -17,6 +17,7 @@
       "$functions/*": ["./functions/*"],
       "$classes/*": ["./classes/*"],
       "$constants/*": ["./constants/*"],
+      "$utils/*": ["./utils/*"],
     }
   }
 }

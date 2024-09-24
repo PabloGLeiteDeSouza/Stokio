@@ -63,7 +63,7 @@ export class Cliente {
     }
   }
 
-  async findByIdPessoa($id_pessoa: number){
+  async findByIdPessoa($id_pessoa: number) {
     try {
       const data = await this.db.getFirstAsync(
         'SELECT * FROM Cliente WHERE id_pessoa = $id_pessoa',
@@ -95,5 +95,18 @@ export class Cliente {
     }
   }
 
-  async disable() {}
+  async disable($id: number) {
+    try {
+      const data = await this.db.runAsync(
+        'UPDATE Cliente SET status = 0 WHERE id = $id',
+        { $id },
+      );
+      if (!data) {
+        throw new Error(errors.database_errors.ErrorsCliente.disable.database);
+      }
+      return { status: true };
+    } catch (error) {
+      throw error;
+    }
+  }
 }

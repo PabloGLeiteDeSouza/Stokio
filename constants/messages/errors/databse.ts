@@ -341,6 +341,9 @@ export const db_error_messages = {
         database: 'Não foi possível encontrar o cliente tente novamente!',
       },
     },
+    disable: {
+      database: 'Não foi possível desabilitar o cliente tente novamente!',
+    },
   },
   ErrorsVenda: {
     update: {
