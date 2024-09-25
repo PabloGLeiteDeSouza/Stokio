@@ -46,6 +46,7 @@ import { Telefone } from '$classes/telefone';
 import { Email } from '$classes/email';
 import { Endereco } from '$classes/endereco';
 import { ClientesObject } from '../types';
+import SearchClientes from '$components/SearchClientes';
 
 const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
   const isFocused = useIsFocused();
@@ -227,69 +228,14 @@ const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
   return todosClientes.length > 0 ? (
     <ScrollView>
       <Box w="$full" px="$5">
-        <FormControl
-          isInvalid={false}
-          size={'lg'}
-          isDisabled={false}
-          isRequired={true}
-          my="$3"
-        >
-          <FormControlLabel>
-            <FormControlLabelText>Buscar Cliente</FormControlLabelText>
-          </FormControlLabel>
-          <Input>
-            <SearchEmpresas
-              onChangeValue={(Text) => {
-                setValorBusca(Text);
-              }}
-              value={valorBusca}
-              tipo={tipoDeBusca}
-            />
-            <Select
-              isInvalid={false}
-              isDisabled={false}
-              onValueChange={(value) => setTipoDeBusca(value)}
-              initialLabel="Selecione uma opcao"
-              defaultValue="-"
-            >
-              <SelectTrigger size={'lg'} variant={'outline'}>
-                <SelectInput placeholder="Select option" />
-                <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
-              </SelectTrigger>
-              <SelectPortal>
-                <SelectBackdrop />
-                <SelectContent>
-                  <SelectDragIndicatorWrapper>
-                    <SelectDragIndicator />
-                  </SelectDragIndicatorWrapper>
-                  <SelectItem
-                    label="Nome Completo"
-                    value="nome_completo"
-                    isPressed={tipoDeBusca === 'nome_completo'}
-                  />
-                  <SelectItem
-                    label="CPF"
-                    value="cpf"
-                    isPressed={tipoDeBusca === 'cpf'}
-                  />
-                </SelectContent>
-              </SelectPortal>
-            </Select>
-            <Button
-              onPress={() => {
-                setIsStartingPage(true);
-                setTimeout(() => buscar_cliente(valorBusca, tipoDeBusca), 1);
-                setIsStartingPage(false);
-              }}
-            >
-              <ButtonIcon as={SearchIcon} />
-            </Button>
-          </Input>
-        </FormControl>
+        <SearchClientes
+          db={db}
+          onSearchValues={(vl) => {
+            setTodosClientes(vl);
+          }}
+          setIsStartingPage={setIsStartingPage}
+        />
         <Box gap="$3">
-          <Text>
-            Para adicionar mais clientes adicione clicando no botao + abaixo:
-          </Text>
           <Button onPress={() => navigation?.navigate('cadastrar-clientes')}>
             <ButtonIcon as={AddIcon} />
           </Button>
