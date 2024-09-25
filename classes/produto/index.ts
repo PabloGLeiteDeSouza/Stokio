@@ -285,7 +285,7 @@ export class Produto {
   async delete(id: number) {
     try {
       const result = await this.db.runAsync(
-        'DELETE * FROM produto WHERE id = $id',
+        'DELETE FROM produto WHERE id = $id',
         {
           $id: id,
         },

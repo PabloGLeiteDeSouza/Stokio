@@ -152,19 +152,17 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({ navigation }) => {
 
   React.useEffect(() => {
     async function StartScreen() {
-        try {
-          const rm = await new Ramo(db).findAll();
-          const ps = await new Pessoa(db).findAll();
-          setRamos(rm);
-          setPessoas(ps);
-        } catch (error) {
-          Alert.alert('Erro', (error as Error).message);
-        }
+      try {
+        const rm = await new Ramo(db).findAll();
+        const ps = await new Pessoa(db).findAll();
+        setRamos(rm);
+        setPessoas(ps);
+      } catch (error) {
+        Alert.alert('Erro', (error as Error).message);
+      }
     }
     StartScreen();
-  }, [])
-
-
+  }, []);
 
   return (
     <ScrollView>
@@ -405,15 +403,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({ navigation }) => {
                   </FormControlError>
                 </FormControl>
 
-                { pessoas.length > 0 && !createPessoa ? (
-                  <>
-                    gs-FOr
-                  </>
-                ) : (
-                  <>
-
-                  </>
-                )}
+                {pessoas.length > 0 && !createPessoa ? <>gs-FOr</> : <></>}
 
                 {values.tipo_empresa === 'pj' ? (
                   <>

@@ -144,7 +144,7 @@ export class UnidadeDeArmazenamento {
   async delete($id: number) {
     try {
       const result = await this.db.runAsync(
-        'DELETE * FROM unidade_de_armazenamento WHERE id = $id',
+        'DELETE FROM unidade_de_armazenamento WHERE id = $id',
         { $id },
       );
       if (!result) {

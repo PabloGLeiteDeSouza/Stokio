@@ -84,7 +84,7 @@ export class Telefone {
     try {
       const { telefone, id_pessoa, id } = Telefone;
       const result = await this.db.runAsync(
-        'UPDATE telefone SET telefone = $telefone, id_empresa = $id_pessoa WHERE id = $id',
+        'UPDATE telefone SET telefone = $telefone, id_pessoa = $id_pessoa WHERE id = $id',
         { $telefone: telefone, $id_pessoa: id_pessoa, $id: id },
       );
       if (!result) {

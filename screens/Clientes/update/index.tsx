@@ -106,7 +106,7 @@ const Update: React.FC<AtualizarClientesScreenProps> = ({
       await new Pessoa(db).update({
         id: values.id_pessoa,
         cpf: values.cpf,
-        data_de_nascimento: values.data_de_nascimento,
+        data_de_nascimento: new Date(values.data_de_nascimento),
         nome: values.nome,
       });
       await new Endereco(db).update({

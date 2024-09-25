@@ -195,7 +195,7 @@ export class Endereco {
   async delete($id: number) {
     try {
       const result = await this.db.runAsync(
-        'DELETE * FROM endereco WHERE id = $id',
+        'DELETE FROM endereco WHERE id = $id',
         { $id },
       );
       if (!result) {

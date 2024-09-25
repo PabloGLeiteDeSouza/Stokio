@@ -1,24 +1,7 @@
-import {
-  Radio,
-  RadioGroup,
-  RadioIcon,
-  RadioIndicator,
-  RadioLabel,
-  CheckboxGroup,
-  CheckboxLabel,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  Switch,
-  HStack,
-  Center,
-  CircleIcon,
-} from '@gluestack-ui/themed';
-
 import React from 'react';
 import Estados from '$databases/Estados.json';
 import {
+  HStack,
   FormControl,
   FormControlLabel,
   FormControlLabelText,
@@ -136,14 +119,14 @@ const Create: React.FC<CadastrarClientesScreenProps> = ({ navigation }) => {
     uf: string;
     telefones: string[];
     emails: string[];
-    saldo: string;
+    limite: string;
     status: boolean;
   }) => {
     try {
       const { id_pessoa, ...vls } = values;
       if (id_pessoa !== '') {
         const cliente = {
-          limite: Number(vls.saldo),
+          limite: Number(vls.limite),
           status: vls.status,
           id_pessoa: Number(id_pessoa),
         };
@@ -160,7 +143,7 @@ const Create: React.FC<CadastrarClientesScreenProps> = ({ navigation }) => {
           numero,
           uf,
           emails,
-          saldo,
+          limite,
           status,
           telefones,
           ...people
@@ -191,7 +174,7 @@ const Create: React.FC<CadastrarClientesScreenProps> = ({ navigation }) => {
         });
         await new Cliente(db).create({
           id_pessoa: pessoa.id,
-          limite: Number(saldo),
+          limite: Number(limite),
           status,
         });
         Alert.alert('Sucesso', 'Cliente criado com sucesso!');
@@ -229,7 +212,7 @@ const Create: React.FC<CadastrarClientesScreenProps> = ({ navigation }) => {
             uf: '',
             telefones: [''],
             emails: [''],
-            saldo: '',
+            limite: '',
             status: true,
           }}
           onSubmit={onSubmit}
@@ -970,20 +953,20 @@ const Create: React.FC<CadastrarClientesScreenProps> = ({ navigation }) => {
                       type="text"
                       defaultValue="1000"
                       placeholder=""
+                      value={values.limite}
+                      onChangeText={handleChange('limite')}
                     />
                   </Input>
 
                   <FormControlHelper>
                     <FormControlHelperText>
-                      Must be atleast 6 characters.
+                      Informe um limite para o cliente.
                     </FormControlHelperText>
                   </FormControlHelper>
 
                   <FormControlError>
                     <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
+                    <FormControlErrorText>{errors.limite}</FormControlErrorText>
                   </FormControlError>
                 </FormControl>
 

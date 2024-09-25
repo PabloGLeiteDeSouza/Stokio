@@ -205,7 +205,7 @@ const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
           {
             text: 'Cancelar',
             onPress: () => {
-              Alert.alert('Aviso', operations.delete_messages.empresa);
+              Alert.alert('Aviso', operations.delete_messages.cliente);
               return;
             },
           },
@@ -288,43 +288,43 @@ const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
         </FormControl>
         <Box gap="$3">
           <Text>
-            Para adicionar mais empresas adicione clicando no botao + abaixo:
+            Para adicionar mais clientes adicione clicando no botao + abaixo:
           </Text>
           <Button onPress={() => navigation?.navigate('cadastrar-clientes')}>
             <ButtonIcon as={AddIcon} />
           </Button>
         </Box>
       </Box>
-      <Box w="$full" mb="$8">
+      <Box w="$full" alignItems="center" my="$8" gap="$8">
         {todosClientes.map((value, i) => {
           return (
-            <Box key={i} w="$full" alignItems="center" gap="$2.5" mt="$8">
-              <Card size="lg" borderRadius="$lg" variant="elevated">
-                <HStack gap="$3">
-                  <VStack gap="$2">
-                    <Heading>Nome Completo: {value.nome}</Heading>
-                    <Text>
-                      <Text fontWeight="$bold">Data de Nascimento:</Text>{' '}
-                      {formatStringDate(String(value.data_de_nascimento))}
-                    </Text>
-                    <Text>
-                      <Text fontWeight="$bold">CPF:</Text> {value.cpf}
-                    </Text>
-                  </VStack>
-                  <VStack gap="$2">
-                    <Button onPress={() => editarCliente(value)}>
-                      <ButtonIcon as={EditIcon} />
-                    </Button>
-                    <Button
-                      action="negative"
-                      onPress={() => deletarCliente(value)}
-                    >
-                      <ButtonIcon as={TrashIcon} />
-                    </Button>
-                  </VStack>
-                </HStack>
-              </Card>
-            </Box>
+            <Card key={i} size="md" borderRadius="$lg" variant="elevated">
+              <HStack gap="$3">
+                <VStack gap="$2">
+                  <Heading>{value.nome}</Heading>
+                  <Text>
+                    <Text fontWeight="$bold">Data de Nascimento:</Text>{' '}
+                    {formatStringDate(
+                      String(new Date(value.data_de_nascimento)),
+                    )}
+                  </Text>
+                  <Text>
+                    <Text fontWeight="$bold">CPF:</Text> {value.cpf}
+                  </Text>
+                </VStack>
+                <VStack gap="$2">
+                  <Button onPress={() => editarCliente(value)}>
+                    <ButtonIcon as={EditIcon} />
+                  </Button>
+                  <Button
+                    action="negative"
+                    onPress={() => deletarCliente(value)}
+                  >
+                    <ButtonIcon as={TrashIcon} />
+                  </Button>
+                </VStack>
+              </HStack>
+            </Card>
           );
         })}
       </Box>

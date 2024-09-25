@@ -105,7 +105,7 @@ export class TipoDeProduto {
   async delete(id: number) {
     try {
       const result = await this.db.runAsync(
-        'DELETE * tipo_de_produto FROM id = $id',
+        'DELETE tipo_de_produto FROM id = $id',
         { $id: id },
       );
       if (!result) {
