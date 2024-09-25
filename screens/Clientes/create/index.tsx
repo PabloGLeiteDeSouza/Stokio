@@ -953,6 +953,7 @@ const Create: React.FC<CadastrarClientesScreenProps> = ({ navigation }) => {
                       type="text"
                       defaultValue="1000"
                       placeholder=""
+                      keyboardType="number-pad"
                       value={values.limite}
                       onChangeText={handleChange('limite')}
                     />

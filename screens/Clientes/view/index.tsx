@@ -187,10 +187,10 @@ const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
                 cliente.emails.map(async (email) => {
                   await new Email(db).delete(email.id);
                 });
-                const empresa = await new Empresa(db).findAllByIdPessoa(
-                  cliente.id_pessoa,
-                );
-                if (empresa.length < 1) {
+                const existsEmpresa = await new Empresa(
+                  db,
+                ).verifyEmpresaExistsIdPessoa(cliente.id_pessoa);
+                if (!existsEmpresa) {
                   await new Pessoa(db).delete(cliente.id_pessoa);
                 }
                 Alert.alert('Sucesso', 'Registro apagado com sucesso!');

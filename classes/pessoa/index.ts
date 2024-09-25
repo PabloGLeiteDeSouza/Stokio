@@ -36,7 +36,7 @@ export class Pessoa {
         {
           $id: pessoa.id,
           $nome: pessoa.nome,
-          $data_de_nascimento: pessoa.data_de_nascimento.toLocaleDateString(),
+          $data_de_nascimento: String(pessoa.data_de_nascimento),
           $cpf: pessoa.cpf,
         },
       );

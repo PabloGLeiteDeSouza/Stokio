@@ -258,4 +258,15 @@ export class Empresa {
       throw error;
     }
   }
+
+  async verifyEmpresaExistsIdPessoa($id_pessoa: number){
+    const result = await this.db.getAllAsync(
+      'SELECT * FROM empresa WHERE id_pessoa = $id_pessoa',
+      { $id_pessoa },
+    );
+    if (result.length > 0) {
+      return true;
+    }
+    return false;
+  }
 }

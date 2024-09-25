@@ -140,7 +140,8 @@ const SearchClientes: React.FC<SearchClientesProps> = ({
               setIsStartingPage(true);
               setTimeout(() => onSearch(), 1);
               setIsStartingPage(false);
-            }}>
+            }}
+          >
             <ButtonIcon as={SearchIcon} />
           </Button>
         </Input>

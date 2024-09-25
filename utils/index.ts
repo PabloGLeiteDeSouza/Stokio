@@ -33,6 +33,7 @@ export function verificarArray(array: Array<unknown>) {
 }
 
 export const formatDateString = (data: Date) => {
+  const date = new Date(data)
   const dia = (data.getDate() + 1).toString().padStart(2, '0');
   const mes = (data.getMonth() + 1).toString().padStart(2, '0');
   const ano = data.getFullYear().toString().padStart(4, '0');

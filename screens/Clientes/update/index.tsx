@@ -71,7 +71,6 @@ import { AtualizarClientesScreenProps } from '../interfaces';
 import { Formik } from 'formik';
 import { ClientesObject } from '../types';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
-import { formatDateString } from 'utils';
 import { mask } from 'react-native-mask-text';
 import { Alert, GestureResponderEvent } from 'react-native';
 import getTelefoneError from '../../../utils/GetErros/telefone';
@@ -103,6 +102,7 @@ const Update: React.FC<AtualizarClientesScreenProps> = ({
         limite: values.limite,
         status: values.status,
       });
+      console.log(values.data_de_nascimento);
       await new Pessoa(db).update({
         id: values.id_pessoa,
         cpf: values.cpf,
@@ -275,15 +275,15 @@ const Update: React.FC<AtualizarClientesScreenProps> = ({
                         editable={false}
                         readOnly={true}
                         type="text"
-                        value={formatDateString(
-                          new Date(values.data_de_nascimento),
-                        )}
+                        value={new Date(
+                          values.data_de_nascimento,
+                        ).toLocaleDateString('pt-br')}
                         placeholder="data"
                       />
                       <Button
                         onPress={() => {
                           DateTimePickerAndroid.open({
-                            value: new Date(),
+                            value: new Date(values.data_de_nascimento),
                             mode: 'date',
                             onChange: (event, date) => {
                               if (date) {
