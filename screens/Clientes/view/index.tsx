@@ -1,26 +1,11 @@
 import {
-  FormControlLabel,
-  FormControlLabelText,
-  Input,
   Button,
   ButtonText,
-  Select,
-  SelectTrigger,
-  SelectInput,
-  SelectIcon,
-  SelectPortal,
-  SelectBackdrop,
-  SelectContent,
-  SelectDragIndicatorWrapper,
-  SelectDragIndicator,
-  SelectItem,
   HStack,
   VStack,
   Heading,
   Text,
-  ChevronDownIcon,
   ButtonIcon,
-  SearchIcon,
   AddIcon,
   TrashIcon,
   Card,
@@ -29,7 +14,7 @@ import {
 import { Empresa } from '$classes/empresa';
 import LoadingScreen from '$components/LoadingScreen';
 import { useThemeApp } from '$providers/theme';
-import { Box, FormControl, ScrollView } from '@gluestack-ui/themed';
+import { Box, ScrollView } from '@gluestack-ui/themed';
 import { useIsFocused } from '@react-navigation/native';
 import React from 'react';
 import { Alert } from 'react-native';
@@ -38,7 +23,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSQLiteContext } from 'expo-sqlite';
 import { EditIcon } from '@gluestack-ui/themed';
 import MessagesWarning, { operations } from 'messages-warnings';
-import SearchEmpresas from '$components/SearchEmpresas';
 import { ListarClientesScreenProps } from '../interfaces';
 import { Pessoa } from '$classes/pessoa';
 import { Cliente } from '$classes/cliente';
@@ -51,16 +35,15 @@ import SearchClientes from '$components/SearchClientes';
 const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
   const isFocused = useIsFocused();
   const db = useSQLiteContext();
-  const [valorBusca, setValorBusca] = React.useState('');
   const [todosClientes, setTodosClientes] = React.useState<
     Array<ClientesObject> | Array<never>
   >([]);
   const { theme } = useThemeApp();
-  const [tipoDeBusca, setTipoDeBusca] = React.useState('');
   const [isStartingPage, setIsStartingPage] = React.useState(true);
+
   async function Start() {
     try {
-      const cli = await new Cliente(db).findAll();
+      const cli = await new Cliente(db).findAllEnable();
       const clientes = await Promise.all(
         cli.map(async (cliente) => {
           try {
@@ -92,65 +75,6 @@ const View: React.FC<ListarClientesScreenProps> = ({ navigation }) => {
     } catch (error) {
       setIsStartingPage(false);
       setTodosClientes([]);
-    }
-  }
-  async function buscar_cliente(valor: string, tipo: string) {
-    try {
-      if (tipo === 'nome_completo') {
-        const pss = await new Pessoa(db).findAllByNome(valor);
-        setTodosClientes(
-          await Promise.all(
-            pss.map(async (ps) => {
-              try {
-                const cliente = await new Cliente(db).findByIdPessoa(ps.id);
-                const telefones = await new Telefone(db).findByIdPessoa(ps.id);
-                const emails = await new Email(db).findAllByIdPessoa(ps.id);
-                const endereco = await new Endereco(db).findUniqueByIdPessoa(
-                  ps.id,
-                );
-                return {
-                  ...ps,
-                  ...cliente,
-                  endereco,
-                  telefones,
-                  emails,
-                };
-              } catch (error) {
-                throw error;
-              }
-            }),
-          ),
-        );
-      } else if (tipo === 'cpf') {
-        const pss = [await new Pessoa(db).findUniqueByCPF(valor)];
-
-        setTodosClientes(
-          await Promise.all(
-            pss.map(async (ps) => {
-              try {
-                const cliente = await new Cliente(db).findByIdPessoa(ps.id);
-                const telefones = await new Telefone(db).findByIdPessoa(ps.id);
-                const emails = await new Email(db).findAllByIdPessoa(ps.id);
-                const endereco = await new Endereco(db).findUniqueByIdPessoa(
-                  ps.id,
-                );
-                return {
-                  ...ps,
-                  ...cliente,
-                  endereco,
-                  telefones,
-                  emails,
-                };
-              } catch (error) {
-                throw error;
-              }
-            }),
-          ),
-        );
-      }
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Erro', (error as Error).message);
     }
   }
 

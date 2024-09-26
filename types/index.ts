@@ -62,15 +62,13 @@ export type RootStackParamList = {
 };
 
 export type UpdateEmpresaObject = {
+  ramo: UpdateRamoDto;
   id: number;
-  id_endereco: number;
-  nome_completo?: string;
-  data_de_nascimento?: string;
-  cpf?: string;
+  id_pessoa: number;
+  id_ramo: number;
   nome_fantasia?: string;
   razao_social?: string;
   cnpj?: string;
-  id_ramo: number;
 };
 
 export type ScreensScanCode = 'cadastrar-produtos' | 'listar-produtos';

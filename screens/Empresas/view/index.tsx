@@ -92,35 +92,27 @@ interface ListarEmpresasScreenProps {
 }
 const View: React.FC<ListarEmpresasScreenProps> = ({ navigation }) => {
   const isFocused = useIsFocused();
-  const db = useSQLiteContext();
   const [valorBusca, setValorBusca] = React.useState('');
-  const [haveItens, setHaveItens] = React.useState({
-    company: false,
-    ramo: false,
-  });
   const [todasEmpresas, setTodasEmpresas] = React.useState<
     Array<UpdateEmpresaObject>
   >([]);
   const { theme } = useThemeApp();
+  const db = useSQLiteContext();
   const [tipoDeBusca, setTipoDeBusca] = React.useState('');
   const [isStartingPage, setIsStartingPage] = React.useState(true);
   async function Start() {
     try {
-      const ramo = await new Ramo(db).findAll();
-      if (ramo.length === 0) {
-        throw new Error('Nao ha ramos cadastrados!');
-      }
-      const empresas = await new Empresa(db).findAll();
-      setTodasEmpresas(empresas as unknown as Array<UpdateEmpresaObject>);
-      setHaveItens({ company: true, ramo: true });
+      const emp = await new Empresa(db).findAll();
+      const empresas = await Promise.all(
+        emp.map(async (e) => {
+          const ramo = await new Ramo(db).findUniqueById(e.id_ramo);
+          return { ...e, ramo };
+      }),
+    );
+      setTodasEmpresas(empresas);
       setIsStartingPage(false);
       return;
     } catch (error) {
-      if ((error as Error).message.includes('ramo')) {
-        setHaveItens({ company: false, ramo: false });
-      } else {
-        setHaveItens({ company: false, ramo: true });
-      }
       setIsStartingPage(false);
       throw error;
     }
@@ -229,106 +221,130 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation }) => {
     return <LoadingScreen />;
   }
 
-  return haveItens.ramo ? (
-    haveItens.company ? (
-      <ScrollView>
-        <Box w="$full" px="$5">
-          <FormControl
-            isInvalid={false}
-            size={'lg'}
-            isDisabled={false}
-            isRequired={true}
-            my="$3"
-          >
-            <FormControlLabel>
-              <FormControlLabelText>Buscar Empresa</FormControlLabelText>
-            </FormControlLabel>
-            <Input>
-              <SearchEmpresas
-                onChangeValue={(Text) => {
-                  setValorBusca(Text);
-                }}
-                value={valorBusca}
-                tipo={tipoDeBusca}
-              />
-              <Select
-                isInvalid={false}
-                isDisabled={false}
-                onValueChange={(value) => setTipoDeBusca(value)}
-                initialLabel="Selecione uma opcao"
-                defaultValue="-"
-              >
-                <SelectTrigger size={'lg'} variant={'outline'}>
-                  <SelectInput placeholder="Select option" />
-                  <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
-                </SelectTrigger>
-                <SelectPortal>
-                  <SelectBackdrop />
-                  <SelectContent>
-                    <SelectDragIndicatorWrapper>
-                      <SelectDragIndicator />
-                    </SelectDragIndicatorWrapper>
-                    <SelectItem
-                      label="Nome Completo"
-                      value="nome_completo"
-                      isPressed={tipoDeBusca === 'nome_completo'}
-                    />
-                    <SelectItem
-                      label="CPF"
-                      value="cpf"
-                      isPressed={tipoDeBusca === 'cpf'}
-                    />
-                    <SelectItem
-                      label="Nome Fantasia"
-                      value="nome_fantasia"
-                      isPressed={tipoDeBusca === 'nome_fantasia'}
-                    />
-                    <SelectItem
-                      label="Razao Social"
-                      value="razao_social"
-                      isPressed={tipoDeBusca === 'razao_social'}
-                    />
-                    <SelectItem
-                      label="CNPJ"
-                      value="cnpj"
-                      isPressed={tipoDeBusca === 'cnpj'}
-                    />
-                  </SelectContent>
-                </SelectPortal>
-              </Select>
-              <Button
-                onPress={() => {
-                  setIsStartingPage(true);
-                  setTimeout(() => busca_empresa(valorBusca, tipoDeBusca), 1);
-                  setIsStartingPage(false);
-                }}
-              >
-                <ButtonIcon as={SearchIcon} />
-              </Button>
-            </Input>
-          </FormControl>
-          <Box gap="$3">
-            <Text>
-              Para adicionar mais empresas adicione clicando no botao + abaixo:
-            </Text>
-            <Button onPress={() => navigation?.navigate('cadastrar-empresas')}>
-              <ButtonIcon as={AddIcon} />
+  return todasEmpresas.length > 0 ? (
+    <ScrollView>
+      <Box w="$full" px="$5">
+        <FormControl
+          isInvalid={false}
+          size={'lg'}
+          isDisabled={false}
+          isRequired={true}
+          my="$3"
+        >
+          <FormControlLabel>
+            <FormControlLabelText>Buscar Empresa</FormControlLabelText>
+          </FormControlLabel>
+          <Input>
+            <SearchEmpresas
+              onChangeValue={(Text) => {
+                setValorBusca(Text);
+              }}
+              value={valorBusca}
+              tipo={tipoDeBusca}
+            />
+            <Select
+              isInvalid={false}
+              isDisabled={false}
+              onValueChange={(value) => setTipoDeBusca(value)}
+              initialLabel="Selecione uma opcao"
+              defaultValue="-"
+            >
+              <SelectTrigger size={'lg'} variant={'outline'}>
+                <SelectInput placeholder="Select option" />
+                <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
+              </SelectTrigger>
+              <SelectPortal>
+                <SelectBackdrop />
+                <SelectContent>
+                  <SelectDragIndicatorWrapper>
+                    <SelectDragIndicator />
+                  </SelectDragIndicatorWrapper>
+                  <SelectItem
+                    label="Nome Completo"
+                    value="nome_completo"
+                    isPressed={tipoDeBusca === 'nome_completo'}
+                  />
+                  <SelectItem
+                    label="CPF"
+                    value="cpf"
+                    isPressed={tipoDeBusca === 'cpf'}
+                  />
+                  <SelectItem
+                    label="Nome Fantasia"
+                    value="nome_fantasia"
+                    isPressed={tipoDeBusca === 'nome_fantasia'}
+                  />
+                  <SelectItem
+                    label="Razao Social"
+                    value="razao_social"
+                    isPressed={tipoDeBusca === 'razao_social'}
+                  />
+                  <SelectItem
+                    label="CNPJ"
+                    value="cnpj"
+                    isPressed={tipoDeBusca === 'cnpj'}
+                  />
+                </SelectContent>
+              </SelectPortal>
+            </Select>
+            <Button
+              onPress={() => {
+                setIsStartingPage(true);
+                setTimeout(() => busca_empresa(valorBusca, tipoDeBusca), 1);
+                setIsStartingPage(false);
+              }}
+            >
+              <ButtonIcon as={SearchIcon} />
             </Button>
-          </Box>
+          </Input>
+        </FormControl>
+        <Box gap="$3">
+          <Text>
+            Para adicionar mais empresas adicione clicando no botao + abaixo:
+          </Text>
+          <Button onPress={() => navigation?.navigate('cadastrar-empresas')}>
+            <ButtonIcon as={AddIcon} />
+          </Button>
         </Box>
-        {todasEmpresas.map((value, i) => {
-          return (
-            <Box key={i} w="$full" alignItems="center" gap="$2.5" my="$2.5">
-              {value.cnpj ? (
-                <Card borderRadius="$lg" gap="$3">
+      </Box>
+      {todasEmpresas.map((value, i) => {
+        return (
+          <Box key={i} w="$full" alignItems="center" gap="$2.5" my="$2.5">
+            {value.cnpj ? (
+              <Card borderRadius="$lg" gap="$3">
+                <VStack gap="$2">
+                  <Heading>Nome fantasia: {value.nome_fantasia}</Heading>
+                  <Text>
+                    <Text fontWeight="$bold">Razão Social:</Text>{' '}
+                    {value.razao_social}
+                  </Text>
+                  <Text>
+                    <Text fontWeight="$bold">CNPJ:</Text> {value.cnpj}
+                  </Text>
+                </VStack>
+                <VStack gap="$2">
+                  <Button onPress={() => editarEmpresa(value)}>
+                    <ButtonIcon as={EditIcon} />
+                  </Button>
+                  <Button
+                    action="negative"
+                    onPress={() => deletarEmpresa(value)}
+                  >
+                    <ButtonIcon as={TrashIcon} />
+                  </Button>
+                </VStack>
+              </Card>
+            ) : (
+              <Card borderRadius="$lg" variant="elevated">
+                <HStack gap="$3">
                   <VStack gap="$2">
-                    <Heading>Nome fantasia: {value.nome_fantasia}</Heading>
+                    <Heading>Nome Completo: {value.nome_completo}</Heading>
                     <Text>
-                      <Text fontWeight="$bold">Razão Social:</Text>{' '}
-                      {value.razao_social}
+                      <Text fontWeight="$bold">Data de Nascimento:</Text>{' '}
+                      {formatStringDate(String(value.data_de_nascimento))}
                     </Text>
                     <Text>
-                      <Text fontWeight="$bold">CNPJ:</Text> {value.cnpj}
+                      <Text fontWeight="$bold">CPF:</Text> {value.cpf}
                     </Text>
                   </VStack>
                   <VStack gap="$2">
@@ -342,74 +358,31 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation }) => {
                       <ButtonIcon as={TrashIcon} />
                     </Button>
                   </VStack>
-                </Card>
-              ) : (
-                <Card borderRadius="$lg" variant="elevated">
-                  <HStack gap="$3">
-                    <VStack gap="$2">
-                      <Heading>Nome Completo: {value.nome_completo}</Heading>
-                      <Text>
-                        <Text fontWeight="$bold">Data de Nascimento:</Text>{' '}
-                        {formatStringDate(String(value.data_de_nascimento))}
-                      </Text>
-                      <Text>
-                        <Text fontWeight="$bold">CPF:</Text> {value.cpf}
-                      </Text>
-                    </VStack>
-                    <VStack gap="$2">
-                      <Button onPress={() => editarEmpresa(value)}>
-                        <ButtonIcon as={EditIcon} />
-                      </Button>
-                      <Button
-                        action="negative"
-                        onPress={() => deletarEmpresa(value)}
-                      >
-                        <ButtonIcon as={TrashIcon} />
-                      </Button>
-                    </VStack>
-                  </HStack>
-                </Card>
-              )}
-            </Box>
-          );
-        })}
-      </ScrollView>
-    ) : (
-      <Box w="$full" h="$full" alignItems="center" justifyContent="center">
-        <Box gap={10}>
-          <Text size="xl" textAlign="center">
-            Não há Empresas cadastradas
-          </Text>
-          <Button
-            $active-bgColor={theme === 'dark' ? '$purple700' : '$purple500'}
-            $dark-backgroundColor="$purple500"
-            $light-backgroundColor="$purple700"
-            gap={10}
-            onPress={() => navigation?.navigate('cadastrar-empresas')}
-          >
-            <ButtonText>Cadastrar Empresas</ButtonText>
-            <ButtonIcon
-              color="$white"
-              as={() => <Ionicons name="add-circle" size={15} color="white" />}
-            />
-          </Button>
-        </Box>
-      </Box>
-    )
+                </HStack>
+              </Card>
+            )}
+          </Box>
+        );
+      })}
+    </ScrollView>
   ) : (
     <Box w="$full" h="$full" alignItems="center" justifyContent="center">
       <Box gap={10}>
         <Text size="xl" textAlign="center">
-          Não há Ramos cadastrados
+          Não há Empresas cadastradas
         </Text>
         <Button
           $active-bgColor={theme === 'dark' ? '$purple700' : '$purple500'}
           $dark-backgroundColor="$purple500"
           $light-backgroundColor="$purple700"
           gap={10}
-          onPress={() => navigation?.navigate('screens-ramos')}
+          onPress={() => navigation?.navigate('cadastrar-empresas')}
         >
-          <ButtonText>Cadastrar Ramos</ButtonText>
+          <ButtonText>Cadastrar Empresas</ButtonText>
+          <ButtonIcon
+            color="$white"
+            as={() => <Ionicons name="add-circle" size={15} color="white" />}
+          />
         </Button>
       </Box>
     </Box>

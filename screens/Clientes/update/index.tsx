@@ -791,7 +791,7 @@ const Update: React.FC<AtualizarClientesScreenProps> = ({
                       </Box>
                       <InputField
                         type="text"
-                        value={values.limite.toString()}
+                        value={Number(values.limite).toString()}
                         keyboardType="number-pad"
                         onChangeText={(txt) => {
                           setFieldValue('limite', Number(txt));
@@ -801,14 +801,14 @@ const Update: React.FC<AtualizarClientesScreenProps> = ({
 
                     <FormControlHelper>
                       <FormControlHelperText>
-                        Must be atleast 6 characters.
+                        Informe o valor do limite desejado.
                       </FormControlHelperText>
                     </FormControlHelper>
 
                     <FormControlError>
                       <FormControlErrorIcon as={AlertCircleIcon} />
                       <FormControlErrorText>
-                        Atleast 6 characters are required.
+                        {errors.limite}
                       </FormControlErrorText>
                     </FormControlError>
                   </FormControl>

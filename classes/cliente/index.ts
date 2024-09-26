@@ -51,9 +51,38 @@ export class Cliente {
 
   async findUnique() {}
 
-  async findAll() {
+  async findAll($status?: boolean) {
     try {
-      const data = await this.db.getAllAsync('SELECT * FROM Cliente');
+      if (typeof $status != 'undefined') {
+        const data = await this.db.getAllAsync(
+          'SELECT * FROM Cliente WHERE status = $status',
+          { $status },
+        );
+        if (!data) {
+          throw new Error(
+            errors.database_errors.ErrorsCliente.find.all.database,
+          );
+        }
+        return data as Array<UpdateClienteDto>;
+      } else {
+        const data = await this.db.getAllAsync('SELECT * FROM Cliente');
+        if (!data) {
+          throw new Error(
+            errors.database_errors.ErrorsCliente.find.all.database,
+          );
+        }
+        return data as Array<UpdateClienteDto>;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findAllEnable() {
+    try {
+      const data = await this.db.getAllAsync(
+        'SELECT * FROM Cliente WHERE status = 1',
+      );
       if (!data) {
         throw new Error(errors.database_errors.ErrorsCliente.find.all.database);
       }
@@ -63,18 +92,45 @@ export class Cliente {
     }
   }
 
-  async findByIdPessoa($id_pessoa: number) {
+  async findAllDisable() {
     try {
-      const data = await this.db.getFirstAsync(
-        'SELECT * FROM Cliente WHERE id_pessoa = $id_pessoa',
-        { $id_pessoa },
+      const data = await this.db.getAllAsync(
+        'SELECT * FROM Cliente WHERE status = 0',
       );
       if (!data) {
-        throw new Error(
-          errors.database_errors.ErrorsCliente.find.byIdPessoa.database,
-        );
+        throw new Error(errors.database_errors.ErrorsCliente.find.all.database);
       }
-      return data as UpdateClienteDto;
+      return data as Array<UpdateClienteDto>;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findByIdPessoa($id_pessoa: number, status?: boolean) {
+    try {
+      if (typeof status !== 'undefined') {
+        const data = await this.db.getFirstAsync(
+          'SELECT * FROM Cliente WHERE id_pessoa = $id_pessoa AND status = $status',
+          { $id_pessoa, $status: String(status) },
+        );
+        if (!data) {
+          throw new Error(
+            errors.database_errors.ErrorsCliente.find.byIdPessoa.database,
+          );
+        }
+        return data as UpdateClienteDto;
+      } else {
+        const data = await this.db.getFirstAsync(
+          'SELECT * FROM Cliente WHERE id_pessoa = $id_pessoa',
+          { $id_pessoa },
+        );
+        if (!data) {
+          throw new Error(
+            errors.database_errors.ErrorsCliente.find.byIdPessoa.database,
+          );
+        }
+        return data as UpdateClienteDto;
+      }
     } catch (error) {
       throw error;
     }
