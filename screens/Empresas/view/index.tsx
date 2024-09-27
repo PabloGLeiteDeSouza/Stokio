@@ -7,21 +7,8 @@ import {
   FormControlErrorIcon,
   FormControlErrorText,
   Input,
-  InputField,
-  Radio,
-  RadioGroup,
-  RadioIcon,
-  RadioIndicator,
-  RadioLabel,
   Button,
   ButtonText,
-  Checkbox,
-  CheckboxGroup,
-  CheckboxIndicator,
-  CheckboxIcon,
-  CheckboxLabel,
-  Textarea,
-  TextareaInput,
   Select,
   SelectTrigger,
   SelectInput,
@@ -32,27 +19,9 @@ import {
   SelectDragIndicatorWrapper,
   SelectDragIndicator,
   SelectItem,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  Switch,
-  Modal,
-  ModalBackdrop,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  HStack,
   VStack,
   Heading,
   Text,
-  Center,
-  Icon,
-  CircleIcon,
-  CheckIcon,
-  AlertCircleIcon,
   ChevronDownIcon,
   ButtonIcon,
   SearchIcon,
@@ -70,7 +39,6 @@ import { RouteProp, useIsFocused } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { Alert } from 'react-native';
-import { formatStringDate } from '../../../utils';
 import { Ionicons } from '@expo/vector-icons';
 import { useSQLiteContext } from 'expo-sqlite';
 import { EditIcon } from '@gluestack-ui/themed';
@@ -107,8 +75,8 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation }) => {
         emp.map(async (e) => {
           const ramo = await new Ramo(db).findUniqueById(e.id_ramo);
           return { ...e, ramo };
-      }),
-    );
+        }),
+      );
       setTodasEmpresas(empresas);
       setIsStartingPage(false);
       return;
@@ -120,20 +88,6 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation }) => {
   async function busca_empresa(valor: string, tipo: string) {
     try {
       switch (tipo) {
-        case 'nome_completo':
-          setTodasEmpresas(
-            (await new Empresa(db).findAllByNomeCompleto(
-              valor,
-            )) as unknown as Array<UpdateEmpresaObject>,
-          );
-          break;
-        case 'cpf':
-          setTodasEmpresas([
-            (await new Empresa(db).findUniqueByCpf(
-              valor,
-            )) as unknown as UpdateEmpresaObject,
-          ]);
-          break;
         case 'nome_fantasia':
           setTodasEmpresas(
             (await new Empresa(db).findAllByNomeFantasia(
@@ -184,8 +138,7 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation }) => {
   const deletarEmpresa = (empresa: UpdateEmpresaObject) => {
     Alert.alert(
       'Aviso',
-      MessagesWarning.delete_messages.empresa +
-        (empresa.cnpj ? empresa.nome_fantasia : empresa.nome_completo),
+      MessagesWarning.delete_messages.empresa + empresa.nome_fantasia,
       [
         {
           text: 'Confirmar',
@@ -310,57 +263,26 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation }) => {
       {todasEmpresas.map((value, i) => {
         return (
           <Box key={i} w="$full" alignItems="center" gap="$2.5" my="$2.5">
-            {value.cnpj ? (
-              <Card borderRadius="$lg" gap="$3">
-                <VStack gap="$2">
-                  <Heading>Nome fantasia: {value.nome_fantasia}</Heading>
-                  <Text>
-                    <Text fontWeight="$bold">Razão Social:</Text>{' '}
-                    {value.razao_social}
-                  </Text>
-                  <Text>
-                    <Text fontWeight="$bold">CNPJ:</Text> {value.cnpj}
-                  </Text>
-                </VStack>
-                <VStack gap="$2">
-                  <Button onPress={() => editarEmpresa(value)}>
-                    <ButtonIcon as={EditIcon} />
-                  </Button>
-                  <Button
-                    action="negative"
-                    onPress={() => deletarEmpresa(value)}
-                  >
-                    <ButtonIcon as={TrashIcon} />
-                  </Button>
-                </VStack>
-              </Card>
-            ) : (
-              <Card borderRadius="$lg" variant="elevated">
-                <HStack gap="$3">
-                  <VStack gap="$2">
-                    <Heading>Nome Completo: {value.nome_completo}</Heading>
-                    <Text>
-                      <Text fontWeight="$bold">Data de Nascimento:</Text>{' '}
-                      {formatStringDate(String(value.data_de_nascimento))}
-                    </Text>
-                    <Text>
-                      <Text fontWeight="$bold">CPF:</Text> {value.cpf}
-                    </Text>
-                  </VStack>
-                  <VStack gap="$2">
-                    <Button onPress={() => editarEmpresa(value)}>
-                      <ButtonIcon as={EditIcon} />
-                    </Button>
-                    <Button
-                      action="negative"
-                      onPress={() => deletarEmpresa(value)}
-                    >
-                      <ButtonIcon as={TrashIcon} />
-                    </Button>
-                  </VStack>
-                </HStack>
-              </Card>
-            )}
+            <Card borderRadius="$lg" gap="$3">
+              <VStack gap="$2">
+                <Heading>Nome fantasia: {value.nome_fantasia}</Heading>
+                <Text>
+                  <Text fontWeight="$bold">Razão Social:</Text>{' '}
+                  {value.razao_social}
+                </Text>
+                <Text>
+                  <Text fontWeight="$bold">CNPJ:</Text> {value.cnpj}
+                </Text>
+              </VStack>
+              <VStack gap="$2">
+                <Button onPress={() => editarEmpresa(value)}>
+                  <ButtonIcon as={EditIcon} />
+                </Button>
+                <Button action="negative" onPress={() => deletarEmpresa(value)}>
+                  <ButtonIcon as={TrashIcon} />
+                </Button>
+              </VStack>
+            </Card>
           </Box>
         );
       })}

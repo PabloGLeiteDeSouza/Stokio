@@ -2,6 +2,7 @@ import { SQLiteDatabase } from 'expo-sqlite';
 import { UpdateRamoDto } from './dto/update-ramo.dto';
 import errors from 'messages-error';
 import MessagesSuccess from 'messages-success';
+import { CreateRamoDto } from './dto/create-ramo.dto';
 
 export class Ramo {
   db: SQLiteDatabase;
@@ -10,7 +11,7 @@ export class Ramo {
     this.db = db;
   }
 
-  async create(ramo: UpdateRamoDto) {
+  async create(ramo: CreateRamoDto) {
     try {
       const data = await this.db.runAsync(
         'INSERT INTO ramo (nome, descricao) VALUES ($nome, $descricao)',

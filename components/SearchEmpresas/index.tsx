@@ -9,9 +9,7 @@ const SearchEmpresas: React.FC<ISearchEmpresas> = ({
 }) => {
   return (
     <>
-      {tipo === 'nome_completo' ||
-      tipo === 'nome_fantasia' ||
-      tipo === 'razao_social' ? (
+      {tipo === 'nome_fantasia' || tipo === 'razao_social' ? (
         <InputField onChangeText={onChangeValue} type="text" value="" />
       ) : tipo === 'cpf' ? (
         <InputField
