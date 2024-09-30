@@ -1,5 +1,5 @@
-import { Venda } from '$classes/Venda';
-import { UpdateVendaDto } from '$classes/Venda/dto/update-venda.dto';
+import { Venda } from '$classes/venda';
+import { UpdateVendaDto } from '$classes/venda/dto/update-venda.dto';
 import { ButtonText, Text } from '@gluestack-ui/themed';
 import { Button } from '@gluestack-ui/themed';
 import { Box } from '@gluestack-ui/themed';
