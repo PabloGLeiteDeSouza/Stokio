@@ -139,6 +139,15 @@ export class EmpresaService implements IEmpresaService {
     }
   }
 
+  // Buscar todas as empresas
+  async getAllEmpresas(): Promise<EmpresaObject[]> {
+    try {
+      return await this.db.getAllAsync<EmpresaObject>('SELECT * FROM empresa');
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // Criação de um ramo
   async createRamo(nome: string): Promise<number> {
     try {

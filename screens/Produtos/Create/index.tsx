@@ -69,18 +69,9 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useThemeApp } from '$providers/theme';
 import { Formik } from 'formik';
 import LoadingScreen from '$components/LoadingScreen';
-import { UpdateEmpresaDto } from '$classes/empresa/dto/update-empresa.dto';
-import { UpdateMarcaDto } from '$classes/marca/dto/update-marca.dto';
-import { UpdateUnidadeDeArmazenamentoDto } from '$classes/ua/dto/update-ua.dto';
-import { UpdateUmDto } from '$classes/um/dto/update-um.dto';
-import { Empresa } from '$classes/empresa';
 import { useSQLiteContext } from 'expo-sqlite';
-import { Marca } from '$classes/marca';
-import { TipoDeProduto } from '$classes/tipo_produto';
-import { Um } from '$classes/um';
-import { UnidadeDeArmazenamento } from '$classes/ua';
 import { Alert, GestureResponderEvent } from 'react-native';
-import { UpdateTipoDeProdutoDto } from '$classes/tipo_produto/dto/update-tipo-de-produto.dto';
+import { EmpresaService } from '$classes/empresa/empresa.service';
 type CadastrarProdutosScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   'cadastrar-produtos'
@@ -93,15 +84,6 @@ interface CadastrarProdutosScreenProps {
   navigation?: CadastrarProdutosScreenNavigationProp;
   route?: CadastrarProdutosScreennRouteProp;
 }
-
-type DadosDB = {
-  empresas: Array<UpdateEmpresaDto>;
-  marcas: Array<UpdateMarcaDto>;
-  tipos_de_produtos: Array<UpdateTipoDeProdutoDto>;
-  unidades_de_medida: Array<UpdateUmDto>;
-  unidades_de_armazenamento: Array<UpdateUnidadeDeArmazenamentoDto>;
-  tipo_produto: Array<UpdateTipoDeProdutoDto>;
-};
 
 const Create: React.FC<CadastrarProdutosScreenProps> = ({
   navigation,
@@ -139,8 +121,8 @@ const Create: React.FC<CadastrarProdutosScreenProps> = ({
   React.useEffect(() => {
     const load = async () => {
       try {
-        const dados_empresas = await new Empresa(db).findAll();
-        if (dados_empresas) {
+        const dados_empresas = await new EmpresaService(db).getAllEmpresas();
+        if (dados_empresas.length > 0) {
           setVerifyExists({
             ...verifyExists,
             empresa: true,
