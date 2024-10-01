@@ -3,11 +3,14 @@ import {
   EmpresaUpdateData,
   EmpresaSearchCriteria,
   TelefoneData,
+  TelefoneObject,
   EmailData,
   EnderecoData,
   RamoObject,
   EmpresaObject,
   SeachParamsEmpresa,
+  EmailObject,
+  EnderecoObject,
 } from './types';
 import { IEmpresaService } from './interfaces';
 import { SQLiteDatabase } from 'expo-sqlite';
@@ -130,10 +133,41 @@ export class EmpresaService implements IEmpresaService {
     }
   }
 
+  async getEnderecoByIdEmpresa(id_empresa: number): Promise<EnderecoObject> {
+    try {
+      const data = await this.db.getFirstAsync<EnderecoObject>(
+        'SELECT * FROM endereco as end INNER JOIN empresa_endereco as emp_end ON emp_end.id_endereco = end.id WHERE emp_end.id_empresa = $id_empresa',
+        { $id_empresa: id_empresa },
+      );
+      if (!data) {
+        throw new Error('Não foram encontrados endereços!');
+      }
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // Buscar todos os ramos
   async getAllRamos(): Promise<RamoObject[]> {
     try {
       return await this.db.getAllAsync<RamoObject>('SELECT * FROM ramo');
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Buscar todos os ramos
+  async getRamoById($id: number): Promise<RamoObject> {
+    try {
+      const dados = await this.db.getFirstAsync<RamoObject>(
+        'SELECT * FROM ramo WHERE id = $id',
+        { $id },
+      );
+      if (!dados) {
+        throw new Error('Não foi possível encontrar o ramo!');
+      }
+      return dados;
     } catch (error) {
       throw error;
     }
@@ -182,6 +216,34 @@ export class EmpresaService implements IEmpresaService {
     }
   }
 
+  // Requerir todos os telefones pelo Id da empresa
+  async getTelefonesByIdEmpresa(
+    id_empresa: number,
+  ): Promise<Array<TelefoneObject>> {
+    try {
+      const res = await this.db.getAllAsync<TelefoneObject>(
+        'SELECT telefone.numero, telefone.id from telefone as tel INNNER JOIN empresa_telefone as et ON tel.id = et.id_telefone WHERE et.id_empresa = $id_empresa',
+        { $id_empresa: id_empresa },
+      );
+      return res;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Requerir todos os emails pelo Id da empresa
+  async getEmailsByIdEmpresa(id_empresa: number) {
+    try {
+      const res = await this.db.getAllAsync<EmailObject>(
+        'SELECT email.endereco, email.id from email INNNER JOIN empresa_email as emp_email ON email.id = emp_email.id_telefone WHERE emp_email.id_empresa = $id_empresa',
+        { $id_empresa: id_empresa },
+      );
+      return res;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // Métodos auxiliares
   private async getOrCreateRamo(nome: string): Promise<number> {
     const ramoExistente = await this.db.getFirstAsync<RamoObject>(
@@ -201,10 +263,6 @@ export class EmpresaService implements IEmpresaService {
     id_empresa: number,
     telefones: TelefoneData[],
   ) {
-    await this.db.runAsync(
-      'DELETE FROM empresa_telefone WHERE id_empresa = $id_empresa',
-      { $id_empresa: id_empresa },
-    );
     for (const telefone of telefones) {
       const res_tel = await this.db.runAsync(
         'INSERT INTO telefone (numero) VALUES ($numero)',
@@ -219,10 +277,6 @@ export class EmpresaService implements IEmpresaService {
   }
 
   private async vincularEmails(id_empresa: number, emails: EmailData[]) {
-    await this.db.runAsync(
-      'DELETE FROM empresa_email WHERE id_empresa = $id_empresa',
-      { $id_empresa: id_empresa },
-    );
     for (const email of emails) {
       const res_email = await this.db.runAsync(
         'INSERT INTO email (endereco) VALUES ($endereco)',
@@ -237,10 +291,6 @@ export class EmpresaService implements IEmpresaService {
   }
 
   private async vincularEndereco(id_empresa: number, endereco: EnderecoData) {
-    await this.db.runAsync(
-      'DELETE FROM empresa_endereco WHERE id_empresa = $id_empresa',
-      { $id_empresa: id_empresa },
-    );
     const res_end = await this.db.runAsync(
       `INSERT INTO endereco (cep, logradouro, numero, complemento, bairro, cidade, uf) 
        VALUES ($cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf)`,

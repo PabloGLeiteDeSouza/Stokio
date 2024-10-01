@@ -30,7 +30,7 @@ import {
   Card,
 } from '@gluestack-ui/themed';
 
-import { Empresa } from '$classes/empresa';
+import { EmpresaService } from '$classes/empresa/empresa.service';
 import LoadingScreen from '$components/LoadingScreen';
 import { useThemeApp } from '$providers/theme';
 import { RootStackParamList, UpdateEmpresaObject } from '$types/index';
@@ -44,7 +44,6 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { EditIcon } from '@gluestack-ui/themed';
 import MessagesWarning, { operations } from 'messages-warnings';
 import SearchEmpresas from '$components/SearchEmpresas';
-import { Ramo } from '$classes/ramo';
 
 type ListarEmpresasScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -69,58 +68,58 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation }) => {
   const [tipoDeBusca, setTipoDeBusca] = React.useState('');
   const [isStartingPage, setIsStartingPage] = React.useState(true);
   async function Start() {
-    try {
-      const emp = await new Empresa(db).findAll();
-      const empresas = await Promise.all(
-        emp.map(async (e) => {
-          const ramo = await new Ramo(db).findUniqueById(e.id_ramo);
-          return { ...e, ramo };
-        }),
-      );
-      setTodasEmpresas(empresas);
-      setIsStartingPage(false);
-      return;
-    } catch (error) {
-      setIsStartingPage(false);
-      throw error;
-    }
+    // try {
+    //   const emp = await new EmpresaService(db).getAllEmpresas();
+    //   const empresas = await Promise.all(
+    //     emp.map(async (e) => {
+    //       const ramo = await new EmpresaService(db).getRamoById(e.id_ramo);
+    //       return { ...e, ramo };
+    //     }),
+    //   );
+    //   setTodasEmpresas(empresas);
+    //   setIsStartingPage(false);
+    //   return;
+    // } catch (error) {
+    //   setIsStartingPage(false);
+    //   throw error;
+    // }
   }
   async function busca_empresa(valor: string, tipo: string) {
-    try {
-      switch (tipo) {
-        case 'nome_fantasia':
-          setTodasEmpresas(
-            (await new Empresa(db).findAllByNomeFantasia(
-              valor,
-            )) as unknown as Array<UpdateEmpresaObject>,
-          );
-          break;
-        case 'razao_social':
-          setTodasEmpresas(
-            (await new Empresa(db).findAllByRazaoSocial(
-              valor,
-            )) as unknown as Array<UpdateEmpresaObject>,
-          );
-          break;
-        case 'cnpj':
-          setTodasEmpresas([
-            (await new Empresa(db).findUniqueByCnpj(
-              valor,
-            )) as unknown as UpdateEmpresaObject,
-          ]);
-          break;
-        default:
-          setTodasEmpresas(
-            (await new Empresa(
-              db,
-            ).findAll()) as unknown as Array<UpdateEmpresaObject>,
-          );
-          break;
-      }
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Erro', (error as Error).message);
-    }
+    // try {
+    //   switch (tipo) {
+    //     case 'nome_fantasia':
+    //       setTodasEmpresas(
+    //         (await new Empresa(db).findAllByNomeFantasia(
+    //           valor,
+    //         )) as unknown as Array<UpdateEmpresaObject>,
+    //       );
+    //       break;
+    //     case 'razao_social':
+    //       setTodasEmpresas(
+    //         (await new Empresa(db).findAllByRazaoSocial(
+    //           valor,
+    //         )) as unknown as Array<UpdateEmpresaObject>,
+    //       );
+    //       break;
+    //     case 'cnpj':
+    //       setTodasEmpresas([
+    //         (await new Empresa(db).findUniqueByCnpj(
+    //           valor,
+    //         )) as unknown as UpdateEmpresaObject,
+    //       ]);
+    //       break;
+    //     default:
+    //       setTodasEmpresas(
+    //         (await new Empresa(
+    //           db,
+    //         ).findAll()) as unknown as Array<UpdateEmpresaObject>,
+    //       );
+    //       break;
+    //   }
+    // } catch (error) {
+    //   console.error(error);
+    //   Alert.alert('Erro', (error as Error).message);
+    // }
   }
   React.useEffect(() => {
     setTimeout(() => {
@@ -143,16 +142,16 @@ const View: React.FC<ListarEmpresasScreenProps> = ({ navigation }) => {
         {
           text: 'Confirmar',
           onPress: async () => {
-            try {
-              await new Empresa(db).delete(empresa.id);
-              Alert.alert('Sucesso', 'Registro apagado com sucesso!');
-              setTimeout(() => {
-                Start();
-              }, 1);
-            } catch (error) {
-              console.error(error);
-              Alert.alert('Erro', (error as Error).message);
-            }
+            // try {
+            //   await new Empresa(db).delete(empresa.id);
+            //   Alert.alert('Sucesso', 'Registro apagado com sucesso!');
+            //   setTimeout(() => {
+            //     Start();
+            //   }, 1);
+            // } catch (error) {
+            //   console.error(error);
+            //   Alert.alert('Erro', (error as Error).message);
+            // }
           },
         },
         {

@@ -1,5 +1,6 @@
 import { UpdateCategoriaDto } from '$classes/categoria/dto/update-categoria.dto';
 import { UpdateClienteDto } from '$classes/cliente/dto/update-cliente.dto';
+import { EmpresaCreateData } from '$classes/empresa/types';
 import { UpdateRamoDto } from '$classes/ramo/dto/update-ramo.dto';
 import { UpdateTipoDeProdutoDto } from '$classes/tipo_produto/dto/update-tipo-de-produto.dto';
 import { UpdateUmDto } from '$classes/um/dto/update-um.dto';
@@ -45,7 +46,7 @@ export type RootStackParamList = {
   'cadastrar-venda'?: object;
   'cadastrar-item-venda'?: object;
   'editar-produtos'?: object;
-  'editar-empresas'?: { empresa: UpdateEmpresaObject };
+  'editar-empresas'?: { empresa: EmpresaCreateData };
   'editar-ua'?: object;
   'editar-um'?: { um: UpdateUmDto };
   'editar-categoria'?: { categoria: UpdateCategoriaDto };
@@ -59,16 +60,6 @@ export type RootStackParamList = {
   'tab-bottom'?: object;
   'auth-screen'?: object;
   configuracoes?: object;
-};
-
-export type UpdateEmpresaObject = {
-  ramo: UpdateRamoDto;
-  id: number;
-  id_pessoa: number;
-  id_ramo: number;
-  nome_fantasia?: string;
-  razao_social?: string;
-  cnpj?: string;
 };
 
 export type ScreensScanCode = 'cadastrar-produtos' | 'listar-produtos';
