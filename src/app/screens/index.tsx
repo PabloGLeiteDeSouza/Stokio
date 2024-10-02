@@ -5,6 +5,7 @@ import EmpresasScreens from './empresa';
 import ConfigScreens from './config';
 import ClienteScreens from './cliente';
 import { FontAwesome6, Ionicons } from '@expo/vector-icons';
+import ProdutoScreens from './produto';
 
 const Tab = createBottomTabNavigator();
 
@@ -17,6 +18,7 @@ const Screens: React.FC = () => {
         options={{
           tabBarIcon: (props) => <FontAwesome6 name="user" {...props} />,
           headerShown: false,
+          title: 'Clientes',
         }}
       />
       <Tab.Screen
@@ -25,6 +27,18 @@ const Screens: React.FC = () => {
         options={{
           tabBarIcon: (props) => <FontAwesome6 name="building" {...props} />,
           headerShown: false,
+          title: 'Empresas',
+        }}
+      />
+      <Tab.Screen
+        name="produto-screens"
+        component={ProdutoScreens}
+        options={{
+          tabBarIcon: (props) => (
+            <FontAwesome6 name="bag-shopping" {...props} />
+          ),
+          headerShown: false,
+          title: 'Produtos'
         }}
       />
       <Tab.Screen
@@ -32,9 +46,10 @@ const Screens: React.FC = () => {
         component={VendasScreens}
         options={{
           tabBarIcon: (props) => (
-            <FontAwesome6 name="bag-shopping" {...props} />
+            <FontAwesome6 name="cart-shopping" {...props} />
           ),
           headerShown: false,
+          title: 'Vendas'
         }}
       />
       <Tab.Screen
@@ -45,6 +60,7 @@ const Screens: React.FC = () => {
             <FontAwesome6 name="boxes-stacked" {...props} />
           ),
           headerShown: false,
+          title: 'Ua'
         }}
       />
       <Tab.Screen
@@ -53,6 +69,7 @@ const Screens: React.FC = () => {
         options={{
           tabBarIcon: (props) => <Ionicons name="settings" {...props} />,
           headerShown: false,
+          title: 'Configurações',
         }}
       />
     </Tab.Navigator>

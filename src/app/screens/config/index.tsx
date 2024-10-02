@@ -1,23 +1,25 @@
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import ScreensRamo from './ramo';
+import ScreensMarca from './marca';
+import ScreensTipoUA from './tipo_ua';
+import ScreensUM from './um';
 
 const Stack = createNativeStackNavigator();
 
 const ConfigScreens: React.FC = () => {
-    return (
-        <Stack.Navigator>
-            <Stack.Screen name="screens-ramo" />
-            <Stack.Screen name="screens-marca" />
-            <Stack.Screen name="screens-tipo-ua" />
-            <Stack.Screen name="screens-um" />
-            <Stack.Screen name="screens-ua" />
-            <Stack.Screen name="configuracoes" />
-        </Stack.Navigator>
-    );
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="configuracoes" component={ConfigScreen} />
+      <Stack.Screen name="screens-ramo" component={ScreensRamo} />
+      <Stack.Screen name="screens-marca" component={ScreensMarca} />
+      <Stack.Screen name="screens-tipo-ua" component={ScreensTipoUA} />
+      <Stack.Screen name="screens-um" component={ScreensUM} />
+    </Stack.Navigator>
+  );
 };
 
 const ConfigScreen: React.FC = () => {
-    return <></>;
-}
+  return <></>;
+};
 
 export default ConfigScreens;
