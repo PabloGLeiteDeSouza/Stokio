@@ -3,21 +3,18 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "utils": ["./utils"],
-      "messages-success": ["./constants/messages/MessagesSuccess"],
-      "messages-error": ["./constants/messages/errors"],
-      "messageerrors": ["./constants/messages/errors"],
-      "messages-warnings": ["./constants/messages/warnings"],
-      "$components/*": ["./components/*"],
-      "$screens/*": ["./screens/*"],
-      "$types/*": ["./types/*"],
-      "$databases/*": ["./databases/*"],
-      "$providers/*": ["./providers/*"],
+      "@/*": ["./src/*"],
+      "$types/*": ["./src/types/*"],
+      "@components/*": ["./src/components/*"],
+      "@screens": ["./src/screens"],
+      "@app": ["./src/app"],
+      "@utils/*": ["./src/utils/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@screens/*": ["./src/app/screens/*"],
+      "@services/*": ["./src/services/*"],
       "$assets/*": ["./assets/*"],
-      "$functions/*": ["./functions/*"],
-      "$classes/*": ["./classes/*"],
-      "$constants/*": ["./constants/*"],
-      "$utils/*": ["./utils/*"],
+      "@constants/*": ["./src/constants/*"],
+      "$providers/*": ["./src/providers/*"],
     }
   }
 }

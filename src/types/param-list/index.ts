@@ -1,5 +1,3 @@
-import { ParamListBase, RouteProp } from '@react-navigation/native';
-
 export type RootStackParamList = {
   'screens-produtos'?: object;
   'screens-tipos-produtos'?: object;
@@ -12,8 +10,9 @@ export type RootStackParamList = {
   'screens-tipos-uas'?: object;
   'screens-ramos'?: object;
   'item-venda-screens'?: object;
+  'cadastrar-produtos'?: { code?: string; result?: boolean };
   'code-scanner'?: { screen: string; type: string };
-  'listar-produtos'?: { code?: string };
+  'listar-produtos'?: { code?: string; result?: boolean };
   'listar-empresas'?: object;
   'listar-ua'?: object;
   'listar-tipo-ua'?: object;
@@ -26,8 +25,7 @@ export type RootStackParamList = {
   'listar-ramos'?: object;
   'listar-venda'?: object;
   'listar-item-venda'?: object;
-  'cadastrar-produtos'?: { code?: string; result?: boolean };
-  'cadastrar-clientes'?: object;
+  'cadastrar-clientes'?: { nome?: string };
   'cadastrar-empresas'?: object;
   'cadastrar-categoria'?: object;
   'cadastrar-marca'?: object;
@@ -37,7 +35,7 @@ export type RootStackParamList = {
   'cadastrar-um'?: object;
   'cadastrar-ramo'?: object;
   'cadastrar-venda'?: object;
-  'cadastrar-item-venda'?: { code?: string; result?: boolean };
+  'cadastrar-item-venda'?: object;
   'editar-produtos'?: object;
   'editar-empresas'?: { empresa: UpdateEmpresaObject };
   'editar-ua'?: object;
@@ -50,34 +48,63 @@ export type RootStackParamList = {
   'editar-clientes'?: { cliente: ClientesObject };
   'editar-venda'?: object;
   'editar-venda-item'?: object;
-  'tab-bottom'?: object;
+  'app-screens'?: object;
   'auth-screen'?: object;
-  configuracoes?: object;
+  'screens-config'?: object;
 };
 
-export type UpdateEmpresaObject = {
-  ramo: UpdateRamoDto;
-  id: number;
-  id_pessoa: number;
-  id_ramo: number;
-  nome_fantasia?: string;
-  razao_social?: string;
-  cnpj?: string;
-};
-
-export type ScreensScanCode =
+export type ParamList =
+  | 'screens-produtos'
+  | 'screens-tipos-produtos'
+  | 'screens-categorias'
+  | 'screens-empresas'
+  | 'screens-marcas'
+  | 'screens-uas'
+  | 'screens-ums'
+  | 'screens-vendas'
+  | 'screens-tipos-uas'
+  | 'screens-ramos'
+  | 'item-venda-screens'
   | 'cadastrar-produtos'
+  | 'code-scanner'
   | 'listar-produtos'
-  | 'cadastrar-item-venda';
+  | 'listar-empresas'
+  | 'listar-ua'
+  | 'listar-tipo-ua'
+  | 'listar-um'
+  | 'listar-categoria'
+  | 'listar-tipo-produto'
+  | 'listar-marca'
+  | 'listar-vendas'
+  | 'listar-clientes'
+  | 'listar-ramos'
+  | 'listar-venda'
+  | 'listar-item-venda'
+  | 'cadastrar-clientes'
+  | 'cadastrar-empresas'
+  | 'cadastrar-categoria'
+  | 'cadastrar-marca'
+  | 'cadastrar-tipo-produto'
+  | 'cadastrar-ua'
+  | 'cadastrar-tipo-ua'
+  | 'cadastrar-um'
+  | 'cadastrar-ramo'
+  | 'cadastrar-venda'
+  | 'cadastrar-item-venda'
+  | 'editar-produtos'
+  | 'editar-empresas'
+  | 'editar-ua'
+  | 'editar-um'
+  | 'editar-categoria'
+  | 'editar-marca'
+  | 'editar-tipo-produto'
+  | 'editar-tipo-ua'
+  | 'editar-ramo'
+  | 'editar-clientes'
+  | 'editar-venda'
+  | 'editar-venda-item'
+  | 'app-screens'
+  | 'auth-screen'
+  | 'screens-config';
 
-export type ScreenComponentType<
-  ParamList extends ParamListBase,
-  RouteName extends keyof ParamList,
-> =
-  | React.ComponentType<{
-      route: RouteProp<ParamList, RouteName>;
-      navigation: unknown;
-    }>
-  | React.ComponentType<object>;
-
-export type TypeUpdateEmpresasObjectToScreen = object;
+export type ParamListCodeScanner = 'cadastrar-produtos' | 'listar-produtos';
