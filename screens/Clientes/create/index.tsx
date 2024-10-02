@@ -49,10 +49,8 @@ import {
 import { ScrollView } from '@gluestack-ui/themed';
 import { Box } from '@gluestack-ui/themed';
 import { useThemeApp } from '$providers/theme';
-import { Pessoa } from '$classes/pessoa';
 import { useSQLiteContext } from 'expo-sqlite';
 import { Alert, GestureResponderEvent } from 'react-native';
-import { UpdatePessoaDto } from '$classes/pessoa/dto/update-pessoa.dto';
 import { RootStackParamList } from '$types/index';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
@@ -68,7 +66,6 @@ import { View } from '@gluestack-ui/themed';
 import { Cliente } from '$classes/cliente';
 import { Endereco } from '$classes/endereco';
 import { Telefone } from '$classes/telefone';
-import { Email } from '$classes/email';
 type CadastrarProdutosScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   'cadastrar-clientes'
@@ -122,65 +119,65 @@ const Create: React.FC<CadastrarClientesScreenProps> = ({ navigation }) => {
     limite: string;
     status: boolean;
   }) => {
-    try {
-      const { id_pessoa, ...vls } = values;
-      if (id_pessoa !== '') {
-        const cliente = {
-          limite: Number(vls.limite),
-          status: vls.status,
-          id_pessoa: Number(id_pessoa),
-        };
-        await new Cliente(db).create(cliente);
-        Alert.alert('Sucesso', 'Cliente criado com sucesso!');
-        navigation?.navigate('listar-clientes');
-      } else {
-        const {
-          bairro,
-          cep,
-          cidade,
-          complemento,
-          logradouro,
-          numero,
-          uf,
-          emails,
-          limite,
-          status,
-          telefones,
-          ...people
-        } = vls;
-        const pessoa = await new Pessoa(db).create(people);
-        const address = {
-          cep,
-          logradouro,
-          complemento,
-          numero: Number(numero),
-          bairro,
-          cidade,
-          uf,
-          id_pessoa: pessoa.id,
-        };
-        await new Endereco(db).create(address);
-        telefones.map(async (tel) => {
-          await new Telefone(db).create({
-            telefone: tel,
-            id_pessoa: pessoa.id,
-          });
-        });
-        emails.map(async (email) => {
-          await new Email(db).create({
-            email,
-            id_pessoa: pessoa.id,
-          });
-        });
-        await new Cliente(db).create({
-          id_pessoa: pessoa.id,
-          limite: Number(limite),
-          status,
-        });
-        Alert.alert('Sucesso', 'Cliente criado com sucesso!');
-        navigation?.navigate('listar-clientes');
-      }
-    } catch (error) {}
+    // try {
+    //   const { id_pessoa, ...vls } = values;
+    //   if (id_pessoa !== '') {
+    //     const cliente = {
+    //       limite: Number(vls.limite),
+    //       status: vls.status,
+    //       id_pessoa: Number(id_pessoa),
+    //     };
+    //     await new Cliente(db).create(cliente);
+    //     Alert.alert('Sucesso', 'Cliente criado com sucesso!');
+    //     navigation?.navigate('listar-clientes');
+    //   } else {
+    //     const {
+    //       bairro,
+    //       cep,
+    //       cidade,
+    //       complemento,
+    //       logradouro,
+    //       numero,
+    //       uf,
+    //       emails,
+    //       limite,
+    //       status,
+    //       telefones,
+    //       ...people
+    //     } = vls;
+    //     const pessoa = await new Pessoa(db).create(people);
+    //     const address = {
+    //       cep,
+    //       logradouro,
+    //       complemento,
+    //       numero: Number(numero),
+    //       bairro,
+    //       cidade,
+    //       uf,
+    //       id_pessoa: pessoa.id,
+    //     };
+    //     await new Endereco(db).create(address);
+    //     telefones.map(async (tel) => {
+    //       await new Telefone(db).create({
+    //         telefone: tel,
+    //         id_pessoa: pessoa.id,
+    //       });
+    //     });
+    //     emails.map(async (email) => {
+    //       await new Email(db).create({
+    //         email,
+    //         id_pessoa: pessoa.id,
+    //       });
+    //     });
+    //     await new Cliente(db).create({
+    //       id_pessoa: pessoa.id,
+    //       limite: Number(limite),
+    //       status,
+    //     });
+    //     Alert.alert('Sucesso', 'Cliente criado com sucesso!');
+    //     navigation?.navigate('listar-clientes');
+    //   }
+    // } catch (error) {}
   };
   const [isAllDisabled, setIsAllDisabled] = React.useState({
     cep: false,

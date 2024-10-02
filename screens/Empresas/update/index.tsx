@@ -80,18 +80,12 @@ import { Alert } from 'react-native';
 import * as Yup from 'yup';
 import { ValidateForms } from '$constants/validations';
 import { mask } from 'react-native-mask-text';
-import { Endereco } from '$classes/endereco';
-import { Empresa } from '$classes/empresa';
-import { View } from '@gluestack-ui/themed';
-import { Email } from '$classes/email';
-import { Telefone } from '$classes/telefone';
 import { useSQLiteContext } from 'expo-sqlite';
 import LoadingScreen from '$components/LoadingScreen';
-import { UpdateEmailDto } from '$classes/email/dto/update-email.dto';
-import { UpdateTelefoneDto } from '$classes/telefone/dto/update-telefone.dto';
-import { UpdateEnderecoDto } from '$classes/endereco/dto/update-endereco.dto';
 import MessagesSuccess from '$constants/messages/MessagesSuccess';
-import { UpdateEmpresaDto } from '$classes/empresa/dto/update-empresa.dto';
+import { TelefoneData } from '$classes/telefone/types';
+import { EmpresaService } from '$classes/empresa/empresa.service';
+import { EmailObject, EnderecoObject, TelefoneObject } from '$classes/empresa/types';
 type EditarEmpresasScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   'editar-empresas'
@@ -169,26 +163,39 @@ const Update: React.FC<EditarEmpresasScreenProps> = ({ navigation, route }) => {
   }
   const empresas = route.params.empresa;
   const [isLoading, setIsLoading] = React.useState(true);
-  const [OEndereco, setOEndereco] = React.useState<UpdateEnderecoDto | object>(
-    {},
+  const [OEndereco, setOEndereco] = React.useState<EnderecoObject>(
+    {} as EnderecoObject,
   );
   const [ArrayTelefones, setArrayTelefones] = React.useState<
-    Array<UpdateTelefoneDto> | Array<never>
+    Array<TelefoneObject>
   >([]);
   const [ArrayEmails, setArrayEmails] = React.useState<
-    Array<UpdateEmailDto> | Array<never>
+    Array<EmailObject> | Array<never>
   >([]);
   const [nomeEstado, setNomeEstado] = React.useState('');
   const db = useSQLiteContext();
   const StartApp = async () => {
-    const endereco = await new Endereco(db).findById(empresas.id_endereco);
-    const telefones = await new Telefone(db).findByIdEmpresa(empresas.id);
-    const emails = await new Email(db).findAllByIdEmpresa(empresas.id);
-    setOEndereco(endereco);
-    setArrayTelefones(telefones);
-    setArrayEmails(emails);
-    setIsLoading(false);
-    setNomeEstado(String(Estados.find((uf) => uf.sigla === endereco.uf)?.nome));
+    try {
+      const endereco = await new EmpresaService(db).getEnderecoByIdEmpresa(
+        empresas.id,
+      );
+      const telefones = await new EmpresaService(db).getTelefonesByIdEmpresa(
+        empresas.id,
+      );
+      const emails = await new EmpresaService(db).getEmailsByIdEmpresa(
+        empresas.id,
+      );
+      setOEndereco(endereco);
+      setArrayTelefones(telefones);
+      setArrayEmails(emails);
+      setIsLoading(false);
+      setNomeEstado(
+        String(Estados.find((uf) => uf.sigla === endereco.uf)?.nome),
+      );
+    } catch (error) {
+      Alert.alert('Erro', (error as Error).message);
+      navigation?.navigate('listar-empresas');
+    }
   };
   const { theme } = useThemeApp();
   const [isAllDisabled, setIsAllDisabled] = React.useState({
@@ -226,12 +233,9 @@ const Update: React.FC<EditarEmpresasScreenProps> = ({ navigation, route }) => {
           initialValues={{
             tipo_empresa: empresas.cnpj ? 'pj' : ('pf' as 'pj' | 'pf'),
             id: empresas.id,
-            nome_completo: empresas.nome_completo ? empresas.nome_completo : '',
-            cpf: empresas.cpf ? empresas.cpf : '',
-            ramo: empresas.ramo ? empresas.ramo : '',
-            data_de_nascimento: empresas.data_de_nascimento
-              ? empresas.data_de_nascimento
-              : '',
+            nome_completo: empresas.nome,
+            id_ramo: empresas.ramo?.id ? empresas.ramo.id : '',
+            ramo: empresas.ramo?.nome ? empresas.ramo.nome : '',
             nome_fantasia: empresas.nome_fantasia ? empresas.nome_fantasia : '',
             razao_social: empresas.razao_social ? empresas.razao_social : '',
             cnpj: empresas.cnpj ? empresas.cnpj : '',

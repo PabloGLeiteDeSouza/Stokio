@@ -1,7 +1,5 @@
 const SelecionarPessoas: React.FC<> = () => {
-    return (
-
-    )
-}
+  return <></>;
+};
 
 export default SelecionarPessoas;

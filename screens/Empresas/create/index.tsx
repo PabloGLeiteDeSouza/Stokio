@@ -516,7 +516,7 @@ const Create: React.FC<CadastrarEmpresasScreenProps> = ({ navigation }) => {
                 {pessoas.length > 0 && !createPessoa ? (
                   <>
                     <Box>
-                      <Button onPress={}>
+                      <Button>
                         <ButtonText>
                           Selecione a Pessoa a ser vinculada
                         </ButtonText>

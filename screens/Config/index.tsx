@@ -27,6 +27,31 @@ const ConfigurationsScreen: React.FC = () => {
               <ButtonText>Importar dados</ButtonText>
             </Button>
           </Box>
+          <Box>
+            <Button>
+              <ButtonText>Marcas</ButtonText>
+            </Button>
+          </Box>
+          <Box>
+            <Button>
+              <ButtonText>Ramos</ButtonText>
+            </Button>
+          </Box>
+          <Box>
+            <Button>
+              <ButtonText>Tipos de Produtos</ButtonText>
+            </Button>
+          </Box>
+          <Box>
+            <Button>
+              <ButtonText>Unidades de Medida</ButtonText>
+            </Button>
+          </Box>
+          <Box>
+            <Button>
+              <ButtonText>Tipos de Unidades de Armazenamento</ButtonText>
+            </Button>
+          </Box>
         </VStack>
       </Box>
     </ScrollView>
