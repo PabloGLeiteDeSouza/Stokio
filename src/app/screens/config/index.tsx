@@ -6,11 +6,12 @@ const Stack = createNativeStackNavigator();
 const ConfigScreens: React.FC = () => {
     return (
         <Stack.Navigator>
-            <Stack.Screen name="" />
-            <Stack.Screen />
-            <Stack.Screen />
-            <Stack.Screen />
-            <Stack.Screen />
+            <Stack.Screen name="screens-ramo" />
+            <Stack.Screen name="screens-marca" />
+            <Stack.Screen name="screens-tipo-ua" />
+            <Stack.Screen name="screens-um" />
+            <Stack.Screen name="screens-ua" />
+            <Stack.Screen name="configuracoes" />
         </Stack.Navigator>
     );
 };
