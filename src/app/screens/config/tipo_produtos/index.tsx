@@ -8,9 +8,21 @@ const Stack = createNativeStackNavigator();
 const ScreensTipoProduto: React.FC = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="visualizar-tipo-produto" component={View} />
-      <Stack.Screen name="cadastrar-tipo-produto" component={Create} />
-      <Stack.Screen name="editar-tipo-produto" component={Update} />
+      <Stack.Screen
+        name="visualizar-tipo-produto"
+        component={View}
+        options={{ title: 'Visualizar Tipo de Produto' }}
+      />
+      <Stack.Screen
+        name="cadastrar-tipo-produto"
+        component={Create}
+        options={{ title: 'Cadastrar Tipo de Produto' }}
+      />
+      <Stack.Screen
+        name="editar-tipo-produto"
+        component={Update}
+        options={{ title: 'Atualizar Tipo de Produto' }}
+      />
     </Stack.Navigator>
   );
 };

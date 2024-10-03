@@ -1,8 +1,5 @@
 const Update: React.FC = () => {
-    return (
-        <>
-        </>
-    )
-}
+  return <></>;
+};
 
 export default Update;

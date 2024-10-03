@@ -1,8 +1,5 @@
 const Create: React.FC = () => {
-    return (
-        <>
-        </>
-    )
-}
+  return <></>;
+};
 
 export default Create;

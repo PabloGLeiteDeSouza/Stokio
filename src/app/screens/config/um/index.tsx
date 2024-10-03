@@ -8,9 +8,21 @@ const Stack = createNativeStackNavigator();
 const ScreensUM: React.FC = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="visualizar-um" component={View} />
-      <Stack.Screen name="cadastrar-um" component={Create} />
-      <Stack.Screen name="editar-um" component={Update} />
+      <Stack.Screen
+        name="visualizar-um"
+        component={View}
+        options={{ title: 'Visualizar Unidade de Medida' }}
+      />
+      <Stack.Screen
+        name="cadastrar-um"
+        component={Create}
+        options={{ title: 'Cadastrar Unidade de Medida' }}
+      />
+      <Stack.Screen
+        name="editar-um"
+        component={Update}
+        options={{ title: 'Atualizar Unidade de Medida' }}
+      />
     </Stack.Navigator>
   );
 };

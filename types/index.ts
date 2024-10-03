@@ -55,7 +55,6 @@ export type RootStackParamList = {
   configuracoes?: object;
 };
 
-<<<<<<< HEAD
 export type UpdateEmpresaObject = {
   ramo: UpdateRamoDto;
   id: number;
@@ -70,9 +69,6 @@ export type ScreensScanCode =
   | 'cadastrar-produtos'
   | 'listar-produtos'
   | 'cadastrar-item-venda';
-=======
-export type ScreensScanCode = 'cadastrar-produtos' | 'listar-produtos';
->>>>>>> ab141bfd11429a7f6b0b233f094958d696230364
 
 export type ScreenComponentType<
   ParamList extends ParamListBase,

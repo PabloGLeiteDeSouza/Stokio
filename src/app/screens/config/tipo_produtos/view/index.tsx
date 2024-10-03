@@ -1,8 +1,5 @@
 const View: React.FC = () => {
-    return (
-        <>
-        </>
-    )
-}
+  return <></>;
+};
 
 export default View;

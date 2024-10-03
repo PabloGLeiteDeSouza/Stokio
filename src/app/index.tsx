@@ -6,6 +6,9 @@ import CodeScanner from '@components/CodeScanner';
 import AuthScreen from '@screens/auth';
 import Screens from './screens';
 import { NavigationContainer } from '@react-navigation/native';
+import FabToggleTheme from '@/components/FabToggleTheme';
+import { useThemeApp } from '@/providers/theme';
+import { ConfigTheme } from '@/constants/colors';
 
 const Stack = createNativeStackNavigator();
 
@@ -16,6 +19,7 @@ const Application: React.FC = () => {
   const [pageStarting, setPageStarting] = React.useState<
     'auth-screen' | 'app-screens'
   >('auth-screen');
+  const { theme } = useThemeApp();
 
   React.useEffect(() => {
     StartApp(setIsLoading, setPageStarting);
@@ -27,7 +31,9 @@ const Application: React.FC = () => {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer
+      theme={theme === 'dark' ? ConfigTheme.dark : ConfigTheme.light}
+    >
       <Stack.Navigator initialRouteName={pageStarting}>
         <Stack.Screen
           name="auth-screen"
@@ -45,6 +51,7 @@ const Application: React.FC = () => {
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
+      <FabToggleTheme />
     </NavigationContainer>
   );
 };

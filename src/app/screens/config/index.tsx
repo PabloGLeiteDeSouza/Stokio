@@ -27,35 +27,35 @@ const ConfigScreens: React.FC = () => {
         }}
       />
       <Stack.Screen
-        name="screens-ramo"
+        name="screens-ramos"
         component={ScreensRamo}
         options={{
           headerShown: false,
         }}
       />
       <Stack.Screen
-        name="screens-marca"
+        name="screens-marcas"
         component={ScreensMarca}
         options={{
           headerShown: false,
         }}
       />
       <Stack.Screen
-        name="screens-tipo-ua"
+        name="screens-tipos-uas"
         component={ScreensTipoUA}
         options={{
           headerShown: false,
         }}
       />
       <Stack.Screen
-        name="screens-um"
+        name="screens-ums"
         component={ScreensUM}
         options={{
           headerShown: false,
         }}
       />
       <Stack.Screen
-        name="screens-tipo-produto"
+        name="screens-tipos-produtos"
         component={ScreensTipoProduto}
         options={{
           headerShown: false,
@@ -102,7 +102,7 @@ const ConfigScreen: React.FC<ConfiguracoesScreenProps> = ({ navigation }) => {
             </Button>
           </Box>
           <Box>
-            <Button onPress={() => navigation?.navigate('screens-uas')}>
+            <Button onPress={() => navigation?.navigate('screens-tipos-uas')}>
               <ButtonText>Tipos de UAs</ButtonText>
             </Button>
           </Box>

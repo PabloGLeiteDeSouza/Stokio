@@ -1,4 +1,4 @@
-import { ThemeProviderApp } from './providers/theme';
+import { ThemeProviderApp } from '@/providers/theme';
 import React from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import * as FileSystem from 'expo-file-system';
