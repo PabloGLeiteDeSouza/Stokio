@@ -51,6 +51,7 @@ export type RootStackParamList = {
   'app-screens'?: object;
   'auth-screen'?: object;
   'screens-config'?: object;
+  configuracoes?: object;
 };
 
 export type ParamList =
@@ -105,6 +106,7 @@ export type ParamList =
   | 'editar-venda-item'
   | 'app-screens'
   | 'auth-screen'
-  | 'screens-config';
+  | 'screens-config'
+  | 'configuracoes';
 
 export type ParamListCodeScanner = 'cadastrar-produtos' | 'listar-produtos';

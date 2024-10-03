@@ -11,7 +11,7 @@ const Stack = createNativeStackNavigator();
 
 SplashScreen.preventAutoHideAsync();
 
-const App: React.FC = () => {
+const Application: React.FC = () => {
   const [isLoading, setIsLoading] = React.useState(true);
   const [pageStarting, setPageStarting] = React.useState<
     'auth-screen' | 'app-screens'
@@ -49,4 +49,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default Application;

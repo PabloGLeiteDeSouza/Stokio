@@ -85,7 +85,11 @@ import LoadingScreen from '$components/LoadingScreen';
 import MessagesSuccess from '$constants/messages/MessagesSuccess';
 import { TelefoneData } from '$classes/telefone/types';
 import { EmpresaService } from '$classes/empresa/empresa.service';
-import { EmailObject, EnderecoObject, TelefoneObject } from '$classes/empresa/types';
+import {
+  EmailObject,
+  EnderecoObject,
+  TelefoneObject,
+} from '$classes/empresa/types';
 type EditarEmpresasScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   'editar-empresas'

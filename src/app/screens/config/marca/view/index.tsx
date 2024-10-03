@@ -1,8 +1,5 @@
-const View: React.FC  = () => {
-    return (
-        <>
-        </>
-    )
-}
+const View: React.FC = () => {
+  return <></>;
+};
 
 export default View;

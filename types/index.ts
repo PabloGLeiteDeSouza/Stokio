@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-=======
-import { UpdateCategoriaDto } from '$classes/categoria/dto/update-categoria.dto';
-import { UpdateClienteDto } from '$classes/cliente/dto/update-cliente.dto';
-import { EmpresaCreateData } from '$classes/empresa/types';
-import { UpdateRamoDto } from '$classes/ramo/dto/update-ramo.dto';
-import { UpdateTipoDeProdutoDto } from '$classes/tipo_produto/dto/update-tipo-de-produto.dto';
-import { UpdateUmDto } from '$classes/um/dto/update-um.dto';
-import { ClientesObject } from '$screens/Clientes/types';
->>>>>>> ab141bfd11429a7f6b0b233f094958d696230364
 import { ParamListBase, RouteProp } from '@react-navigation/native';
 
 export type RootStackParamList = {

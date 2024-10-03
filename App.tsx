@@ -4,11 +4,11 @@ import * as SplashScreen from 'expo-splash-screen';
 import * as FileSystem from 'expo-file-system';
 import { Asset } from 'expo-asset';
 import { SQLiteProvider } from 'expo-sqlite';
-import App from '@app';
+import Application from '@app';
 
 SplashScreen.preventAutoHideAsync();
 
-export default function Application() {
+export default function App() {
   const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -38,7 +38,7 @@ export default function Application() {
   return (
     <ThemeProviderApp>
       <SQLiteProvider databaseName="stock.db">
-        <App />
+        <Application />
       </SQLiteProvider>
     </ThemeProviderApp>
   );

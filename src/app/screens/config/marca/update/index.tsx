@@ -1,8 +1,5 @@
-const Update: React.FC  = () => {
-    return (
-        <>
-        </>
-    )
-}
+const Update: React.FC = () => {
+  return <></>;
+};
 
 export default Update;

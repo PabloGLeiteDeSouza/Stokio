@@ -38,7 +38,7 @@ const Screens: React.FC = () => {
             <FontAwesome6 name="bag-shopping" {...props} />
           ),
           headerShown: false,
-          title: 'Produtos'
+          title: 'Produtos',
         }}
       />
       <Tab.Screen
@@ -49,7 +49,7 @@ const Screens: React.FC = () => {
             <FontAwesome6 name="cart-shopping" {...props} />
           ),
           headerShown: false,
-          title: 'Vendas'
+          title: 'Vendas',
         }}
       />
       <Tab.Screen
@@ -60,7 +60,7 @@ const Screens: React.FC = () => {
             <FontAwesome6 name="boxes-stacked" {...props} />
           ),
           headerShown: false,
-          title: 'Ua'
+          title: 'Ua',
         }}
       />
       <Tab.Screen

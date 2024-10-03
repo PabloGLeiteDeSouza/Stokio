@@ -1,9 +1,9 @@
-import { createStackNavigator } from '@react-navigation/stack';
 import View from './view';
 import Create from './create';
 import Update from './update';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 
 const ScreensUM: React.FC = () => {
   return (
