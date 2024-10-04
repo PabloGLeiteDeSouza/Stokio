@@ -68,9 +68,9 @@ import { Card } from '@gluestack-ui/themed';
 import { EditIcon } from '@gluestack-ui/themed';
 import Pessoas from './pessoas.json';
 import { SearchIcon } from '@gluestack-ui/themed';
+import { VisualizarClienteScreen } from '@/interfaces/cliente';
 
-const View: React.FC = () => {
-
+const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
   type Pessoa = {
     nome: string;
     idade: number;
@@ -100,7 +100,7 @@ const View: React.FC = () => {
   const [clientes, setClientes] = React.useState<Array<Pessoa>>(Pessoas);
 
   return (
-    <Box w="$full" px="$8" py="$8">
+    <Box w="$full" h="$full" px="$8" py="$8">
       <Box gap="$5">
         <Formik
           initialValues={{
@@ -211,7 +211,7 @@ const View: React.FC = () => {
             );
           }}
         </Formik>
-        <Button>
+        <Button onPress={() => navigation?.navigate('cadastrar-cliente')}>
           <ButtonText>Cadastrar Cliente</ButtonText>
           <ButtonIcon ml="$5" as={AddIcon} />
         </Button>
@@ -222,7 +222,7 @@ const View: React.FC = () => {
         <Divider />
       </Box>
       <ScrollView w="$full">
-        <Box w="$full" mb={330}>
+        <Box w="$full">
           {clientes.map((cliente, index) => (
             <Card key={index} size="md" variant="elevated" m="$3">
               <HStack justifyContent="space-between">

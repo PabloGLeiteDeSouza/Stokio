@@ -66,12 +66,11 @@ import { Box, ScrollView } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import { Card } from '@gluestack-ui/themed';
 import { EditIcon } from '@gluestack-ui/themed';
-import Uas from './pessoas.json';
+import Ramos from './pessoas.json';
 import { SearchIcon } from '@gluestack-ui/themed';
 
 const View: React.FC = () => {
-
-  type Ua = {
+  type Ramo = {
     nome: string;
     idade: number;
     cpf: string;
@@ -97,7 +96,7 @@ const View: React.FC = () => {
     cor: string;
   };
 
-  const [uas, setUas] = React.useState<Array<Ua>>(Uas);
+  const [ramos, setRamos] = React.useState<Array<Ramo>>(Ramos);
 
   return (
     <Box w="$full" px="$8" py="$8">
@@ -107,73 +106,11 @@ const View: React.FC = () => {
             busca: '',
             tipo: '',
           }}
+          onSubmit={() => {}}
         >
-          {({ values, handleChange, setFieldValue }) => {
+          {({ values, handleChange, errors }) => {
             return (
               <>
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>
-                      Selecione o tipo de busca da uas
-                    </FormControlLabelText>
-                  </FormControlLabel>
-                  <Select
-                    onValueChange={(text) => {
-                      setFieldValue('tipo', text);
-                    }}
-                    isInvalid={false}
-                    isDisabled={false}
-                  >
-                    <SelectTrigger size="lg" variant={'rounded'}>
-                      <SelectInput placeholder="Selecione uma opcao" />
-                      <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
-                    </SelectTrigger>
-                    <SelectPortal>
-                      <SelectBackdrop />
-                      <SelectContent>
-                        <SelectDragIndicatorWrapper>
-                          <SelectDragIndicator />
-                        </SelectDragIndicatorWrapper>
-                        <SelectItem label="UX Research" value="UX Research" />
-                        <SelectItem
-                          label="Web Development"
-                          value="Web Development"
-                        />
-                        <SelectItem
-                          label="Cross Platform Development Process"
-                          value="Cross Platform Development Process"
-                        />
-                        <SelectItem
-                          label="UI Designing"
-                          value="UI Designing"
-                          isDisabled={true}
-                        />
-                        <SelectItem
-                          label="Backend Development"
-                          value="Backend Development"
-                        />
-                      </SelectContent>
-                    </SelectPortal>
-                  </Select>
-
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Must be atleast 6 characters.
-                    </FormControlHelperText>
-                  </FormControlHelper>
-
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
                 <FormControl
                   isInvalid={false}
                   size={'md'}
@@ -188,6 +125,7 @@ const View: React.FC = () => {
                       type="text"
                       value={values.busca}
                       placeholder="Buscar"
+                      onChangeText={handleChange('buscar')}
                     />
                     <Button>
                       <ButtonIcon as={SearchIcon} />
@@ -196,15 +134,13 @@ const View: React.FC = () => {
 
                   <FormControlHelper>
                     <FormControlHelperText>
-                      Must be atleast 6 characters.
+                      Informe o nome do Ramo que deseja buscar.
                     </FormControlHelperText>
                   </FormControlHelper>
 
                   <FormControlError>
                     <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
+                    <FormControlErrorText>{errors.busca}</FormControlErrorText>
                   </FormControlError>
                 </FormControl>
               </>
@@ -212,26 +148,26 @@ const View: React.FC = () => {
           }}
         </Formik>
         <Button>
-          <ButtonText>Cadastrar UAs</ButtonText>
+          <ButtonText>Cadastrar Ramos</ButtonText>
           <ButtonIcon ml="$5" as={AddIcon} />
         </Button>
       </Box>
       <Box w="$full" alignItems="center" gap="$5" my="$5">
         <Divider />
-        <Text>UAs</Text>
+        <Text>Ramos</Text>
         <Divider />
       </Box>
       <ScrollView w="$full">
-        <Box w="$full" mb={330}>
-          {uas.map((ua, index) => (
+        <Box w="$full" mb={220}>
+          {ramos.map((ramo, index) => (
             <Card key={index} size="md" variant="elevated" m="$3">
               <HStack justifyContent="space-between">
                 <Box w="$2/3">
                   <Heading mb="$1" size="md">
-                    {ua.nome}
+                    {ramo.nome}
                   </Heading>
-                  <Text size="sm">{ua.data_nasc}</Text>
-                  <Text size="sm">{ua.cpf}</Text>
+                  <Text size="sm">{ramo.data_nasc}</Text>
+                  <Text size="sm">{ramo.cpf}</Text>
                 </Box>
                 <Box gap="$5">
                   <Button action="negative">

@@ -19,9 +19,9 @@ const ProdutoScreens: React.FC = () => {
         options={{ title: 'Cadastrar Produtos' }}
       />
       <Stack.Screen
-        name="editar-produto"
+        name="atualizar-produto"
         component={Update}
-        options={{ title: 'Editar Produto' }}
+        options={{ title: 'Atualizar Produto' }}
       />
     </Stack.Navigator>
   );

@@ -14,12 +14,12 @@ const ClienteScreens: React.FC = () => {
         options={{ title: 'Visualizar Clientes' }}
       />
       <Stack.Screen
-        name="cadastrar-ua"
+        name="cadastrar-cliente"
         component={Create}
         options={{ title: 'Cadastrar Clientes' }}
       />
       <Stack.Screen
-        name="editar-ua"
+        name="atualizar-cliente"
         component={Update}
         options={{ title: 'Editar Clientes' }}
       />

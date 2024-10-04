@@ -70,7 +70,6 @@ import Empresas from './pessoas.json';
 import { SearchIcon } from '@gluestack-ui/themed';
 
 const View: React.FC = () => {
-
   type Empresa = {
     nome: string;
     idade: number;

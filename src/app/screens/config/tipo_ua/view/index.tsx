@@ -70,7 +70,6 @@ import Tipos_Uas from './pessoas.json';
 import { SearchIcon } from '@gluestack-ui/themed';
 
 const View: React.FC = () => {
-
   type Tipos_Ua = {
     nome: string;
     idade: number;
@@ -97,7 +96,7 @@ const View: React.FC = () => {
     cor: string;
   };
 
-  const [Tipos_Uas, setTipos_Uas] = React.useState<Array<Tipos_Ua>>(Tipos_Uas);
+  const [tipos_Uas, setTipos_Uas] = React.useState<Array<Tipos_Ua>>(Tipos_Uas);
 
   return (
     <Box w="$full" px="$8" py="$8">
@@ -105,75 +104,11 @@ const View: React.FC = () => {
         <Formik
           initialValues={{
             busca: '',
-            tipo: '',
           }}
         >
-          {({ values, handleChange, setFieldValue }) => {
+          {({ values, handleChange }) => {
             return (
               <>
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>
-                      Selecione o tipo de busca da Tipos_Uas
-                    </FormControlLabelText>
-                  </FormControlLabel>
-                  <Select
-                    onValueChange={(text) => {
-                      setFieldValue('tipo', text);
-                    }}
-                    isInvalid={false}
-                    isDisabled={false}
-                  >
-                    <SelectTrigger size="lg" variant={'rounded'}>
-                      <SelectInput placeholder="Selecione uma opcao" />
-                      <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
-                    </SelectTrigger>
-                    <SelectPortal>
-                      <SelectBackdrop />
-                      <SelectContent>
-                        <SelectDragIndicatorWrapper>
-                          <SelectDragIndicator />
-                        </SelectDragIndicatorWrapper>
-                        <SelectItem label="UX Research" value="UX Research" />
-                        <SelectItem
-                          label="Web Development"
-                          value="Web Development"
-                        />
-                        <SelectItem
-                          label="Cross Platform Development Process"
-                          value="Cross Platform Development Process"
-                        />
-                        <SelectItem
-                          label="UI Designing"
-                          value="UI Designing"
-                          isDisabled={true}
-                        />
-                        <SelectItem
-                          label="Backend Development"
-                          value="Backend Development"
-                        />
-                      </SelectContent>
-                    </SelectPortal>
-                  </Select>
-
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Must be atleast 6 characters.
-                    </FormControlHelperText>
-                  </FormControlHelper>
-
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
                 <FormControl
                   isInvalid={false}
                   size={'md'}
@@ -188,6 +123,7 @@ const View: React.FC = () => {
                       type="text"
                       value={values.busca}
                       placeholder="Buscar"
+                      onChangeText={handleChange('buscar')}
                     />
                     <Button>
                       <ButtonIcon as={SearchIcon} />
@@ -212,18 +148,18 @@ const View: React.FC = () => {
           }}
         </Formik>
         <Button>
-          <ButtonText>Cadastrar Tipos_Uas</ButtonText>
+          <ButtonText>Cadastrar Tipos de UAs</ButtonText>
           <ButtonIcon ml="$5" as={AddIcon} />
         </Button>
       </Box>
       <Box w="$full" alignItems="center" gap="$5" my="$5">
         <Divider />
-        <Text>Tipos_Uas</Text>
+        <Text>Tipos de Unidades de Armazenamento</Text>
         <Divider />
       </Box>
       <ScrollView w="$full">
-        <Box w="$full" mb={330}>
-          {Tipos_Uas.map((Tipo_Ua, index) => (
+        <Box w="$full" mb={220}>
+          {tipos_Uas.map((Tipo_Ua, index) => (
             <Card key={index} size="md" variant="elevated" m="$3">
               <HStack justifyContent="space-between">
                 <Box w="$2/3">

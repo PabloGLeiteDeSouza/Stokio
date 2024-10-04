@@ -19,9 +19,9 @@ const VendasScreens: React.FC = () => {
         options={{ title: 'Criar Vendas' }}
       />
       <Stack.Screen
-        name="editar-vendas"
+        name="atualizar-vendas"
         component={Update}
-        options={{ title: 'Editar Venda' }}
+        options={{ title: 'Atualizar Venda' }}
       />
     </Stack.Navigator>
   );

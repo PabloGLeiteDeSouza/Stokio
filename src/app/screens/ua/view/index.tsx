@@ -70,7 +70,6 @@ import Uas from './pessoas.json';
 import { SearchIcon } from '@gluestack-ui/themed';
 
 const View: React.FC = () => {
-
   type Ua = {
     nome: string;
     idade: number;

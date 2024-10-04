@@ -66,12 +66,11 @@ import { Box, ScrollView } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import { Card } from '@gluestack-ui/themed';
 import { EditIcon } from '@gluestack-ui/themed';
-import Uas from './pessoas.json';
+import Marcas from './pessoas.json';
 import { SearchIcon } from '@gluestack-ui/themed';
 
 const View: React.FC = () => {
-
-  type Ua = {
+  type Marca = {
     nome: string;
     idade: number;
     cpf: string;
@@ -97,7 +96,7 @@ const View: React.FC = () => {
     cor: string;
   };
 
-  const [uas, setUas] = React.useState<Array<Ua>>(Uas);
+  const [marcas, setMarcas] = React.useState<Array<Marca>>(Marcas);
 
   return (
     <Box w="$full" px="$8" py="$8">
@@ -119,7 +118,7 @@ const View: React.FC = () => {
                 >
                   <FormControlLabel>
                     <FormControlLabelText>
-                      Selecione o tipo de busca da uas
+                      Selecione o tipo de busca da Marca
                     </FormControlLabelText>
                   </FormControlLabel>
                   <Select
@@ -212,26 +211,26 @@ const View: React.FC = () => {
           }}
         </Formik>
         <Button>
-          <ButtonText>Cadastrar UAs</ButtonText>
+          <ButtonText>Cadastrar Marcas</ButtonText>
           <ButtonIcon ml="$5" as={AddIcon} />
         </Button>
       </Box>
       <Box w="$full" alignItems="center" gap="$5" my="$5">
         <Divider />
-        <Text>UAs</Text>
+        <Text>Marcas</Text>
         <Divider />
       </Box>
       <ScrollView w="$full">
         <Box w="$full" mb={330}>
-          {uas.map((ua, index) => (
+          {marcas.map((Marca, index) => (
             <Card key={index} size="md" variant="elevated" m="$3">
               <HStack justifyContent="space-between">
                 <Box w="$2/3">
                   <Heading mb="$1" size="md">
-                    {ua.nome}
+                    {Marca.nome}
                   </Heading>
-                  <Text size="sm">{ua.data_nasc}</Text>
-                  <Text size="sm">{ua.cpf}</Text>
+                  <Text size="sm">{Marca.data_nasc}</Text>
+                  <Text size="sm">{Marca.cpf}</Text>
                 </Box>
                 <Box gap="$5">
                   <Button action="negative">
