@@ -69,10 +69,10 @@ import { Card } from '@gluestack-ui/themed';
 import { EditIcon } from '@gluestack-ui/themed';
 import Uas from './pessoas.json';
 import { SearchIcon } from '@gluestack-ui/themed';
-import BuscasTipos from "./busca_tipos_vendas.json";
-import { FontAwesome6 } from '@expo/vector-icons';
+import BuscasTipos from './busca_tipos_vendas.json';
+import { VisualizarProdutoScreen } from '@/interfaces/produto';
 
-const View: React.FC<> = () => {
+const View: React.FC<VisualizarProdutoScreen> = () => {
   type Ua = {
     nome: string;
     idade: number;
@@ -99,12 +99,12 @@ const View: React.FC<> = () => {
     cor: string;
   };
 
-  const tipos_busca: Array<{ label: string, value: string }> = BuscasTipos;
+  const tipos_busca: Array<{ label: string; value: string }> = BuscasTipos;
 
   const [uas, setUas] = React.useState<Array<Ua>>(Uas);
 
   return (
-    <Box w="$full" px="$8" py="$8">
+    <Box w="$full" h="$full" px="$8" py="$8">
       <Box gap="$5">
         <Formik
           initialValues={{
@@ -220,7 +220,7 @@ const View: React.FC<> = () => {
         <Divider />
       </Box>
       <ScrollView w="$full">
-        <Box w="$full" mb={330}>
+        <Box w="$full">
           {uas.map((ua, index) => (
             <Card key={index} size="md" variant="elevated" m="$3">
               <HStack justifyContent="space-between">

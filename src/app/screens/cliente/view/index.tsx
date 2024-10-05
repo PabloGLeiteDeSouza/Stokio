@@ -237,7 +237,9 @@ const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
                   <Button action="negative">
                     <ButtonIcon as={TrashIcon} />
                   </Button>
-                  <Button>
+                  <Button
+                    onPress={() => navigation?.navigate('atualizar-cliente')}
+                  >
                     <ButtonIcon as={EditIcon} />
                   </Button>
                 </Box>

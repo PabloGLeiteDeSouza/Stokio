@@ -103,7 +103,7 @@ const View: React.FC = () => {
   const [uas, setUas] = React.useState<Array<Ua>>(Uas);
 
   return (
-    <Box w="$full" px="$8" py="$8">
+    <Box w="$full" h="$full" px="$8" py="$8">
       <Box gap="$5">
         <Formik
           initialValues={{
@@ -219,7 +219,7 @@ const View: React.FC = () => {
         <Divider />
       </Box>
       <ScrollView w="$full">
-        <Box w="$full" mb={330}>
+        <Box w="$full">
           {uas.map((ua, index) => (
             <Card key={index} size="md" variant="elevated" m="$3">
               <HStack justifyContent="space-between">
