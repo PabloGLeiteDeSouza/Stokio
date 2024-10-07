@@ -7,8 +7,8 @@ import AuthScreen from '@screens/auth';
 import Screens from './screens';
 import { NavigationContainer } from '@react-navigation/native';
 import FabToggleTheme from '@/components/FabToggleTheme';
-import { useThemeApp } from '@/providers/theme';
 import { ConfigTheme } from '@/constants/colors';
+import useThemeApp from '@/hooks/useTheme';
 
 const Stack = createNativeStackNavigator();
 

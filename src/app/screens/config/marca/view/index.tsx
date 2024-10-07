@@ -61,118 +61,58 @@ import {
   RemoveIcon,
   TrashIcon,
   AddIcon,
+  FlatList,
 } from '@gluestack-ui/themed';
 import { Box, ScrollView } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import { Card } from '@gluestack-ui/themed';
 import { EditIcon } from '@gluestack-ui/themed';
-import Marcas from './pessoas.json';
+import Marcas from './marcas.json';
 import { SearchIcon } from '@gluestack-ui/themed';
+import { VisualizarMarcaScreen } from '@/interfaces/marca';
+import { Marca, MarcaFlatList } from '@/types/screens/marca';
+import { ListRenderItem } from 'react-native';
 
-const View: React.FC = () => {
-  type Marca = {
-    nome: string;
-    idade: number;
-    cpf: string;
-    rg: string;
-    data_nasc: string;
-    sexo: string;
-    signo: string;
-    mae: string;
-    pai: string;
-    email: string;
-    senha: string;
-    cep: string;
-    endereco: string;
-    numero: number;
-    bairro: string;
-    cidade: string;
-    estado: string;
-    telefone_fixo: string;
-    celular: string;
-    altura: string;
-    peso: number;
-    tipo_sanguineo: string;
-    cor: string;
-  };
-
+const View: React.FC<VisualizarMarcaScreen> = ({ navigation }) => {
   const [marcas, setMarcas] = React.useState<Array<Marca>>(Marcas);
-
+  const FlatListMarca = FlatList as MarcaFlatList;
+  const ListRenderMarca: ListRenderItem<Marca> = ({ item }) => {
+    return (
+      <Card size="md" variant="elevated" m="$3">
+        <HStack justifyContent="space-between">
+          <Box w="$2/3">
+            <Heading mb="$1" size="md">
+              {item.nome}
+            </Heading>
+          </Box>
+          <Box gap="$5">
+            <Button action="negative">
+              <ButtonIcon as={TrashIcon} />
+            </Button>
+            <Button
+              onPress={() =>
+                navigation?.navigate('atualizar-marca', { id: item.id })
+              }
+            >
+              <ButtonIcon as={EditIcon} />
+            </Button>
+          </Box>
+        </HStack>
+      </Card>
+    );
+  };
   return (
-    <Box w="$full" px="$8" py="$8">
+    <Box h="$full" w="$full" px="$8" py="$8">
       <Box gap="$5">
         <Formik
           initialValues={{
             busca: '',
-            tipo: '',
           }}
+          onSubmit={() => {}}
         >
-          {({ values, handleChange, setFieldValue }) => {
+          {({ values, handleChange, errors }) => {
             return (
               <>
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>
-                      Selecione o tipo de busca da Marca
-                    </FormControlLabelText>
-                  </FormControlLabel>
-                  <Select
-                    onValueChange={(text) => {
-                      setFieldValue('tipo', text);
-                    }}
-                    isInvalid={false}
-                    isDisabled={false}
-                  >
-                    <SelectTrigger size="lg" variant={'rounded'}>
-                      <SelectInput placeholder="Selecione uma opcao" />
-                      <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
-                    </SelectTrigger>
-                    <SelectPortal>
-                      <SelectBackdrop />
-                      <SelectContent>
-                        <SelectDragIndicatorWrapper>
-                          <SelectDragIndicator />
-                        </SelectDragIndicatorWrapper>
-                        <SelectItem label="UX Research" value="UX Research" />
-                        <SelectItem
-                          label="Web Development"
-                          value="Web Development"
-                        />
-                        <SelectItem
-                          label="Cross Platform Development Process"
-                          value="Cross Platform Development Process"
-                        />
-                        <SelectItem
-                          label="UI Designing"
-                          value="UI Designing"
-                          isDisabled={true}
-                        />
-                        <SelectItem
-                          label="Backend Development"
-                          value="Backend Development"
-                        />
-                      </SelectContent>
-                    </SelectPortal>
-                  </Select>
-
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Must be atleast 6 characters.
-                    </FormControlHelperText>
-                  </FormControlHelper>
-
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
                 <FormControl
                   isInvalid={false}
                   size={'md'}
@@ -187,6 +127,7 @@ const View: React.FC = () => {
                       type="text"
                       value={values.busca}
                       placeholder="Buscar"
+                      onChangeText={handleChange('buscar')}
                     />
                     <Button>
                       <ButtonIcon as={SearchIcon} />
@@ -201,16 +142,14 @@ const View: React.FC = () => {
 
                   <FormControlError>
                     <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
+                    <FormControlErrorText>{errors.busca}</FormControlErrorText>
                   </FormControlError>
                 </FormControl>
               </>
             );
           }}
         </Formik>
-        <Button>
+        <Button onPress={() => navigation?.navigate('cadastrar-marca')}>
           <ButtonText>Cadastrar Marcas</ButtonText>
           <ButtonIcon ml="$5" as={AddIcon} />
         </Button>
@@ -220,31 +159,11 @@ const View: React.FC = () => {
         <Text>Marcas</Text>
         <Divider />
       </Box>
-      <ScrollView w="$full">
-        <Box w="$full" mb={330}>
-          {marcas.map((Marca, index) => (
-            <Card key={index} size="md" variant="elevated" m="$3">
-              <HStack justifyContent="space-between">
-                <Box w="$2/3">
-                  <Heading mb="$1" size="md">
-                    {Marca.nome}
-                  </Heading>
-                  <Text size="sm">{Marca.data_nasc}</Text>
-                  <Text size="sm">{Marca.cpf}</Text>
-                </Box>
-                <Box gap="$5">
-                  <Button action="negative">
-                    <ButtonIcon as={TrashIcon} />
-                  </Button>
-                  <Button>
-                    <ButtonIcon as={EditIcon} />
-                  </Button>
-                </Box>
-              </HStack>
-            </Card>
-          ))}
-        </Box>
-      </ScrollView>
+      <FlatListMarca
+        data={marcas}
+        renderItem={ListRenderMarca}
+        keyExtractor={(item) => String(item.id)}
+      />
     </Box>
   );
 };

@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Create from './create';
 import View from './view';
 import Update from './update';
+import Details from './view/details';
 
 const Stack = createNativeStackNavigator();
 
@@ -11,17 +12,22 @@ const UaScreens: React.FC = () => {
       <Stack.Screen
         name="visualizar-uas"
         component={View}
-        options={{ title: 'Visualizar Unidade de Armazenamento' }}
+        options={{ title: 'Visualizar Unidades de Armazenamento' }}
       />
       <Stack.Screen
         name="cadastrar-ua"
         component={Create}
-        options={{ title: 'Cadastrar Unidades de Armazenamento' }}
+        options={{ title: 'Cadastrar Unidade de Armazenamento' }}
       />
       <Stack.Screen
-        name="editar-ua"
+        name="atualizar-ua"
         component={Update}
-        options={{ title: 'Editar Unidades de Armazenamento' }}
+        options={{ title: 'Editar Unidade de Armazenamento' }}
+      />
+      <Stack.Screen
+        name="detalhes-ua"
+        component={Details}
+        options={{ title: 'Detalhes da Unidade de Armazenamento' }}
       />
     </Stack.Navigator>
   );

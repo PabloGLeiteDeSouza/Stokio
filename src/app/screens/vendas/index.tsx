@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import View from './view';
 import Create from './create';
 import Update from './update';
+import Details from './view/details';
 
 const Stack = createNativeStackNavigator();
 
@@ -14,14 +15,19 @@ const VendasScreens: React.FC = () => {
         options={{ title: 'Visualizar Vendas' }}
       />
       <Stack.Screen
-        name="criar-vendas"
+        name="cadastrar-venda"
         component={Create}
         options={{ title: 'Criar Vendas' }}
       />
       <Stack.Screen
-        name="atualizar-vendas"
+        name="atualizar-venda"
         component={Update}
         options={{ title: 'Atualizar Venda' }}
+      />
+      <Stack.Screen
+        name="detalhes-venda"
+        component={Details}
+        options={{ title: 'Detalhes da Venda' }}
       />
     </Stack.Navigator>
   );

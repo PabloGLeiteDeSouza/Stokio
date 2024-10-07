@@ -23,6 +23,11 @@ export type RootStackParamList = {
   'visualizar-clientes'?: object;
   'visualizar-ramos'?: object;
   'visualizar-itens-vendas'?: object;
+  'detalhes-cliente'?: { id: number | string };
+  'detalhes-empresa'?: { id: number | string };
+  'detalhes-produto'?: { id: number | string };
+  'detalhes-venda'?: { id: number | string };
+  'detalhes-ua'?: { id: number | string };
   'cadastrar-produto'?: { code?: string; result?: boolean };
   'cadastrar-cliente'?: { nome?: string };
   'cadastrar-empresa'?: object;
@@ -35,18 +40,17 @@ export type RootStackParamList = {
   'cadastrar-ramo'?: object;
   'cadastrar-venda'?: object;
   'cadastrar-item-venda'?: object;
-  'atualizar-produto'?: object;
-  'atualizar-empresa'?: { empresa: UpdateEmpresaObject };
-  'atualizar-ua'?: object;
-  'atualizar-um'?: { um: UpdateUmDto };
-  'atualizar-categoria'?: { categoria: UpdateCategoriaDto };
-  'atualizar-marca'?: object;
-  'atualizar-tipo-produto'?: { tipo_de_produto: UpdateTipoDeProdutoDto };
-  'atualizar-tipo-ua'?: object;
-  'atualizar-ramo'?: { ramo: UpdateRamoDto };
-  'atualizar-cliente'?: { cliente: ClientesObject };
-  'atualizar-venda'?: object;
-  'atualizar-venda-item'?: object;
+  'atualizar-produto'?: { id: number | string };
+  'atualizar-empresa'?: { id: number | string };
+  'atualizar-ua'?: { id: number | string };
+  'atualizar-um'?: { id: number | string };
+  'atualizar-marca'?: { id: number | string };
+  'atualizar-tipo-produto'?: { id: number | string };
+  'atualizar-tipo-ua'?: { id: number | string };
+  'atualizar-ramo'?: { id: number | string };
+  'atualizar-cliente'?: { id: number | string };
+  'atualizar-venda'?: { id: number | string };
+  'atualizar-venda-item'?: { id: number | string };
   'app-screens'?: object;
   'auth-screen'?: object;
   'screens-config'?: object;
@@ -80,6 +84,11 @@ export type ParamList =
   | 'visualizar-ramos'
   | 'visualizar-venda'
   | 'visualizar-item-venda'
+  | 'detalhes-cliente'
+  | 'detalhes-empresa'
+  | 'detalhes-produto'
+  | 'detalhes-venda'
+  | 'detalhes-ua'
   | 'cadastrar-clientes'
   | 'cadastrar-empresas'
   | 'cadastrar-categoria'
@@ -108,4 +117,7 @@ export type ParamList =
   | 'screens-config'
   | 'configuracoes';
 
-export type ParamListCodeScanner = 'cadastrar-produtos' | 'visualizar-produtos';
+export type ParamListCodeScanner =
+  | 'cadastrar-produtos'
+  | 'visualizar-produtos'
+  | 'cadastrar-venda';

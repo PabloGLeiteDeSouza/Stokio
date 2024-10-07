@@ -61,43 +61,47 @@ import {
   RemoveIcon,
   TrashIcon,
   AddIcon,
+  EyeIcon,
 } from '@gluestack-ui/themed';
-import { Box, ScrollView } from '@gluestack-ui/themed';
+import { Box } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import { Card } from '@gluestack-ui/themed';
-import { EditIcon } from '@gluestack-ui/themed';
-import Pessoas from './pessoas.json';
+import CLIENTES from './clientes.json';
 import { SearchIcon } from '@gluestack-ui/themed';
 import { VisualizarClienteScreen } from '@/interfaces/cliente';
+import { FlatList } from '@gluestack-ui/themed';
+import { ListRenderItem } from 'react-native';
+import { Cliente, ClientFlatList } from './types';
 
 const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
-  type Pessoa = {
-    nome: string;
-    idade: number;
-    cpf: string;
-    rg: string;
-    data_nasc: string;
-    sexo: string;
-    signo: string;
-    mae: string;
-    pai: string;
-    email: string;
-    senha: string;
-    cep: string;
-    endereco: string;
-    numero: number;
-    bairro: string;
-    cidade: string;
-    estado: string;
-    telefone_fixo: string;
-    celular: string;
-    altura: string;
-    peso: number;
-    tipo_sanguineo: string;
-    cor: string;
-  };
+  const [clientes, setClientes] = React.useState<Array<Cliente>>(CLIENTES);
 
-  const [clientes, setClientes] = React.useState<Array<Pessoa>>(Pessoas);
+  const FlatListClient = FlatList as ClientFlatList;
+
+  const ListRenderCliente: ListRenderItem<Cliente> = ({ item }) => {
+    return (
+      <Card size="md" variant="elevated" m="$3">
+        <HStack justifyContent="space-between">
+          <Box w="$2/3">
+            <Heading mb="$1" size="md">
+              {item.nome}
+            </Heading>
+            <Text size="sm">{item.data_nascimento}</Text>
+            <Text size="sm">{item.cpf}</Text>
+          </Box>
+          <Box gap="$5">
+            <Button
+              onPress={() =>
+                navigation?.navigate('detalhes-cliente', { id: item.id })
+              }
+            >
+              <ButtonIcon as={EyeIcon} />
+            </Button>
+          </Box>
+        </HStack>
+      </Card>
+    );
+  };
 
   return (
     <Box w="$full" h="$full" px="$8" py="$8">
@@ -107,6 +111,7 @@ const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
             busca: '',
             tipo: '',
           }}
+          onSubmit={() => {}}
         >
           {({ values, handleChange, setFieldValue }) => {
             return (
@@ -188,6 +193,7 @@ const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
                       type="text"
                       value={values.busca}
                       placeholder="Buscar"
+                      onChangeText={handleChange('busca')}
                     />
                     <Button>
                       <ButtonIcon as={SearchIcon} />
@@ -221,33 +227,11 @@ const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
         <Text>Clientes</Text>
         <Divider />
       </Box>
-      <ScrollView w="$full">
-        <Box w="$full">
-          {clientes.map((cliente, index) => (
-            <Card key={index} size="md" variant="elevated" m="$3">
-              <HStack justifyContent="space-between">
-                <Box w="$2/3">
-                  <Heading mb="$1" size="md">
-                    {cliente.nome}
-                  </Heading>
-                  <Text size="sm">{cliente.data_nasc}</Text>
-                  <Text size="sm">{cliente.cpf}</Text>
-                </Box>
-                <Box gap="$5">
-                  <Button action="negative">
-                    <ButtonIcon as={TrashIcon} />
-                  </Button>
-                  <Button
-                    onPress={() => navigation?.navigate('atualizar-cliente')}
-                  >
-                    <ButtonIcon as={EditIcon} />
-                  </Button>
-                </Box>
-              </HStack>
-            </Card>
-          ))}
-        </Box>
-      </ScrollView>
+      <FlatListClient
+        data={clientes}
+        renderItem={ListRenderCliente}
+        keyExtractor={(vl, i) => i.toString()}
+      />
     </Box>
   );
 };

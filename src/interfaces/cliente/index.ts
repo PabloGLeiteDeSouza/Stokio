@@ -5,6 +5,8 @@ import {
   AtualizarClienteScreenRouterProp,
   VisualisarClienteScreenNavigationProp,
   VisualisarClienteScreenRouterProp,
+  DetalhesClienteScreenNavigationProp,
+  DetalhesClienteScreenRouterProp,
 } from '@/types/screens/cliente';
 
 export interface CadastrarClienteScreen {
@@ -20,4 +22,9 @@ export interface AtualizarClienteScreen {
 export interface VisualizarClienteScreen {
   navigation?: VisualisarClienteScreenNavigationProp;
   route?: VisualisarClienteScreenRouterProp;
+}
+
+export interface DetalhesClienteScreen {
+  navigation?: DetalhesClienteScreenNavigationProp;
+  route?: DetalhesClienteScreenRouterProp;
 }

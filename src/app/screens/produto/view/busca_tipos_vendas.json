@@ -1,22 +1,22 @@
 [
     {
-        "label": "1",
-        "value": "1"
+        "label": "Codigo de barras",
+        "value": "codigo_de_barras"
     },
     {
-        "label": "2",
-        "value": "2"
+        "label": "Nome",
+        "value": "nome"
     },
     {
-        "label": "3",
-        "value": "3"
+        "label": "Marca",
+        "value": "marca"
     },
     {
-        "label": "4",
-        "value": "4"
+        "label": "Tipo",
+        "value": "tipo"
     },
     {
-        "label": "5",
-        "value": "5"
+        "label": "Unidade de armazenamento",
+        "value": "ua"
     }
 ]

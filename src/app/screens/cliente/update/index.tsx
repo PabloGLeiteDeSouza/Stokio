@@ -443,7 +443,7 @@ const Update: React.FC = () => {
                           </FormControlErrorText>
                         </FormControlError>
                       </FormControl>
-                      <Button action="negative" >
+                      <Button action="negative">
                         <ButtonIcon as={TrashIcon} />
                       </Button>
                       <Button action="positive">
@@ -481,7 +481,7 @@ const Update: React.FC = () => {
                           </FormControlErrorText>
                         </FormControlError>
                       </FormControl>
-                      <Button action="negative" >
+                      <Button action="negative">
                         <ButtonIcon as={TrashIcon} />
                       </Button>
                       <Button action="positive">
@@ -533,5 +533,5 @@ const Update: React.FC = () => {
       </ScrollView>
     </Box>
   );
-};;
+};
 export default Update;

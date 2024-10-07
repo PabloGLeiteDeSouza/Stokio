@@ -62,58 +62,65 @@ import {
   TrashIcon,
   AddIcon,
   EyeIcon,
+  FlatList,
 } from '@gluestack-ui/themed';
 import { Box, ScrollView } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import { Card } from '@gluestack-ui/themed';
 import { EditIcon } from '@gluestack-ui/themed';
-import Uas from './pessoas.json';
+import Produtos from './produtos.json';
 import { SearchIcon } from '@gluestack-ui/themed';
 import BuscasTipos from './busca_tipos_vendas.json';
 import { VisualizarProdutoScreen } from '@/interfaces/produto';
-
-const View: React.FC<VisualizarProdutoScreen> = () => {
-  type Ua = {
-    nome: string;
-    idade: number;
-    cpf: string;
-    rg: string;
-    data_nasc: string;
-    sexo: string;
-    signo: string;
-    mae: string;
-    pai: string;
-    email: string;
-    senha: string;
-    cep: string;
-    endereco: string;
-    numero: number;
-    bairro: string;
-    cidade: string;
-    estado: string;
-    telefone_fixo: string;
-    celular: string;
-    altura: string;
-    peso: number;
-    tipo_sanguineo: string;
-    cor: string;
+import { Produto, ProdutoFlatList } from '@/types/screens/produto';
+import { ListRenderItem } from 'react-native';
+import { FontAwesome5 } from '@expo/vector-icons';
+const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
+  const tipos_busca: Array<{
+    label: string;
+    value: string;
+  }> = BuscasTipos;
+  const [produtos, setProdutos] = React.useState<Array<Produto>>(Produtos);
+  const FlatListProduto = FlatList as ProdutoFlatList;
+  const ListRenderProduto: ListRenderItem<Produto> = ({ item }) => {
+    return (
+      <Card size="md" variant="elevated" m="$3">
+        <HStack justifyContent="space-between">
+          <Box w="$2/3" gap="$1">
+            <Heading mb="$1" size="md">
+              {item.nome}
+            </Heading>
+            <Text size="md">{item.data_validade}</Text>
+            <Text size="md">{item.tipo}</Text>
+            <Text size="md">{item.marca}</Text>
+          </Box>
+          <Box gap="$5">
+            <Button
+              action="primary"
+              onPress={() =>
+                navigation?.navigate('detalhes-produto', {
+                  id: item.id,
+                })
+              }
+            >
+              <ButtonIcon as={EyeIcon} />
+            </Button>
+          </Box>
+        </HStack>
+      </Card>
+    );
   };
-
-  const tipos_busca: Array<{ label: string; value: string }> = BuscasTipos;
-
-  const [uas, setUas] = React.useState<Array<Ua>>(Uas);
-
   return (
     <Box w="$full" h="$full" px="$8" py="$8">
       <Box gap="$5">
         <Formik
           initialValues={{
             busca: '',
-            tipo: '',
+            tipo: 'nome',
           }}
           onSubmit={() => {}}
         >
-          {({ values, handleChange, setFieldValue }) => {
+          {({ values, handleChange, setFieldValue, errors }) => {
             return (
               <>
                 <FormControl
@@ -133,6 +140,9 @@ const View: React.FC<VisualizarProdutoScreen> = () => {
                     }}
                     isInvalid={false}
                     isDisabled={false}
+                    selectedValue={
+                      tipos_busca.find((vl) => vl.value === values.tipo)?.label
+                    }
                   >
                     <SelectTrigger size="lg" variant={'rounded'}>
                       <SelectInput placeholder="Selecione uma opcao" />
@@ -171,45 +181,97 @@ const View: React.FC<VisualizarProdutoScreen> = () => {
                     </FormControlErrorText>
                   </FormControlError>
                 </FormControl>
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>Buscar</FormControlLabelText>
-                  </FormControlLabel>
-                  <Input>
-                    <InputField
-                      type="text"
-                      value={values.busca}
-                      placeholder="Buscar"
-                      onChangeText={handleChange('busca')}
-                    />
-                    <Button>
-                      <ButtonIcon as={SearchIcon} />
-                    </Button>
-                  </Input>
+                {values.tipo === 'codigo_de_barras' && (
+                  <>
+                    <FormControl
+                      isInvalid={false}
+                      size={'md'}
+                      isDisabled={false}
+                      isRequired={true}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>
+                          Buscar por codigo de barras
+                        </FormControlLabelText>
+                      </FormControlLabel>
+                      <HStack space="sm">
+                        <Input w="$4/5">
+                          <InputField
+                            type="text"
+                            placeholder="codigo de barras"
+                            value={values.busca}
+                          />
+                          <Button>
+                            <ButtonIcon
+                              as={(props: object) => (
+                                <FontAwesome5 name="barcode" {...props} />
+                              )}
+                            />
+                          </Button>
+                        </Input>
+                        <Button>
+                          <ButtonIcon as={SearchIcon} />
+                        </Button>
+                      </HStack>
 
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Must be atleast 6 characters.
-                    </FormControlHelperText>
-                  </FormControlHelper>
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          Informe um codigo de barras.
+                        </FormControlHelperText>
+                      </FormControlHelper>
 
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
+                      <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
+                          {errors.busca}
+                        </FormControlErrorText>
+                      </FormControlError>
+                    </FormControl>
+                  </>
+                )}
+                {values.tipo === 'nome' && (
+                  <>
+                    <FormControl
+                      isInvalid={false}
+                      size={'md'}
+                      isDisabled={false}
+                      isRequired={true}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>Buscar</FormControlLabelText>
+                      </FormControlLabel>
+                      <Input>
+                        <InputField
+                          type="text"
+                          value={values.busca}
+                          placeholder="Buscar"
+                          onChangeText={handleChange('busca')}
+                        />
+                        <Button>
+                          <ButtonIcon as={SearchIcon} />
+                        </Button>
+                      </Input>
+
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          Must be atleast 6 characters.
+                        </FormControlHelperText>
+                      </FormControlHelper>
+
+                      <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
+                          Atleast 6 characters are required.
+                        </FormControlErrorText>
+                      </FormControlError>
+                    </FormControl>
+                  </>
+                )}
               </>
             );
           }}
         </Formik>
-        <Button>
+        <Button onPress={() => navigation?.navigate('cadastrar-produto')}>
           <ButtonText>Cadastrar Produto</ButtonText>
           <ButtonIcon ml="$5" as={AddIcon} />
         </Button>
@@ -219,34 +281,11 @@ const View: React.FC<VisualizarProdutoScreen> = () => {
         <Text>Produtos</Text>
         <Divider />
       </Box>
-      <ScrollView w="$full">
-        <Box w="$full">
-          {uas.map((ua, index) => (
-            <Card key={index} size="md" variant="elevated" m="$3">
-              <HStack justifyContent="space-between">
-                <Box w="$2/3">
-                  <Heading mb="$1" size="md">
-                    {ua.nome}
-                  </Heading>
-                  <Text size="sm">{ua.data_nasc}</Text>
-                  <Text size="sm">{ua.cpf}</Text>
-                </Box>
-                <Box gap="$5">
-                  <Button action="primary">
-                    <ButtonIcon as={EyeIcon} />
-                  </Button>
-                  <Button>
-                    <ButtonIcon as={EditIcon} />
-                  </Button>
-                  <Button action="negative">
-                    <ButtonIcon as={TrashIcon} />
-                  </Button>
-                </Box>
-              </HStack>
-            </Card>
-          ))}
-        </Box>
-      </ScrollView>
+      <FlatListProduto
+        data={produtos}
+        renderItem={ListRenderProduto}
+        keyExtractor={(v) => v.id}
+      />
     </Box>
   );
 };

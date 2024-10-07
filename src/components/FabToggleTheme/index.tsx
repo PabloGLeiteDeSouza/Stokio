@@ -21,8 +21,8 @@ import {
   Image,
   CheckboxIcon,
 } from '@gluestack-ui/themed';
-import { useThemeApp } from '@/providers/theme';
 import { FontAwesome6 } from '@expo/vector-icons';
+import useThemeApp from '@/hooks/useTheme';
 
 const FabToggleTheme: React.FC = () => {
   const { toggleTheme, theme } = useThemeApp();

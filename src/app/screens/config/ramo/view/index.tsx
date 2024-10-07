@@ -61,50 +61,54 @@ import {
   RemoveIcon,
   TrashIcon,
   AddIcon,
+  FlatList,
+  EyeIcon,
 } from '@gluestack-ui/themed';
 import { Box, ScrollView } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import { Card } from '@gluestack-ui/themed';
 import { EditIcon } from '@gluestack-ui/themed';
-import Ramos from './pessoas.json';
+import Ramos from './ramos.json';
 import { SearchIcon } from '@gluestack-ui/themed';
+import { Ramo, RamoFlatList } from '@/types/screens/ramo';
+import { ListRenderItem } from 'react-native';
+import { VisualizarRamoScreen } from '@/interfaces/ramo';
 
-const View: React.FC = () => {
-  type Ramo = {
-    nome: string;
-    idade: number;
-    cpf: string;
-    rg: string;
-    data_nasc: string;
-    sexo: string;
-    signo: string;
-    mae: string;
-    pai: string;
-    email: string;
-    senha: string;
-    cep: string;
-    endereco: string;
-    numero: number;
-    bairro: string;
-    cidade: string;
-    estado: string;
-    telefone_fixo: string;
-    celular: string;
-    altura: string;
-    peso: number;
-    tipo_sanguineo: string;
-    cor: string;
+const View: React.FC<VisualizarRamoScreen> = ({ navigation }) => {
+  const [ramos, setRamos] = React.useState<Array<Ramo>>(Ramos);
+  const FlatListRamo = FlatList as RamoFlatList;
+  const ListRenderRamo: ListRenderItem<Ramo> = ({ item }) => {
+    return (
+      <Card size="md" variant="elevated" m="$3">
+        <HStack justifyContent="space-between">
+          <Box w="$2/3">
+            <Heading mb="$1" size="md">
+              {item.nome}
+            </Heading>
+          </Box>
+          <Box gap="$5">
+            <Button
+              onPress={() =>
+                navigation?.navigate('atualizar-ramo', { id: String(item.id) })
+              }
+            >
+              <ButtonIcon as={EditIcon} />
+            </Button>
+            <Button action="negative">
+              <ButtonIcon as={TrashIcon} />
+            </Button>
+          </Box>
+        </HStack>
+      </Card>
+    );
   };
 
-  const [ramos, setRamos] = React.useState<Array<Ramo>>(Ramos);
-
   return (
-    <Box w="$full" px="$8" py="$8">
+    <Box w="$full" h="$full" px="$8" py="$8">
       <Box gap="$5">
         <Formik
           initialValues={{
             busca: '',
-            tipo: '',
           }}
           onSubmit={() => {}}
         >
@@ -147,7 +151,7 @@ const View: React.FC = () => {
             );
           }}
         </Formik>
-        <Button>
+        <Button onPress={() => navigation?.navigate('cadastrar-ramo')}>
           <ButtonText>Cadastrar Ramos</ButtonText>
           <ButtonIcon ml="$5" as={AddIcon} />
         </Button>
@@ -157,31 +161,11 @@ const View: React.FC = () => {
         <Text>Ramos</Text>
         <Divider />
       </Box>
-      <ScrollView w="$full">
-        <Box w="$full" mb={220}>
-          {ramos.map((ramo, index) => (
-            <Card key={index} size="md" variant="elevated" m="$3">
-              <HStack justifyContent="space-between">
-                <Box w="$2/3">
-                  <Heading mb="$1" size="md">
-                    {ramo.nome}
-                  </Heading>
-                  <Text size="sm">{ramo.data_nasc}</Text>
-                  <Text size="sm">{ramo.cpf}</Text>
-                </Box>
-                <Box gap="$5">
-                  <Button action="negative">
-                    <ButtonIcon as={TrashIcon} />
-                  </Button>
-                  <Button>
-                    <ButtonIcon as={EditIcon} />
-                  </Button>
-                </Box>
-              </HStack>
-            </Card>
-          ))}
-        </Box>
-      </ScrollView>
+      <FlatListRamo
+        data={ramos}
+        renderItem={ListRenderRamo}
+        keyExtractor={(item) => String(item.id)}
+      />
     </Box>
   );
 };

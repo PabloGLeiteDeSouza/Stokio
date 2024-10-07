@@ -61,53 +61,59 @@ import {
   RemoveIcon,
   TrashIcon,
   AddIcon,
+  FlatList,
+  EyeIcon,
 } from '@gluestack-ui/themed';
 import { Box, ScrollView } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import { Card } from '@gluestack-ui/themed';
 import { EditIcon } from '@gluestack-ui/themed';
-import Uas from './pessoas.json';
+import Uas from './uas.json';
 import { SearchIcon } from '@gluestack-ui/themed';
+import { Ua, UaFlatList } from '@/types/screens/ua';
+import { ListRenderItem } from 'react-native';
+import { VisualizarUaScreen } from '@/interfaces/ua';
 
-const View: React.FC = () => {
-  type Ua = {
-    nome: string;
-    idade: number;
-    cpf: string;
-    rg: string;
-    data_nasc: string;
-    sexo: string;
-    signo: string;
-    mae: string;
-    pai: string;
-    email: string;
-    senha: string;
-    cep: string;
-    endereco: string;
-    numero: number;
-    bairro: string;
-    cidade: string;
-    estado: string;
-    telefone_fixo: string;
-    celular: string;
-    altura: string;
-    peso: number;
-    tipo_sanguineo: string;
-    cor: string;
-  };
+const View: React.FC<VisualizarUaScreen> = ({ navigation }) => {
+  const FlatListUa = FlatList as UaFlatList;
 
   const [uas, setUas] = React.useState<Array<Ua>>(Uas);
 
+  const ListRenderUa: ListRenderItem<Ua> = ({ item }) => {
+    return (
+      <Card size="md" variant="elevated" m="$3">
+        <HStack justifyContent="space-between">
+          <Box w="$2/3">
+            <Heading mb="$1" size="md">
+              {item.nome}
+            </Heading>
+            <Text size="sm">{item.tipo}</Text>
+          </Box>
+          <Box gap="$5">
+            <Button
+              onPress={() =>
+                navigation?.navigate('detalhes-ua', { id: item.id })
+              }
+            >
+              <ButtonIcon as={EyeIcon} />
+            </Button>
+          </Box>
+        </HStack>
+      </Card>
+    );
+  };
+
   return (
-    <Box w="$full" px="$8" py="$8">
+    <Box w="$full" h="$full" px="$8" py="$8">
       <Box gap="$5">
         <Formik
           initialValues={{
             busca: '',
             tipo: '',
           }}
+          onSubmit={() => {}}
         >
-          {({ values, handleChange, setFieldValue }) => {
+          {({ values, handleChange, setFieldValue, errors }) => {
             return (
               <>
                 <FormControl
@@ -138,23 +144,15 @@ const View: React.FC = () => {
                         <SelectDragIndicatorWrapper>
                           <SelectDragIndicator />
                         </SelectDragIndicatorWrapper>
-                        <SelectItem label="UX Research" value="UX Research" />
                         <SelectItem
-                          label="Web Development"
-                          value="Web Development"
+                          label="nome"
+                          value="nome"
+                          isPressed={values.tipo === 'nome'}
                         />
                         <SelectItem
-                          label="Cross Platform Development Process"
-                          value="Cross Platform Development Process"
-                        />
-                        <SelectItem
-                          label="UI Designing"
-                          value="UI Designing"
-                          isDisabled={true}
-                        />
-                        <SelectItem
-                          label="Backend Development"
-                          value="Backend Development"
+                          label="tipo"
+                          value="tipo"
+                          isPressed={values.tipo === 'tipo'}
                         />
                       </SelectContent>
                     </SelectPortal>
@@ -162,55 +160,125 @@ const View: React.FC = () => {
 
                   <FormControlHelper>
                     <FormControlHelperText>
-                      Must be atleast 6 characters.
+                      Selecione uma opcao.
                     </FormControlHelperText>
                   </FormControlHelper>
 
                   <FormControlError>
                     <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
+                    <FormControlErrorText>{errors.tipo}</FormControlErrorText>
                   </FormControlError>
                 </FormControl>
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>Buscar</FormControlLabelText>
-                  </FormControlLabel>
-                  <Input>
-                    <InputField
-                      type="text"
-                      value={values.busca}
-                      placeholder="Buscar"
-                    />
-                    <Button>
-                      <ButtonIcon as={SearchIcon} />
-                    </Button>
-                  </Input>
+                {values.tipo === 'nome' && (
+                  <>
+                    <FormControl
+                      isInvalid={false}
+                      size={'md'}
+                      isDisabled={false}
+                      isRequired={true}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>Buscar</FormControlLabelText>
+                      </FormControlLabel>
+                      <Input>
+                        <InputField
+                          type="text"
+                          value={values.busca}
+                          placeholder="Buscar"
+                          onChangeText={handleChange('buscar')}
+                        />
+                        <Button>
+                          <ButtonIcon as={SearchIcon} />
+                        </Button>
+                      </Input>
 
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Must be atleast 6 characters.
-                    </FormControlHelperText>
-                  </FormControlHelper>
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          Must be atleast 6 characters.
+                        </FormControlHelperText>
+                      </FormControlHelper>
 
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
+                      <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
+                          {errors.busca}
+                        </FormControlErrorText>
+                      </FormControlError>
+                    </FormControl>
+                  </>
+                )}
+                {values.tipo === 'tipo' && (
+                  <>
+                    <FormControl
+                      isInvalid={false}
+                      size={'md'}
+                      isDisabled={false}
+                      isRequired={true}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>Password</FormControlLabelText>
+                      </FormControlLabel>
+                      <Select isInvalid={false} isDisabled={false}>
+                        <SelectTrigger size={'lg'} variant={'rounded'}>
+                          <SelectInput placeholder="Select option" />
+                          <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
+                        </SelectTrigger>
+                        <SelectPortal>
+                          <SelectBackdrop />
+                          <SelectContent>
+                            <SelectDragIndicatorWrapper>
+                              <SelectDragIndicator />
+                            </SelectDragIndicatorWrapper>
+                            <SelectItem
+                              label="UX Research"
+                              value="UX Research"
+                            />
+                            <SelectItem
+                              label="Web Development"
+                              value="Web Development"
+                            />
+                            <SelectItem
+                              label="Cross Platform Development Process"
+                              value="Cross Platform Development Process"
+                            />
+                            <SelectItem
+                              label="UI Designing"
+                              value="UI Designing"
+                              isDisabled={true}
+                            />
+                            <SelectItem
+                              label="Backend Development"
+                              value="Backend Development"
+                            />
+                          </SelectContent>
+                        </SelectPortal>
+                      </Select>
+
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          Must be atleast 6 characters.
+                        </FormControlHelperText>
+                      </FormControlHelper>
+
+                      <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
+                          Atleast 6 characters are required.
+                        </FormControlErrorText>
+                      </FormControlError>
+                    </FormControl>
+                    <Box>
+                      <Button>
+                        <ButtonText>Buscar</ButtonText>
+                      </Button>
+                    </Box>
+                  </>
+                )}
               </>
             );
           }}
         </Formik>
-        <Button>
+        <Button onPress={() => navigation?.navigate('cadastrar-ua')}>
           <ButtonText>Cadastrar UAs</ButtonText>
           <ButtonIcon ml="$5" as={AddIcon} />
         </Button>
@@ -220,31 +288,11 @@ const View: React.FC = () => {
         <Text>UAs</Text>
         <Divider />
       </Box>
-      <ScrollView w="$full">
-        <Box w="$full" mb={330}>
-          {uas.map((ua, index) => (
-            <Card key={index} size="md" variant="elevated" m="$3">
-              <HStack justifyContent="space-between">
-                <Box w="$2/3">
-                  <Heading mb="$1" size="md">
-                    {ua.nome}
-                  </Heading>
-                  <Text size="sm">{ua.data_nasc}</Text>
-                  <Text size="sm">{ua.cpf}</Text>
-                </Box>
-                <Box gap="$5">
-                  <Button action="negative">
-                    <ButtonIcon as={TrashIcon} />
-                  </Button>
-                  <Button>
-                    <ButtonIcon as={EditIcon} />
-                  </Button>
-                </Box>
-              </HStack>
-            </Card>
-          ))}
-        </Box>
-      </ScrollView>
+      <FlatListUa
+        data={uas}
+        renderItem={ListRenderUa}
+        keyExtractor={(v, i) => i.toString()}
+      />
     </Box>
   );
 };

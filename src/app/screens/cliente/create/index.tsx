@@ -1,4 +1,4 @@
-import { AddIcon, Heading, RemoveIcon } from '@gluestack-ui/themed';
+import { AddIcon, Card, Heading, RemoveIcon } from '@gluestack-ui/themed';
 import React from 'react';
 import {
   FormControl,
@@ -61,7 +61,30 @@ import { Box, Text } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import { CalendarDaysIcon } from '@gluestack-ui/themed';
 import { ScrollView } from '@gluestack-ui/themed';
+import { TrashIcon } from '@gluestack-ui/themed';
+import { CloseIcon } from '@gluestack-ui/themed';
+import { Pessoa, PessoaFlatList } from '@/types/screens/cliente';
+import { FlatList } from '@gluestack-ui/themed';
+import { ListRenderItem } from 'react-native';
 const Create: React.FC = () => {
+  const [pessoas, setPessoas] = React.useState<Array<Pessoa>>([
+    {
+      id: 1,
+      nome: 'João',
+      cpf: '123.123.123-12',
+      data_nascimento: '05-20-2000',
+    },
+    {
+      id: 2,
+      nome: 'Lucas',
+      cpf: '234.234.234-23',
+      data_nascimento: '06-15-1999',
+    },
+  ]);
+  const [showModal, setShowModal] = React.useState(false);
+  const ref = React.useRef(null);
+  const FlastListPessoa = FlatList as PessoaFlatList;
+
   return (
     <Box w="$full" h="$full">
       <ScrollView w="$full">
@@ -72,6 +95,7 @@ const Create: React.FC = () => {
           <Box>
             <Formik
               initialValues={{
+                id_pessoa: '',
                 nome: '',
                 data_nascimento: new Date(),
                 cpf: '',
@@ -99,6 +123,41 @@ const Create: React.FC = () => {
               onSubmit={() => {}}
             >
               {({ handleChange, setFieldValue, values, errors }) => {
+                const ListRenderPessoa: ListRenderItem<Pessoa> = ({ item }) => {
+                  return (
+                    <Card>
+                      <HStack>
+                        <Box>
+                          <Checkbox
+                            size="md"
+                            isInvalid={false}
+                            isDisabled={false}
+                            value=""
+                            onChange={(s) => {
+                              if (s) {
+                                setFieldValue('id_pessoa', item.id);
+                              } else {
+                                setFieldValue('id_pessoa', '');
+                              }
+                            }}
+                          >
+                            <CheckboxIndicator mr="$2">
+                              <CheckboxIcon as={CheckIcon} />
+                            </CheckboxIndicator>
+                          </Checkbox>
+                        </Box>
+                        <Box>
+                          <Heading>{item.nome}</Heading>
+                        </Box>
+                        <Box>
+                          <Text size="md">{item.cpf}</Text>
+                          <Text>{item.data_nascimento}</Text>
+                        </Box>
+                      </HStack>
+                    </Card>
+                  );
+                };
+
                 return (
                   <Box gap="$5">
                     <FormControl
@@ -107,6 +166,48 @@ const Create: React.FC = () => {
                       isDisabled={false}
                       isRequired={true}
                     >
+                      {values.id_pessoa == '' && pessoas.length > 0 ? (
+                        <Box>
+                          <Box>
+                            <Text>Selecione uma pessoa:</Text>
+                            <Button onPress={() => setShowModal(true)}>
+                              <ButtonText>Selecionar Pessoa</ButtonText>
+                            </Button>
+                          </Box>
+                          <Modal
+                            h="$full"
+                            size="lg"
+                            isOpen={showModal}
+                            onClose={() => {
+                              setShowModal(false);
+                            }}
+                            finalFocusRef={ref}
+                          >
+                            <ModalBackdrop />
+                            <ModalContent>
+                              <ModalHeader>
+                                <Heading size="lg">
+                                  Selecione uma pessoa
+                                </Heading>
+                                <ModalCloseButton>
+                                  <Icon as={CloseIcon} />
+                                </ModalCloseButton>
+                              </ModalHeader>
+                              <ScrollView>
+                                <ModalBody>
+                                  <FlastListPessoa
+                                    data={pessoas}
+                                    renderItem={ListRenderPessoa}
+                                    keyExtractor={(item) => item.id}
+                                  />
+                                </ModalBody>
+                              </ScrollView>
+                            </ModalContent>
+                          </Modal>
+                        </Box>
+                      ) : (
+                        <></>
+                      )}
                       <FormControlLabel>
                         <FormControlLabelText>Nome</FormControlLabelText>
                       </FormControlLabel>
@@ -445,6 +546,9 @@ const Create: React.FC = () => {
                       <Button action="negative">
                         <ButtonIcon as={RemoveIcon} />
                       </Button>
+                      <Button action="negative">
+                        <ButtonIcon as={TrashIcon} />
+                      </Button>
                     </Box>
 
                     <Box gap="$2.5">
@@ -479,6 +583,9 @@ const Create: React.FC = () => {
                       </Button>
                       <Button action="negative">
                         <ButtonIcon as={RemoveIcon} />
+                      </Button>
+                      <Button action="negative">
+                        <ButtonIcon as={TrashIcon} />
                       </Button>
                     </Box>
 

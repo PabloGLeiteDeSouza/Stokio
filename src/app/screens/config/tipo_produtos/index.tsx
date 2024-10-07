@@ -19,7 +19,7 @@ const ScreensTipoProduto: React.FC = () => {
         options={{ title: 'Cadastrar Tipo de Produto' }}
       />
       <Stack.Screen
-        name="editar-tipo-produto"
+        name="atualizar-tipo-produto"
         component={Update}
         options={{ title: 'Atualizar Tipo de Produto' }}
       />

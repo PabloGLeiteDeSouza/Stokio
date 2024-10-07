@@ -62,45 +62,59 @@ import {
   TrashIcon,
   AddIcon,
   EyeIcon,
+  FlatList,
 } from '@gluestack-ui/themed';
 import { Box, ScrollView } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import { Card } from '@gluestack-ui/themed';
 import { EditIcon } from '@gluestack-ui/themed';
-import Uas from './pessoas.json';
+import Vendas from './vendas.json';
 import { SearchIcon } from '@gluestack-ui/themed';
-import BuscasTipos from "./busca_tipos_vendas.json";
+import BuscasTipos from './busca_tipos_vendas.json';
+import { Venda, VendaFlatList } from '@/types/screens/venda';
+import { ListRenderItem } from 'react-native';
+import { VisualizarVendaScreen } from '@/interfaces/venda';
 
-const View: React.FC = () => {
-  type Ua = {
-    nome: string;
-    idade: number;
-    cpf: string;
-    rg: string;
-    data_nasc: string;
-    sexo: string;
-    signo: string;
-    mae: string;
-    pai: string;
-    email: string;
-    senha: string;
-    cep: string;
-    endereco: string;
-    numero: number;
-    bairro: string;
-    cidade: string;
-    estado: string;
-    telefone_fixo: string;
-    celular: string;
-    altura: string;
-    peso: number;
-    tipo_sanguineo: string;
-    cor: string;
+const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
+  const tipos_busca: Array<{ label: string; value: string }> = BuscasTipos;
+
+  const [vendas, setVendas] = React.useState<Array<Venda>>(Vendas);
+  const [loadingVendas, setLoadingVendas] = React.useState(true);
+
+  const FlatListVenda = FlatList as VendaFlatList;
+
+  const ListRenderVenda: ListRenderItem<Venda> = ({ item }) => {
+    return (
+      <Card size="md" variant="elevated" m="$3">
+        <HStack justifyContent="space-between">
+          <Box gap="$2.5" w="$2/3">
+            <Heading size="lg">
+              {item.nome}
+            </Heading>
+            <Text size="md">{item.valor}</Text>
+            <Text color={item.status === 'devendo' ? '$red600' : ''} size="md">
+              {item.status}
+            </Text>
+          </Box>
+          <Box gap="$5">
+            <Button
+              onPress={() =>
+                navigation?.navigate('detalhes-venda', { id: String(item.id) })
+              }
+            >
+              <ButtonIcon as={EyeIcon} />
+            </Button>
+          </Box>
+        </HStack>
+      </Card>
+    );
   };
 
-  const tipos_busca: Array<{ label: string, value: string }> = BuscasTipos;
-
-  const [uas, setUas] = React.useState<Array<Ua>>(Uas);
+  React.useEffect(() => {
+    setTimeout(() => {
+      setLoadingVendas(false);
+    }, 2000);
+  }, []);
 
   return (
     <Box w="$full" h="$full" px="$8" py="$8">
@@ -208,7 +222,7 @@ const View: React.FC = () => {
             );
           }}
         </Formik>
-        <Button>
+        <Button onPress={() => navigation?.navigate('cadastrar-venda')}>
           <ButtonText>Cadastrar Venda</ButtonText>
           <ButtonIcon ml="$5" as={AddIcon} />
         </Button>
@@ -218,34 +232,19 @@ const View: React.FC = () => {
         <Text>Vendas</Text>
         <Divider />
       </Box>
-      <ScrollView w="$full">
-        <Box w="$full">
-          {uas.map((ua, index) => (
-            <Card key={index} size="md" variant="elevated" m="$3">
-              <HStack justifyContent="space-between">
-                <Box w="$2/3">
-                  <Heading mb="$1" size="md">
-                    {ua.nome}
-                  </Heading>
-                  <Text size="sm">{ua.data_nasc}</Text>
-                  <Text size="sm">{ua.cpf}</Text>
-                </Box>
-                <Box gap="$5">
-                  <Button action="positive">
-                    <ButtonIcon as={EyeIcon} />
-                  </Button>
-                  <Button>
-                    <ButtonIcon as={EditIcon} />
-                  </Button>
-                  <Button action="negative">
-                    <ButtonIcon as={TrashIcon} />
-                  </Button>
-                </Box>
-              </HStack>
-            </Card>
-          ))}
-        </Box>
-      </ScrollView>
+      <FlatListVenda
+        data={vendas}
+        renderItem={ListRenderVenda}
+        keyExtractor={(item) => String(item.id)}
+        refreshing={loadingVendas}
+        onRefresh={() => {
+          console.log('refreshed');
+          setLoadingVendas(true);
+          setTimeout(() => {
+            setLoadingVendas(false);
+          }, 2000);
+        }}
+      />
     </Box>
   );
 };

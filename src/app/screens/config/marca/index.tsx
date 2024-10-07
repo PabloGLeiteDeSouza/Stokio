@@ -19,7 +19,7 @@ const ScreensMarca: React.FC = () => {
         options={{ title: 'Cadadastrar Marca' }}
       />
       <Stack.Screen
-        name="editar-marca"
+        name="atualizar-marca"
         component={Update}
         options={{ title: 'Atualizar Marca' }}
       />

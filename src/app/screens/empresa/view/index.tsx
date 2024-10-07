@@ -61,41 +61,52 @@ import {
   RemoveIcon,
   TrashIcon,
   AddIcon,
+  FlatList,
+  EyeIcon,
 } from '@gluestack-ui/themed';
 import { Box, ScrollView } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import { Card } from '@gluestack-ui/themed';
 import { EditIcon } from '@gluestack-ui/themed';
-import Empresas from './pessoas.json';
+import Empresas from './empresas.json';
 import { SearchIcon } from '@gluestack-ui/themed';
+import { Empresa, EmpresaFlatList } from '@/types/screens/empresa';
+import { ListRenderItem } from 'react-native';
+import { VisualizarEmpresaScreen } from '@/interfaces/empresa';
 
-const View: React.FC = () => {
-  type Empresa = {
-    nome: string;
-    idade: number;
-    cpf: string;
-    rg: string;
-    data_nasc: string;
-    sexo: string;
-    signo: string;
-    mae: string;
-    pai: string;
-    email: string;
-    senha: string;
-    cep: string;
-    endereco: string;
-    numero: number;
-    bairro: string;
-    cidade: string;
-    estado: string;
-    telefone_fixo: string;
-    celular: string;
-    altura: string;
-    peso: number;
-    tipo_sanguineo: string;
-    cor: string;
+const View: React.FC<VisualizarEmpresaScreen> = ({ navigation }) => {
+  const FlatListEmpresa = FlatList as EmpresaFlatList;
+  const ListRenderEmpresa: ListRenderItem<Empresa> = ({ item }) => {
+    return (
+      <Card size="md" variant="elevated" m="$3">
+        <HStack justifyContent="space-between">
+          <Box w="$2/3">
+            <Heading mb="$1" size="md">
+              {item.nome_fantasia}
+            </Heading>
+            {item.cnpj ? (
+              <Text mb="$1" size="sm">
+                {item.cnpj}
+              </Text>
+            ) : (
+              <Text mb="$1" size="sm">
+                {item.cpf}
+              </Text>
+            )}
+          </Box>
+          <Box gap="$5">
+            <Button
+              onPress={() =>
+                navigation?.navigate('detalhes-empresa', { id: item.id })
+              }
+            >
+              <ButtonIcon as={EyeIcon} />
+            </Button>
+          </Box>
+        </HStack>
+      </Card>
+    );
   };
-
   const [empresas, setEmpresas] = React.useState<Array<Empresa>>(Empresas);
 
   return (
@@ -187,6 +198,7 @@ const View: React.FC = () => {
                       type="text"
                       value={values.busca}
                       placeholder="Buscar"
+                      onChangeText={handleChange('busca')}
                     />
                     <Button>
                       <ButtonIcon as={SearchIcon} />
@@ -210,7 +222,7 @@ const View: React.FC = () => {
             );
           }}
         </Formik>
-        <Button>
+        <Button onPress={() => navigation?.navigate('cadastrar-empresa')}>
           <ButtonText>Cadastrar Empresas</ButtonText>
           <ButtonIcon ml="$5" as={AddIcon} />
         </Button>
@@ -220,32 +232,11 @@ const View: React.FC = () => {
         <Text>Empresas</Text>
         <Divider />
       </Box>
-      <ScrollView w="$full">
-        <Flas
-        <Box w="$full">
-          {empresas.map((empresa, index) => (
-            <Card key={index} size="md" variant="elevated" m="$3">
-              <HStack justifyContent="space-between">
-                <Box w="$2/3">
-                  <Heading mb="$1" size="md">
-                    {empresa.nome}
-                  </Heading>
-                  <Text size="sm">{empresa.data_nasc}</Text>
-                  <Text size="sm">{empresa.cpf}</Text>
-                </Box>
-                <Box gap="$5">
-                  <Button action="negative">
-                    <ButtonIcon as={TrashIcon} />
-                  </Button>
-                  <Button>
-                    <ButtonIcon as={EditIcon} />
-                  </Button>
-                </Box>
-              </HStack>
-            </Card>
-          ))}
-        </Box>
-      </ScrollView>
+      <FlatListEmpresa
+        data={empresas}
+        renderItem={ListRenderEmpresa}
+        keyExtractor={(item) => String(item.id)}
+      />
     </Box>
   );
 };

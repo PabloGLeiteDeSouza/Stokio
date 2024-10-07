@@ -19,7 +19,7 @@ const ScreensRamo: React.FC = () => {
         options={{ title: 'Cadastrar Ramos' }}
       />
       <Stack.Screen
-        name="editar-ramo"
+        name="atualizar-ramo"
         component={Update}
         options={{ title: 'Atualizar Ramos' }}
       />

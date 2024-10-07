@@ -61,50 +61,55 @@ import {
   RemoveIcon,
   TrashIcon,
   AddIcon,
+  FlatList,
 } from '@gluestack-ui/themed';
-import { Box, ScrollView } from '@gluestack-ui/themed';
+import { Box } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import { Card } from '@gluestack-ui/themed';
 import { EditIcon } from '@gluestack-ui/themed';
-import Tipos_Uas from './pessoas.json';
+import Tipos_Uas from './tipos_uas.json';
 import { SearchIcon } from '@gluestack-ui/themed';
+import { TipoUa, TipoUaFlatList } from '@/types/screens/tipo-ua';
+import { ListRenderItem } from 'react-native';
+import { VisualizarTipoUaScreen } from '@/interfaces/tipo-ua';
 
-const View: React.FC = () => {
-  type Tipos_Ua = {
-    nome: string;
-    idade: number;
-    cpf: string;
-    rg: string;
-    data_nasc: string;
-    sexo: string;
-    signo: string;
-    mae: string;
-    pai: string;
-    email: string;
-    senha: string;
-    cep: string;
-    endereco: string;
-    numero: number;
-    bairro: string;
-    cidade: string;
-    estado: string;
-    telefone_fixo: string;
-    celular: string;
-    altura: string;
-    peso: number;
-    tipo_sanguineo: string;
-    cor: string;
+const View: React.FC<VisualizarTipoUaScreen> = ({ navigation }) => {
+  const [tipos_Uas, setTipos_Uas] = React.useState<Array<TipoUa>>(Tipos_Uas);
+  const FlatListTipoUa = FlatList as TipoUaFlatList;
+  const ListRenderTipoUa: ListRenderItem<TipoUa> = ({ item }) => {
+    return (
+      <Card size="md" variant="elevated" m="$3">
+        <HStack justifyContent="space-between">
+          <Box w="$2/3">
+            <Heading mb="$1" size="md">
+              {item.nome}
+            </Heading>
+          </Box>
+          <Box gap="$5">
+            <Button action="negative">
+              <ButtonIcon as={TrashIcon} />
+            </Button>
+            <Button
+              onPress={() =>
+                navigation?.navigate('atualizar-tipo-ua', { id: item.id })
+              }
+            >
+              <ButtonIcon as={EditIcon} />
+            </Button>
+          </Box>
+        </HStack>
+      </Card>
+    );
   };
 
-  const [tipos_Uas, setTipos_Uas] = React.useState<Array<Tipos_Ua>>(Tipos_Uas);
-
   return (
-    <Box w="$full" px="$8" py="$8">
+    <Box w="$full" h="$full" px="$8" py="$8">
       <Box gap="$5">
         <Formik
           initialValues={{
             busca: '',
           }}
+          onSubmit={() => {}}
         >
           {({ values, handleChange }) => {
             return (
@@ -147,7 +152,7 @@ const View: React.FC = () => {
             );
           }}
         </Formik>
-        <Button>
+        <Button onPress={() => navigation?.navigate('cadastrar-tipo-ua')}>
           <ButtonText>Cadastrar Tipos de UAs</ButtonText>
           <ButtonIcon ml="$5" as={AddIcon} />
         </Button>
@@ -157,31 +162,11 @@ const View: React.FC = () => {
         <Text>Tipos de Unidades de Armazenamento</Text>
         <Divider />
       </Box>
-      <ScrollView w="$full">
-        <Box w="$full" mb={220}>
-          {tipos_Uas.map((Tipo_Ua, index) => (
-            <Card key={index} size="md" variant="elevated" m="$3">
-              <HStack justifyContent="space-between">
-                <Box w="$2/3">
-                  <Heading mb="$1" size="md">
-                    {Tipo_Ua.nome}
-                  </Heading>
-                  <Text size="sm">{Tipo_Ua.data_nasc}</Text>
-                  <Text size="sm">{Tipo_Ua.cpf}</Text>
-                </Box>
-                <Box gap="$5">
-                  <Button action="negative">
-                    <ButtonIcon as={TrashIcon} />
-                  </Button>
-                  <Button>
-                    <ButtonIcon as={EditIcon} />
-                  </Button>
-                </Box>
-              </HStack>
-            </Card>
-          ))}
-        </Box>
-      </ScrollView>
+      <FlatListTipoUa
+        data={tipos_Uas}
+        renderItem={ListRenderTipoUa}
+        keyExtractor={(item) => String(item.id)}
+      />
     </Box>
   );
 };

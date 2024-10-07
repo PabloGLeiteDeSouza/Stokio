@@ -37,14 +37,13 @@ export class Empresa {
     }
   }
 
-    
   // Cadastro de empresa
   async create(dados: EmpresaCreateData) {
     try {
       // Verifica se o CNPJ/CPF já existe
       const empresaExistente = await this.db.getFirstAsync<EmpresaObject>(
         'SELECT id FROM empresa WHERE cnpj = $cnpj',
-        { $cnpj: dados.cnpj }
+        { $cnpj: dados.cnpj },
       );
 
       if (empresaExistente) {
@@ -56,7 +55,7 @@ export class Empresa {
       if (dados.ramo) {
         const ramoExistente = await this.db.getFirstAsync<RamoObject>(
           'SELECT id FROM ramo WHERE nome = $nome',
-          { $nome: dados.ramo.nome }
+          { $nome: dados.ramo.nome },
         );
 
         if (ramoExistente) {
@@ -64,7 +63,7 @@ export class Empresa {
         } else {
           const res_ramo = await this.db.runAsync(
             'INSERT INTO ramo (nome) VALUES ($nome)',
-            { $nome: dados.ramo.nome }
+            { $nome: dados.ramo.nome },
           );
           id_ramo = res_ramo.lastInsertRowId;
         }
@@ -79,7 +78,7 @@ export class Empresa {
           $razao_social: dados.razao_social || null,
           $cnpj: dados.cnpj,
           $id_ramo: id_ramo || null,
-        }
+        },
       );
 
       if (res_emp.changes < 1) {
@@ -92,7 +91,6 @@ export class Empresa {
       await this.vincularTelefones(id_empresa, dados.telefones);
       await this.vincularEmails(id_empresa, dados.emails);
       await this.vincularEndereco(id_empresa, dados.endereco);
-
     } catch (error) {
       throw error;
     }
@@ -110,7 +108,7 @@ export class Empresa {
           $razao_social: dados.razao_social || null,
           $cnpj: dados.cnpj,
           $id: id,
-        }
+        },
       );
 
       if (res_emp.changes < 1) {
@@ -121,22 +119,22 @@ export class Empresa {
       if (dados.ramo) {
         const ramoExistente = await this.db.getFirstAsync<RamoObject>(
           'SELECT id FROM ramo WHERE nome = $nome',
-          { $nome: dados.ramo.nome }
+          { $nome: dados.ramo.nome },
         );
 
         if (ramoExistente) {
           await this.db.runAsync(
             'UPDATE empresa SET id_ramo = $id_ramo WHERE id = $id',
-            { $id_ramo: ramoExistente.id, $id: id }
+            { $id_ramo: ramoExistente.id, $id: id },
           );
         } else {
           const res_ramo = await this.db.runAsync(
             'INSERT INTO ramo (nome) VALUES ($nome)',
-            { $nome: dados.ramo.nome }
+            { $nome: dados.ramo.nome },
           );
           await this.db.runAsync(
             'UPDATE empresa SET id_ramo = $id_ramo WHERE id = $id',
-            { $id_ramo: res_ramo.lastInsertRowId, $id: id }
+            { $id_ramo: res_ramo.lastInsertRowId, $id: id },
           );
         }
       }
@@ -145,7 +143,6 @@ export class Empresa {
       await this.vincularTelefones(id, dados.telefones);
       await this.vincularEmails(id, dados.emails);
       await this.vincularEndereco(id, dados.endereco);
-
     } catch (error) {
       throw error;
     }
@@ -154,7 +151,6 @@ export class Empresa {
   // Buscar empresa por múltiplos critérios
   async search(criteria: EmpresaSearchCriteria) {
     try {
-
       let query = 'SELECT * FROM empresa WHERE 1=1';
       const params: any = {};
 
@@ -196,9 +192,12 @@ export class Empresa {
   // Cadastro, atualização e exclusão de ramos
   async createRamo(nome: string) {
     try {
-      const res = await this.db.runAsync('INSERT INTO ramo (nome) VALUES ($nome)', {
-        $nome: nome,
-      });
+      const res = await this.db.runAsync(
+        'INSERT INTO ramo (nome) VALUES ($nome)',
+        {
+          $nome: nome,
+        },
+      );
       return res.lastInsertRowId;
     } catch (error) {
       throw error;
@@ -226,20 +225,23 @@ export class Empresa {
 
   // Métodos auxiliares para vinculação de telefones, e-mails e endereços
 
-  private async vincularTelefones(id_empresa: number, telefones: TelefoneData[]) {
+  private async vincularTelefones(
+    id_empresa: number,
+    telefones: TelefoneData[],
+  ) {
     await Promise.all(
       telefones.map(async (telefone) => {
         const res_telefone = await this.db.runAsync(
           'INSERT INTO telefone (numero) VALUES ($numero)',
-          { $numero: telefone.numero }
+          { $numero: telefone.numero },
         );
         const id_telefone = res_telefone.lastInsertRowId;
 
         await this.db.runAsync(
           'INSERT INTO empresa_telefone (id_empresa, id_telefone) VALUES ($id_empresa, $id_telefone)',
-          { $id_empresa: id_empresa, $id_telefone: id_telefone }
+          { $id_empresa: id_empresa, $id_telefone: id_telefone },
         );
-      })
+      }),
     );
   }
 
@@ -248,15 +250,15 @@ export class Empresa {
       emails.map(async (email) => {
         const res_email = await this.db.runAsync(
           'INSERT INTO email (endereco) VALUES ($endereco)',
-          { $endereco: email.endereco }
+          { $endereco: email.endereco },
         );
         const id_email = res_email.lastInsertRowId;
 
         await this.db.runAsync(
           'INSERT INTO empresa_email (id_empresa, id_email) VALUES ($id_empresa, $id_email)',
-          { $id_empresa: id_empresa, $id_email: id_email }
+          { $id_empresa: id_empresa, $id_email: id_email },
         );
-      })
+      }),
     );
   }
 
@@ -271,23 +273,17 @@ export class Empresa {
         $bairro: endereco.bairro,
         $cidade: endereco.cidade,
         $uf: endereco.uf,
-      }
+      },
     );
 
     const id_endereco = res_end.lastInsertRowId;
     await this.db.runAsync(
       'INSERT INTO empresa_endereco (id_empresa, id_endereco) VALUES ($id_empresa, $id_endereco)',
-      { $id_empresa: id_empresa, $id_endereco: id_endereco }
+      { $id_empresa: id_empresa, $id_endereco: id_endereco },
     );
   }
-  
 
-
-  async getAllRamos(){
-
-  }
-
-  async get
+  async getAllRamos() {}
 
   async update(id: number, empresa: UpdateEmpresaDto) {
     try {

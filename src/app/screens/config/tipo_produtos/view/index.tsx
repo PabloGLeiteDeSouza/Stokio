@@ -61,46 +61,53 @@ import {
   RemoveIcon,
   TrashIcon,
   AddIcon,
+  FlatList,
+  Box,
+  ScrollView,
+  Card,
+  EditIcon,
+  SearchIcon,
 } from '@gluestack-ui/themed';
-import { Box, ScrollView } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
-import { Card } from '@gluestack-ui/themed';
-import { EditIcon } from '@gluestack-ui/themed';
-import Tipos_Produtos from './pessoas.json';
-import { SearchIcon } from '@gluestack-ui/themed';
+import Tipos_Produtos from './tipo_produto.json';
+import { TipoProduto, TipoProdutoFlatList } from '@/types/screens/tipo-produto';
+import { ListRenderItem } from 'react-native';
+import { VisualizarTipoProdutoScreen } from '@/interfaces/tipo-produto';
 
-const View: React.FC = () => {
-  type TipoProduto = {
-    nome: string;
-    idade: number;
-    cpf: string;
-    rg: string;
-    data_nasc: string;
-    sexo: string;
-    signo: string;
-    mae: string;
-    pai: string;
-    email: string;
-    senha: string;
-    cep: string;
-    endereco: string;
-    numero: number;
-    bairro: string;
-    cidade: string;
-    estado: string;
-    telefone_fixo: string;
-    celular: string;
-    altura: string;
-    peso: number;
-    tipo_sanguineo: string;
-    cor: string;
-  };
-
+const View: React.FC<VisualizarTipoProdutoScreen> = ({ navigation }) => {
   const [tipos_produtos, setTipos_Produtos] =
     React.useState<Array<TipoProduto>>(Tipos_Produtos);
+  const FlatListTipoProduto = FlatList as TipoProdutoFlatList;
+  const ListRenderTipoProduto: ListRenderItem<TipoProduto> = ({ item }) => {
+    return (
+      <Card size="md" variant="elevated" m="$3">
+        <HStack justifyContent="space-between">
+          <Box w="$2/3">
+            <Heading mb="$1" size="md">
+              {item.nome}
+            </Heading>
+          </Box>
+          <Box gap="$5">
+            <Button action="negative">
+              <ButtonIcon as={TrashIcon} />
+            </Button>
+            <Button
+              onPress={() =>
+                navigation?.navigate('atualizar-tipo-produto', {
+                  id: Number(item.id),
+                })
+              }
+            >
+              <ButtonIcon as={EditIcon} />
+            </Button>
+          </Box>
+        </HStack>
+      </Card>
+    );
+  };
 
   return (
-    <Box w="$full" px="$8" py="$8">
+    <Box h="$full" w="$full" px="$8" py="$8">
       <Box gap="$5">
         <Formik
           initialValues={{
@@ -147,7 +154,7 @@ const View: React.FC = () => {
             );
           }}
         </Formik>
-        <Button>
+        <Button onPress={() => navigation?.navigate('cadastrar-tipo-produto')}>
           <ButtonText>Cadastrar Tipos de produtos</ButtonText>
           <ButtonIcon ml="$5" as={AddIcon} />
         </Button>
@@ -157,31 +164,11 @@ const View: React.FC = () => {
         <Text>Tipos de Produtos</Text>
         <Divider />
       </Box>
-      <ScrollView w="$full">
-        <Box w="$full" mb={220}>
-          {tipos_produtos.map((tipo_produto, index) => (
-            <Card key={index} size="md" variant="elevated" m="$3">
-              <HStack justifyContent="space-between">
-                <Box w="$2/3">
-                  <Heading mb="$1" size="md">
-                    {tipo_produto.nome}
-                  </Heading>
-                  <Text size="sm">{tipo_produto.data_nasc}</Text>
-                  <Text size="sm">{tipo_produto.cpf}</Text>
-                </Box>
-                <Box gap="$5">
-                  <Button action="negative">
-                    <ButtonIcon as={TrashIcon} />
-                  </Button>
-                  <Button>
-                    <ButtonIcon as={EditIcon} />
-                  </Button>
-                </Box>
-              </HStack>
-            </Card>
-          ))}
-        </Box>
-      </ScrollView>
+      <FlatListTipoProduto
+        data={tipos_produtos}
+        renderItem={ListRenderTipoProduto}
+        keyExtractor={(item) => String(item.id)}
+      />
     </Box>
   );
 };

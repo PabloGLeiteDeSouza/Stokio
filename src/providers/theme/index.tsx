@@ -4,24 +4,11 @@ import { GluestackUIProvider } from '@gluestack-ui/themed';
 import React from 'react';
 import { Appearance, Platform } from 'react-native';
 import * as NavigationBar from 'expo-navigation-bar';
+import ThemeContextApp from '@/contexts/theme';
 
 interface ThemeProviderAppProps {
   children: React.ReactNode;
 }
-
-interface ThemeContextAppProps {
-  toggleTheme: () => void;
-  setTheme: (theme: 'light' | 'dark') => void;
-  theme: 'light' | 'dark';
-}
-
-const ThemeContextApp = React.createContext<ThemeContextAppProps>({
-  toggleTheme: () => {},
-  setTheme: (theme: 'light' | 'dark') => {
-    theme;
-  },
-  theme: Appearance.getColorScheme() as 'light' | 'dark',
-});
 
 const ThemeProviderApp: React.FC<ThemeProviderAppProps> = ({ children }) => {
   const [theme, SetTheme] = React.useState<'light' | 'dark'>(
@@ -56,6 +43,4 @@ const ThemeProviderApp: React.FC<ThemeProviderAppProps> = ({ children }) => {
   );
 };
 
-const useThemeApp = () => React.useContext(ThemeContextApp);
-
-export { ThemeProviderApp, useThemeApp };
+export { ThemeProviderApp };

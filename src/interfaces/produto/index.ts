@@ -5,6 +5,8 @@ import {
   AtualizarProdutoScreenRouterProp,
   VisualisarProdutoScreenNavigationProp,
   VisualisarProdutoScreenRouterProp,
+  DetalhesProdutoScreenNavigationProp,
+  DetalhesProdutoScreenRouterProp,
 } from '@/types/screens/produto';
 
 export interface CadastrarProdutoScreen {
@@ -20,4 +22,8 @@ export interface AtualizarProdutoScreen {
 export interface VisualizarProdutoScreen {
   navigation?: VisualisarProdutoScreenNavigationProp;
   route?: VisualisarProdutoScreenRouterProp;
+}
+export interface DetalhesProdutoScreen {
+  navigation?: DetalhesProdutoScreenNavigationProp;
+  route?: DetalhesProdutoScreenRouterProp;
 }
