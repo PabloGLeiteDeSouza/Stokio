@@ -198,7 +198,7 @@ const Create: React.FC = () => {
                                   <FlastListPessoa
                                     data={pessoas}
                                     renderItem={ListRenderPessoa}
-                                    keyExtractor={(item) => item.id}
+                                    keyExtractor={(item) => String(item.id)}
                                   />
                                 </ModalBody>
                               </ScrollView>
