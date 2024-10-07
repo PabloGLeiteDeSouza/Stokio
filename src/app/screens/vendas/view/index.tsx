@@ -88,9 +88,7 @@ const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
       <Card size="md" variant="elevated" m="$3">
         <HStack justifyContent="space-between">
           <Box gap="$2.5" w="$2/3">
-            <Heading size="lg">
-              {item.nome}
-            </Heading>
+            <Heading size="lg">{item.nome}</Heading>
             <Text size="md">{item.valor}</Text>
             <Text color={item.status === 'devendo' ? '$red600' : ''} size="md">
               {item.status}

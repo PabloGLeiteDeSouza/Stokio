@@ -107,9 +107,21 @@ const View: React.FC<VisualizarEmpresaScreen> = ({ navigation }) => {
       </Card>
     );
   };
-  const [empresas, setEmpresas] = React.useState<Array<Empresa>>(Empresas);
+  const [empresas, setEmpresas] = React.useState<Array<Empresa>>([]);
 
-  return (
+  return empresas.length < 1 ? (
+    <Box h="$full" w="$full" alignItems="center" justifyContent="center">
+      <Box gap="$5">
+        <Heading textAlign="center">Empresas não encontradas</Heading>
+        <Box>
+          <Button onPress={() => navigation?.navigate('cadastrar-empresa')}>
+            <ButtonText>Cadastrar Empresas</ButtonText>
+            <ButtonIcon as={AddIcon} />
+          </Button>
+        </Box>
+      </Box>
+    </Box>
+  ) : (
     <Box w="$full" h="$full" px="$8" py="$8">
       <Box gap="$5">
         <Formik

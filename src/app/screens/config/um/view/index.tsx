@@ -74,7 +74,6 @@ import { ListRenderItem } from 'react-native';
 import { VisualizarUmScreen } from '@/interfaces/um';
 
 const View: React.FC<VisualizarUmScreen> = ({ navigation }) => {
-
   const [ums, setUms] = React.useState<Array<Um>>(UMs);
   const FlatListUms = FlatList as UmFlatList;
   const ListRenderUms: ListRenderItem<Um> = ({ item }) => {

@@ -74,7 +74,7 @@ import { ListRenderItem } from 'react-native';
 import { Cliente, ClientFlatList } from './types';
 
 const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
-  const [clientes, setClientes] = React.useState<Array<Cliente>>(CLIENTES);
+  const [clientes, setClientes] = React.useState<Array<Cliente>>([]);
 
   const FlatListClient = FlatList as ClientFlatList;
 
@@ -103,7 +103,19 @@ const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
     );
   };
 
-  return (
+  return clientes.length < 1 ? (
+    <Box h="$full" w="$full" alignItems="center" justifyContent="center">
+      <Box gap="$5">
+        <Heading textAlign="center">Clientes não encontrados</Heading>
+        <Box>
+          <Button onPress={() => navigation?.navigate('cadastrar-cliente')}>
+            <ButtonText>Cadastrar Clientes</ButtonText>
+            <ButtonIcon as={AddIcon} />
+          </Button>
+        </Box>
+      </Box>
+    </Box>
+  ) : (
     <Box w="$full" h="$full" px="$8" py="$8">
       <Box gap="$5">
         <Formik

@@ -136,8 +136,17 @@ const Create: React.FC = () => {
                             onChange={(s) => {
                               if (s) {
                                 setFieldValue('id_pessoa', item.id);
+                                setFieldValue('nome', item.nome);
+                                setFieldValue(
+                                  'data_nascimento',
+                                  item.data_nascimento,
+                                );
+                                setFieldValue('cpf', item.cpf);
                               } else {
                                 setFieldValue('id_pessoa', '');
+                                setFieldValue('nome', '');
+                                setFieldValue('data_nascimento', new Date());
+                                setFieldValue('cpf', '');
                               }
                             }}
                           >
@@ -160,435 +169,460 @@ const Create: React.FC = () => {
 
                 return (
                   <Box gap="$5">
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      {values.id_pessoa == '' && pessoas.length > 0 ? (
-                        <Box>
-                          <Box>
-                            <Text>Selecione uma pessoa:</Text>
-                            <Button onPress={() => setShowModal(true)}>
-                              <ButtonText>Selecionar Pessoa</ButtonText>
-                            </Button>
-                          </Box>
-                          <Modal
-                            h="$full"
-                            size="lg"
-                            isOpen={showModal}
-                            onClose={() => {
-                              setShowModal(false);
-                            }}
-                            finalFocusRef={ref}
-                          >
-                            <ModalBackdrop />
-                            <ModalContent>
-                              <ModalHeader>
-                                <Heading size="lg">
-                                  Selecione uma pessoa
-                                </Heading>
-                                <ModalCloseButton>
-                                  <Icon as={CloseIcon} />
-                                </ModalCloseButton>
-                              </ModalHeader>
-                              <ScrollView>
-                                <ModalBody>
-                                  <FlastListPessoa
-                                    data={pessoas}
-                                    renderItem={ListRenderPessoa}
-                                    keyExtractor={(item) => String(item.id)}
-                                  />
-                                </ModalBody>
-                              </ScrollView>
-                            </ModalContent>
-                          </Modal>
+                    {values.id_pessoa == '' && pessoas.length > 0 ? (
+                      <Box>
+                        <Box gap="$5">
+                          <Text>Selecione uma pessoa:</Text>
+                          <Button onPress={() => setShowModal(true)} ref={ref}>
+                            <ButtonText>Selecionar Pessoa</ButtonText>
+                          </Button>
                         </Box>
-                      ) : (
-                        <></>
-                      )}
-                      <FormControlLabel>
-                        <FormControlLabelText>Nome</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <InputField
-                          type="text"
-                          placeholder="Nome Completo do Clinente"
-                          onChangeText={handleChange('nome')}
-                        />
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          {errors.nome}
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>
-                          Data de nascimento
-                        </FormControlLabelText>
-                      </FormControlLabel>
-                      <Input isReadOnly={true}>
-                        <InputField
-                          type="text"
-                          value={values.data_nascimento.toLocaleDateString(
-                            'PT-BR',
-                          )}
-                          placeholder="password"
-                        />
-                        <Button>
-                          <ButtonIcon as={CalendarDaysIcon} />
-                        </Button>
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          {errors.data_nascimento}
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>CPF</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <InputField
-                          type="text"
-                          value={values.cpf}
-                          placeholder="123.123.123.12"
-                        />
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          {errors.cpf}
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>Cep</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <InputField type="text" placeholder="password" />
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          Atleast 6 characters are required.
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>Rua</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <InputField type="text" placeholder="password" />
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          Atleast 6 characters are required.
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>Numero</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <InputField type="text" placeholder="password" />
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          Atleast 6 characters are required.
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>Complemento</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <InputField type="text" placeholder="password" />
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          Atleast 6 characters are required.
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>Bairro</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <InputField type="text" placeholder="password" />
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          Atleast 6 characters are required.
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>Cidade</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <InputField type="text" placeholder="password" />
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          Atleast 6 characters are required.
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>UF</FormControlLabelText>
-                      </FormControlLabel>
-                      <Select isInvalid={false} isDisabled={false}>
-                        <SelectTrigger size={'md'} variant={'rounded'}>
-                          <SelectInput placeholder="Selecione uma UF" />
-                          <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
-                        </SelectTrigger>
-                        <SelectPortal>
-                          <SelectBackdrop />
-                          <SelectContent>
-                            <SelectDragIndicatorWrapper>
-                              <SelectDragIndicator />
-                            </SelectDragIndicatorWrapper>
-                            <SelectItem
-                              label="UX Research"
-                              value="UX Research"
+                        <Modal
+                          h="$full"
+                          size="lg"
+                          isOpen={showModal}
+                          onClose={() => {
+                            setShowModal(false);
+                          }}
+                          finalFocusRef={ref}
+                        >
+                          <ModalBackdrop />
+                          <ModalContent>
+                            <ModalHeader>
+                              <Heading size="lg">Selecione uma pessoa</Heading>
+                              <ModalCloseButton>
+                                <Icon as={CloseIcon} />
+                              </ModalCloseButton>
+                            </ModalHeader>
+                            <ModalBody>
+                              <FlastListPessoa
+                                data={pessoas}
+                                renderItem={ListRenderPessoa}
+                                keyExtractor={(item) => String(item.id)}
+                              />
+                            </ModalBody>
+                            <ModalFooter />
+                          </ModalContent>
+                        </Modal>
+                      </Box>
+                    ) : values.id_pessoa ? (
+                      <Card my="$5">
+                        <HStack>
+                          <Box gap="$2.5">
+                            <Box>
+                              <Heading>{values.nome}</Heading>
+                            </Box>
+                            <Box>
+                              <Text>{values.cpf}</Text>
+                            </Box>
+                            <Box>
+                              <Text>
+                                {new Date(
+                                  values.data_nascimento,
+                                ).toLocaleDateString('PT-BR')}
+                              </Text>
+                            </Box>
+                          </Box>
+                        </HStack>
+                      </Card>
+                    ) : (
+                      <>
+                        <FormControl
+                          isInvalid={false}
+                          size={'md'}
+                          isDisabled={false}
+                          isRequired={true}
+                        >
+                          <FormControlLabel>
+                            <FormControlLabelText>Nome</FormControlLabelText>
+                          </FormControlLabel>
+                          <Input>
+                            <InputField
+                              type="text"
+                              placeholder="Nome Completo do Clinente"
+                              onChangeText={handleChange('nome')}
                             />
-                            <SelectItem
-                              label="Web Development"
-                              value="Web Development"
+                          </Input>
+
+                          <FormControlHelper>
+                            <FormControlHelperText>
+                              Must be atleast 6 characters.
+                            </FormControlHelperText>
+                          </FormControlHelper>
+
+                          <FormControlError>
+                            <FormControlErrorIcon as={AlertCircleIcon} />
+                            <FormControlErrorText>
+                              {errors.nome}
+                            </FormControlErrorText>
+                          </FormControlError>
+                        </FormControl>
+                        <FormControl
+                          isInvalid={false}
+                          size={'md'}
+                          isDisabled={false}
+                          isRequired={true}
+                        >
+                          <FormControlLabel>
+                            <FormControlLabelText>
+                              Data de nascimento
+                            </FormControlLabelText>
+                          </FormControlLabel>
+                          <Input isReadOnly={true}>
+                            <InputField
+                              type="text"
+                              value={values.data_nascimento.toLocaleDateString(
+                                'PT-BR',
+                              )}
+                              placeholder="password"
                             />
-                            <SelectItem
-                              label="Cross Platform Development Process"
-                              value="Cross Platform Development Process"
+                            <Button>
+                              <ButtonIcon as={CalendarDaysIcon} />
+                            </Button>
+                          </Input>
+
+                          <FormControlHelper>
+                            <FormControlHelperText>
+                              Must be atleast 6 characters.
+                            </FormControlHelperText>
+                          </FormControlHelper>
+
+                          <FormControlError>
+                            <FormControlErrorIcon as={AlertCircleIcon} />
+                            <FormControlErrorText>
+                              {errors.data_nascimento}
+                            </FormControlErrorText>
+                          </FormControlError>
+                        </FormControl>
+                        <FormControl
+                          isInvalid={false}
+                          size={'md'}
+                          isDisabled={false}
+                          isRequired={true}
+                        >
+                          <FormControlLabel>
+                            <FormControlLabelText>CPF</FormControlLabelText>
+                          </FormControlLabel>
+                          <Input>
+                            <InputField
+                              type="text"
+                              value={values.cpf}
+                              placeholder="123.123.123.12"
                             />
-                            <SelectItem
-                              label="UI Designing"
-                              value="UI Designing"
-                              isDisabled={true}
-                            />
-                            <SelectItem
-                              label="Backend Development"
-                              value="Backend Development"
-                            />
-                          </SelectContent>
-                        </SelectPortal>
-                      </Select>
+                          </Input>
 
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
+                          <FormControlHelper>
+                            <FormControlHelperText>
+                              Must be atleast 6 characters.
+                            </FormControlHelperText>
+                          </FormControlHelper>
 
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          Atleast 6 characters are required.
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
-                    <Box gap="$2.5">
-                      <FormControl
-                        isInvalid={false}
-                        size={'md'}
-                        isDisabled={false}
-                        isRequired={true}
-                      >
-                        <FormControlLabel>
-                          <FormControlLabelText>Telefone</FormControlLabelText>
-                        </FormControlLabel>
-                        <Input>
-                          <InputField type="text" placeholder="password" />
-                        </Input>
+                          <FormControlError>
+                            <FormControlErrorIcon as={AlertCircleIcon} />
+                            <FormControlErrorText>
+                              {errors.cpf}
+                            </FormControlErrorText>
+                          </FormControlError>
+                        </FormControl>
+                        <FormControl
+                          isInvalid={false}
+                          size={'md'}
+                          isDisabled={false}
+                          isRequired={true}
+                        >
+                          <FormControlLabel>
+                            <FormControlLabelText>Cep</FormControlLabelText>
+                          </FormControlLabel>
+                          <Input>
+                            <InputField type="text" placeholder="password" />
+                          </Input>
 
-                        <FormControlHelper>
-                          <FormControlHelperText>
-                            Must be atleast 6 characters.
-                          </FormControlHelperText>
-                        </FormControlHelper>
+                          <FormControlHelper>
+                            <FormControlHelperText>
+                              Must be atleast 6 characters.
+                            </FormControlHelperText>
+                          </FormControlHelper>
 
-                        <FormControlError>
-                          <FormControlErrorIcon as={AlertCircleIcon} />
-                          <FormControlErrorText>
-                            Atleast 6 characters are required.
-                          </FormControlErrorText>
-                        </FormControlError>
-                      </FormControl>
-                      <Button action="positive">
-                        <ButtonIcon as={AddIcon} />
-                      </Button>
-                      <Button action="negative">
-                        <ButtonIcon as={RemoveIcon} />
-                      </Button>
-                      <Button action="negative">
-                        <ButtonIcon as={TrashIcon} />
-                      </Button>
-                    </Box>
+                          <FormControlError>
+                            <FormControlErrorIcon as={AlertCircleIcon} />
+                            <FormControlErrorText>
+                              Atleast 6 characters are required.
+                            </FormControlErrorText>
+                          </FormControlError>
+                        </FormControl>
+                        <FormControl
+                          isInvalid={false}
+                          size={'md'}
+                          isDisabled={false}
+                          isRequired={true}
+                        >
+                          <FormControlLabel>
+                            <FormControlLabelText>Rua</FormControlLabelText>
+                          </FormControlLabel>
+                          <Input>
+                            <InputField type="text" placeholder="password" />
+                          </Input>
 
-                    <Box gap="$2.5">
-                      <FormControl
-                        isInvalid={false}
-                        size={'md'}
-                        isDisabled={false}
-                        isRequired={true}
-                      >
-                        <FormControlLabel>
-                          <FormControlLabelText>Email</FormControlLabelText>
-                        </FormControlLabel>
-                        <Input>
-                          <InputField type="text" placeholder="password" />
-                        </Input>
+                          <FormControlHelper>
+                            <FormControlHelperText>
+                              Must be atleast 6 characters.
+                            </FormControlHelperText>
+                          </FormControlHelper>
 
-                        <FormControlHelper>
-                          <FormControlHelperText>
-                            Must be atleast 6 characters.
-                          </FormControlHelperText>
-                        </FormControlHelper>
+                          <FormControlError>
+                            <FormControlErrorIcon as={AlertCircleIcon} />
+                            <FormControlErrorText>
+                              Atleast 6 characters are required.
+                            </FormControlErrorText>
+                          </FormControlError>
+                        </FormControl>
+                        <FormControl
+                          isInvalid={false}
+                          size={'md'}
+                          isDisabled={false}
+                          isRequired={true}
+                        >
+                          <FormControlLabel>
+                            <FormControlLabelText>Numero</FormControlLabelText>
+                          </FormControlLabel>
+                          <Input>
+                            <InputField type="text" placeholder="password" />
+                          </Input>
 
-                        <FormControlError>
-                          <FormControlErrorIcon as={AlertCircleIcon} />
-                          <FormControlErrorText>
-                            Atleast 6 characters are required.
-                          </FormControlErrorText>
-                        </FormControlError>
-                      </FormControl>
-                      <Button action="positive">
-                        <ButtonIcon as={AddIcon} />
-                      </Button>
-                      <Button action="negative">
-                        <ButtonIcon as={RemoveIcon} />
-                      </Button>
-                      <Button action="negative">
-                        <ButtonIcon as={TrashIcon} />
-                      </Button>
-                    </Box>
+                          <FormControlHelper>
+                            <FormControlHelperText>
+                              Must be atleast 6 characters.
+                            </FormControlHelperText>
+                          </FormControlHelper>
 
+                          <FormControlError>
+                            <FormControlErrorIcon as={AlertCircleIcon} />
+                            <FormControlErrorText>
+                              Atleast 6 characters are required.
+                            </FormControlErrorText>
+                          </FormControlError>
+                        </FormControl>
+                        <FormControl
+                          isInvalid={false}
+                          size={'md'}
+                          isDisabled={false}
+                          isRequired={true}
+                        >
+                          <FormControlLabel>
+                            <FormControlLabelText>
+                              Complemento
+                            </FormControlLabelText>
+                          </FormControlLabel>
+                          <Input>
+                            <InputField type="text" placeholder="password" />
+                          </Input>
+
+                          <FormControlHelper>
+                            <FormControlHelperText>
+                              Must be atleast 6 characters.
+                            </FormControlHelperText>
+                          </FormControlHelper>
+
+                          <FormControlError>
+                            <FormControlErrorIcon as={AlertCircleIcon} />
+                            <FormControlErrorText>
+                              Atleast 6 characters are required.
+                            </FormControlErrorText>
+                          </FormControlError>
+                        </FormControl>
+                        <FormControl
+                          isInvalid={false}
+                          size={'md'}
+                          isDisabled={false}
+                          isRequired={true}
+                        >
+                          <FormControlLabel>
+                            <FormControlLabelText>Bairro</FormControlLabelText>
+                          </FormControlLabel>
+                          <Input>
+                            <InputField type="text" placeholder="password" />
+                          </Input>
+
+                          <FormControlHelper>
+                            <FormControlHelperText>
+                              Must be atleast 6 characters.
+                            </FormControlHelperText>
+                          </FormControlHelper>
+
+                          <FormControlError>
+                            <FormControlErrorIcon as={AlertCircleIcon} />
+                            <FormControlErrorText>
+                              Atleast 6 characters are required.
+                            </FormControlErrorText>
+                          </FormControlError>
+                        </FormControl>
+                        <FormControl
+                          isInvalid={false}
+                          size={'md'}
+                          isDisabled={false}
+                          isRequired={true}
+                        >
+                          <FormControlLabel>
+                            <FormControlLabelText>Cidade</FormControlLabelText>
+                          </FormControlLabel>
+                          <Input>
+                            <InputField type="text" placeholder="password" />
+                          </Input>
+
+                          <FormControlHelper>
+                            <FormControlHelperText>
+                              Must be atleast 6 characters.
+                            </FormControlHelperText>
+                          </FormControlHelper>
+
+                          <FormControlError>
+                            <FormControlErrorIcon as={AlertCircleIcon} />
+                            <FormControlErrorText>
+                              Atleast 6 characters are required.
+                            </FormControlErrorText>
+                          </FormControlError>
+                        </FormControl>
+                        <FormControl
+                          isInvalid={false}
+                          size={'md'}
+                          isDisabled={false}
+                          isRequired={true}
+                        >
+                          <FormControlLabel>
+                            <FormControlLabelText>UF</FormControlLabelText>
+                          </FormControlLabel>
+                          <Select isInvalid={false} isDisabled={false}>
+                            <SelectTrigger size={'md'} variant={'rounded'}>
+                              <SelectInput placeholder="Selecione uma UF" />
+                              <SelectIcon
+                                mr={'$3'}
+                                ml={0}
+                                as={ChevronDownIcon}
+                              />
+                            </SelectTrigger>
+                            <SelectPortal>
+                              <SelectBackdrop />
+                              <SelectContent>
+                                <SelectDragIndicatorWrapper>
+                                  <SelectDragIndicator />
+                                </SelectDragIndicatorWrapper>
+                                <SelectItem
+                                  label="UX Research"
+                                  value="UX Research"
+                                />
+                                <SelectItem
+                                  label="Web Development"
+                                  value="Web Development"
+                                />
+                                <SelectItem
+                                  label="Cross Platform Development Process"
+                                  value="Cross Platform Development Process"
+                                />
+                                <SelectItem
+                                  label="UI Designing"
+                                  value="UI Designing"
+                                  isDisabled={true}
+                                />
+                                <SelectItem
+                                  label="Backend Development"
+                                  value="Backend Development"
+                                />
+                              </SelectContent>
+                            </SelectPortal>
+                          </Select>
+
+                          <FormControlHelper>
+                            <FormControlHelperText>
+                              Must be atleast 6 characters.
+                            </FormControlHelperText>
+                          </FormControlHelper>
+
+                          <FormControlError>
+                            <FormControlErrorIcon as={AlertCircleIcon} />
+                            <FormControlErrorText>
+                              Atleast 6 characters are required.
+                            </FormControlErrorText>
+                          </FormControlError>
+                        </FormControl>
+                        <Box gap="$2.5">
+                          <FormControl
+                            isInvalid={false}
+                            size={'md'}
+                            isDisabled={false}
+                            isRequired={true}
+                          >
+                            <FormControlLabel>
+                              <FormControlLabelText>
+                                Telefone
+                              </FormControlLabelText>
+                            </FormControlLabel>
+                            <Input>
+                              <InputField type="text" placeholder="password" />
+                            </Input>
+
+                            <FormControlHelper>
+                              <FormControlHelperText>
+                                Must be atleast 6 characters.
+                              </FormControlHelperText>
+                            </FormControlHelper>
+
+                            <FormControlError>
+                              <FormControlErrorIcon as={AlertCircleIcon} />
+                              <FormControlErrorText>
+                                Atleast 6 characters are required.
+                              </FormControlErrorText>
+                            </FormControlError>
+                          </FormControl>
+                          <Button action="positive">
+                            <ButtonIcon as={AddIcon} />
+                          </Button>
+                          <Button action="negative">
+                            <ButtonIcon as={RemoveIcon} />
+                          </Button>
+                          <Button action="negative">
+                            <ButtonIcon as={TrashIcon} />
+                          </Button>
+                        </Box>
+
+                        <Box gap="$2.5">
+                          <FormControl
+                            isInvalid={false}
+                            size={'md'}
+                            isDisabled={false}
+                            isRequired={true}
+                          >
+                            <FormControlLabel>
+                              <FormControlLabelText>Email</FormControlLabelText>
+                            </FormControlLabel>
+                            <Input>
+                              <InputField type="text" placeholder="password" />
+                            </Input>
+
+                            <FormControlHelper>
+                              <FormControlHelperText>
+                                Must be atleast 6 characters.
+                              </FormControlHelperText>
+                            </FormControlHelper>
+
+                            <FormControlError>
+                              <FormControlErrorIcon as={AlertCircleIcon} />
+                              <FormControlErrorText>
+                                Atleast 6 characters are required.
+                              </FormControlErrorText>
+                            </FormControlError>
+                          </FormControl>
+                          <Button action="positive">
+                            <ButtonIcon as={AddIcon} />
+                          </Button>
+                          <Button action="negative">
+                            <ButtonIcon as={RemoveIcon} />
+                          </Button>
+                          <Button action="negative">
+                            <ButtonIcon as={TrashIcon} />
+                          </Button>
+                        </Box>
+                      </>
+                    )}
                     <FormControl
                       isInvalid={false}
                       size={'md'}
