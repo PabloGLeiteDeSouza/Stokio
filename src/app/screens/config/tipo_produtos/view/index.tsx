@@ -106,7 +106,21 @@ const View: React.FC<VisualizarTipoProdutoScreen> = ({ navigation }) => {
     );
   };
 
-  return (
+  return tipos_produtos.length < 1 ? (
+    <Box h="$full" w="$full" alignItems="center" justifyContent="center">
+      <Box gap="$5">
+        <Heading textAlign="center">Tipos de Produtos não encontrados</Heading>
+        <Box>
+          <Button
+            onPress={() => navigation?.navigate('cadastrar-tipo-produto')}
+          >
+            <ButtonText>Cadastrar Tipo de Produto</ButtonText>
+            <ButtonIcon as={AddIcon} />
+          </Button>
+        </Box>
+      </Box>
+    </Box>
+  ) : (
     <Box h="$full" w="$full" px="$8" py="$8">
       <Box gap="$5">
         <Formik

@@ -115,7 +115,7 @@ const View: React.FC<VisualizarEmpresaScreen> = ({ navigation }) => {
         <Heading textAlign="center">Empresas não encontradas</Heading>
         <Box>
           <Button onPress={() => navigation?.navigate('cadastrar-empresa')}>
-            <ButtonText>Cadastrar Empresas</ButtonText>
+            <ButtonText>Cadastrar Empresa</ButtonText>
             <ButtonIcon as={AddIcon} />
           </Button>
         </Box>

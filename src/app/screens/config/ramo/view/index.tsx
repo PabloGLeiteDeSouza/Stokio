@@ -103,7 +103,19 @@ const View: React.FC<VisualizarRamoScreen> = ({ navigation }) => {
     );
   };
 
-  return (
+  return clientes.length < 1 ? (
+    <Box h="$full" w="$full" alignItems="center" justifyContent="center">
+      <Box gap="$5">
+        <Heading textAlign="center">Ramos não encontrados</Heading>
+        <Box>
+          <Button onPress={() => navigation?.navigate('cadastrar-ramo')}>
+            <ButtonText>Cadastrar Ramo</ButtonText>
+            <ButtonIcon as={AddIcon} />
+          </Button>
+        </Box>
+      </Box>
+    </Box>
+  ) : (
     <Box w="$full" h="$full" px="$8" py="$8">
       <Box gap="$5">
         <Formik

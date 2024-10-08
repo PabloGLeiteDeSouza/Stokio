@@ -103,7 +103,21 @@ const View: React.FC<VisualizarUaScreen> = ({ navigation }) => {
     );
   };
 
-  return (
+  return uas.length < 1 ? (
+    <Box h="$full" w="$full" alignItems="center" justifyContent="center">
+      <Box gap="$5">
+        <Heading textAlign="center">
+          Unidades de Armazenamento não encontradas
+        </Heading>
+        <Box>
+          <Button onPress={() => navigation?.navigate('cadastrar-ua')}>
+            <ButtonText>Cadastrar Ua</ButtonText>
+            <ButtonIcon as={AddIcon} />
+          </Button>
+        </Box>
+      </Box>
+    </Box>
+  ) : (
     <Box w="$full" h="$full" px="$8" py="$8">
       <Box gap="$5">
         <Formik

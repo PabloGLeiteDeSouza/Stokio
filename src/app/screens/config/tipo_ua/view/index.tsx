@@ -102,7 +102,21 @@ const View: React.FC<VisualizarTipoUaScreen> = ({ navigation }) => {
     );
   };
 
-  return (
+  return clientes.length < 1 ? (
+    <Box h="$full" w="$full" alignItems="center" justifyContent="center">
+      <Box gap="$5">
+        <Heading textAlign="center">
+          Tipos de Unidades de Armazenamento não encontrados
+        </Heading>
+        <Box>
+          <Button onPress={() => navigation?.navigate('cadastrar-tipo-ua')}>
+            <ButtonText>Cadastrar Tipo de UA</ButtonText>
+            <ButtonIcon as={AddIcon} />
+          </Button>
+        </Box>
+      </Box>
+    </Box>
+  ) : (
     <Box w="$full" h="$full" px="$8" py="$8">
       <Box gap="$5">
         <Formik

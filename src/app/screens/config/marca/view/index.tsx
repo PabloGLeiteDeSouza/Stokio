@@ -101,7 +101,19 @@ const View: React.FC<VisualizarMarcaScreen> = ({ navigation }) => {
       </Card>
     );
   };
-  return (
+  return marcas.length < 1 ? (
+    <Box h="$full" w="$full" alignItems="center" justifyContent="center">
+      <Box gap="$5">
+        <Heading textAlign="center">Marcas não encontradas</Heading>
+        <Box>
+          <Button onPress={() => navigation?.navigate('cadastrar-marca')}>
+            <ButtonText>Cadastrar Marca</ButtonText>
+            <ButtonIcon as={AddIcon} />
+          </Button>
+        </Box>
+      </Box>
+    </Box>
+  ) : (
     <Box h="$full" w="$full" px="$8" py="$8">
       <Box gap="$5">
         <Formik

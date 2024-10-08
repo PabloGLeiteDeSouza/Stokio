@@ -109,7 +109,7 @@ const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
         <Heading textAlign="center">Clientes não encontrados</Heading>
         <Box>
           <Button onPress={() => navigation?.navigate('cadastrar-cliente')}>
-            <ButtonText>Cadastrar Clientes</ButtonText>
+            <ButtonText>Cadastrar Cliente</ButtonText>
             <ButtonIcon as={AddIcon} />
           </Button>
         </Box>

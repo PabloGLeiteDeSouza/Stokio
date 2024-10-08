@@ -102,7 +102,19 @@ const View: React.FC<VisualizarUmScreen> = ({ navigation }) => {
     );
   };
 
-  return (
+  return ums.length < 1 ? (
+    <Box h="$full" w="$full" alignItems="center" justifyContent="center">
+      <Box gap="$5">
+        <Heading textAlign="center">Unidades de Medida não encontradas</Heading>
+        <Box>
+          <Button onPress={() => navigation?.navigate('cadastrar-um')}>
+            <ButtonText>Cadastrar UM</ButtonText>
+            <ButtonIcon as={AddIcon} />
+          </Button>
+        </Box>
+      </Box>
+    </Box>
+  ) : (
     <Box w="$full" h="$full" px="$8" py="$8">
       <Box gap="$5">
         <Formik

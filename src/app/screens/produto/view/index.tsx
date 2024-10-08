@@ -110,7 +110,19 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
       </Card>
     );
   };
-  return (
+  return produtos.length < 1 ? (
+    <Box h="$full" w="$full" alignItems="center" justifyContent="center">
+      <Box gap="$5">
+        <Heading textAlign="center">Produtos não encontrados</Heading>
+        <Box>
+          <Button onPress={() => navigation?.navigate('cadastrar-produto')}>
+            <ButtonText>Cadastrar Produto</ButtonText>
+            <ButtonIcon as={AddIcon} />
+          </Button>
+        </Box>
+      </Box>
+    </Box>
+  ) : (
     <Box w="$full" h="$full" px="$8" py="$8">
       <Box gap="$5">
         <Formik
