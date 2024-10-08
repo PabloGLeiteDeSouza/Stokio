@@ -41,6 +41,14 @@ const Details: React.FC<DetalhesProdutoScreen> = ({ navigation, route }) => {
               <Heading>Nome:</Heading>
               <Text>João</Text>
             </Box>
+            <Box gap="$1.5">
+              <Heading>Empresa:</Heading>
+              <Text>Velho</Text>
+            </Box>
+            <Box gap="$1.5">
+              <Heading>cnpj:</Heading>
+              <Text>123456789</Text>
+            </Box>
             <Box>
               <Heading>Codigo de barras:</Heading>
               <Text>12345678901234</Text>
@@ -78,7 +86,7 @@ const Details: React.FC<DetalhesProdutoScreen> = ({ navigation, route }) => {
               <Text>Caixa</Text>
             </Box>
             <Box gap="$5">
-              <Button onPress={() => navigation?.navigate('atualizar-empresa')}>
+              <Button onPress={() => navigation?.navigate('atualizar-venda')}>
                 <ButtonText>Editar</ButtonText>
               </Button>
               <Button action="negative">

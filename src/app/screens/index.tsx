@@ -22,7 +22,7 @@ const Screens: React.FC = () => {
         }}
       />
       <Tab.Screen
-        name="empresa-screens"
+        name="screens-empresas"
         component={EmpresasScreens}
         options={{
           tabBarIcon: (props) => <FontAwesome6 name="building" {...props} />,
@@ -31,7 +31,7 @@ const Screens: React.FC = () => {
         }}
       />
       <Tab.Screen
-        name="produto-screens"
+        name="screens-produtos"
         component={ProdutoScreens}
         options={{
           tabBarIcon: (props) => (
@@ -42,7 +42,7 @@ const Screens: React.FC = () => {
         }}
       />
       <Tab.Screen
-        name="venda-screens"
+        name="screens-vendas"
         component={VendasScreens}
         options={{
           tabBarIcon: (props) => (
@@ -53,7 +53,7 @@ const Screens: React.FC = () => {
         }}
       />
       <Tab.Screen
-        name="ua-screens"
+        name="screens-ua"
         component={UaScreens}
         options={{
           tabBarIcon: (props) => (

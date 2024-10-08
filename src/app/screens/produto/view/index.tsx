@@ -73,7 +73,7 @@ import { SearchIcon } from '@gluestack-ui/themed';
 import BuscasTipos from './busca_tipos_vendas.json';
 import { VisualizarProdutoScreen } from '@/interfaces/produto';
 import { Produto, ProdutoFlatList } from '@/types/screens/produto';
-import { ListRenderItem } from 'react-native';
+import { Alert, ListRenderItem } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
   const tipos_busca: Array<{
@@ -110,12 +110,26 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
       </Card>
     );
   };
+  const onCadastrarProduto = () => {
+    if (true) {
+      Alert.alert('Erro', 'Não existem empresas cadastradas!');
+      navigation?.navigate('screens-empresas');
+    } else if (true) {
+      Alert.alert('Erro', 'Não existem marcas cadastradas!');
+      navigation?.navigate('screens-empresas');
+    } else if (true) {
+      Alert.alert('Erro', 'Não existem tipos de produtos cadastrados!');
+      navigation?.navigate('screens-empresas');
+    } else {
+      navigation?.navigate('cadastrar-produto');
+    }
+  };
   return produtos.length < 1 ? (
     <Box h="$full" w="$full" alignItems="center" justifyContent="center">
       <Box gap="$5">
         <Heading textAlign="center">Produtos não encontrados</Heading>
         <Box>
-          <Button onPress={() => navigation?.navigate('cadastrar-produto')}>
+          <Button onPress={onCadastrarProduto}>
             <ButtonText>Cadastrar Produto</ButtonText>
             <ButtonIcon as={AddIcon} />
           </Button>
@@ -283,7 +297,7 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
             );
           }}
         </Formik>
-        <Button onPress={() => navigation?.navigate('cadastrar-produto')}>
+        <Button onPress={onCadastrarProduto}>
           <ButtonText>Cadastrar Produto</ButtonText>
           <ButtonIcon ml="$5" as={AddIcon} />
         </Button>

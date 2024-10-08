@@ -65,7 +65,7 @@ import { TrashIcon } from '@gluestack-ui/themed';
 import { CloseIcon } from '@gluestack-ui/themed';
 import { Pessoa, PessoaFlatList } from '@/types/screens/cliente';
 import { FlatList } from '@gluestack-ui/themed';
-import { ListRenderItem } from 'react-native';
+import { ListRenderItem, Touchable, TouchableHighlight } from 'react-native';
 const Create: React.FC = () => {
   const [pessoas, setPessoas] = React.useState<Array<Pessoa>>([
     {
@@ -123,47 +123,48 @@ const Create: React.FC = () => {
               onSubmit={() => {}}
             >
               {({ handleChange, setFieldValue, values, errors }) => {
+                const onSetPerson = (s: boolean, item: Pessoa) => {
+                  if (s) {
+                    setFieldValue('id_pessoa', item.id);
+                    setFieldValue('nome', item.nome);
+                    setFieldValue('data_nascimento', item.data_nascimento);
+                    setFieldValue('cpf', item.cpf);
+                  } else {
+                    setFieldValue('id_pessoa', '');
+                    setFieldValue('nome', '');
+                    setFieldValue('data_nascimento', new Date());
+                    setFieldValue('cpf', '');
+                  }
+                };
+
                 const ListRenderPessoa: ListRenderItem<Pessoa> = ({ item }) => {
                   return (
-                    <Card>
-                      <HStack>
-                        <Box>
-                          <Checkbox
-                            size="md"
-                            isInvalid={false}
-                            isDisabled={false}
-                            value=""
-                            onChange={(s) => {
-                              if (s) {
-                                setFieldValue('id_pessoa', item.id);
-                                setFieldValue('nome', item.nome);
-                                setFieldValue(
-                                  'data_nascimento',
-                                  item.data_nascimento,
-                                );
-                                setFieldValue('cpf', item.cpf);
-                              } else {
-                                setFieldValue('id_pessoa', '');
-                                setFieldValue('nome', '');
-                                setFieldValue('data_nascimento', new Date());
-                                setFieldValue('cpf', '');
-                              }
-                            }}
-                          >
+                    <Checkbox
+                      size="md"
+                      isInvalid={false}
+                      isDisabled={false}
+                      value=""
+                      onChange={(s) => onSetPerson(s, item)}
+                    >
+                      <Card my="$2.5">
+                        <HStack space="md">
+                          <Box justifyContent="center">
                             <CheckboxIndicator mr="$2">
                               <CheckboxIcon as={CheckIcon} />
                             </CheckboxIndicator>
-                          </Checkbox>
-                        </Box>
-                        <Box>
-                          <Heading>{item.nome}</Heading>
-                        </Box>
-                        <Box>
-                          <Text size="md">{item.cpf}</Text>
-                          <Text>{item.data_nascimento}</Text>
-                        </Box>
-                      </HStack>
-                    </Card>
+                          </Box>
+                          <Box>
+                            <Box>
+                              <Heading>{item.nome}</Heading>
+                            </Box>
+                            <Box>
+                              <Text size="md">{item.cpf}</Text>
+                              <Text>{item.data_nascimento}</Text>
+                            </Box>
+                          </Box>
+                        </HStack>
+                      </Card>
+                    </Checkbox>
                   );
                 };
 

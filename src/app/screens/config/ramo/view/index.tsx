@@ -75,7 +75,7 @@ import { ListRenderItem } from 'react-native';
 import { VisualizarRamoScreen } from '@/interfaces/ramo';
 
 const View: React.FC<VisualizarRamoScreen> = ({ navigation }) => {
-  const [ramos, setRamos] = React.useState<Array<Ramo>>(Ramos);
+  const [ramos, setRamos] = React.useState<Array<Ramo>>([]);
   const FlatListRamo = FlatList as RamoFlatList;
   const ListRenderRamo: ListRenderItem<Ramo> = ({ item }) => {
     return (
@@ -103,7 +103,7 @@ const View: React.FC<VisualizarRamoScreen> = ({ navigation }) => {
     );
   };
 
-  return clientes.length < 1 ? (
+  return ramos.length < 1 ? (
     <Box h="$full" w="$full" alignItems="center" justifyContent="center">
       <Box gap="$5">
         <Heading textAlign="center">Ramos não encontrados</Heading>
