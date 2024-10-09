@@ -1,3 +1,4 @@
+import { DetalhesVendaScreen } from '@/interfaces/venda';
 import {
   Box,
   Button,
@@ -9,7 +10,8 @@ import {
 } from '@gluestack-ui/themed';
 import React from 'react';
 
-const Details: React.FC = () => {
+const Details: React.FC<DetalhesVendaScreen> = ({ navigation }) => {
+
   return (
     <Box h="$full" w="$full">
       <ScrollView mx="$1">
@@ -106,7 +108,11 @@ const Details: React.FC = () => {
               <Text>Pago</Text>
             </Box>
             <Box gap="$5">
-              <Button>
+              <Button
+                onPress={() =>
+                  navigation?.navigate('atualizar-venda', { id: 1 })
+                }
+              >
                 <ButtonText>Editar</ButtonText>
               </Button>
               <Button action="negative">

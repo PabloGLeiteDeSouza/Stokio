@@ -111,18 +111,19 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
     );
   };
   const onCadastrarProduto = () => {
-    if (true) {
-      Alert.alert('Erro', 'Não existem empresas cadastradas!');
-      navigation?.navigate('screens-empresas');
-    } else if (true) {
-      Alert.alert('Erro', 'Não existem marcas cadastradas!');
-      navigation?.navigate('screens-empresas');
-    } else if (true) {
-      Alert.alert('Erro', 'Não existem tipos de produtos cadastrados!');
-      navigation?.navigate('screens-empresas');
-    } else {
-      navigation?.navigate('cadastrar-produto');
-    }
+    // if (true) {
+    //   Alert.alert('Erro', 'Não existem empresas cadastradas!');
+    //   navigation?.navigate('screens-empresas');
+    // } else if (true) {
+    //   Alert.alert('Erro', 'Não existem marcas cadastradas!');
+    //   navigation?.navigate('screens-empresas');
+    // } else if (true) {
+    //   Alert.alert('Erro', 'Não existem tipos de produtos cadastrados!');
+    //   navigation?.navigate('screens-empresas');
+    // } else {
+    //   navigation?.navigate('cadastrar-produto');
+    // }
+    navigation?.navigate('cadastrar-produto');
   };
   return produtos.length < 1 ? (
     <Box h="$full" w="$full" alignItems="center" justifyContent="center">

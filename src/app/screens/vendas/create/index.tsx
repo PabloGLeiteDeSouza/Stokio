@@ -62,20 +62,15 @@ const Create: React.FC = () => {
   const [empresas, setEmpresas] = React.useState([]);
   const [showModalEmpresa, setShowModalEmpresa] = React.useState(false);
   const refEmpresa = React.useRef(null);
-  
+
   React.useEffect(() => {
     async function Start() {
       try {
-        setEmpresas([])
-      } catch (error) {
-        
-      }
+        setEmpresas([]);
+      } catch (error) {}
     }
     Start();
-  }, [])
-
-
-
+  }, []);
 
   return (
     <Box w="$full" h="$full">

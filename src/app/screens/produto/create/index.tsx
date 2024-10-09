@@ -58,6 +58,7 @@ import {
 } from '@gluestack-ui/themed';
 import { Box, ScrollView, Text } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
+import ModalSelectEmpresa from '@/components/Custom/Modal/SelectEmpresa';
 const Create: React.FC = () => {
   return (
     <Box mt="$5" mx="$8">
@@ -85,6 +86,7 @@ const Create: React.FC = () => {
             {({ values, handleChange, setFieldValue }) => {
               return (
                 <>
+                  <ModalSelectEmpresa onChangeEmpresa={() => {}} />
                   <FormControl
                     isInvalid={false}
                     size={'md'}

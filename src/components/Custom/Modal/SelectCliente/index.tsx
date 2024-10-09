@@ -99,9 +99,7 @@ const ModalSelectCliente: React.FC<IModalSelectClienteProps> = ({
             <Card>
               <HStack>
                 <VStack>
-                  <Box>
-                    
-                  </Box>
+                  <Box></Box>
                 </VStack>
               </HStack>
             </Card>

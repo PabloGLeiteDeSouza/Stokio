@@ -19,23 +19,78 @@ import {
   InputField,
   ArrowLeftIcon,
   Link,
+  FlatList,
+  Checkbox,
+  CheckboxIndicator,
+  CheckboxLabel,
 } from '@gluestack-ui/themed';
 
 import { Box, Button, ButtonText } from '@gluestack-ui/themed';
 import React from 'react';
-import { IModalSelectEmpresaProps } from './interfaces/index.ts';
+import { IModalSelectEmpresaProps } from './interfaces';
+import { ModalVendaFlatList } from './types';
+import { Alert, ListRenderItem } from 'react-native';
+import { Empresa } from '@/types/screens/empresa';
+import { Card } from '@gluestack-ui/themed';
+import { CheckIcon } from '@gluestack-ui/themed';
+import { CheckboxIcon } from '@gluestack-ui/themed';
 
 const ModalSelectEmpresa: React.FC<IModalSelectEmpresaProps> = ({
   onChangeEmpresa,
 }) => {
   const [showModal, setShowModal] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
   const ref = React.useRef(null);
-  const [Empresas, setEmpresas] = React.useState([]);
+  const [Empresas, setEmpresas] = React.useState<Array<Empresa>>([]);
+  const FlatListEmpresas = FlatList as ModalVendaFlatList;
+
+  React.useEffect(() => {
+    const loadEmpresas = async () => {
+      try {
+        setIsLoading(false);
+      } catch (error) {
+        Alert.alert('Erro', (error as Error).message);
+        throw error;
+      }
+    };
+    loadEmpresas();
+  }, []);
+
+
+  const ListRenderEmpresas: ListRenderItem<Empresa> = ({ item }) => {
+    return (
+      <Checkbox value={String(item.id)}>
+        <CheckboxLabel>
+          <Card>
+            <HStack>
+              <VStack>
+                <CheckboxIndicator mr="$2">
+                  <CheckboxIcon as={CheckIcon} />
+                </CheckboxIndicator>
+              </VStack>
+            </HStack>
+          </Card>
+        </CheckboxLabel>
+      </Checkbox>
+    );
+  };
+
+
   return (
     <Box>
-      <Button>
-        <ButtonText>Seleccionar Empresa</ButtonText>
+      {isLoading && (
+        <Button isDisabled={true} bg="$darkBlue600" p="$3">
+          <ButtonSpinner mr="$1" />
+          <ButtonText fontWeight="$medium" fontSize="$sm">
+            Por Favor aguarde...
+          </ButtonText>
       </Button>
+      )}
+      {!isLoading && (
+        <Button onPress={() => setShowModal(true)}>
+          <ButtonText>Seleccionar Empresa</ButtonText>
+        </Button>
+      )}
       <Modal
         isOpen={showModal}
         onClose={() => {
@@ -46,17 +101,19 @@ const ModalSelectEmpresa: React.FC<IModalSelectEmpresaProps> = ({
         <ModalBackdrop />
         <ModalContent>
           <ModalHeader>
-            <Heading size="lg">Engage with Modals</Heading>
+            <Heading size="lg">Selecione a Empresa:</Heading>
             <ModalCloseButton>
               <Icon as={CloseIcon} />
             </ModalCloseButton>
           </ModalHeader>
           <ModalBody>
-            <Text>
-              Elevate user interactions with our versatile modals. Seamlessly
-              integrate notifications, forms, and media displays. Make an impact
-              effortlessly.
-            </Text>
+            <Box gap="$8">
+              <FlatListEmpresas
+                data={Empresas}
+                renderItem={ListRenderEmpresas}
+                keyExtractor={(item) => String(item.id)}
+              />
+            </Box>
           </ModalBody>
           <ModalFooter>
             <Button
