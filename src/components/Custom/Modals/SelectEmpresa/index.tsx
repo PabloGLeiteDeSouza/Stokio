@@ -29,11 +29,13 @@ import { Box, Button, ButtonText } from '@gluestack-ui/themed';
 import React from 'react';
 import { IModalSelectEmpresaProps } from './interfaces';
 import { ModalVendaFlatList } from './types';
-import { Alert, ListRenderItem } from 'react-native';
+import { Alert, ListRenderItem, TouchableHighlight } from 'react-native';
 import { Empresa } from '@/types/screens/empresa';
 import { Card } from '@gluestack-ui/themed';
 import { CheckIcon } from '@gluestack-ui/themed';
 import { CheckboxIcon } from '@gluestack-ui/themed';
+import { ButtonSpinner } from '@gluestack-ui/themed';
+import ItemListEmpresas from './ItemListEmpresas';
 
 const ModalSelectEmpresa: React.FC<IModalSelectEmpresaProps> = ({
   onChangeEmpresa,
@@ -41,7 +43,29 @@ const ModalSelectEmpresa: React.FC<IModalSelectEmpresaProps> = ({
   const [showModal, setShowModal] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const ref = React.useRef(null);
-  const [Empresas, setEmpresas] = React.useState<Array<Empresa>>([]);
+  const [Empresas, setEmpresas] = React.useState<Array<Empresa>>([
+    {
+      id: 1,
+      nome_fantasia: 'Empresa 1',
+      razao_social: 'Empresa 1',
+      cnpj: '12345678901234',
+      cpf: '43857395034',
+    },
+    {
+      id: 2,
+      nome_fantasia: 'Empresa 2',
+      razao_social: 'Empresa 2',
+      cnpj: '98765434567898',
+      cpf: '452617832193',
+    },
+  ]);
+  const [selectedEmpresa, setSelectedEmpresa] = React.useState<Empresa>({
+    id: 0,
+    cpf: '',
+    cnpj: '',
+    nome_fantasia: '',
+    razao_social: '',
+  });
   const FlatListEmpresas = FlatList as ModalVendaFlatList;
 
   React.useEffect(() => {
@@ -56,25 +80,17 @@ const ModalSelectEmpresa: React.FC<IModalSelectEmpresaProps> = ({
     loadEmpresas();
   }, []);
 
-
   const ListRenderEmpresas: ListRenderItem<Empresa> = ({ item }) => {
     return (
-      <Checkbox value={String(item.id)}>
-        <CheckboxLabel>
-          <Card>
-            <HStack>
-              <VStack>
-                <CheckboxIndicator mr="$2">
-                  <CheckboxIcon as={CheckIcon} />
-                </CheckboxIndicator>
-              </VStack>
-            </HStack>
-          </Card>
-        </CheckboxLabel>
-      </Checkbox>
+      <ItemListEmpresas
+        item={item}
+        onChangeItem={(item) => {
+          setSelectedEmpresa(item);
+        }}
+        selectedEmpresa={selectedEmpresa}
+      />
     );
   };
-
 
   return (
     <Box>
@@ -84,7 +100,7 @@ const ModalSelectEmpresa: React.FC<IModalSelectEmpresaProps> = ({
           <ButtonText fontWeight="$medium" fontSize="$sm">
             Por Favor aguarde...
           </ButtonText>
-      </Button>
+        </Button>
       )}
       {!isLoading && (
         <Button onPress={() => setShowModal(true)}>
@@ -107,7 +123,7 @@ const ModalSelectEmpresa: React.FC<IModalSelectEmpresaProps> = ({
             </ModalCloseButton>
           </ModalHeader>
           <ModalBody>
-            <Box gap="$8">
+            <Box>
               <FlatListEmpresas
                 data={Empresas}
                 renderItem={ListRenderEmpresas}
@@ -125,17 +141,18 @@ const ModalSelectEmpresa: React.FC<IModalSelectEmpresaProps> = ({
                 setShowModal(false);
               }}
             >
-              <ButtonText>Cancel</ButtonText>
+              <ButtonText>Cancelar</ButtonText>
             </Button>
             <Button
               size="sm"
               action="positive"
               borderWidth="$0"
               onPress={() => {
+                onChangeEmpresa(selectedEmpresa);
                 setShowModal(false);
               }}
             >
-              <ButtonText>Explore</ButtonText>
+              <ButtonText>Confirmar</ButtonText>
             </Button>
           </ModalFooter>
         </ModalContent>

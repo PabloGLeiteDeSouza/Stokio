@@ -57,7 +57,7 @@ import {
 } from '@gluestack-ui/themed';
 import { Box, Heading, ScrollView, Text } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
-import ModalSelectCliente from '@/components/Custom/Modal/SelectCliente';
+import ModalSelectCliente from '@/components/Custom/Modals/SelectCliente';
 const Create: React.FC = () => {
   const [empresas, setEmpresas] = React.useState([]);
   const [showModalEmpresa, setShowModalEmpresa] = React.useState(false);

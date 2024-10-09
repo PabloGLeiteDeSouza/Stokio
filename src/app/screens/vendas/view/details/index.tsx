@@ -11,7 +11,6 @@ import {
 import React from 'react';
 
 const Details: React.FC<DetalhesVendaScreen> = ({ navigation }) => {
-
   return (
     <Box h="$full" w="$full">
       <ScrollView mx="$1">

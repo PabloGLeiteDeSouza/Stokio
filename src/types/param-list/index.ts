@@ -1,5 +1,5 @@
 export type RootStackParamList = {
-  'code-scanner'?: { screen: string; type: string };
+  'code-scanner'?: { screen: ParamListCodeScanner };
   'screens-produtos'?: object;
   'screens-tipos-produtos'?: object;
   'screens-categorias'?: object;
@@ -118,6 +118,6 @@ export type ParamList =
   | 'configuracoes';
 
 export type ParamListCodeScanner =
-  | 'cadastrar-produtos'
+  | 'cadastrar-produto'
   | 'visualizar-produtos'
   | 'cadastrar-venda';
