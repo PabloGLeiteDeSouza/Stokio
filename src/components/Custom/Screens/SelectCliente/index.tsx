@@ -15,8 +15,14 @@ import {
 } from '@gluestack-ui/themed';
 import React from 'react';
 import { ListRenderItem } from 'react-native';
+import { ISlectClienteProps } from './interfaces';
 
-const SelectCliente: React.FC = ({ navigation }) => {
+const SelectCliente: React.FC<ISlectClienteProps> = ({ navigation, route }) => {
+  if (!route || !route.params || !route.params.screen) {
+    navigation?.goBack();
+    return null;
+  }
+  const screen = route.params.screen;
   const [isLaoding, setIsLoading] = React.useState(true);
   const [clientes, setClientes] = React.useState<Array<Cliente>>([
     {

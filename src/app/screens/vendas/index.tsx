@@ -3,6 +3,7 @@ import View from './view';
 import Create from './create';
 import Update from './update';
 import Details from './view/details';
+import SelectCliente from '@/components/Custom/Screens/SelectCliente';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +29,11 @@ const VendasScreens: React.FC = () => {
         name="detalhes-venda"
         component={Details}
         options={{ title: 'Detalhes da Venda' }}
+      />
+      <Stack.Screen
+        name="selecionar-cliente"
+        component={SelectCliente}
+        options={{ title: 'Selecionar Cliente' }}
       />
     </Stack.Navigator>
   );
