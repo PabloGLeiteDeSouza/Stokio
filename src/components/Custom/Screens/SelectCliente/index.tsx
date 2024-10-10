@@ -1,0 +1,117 @@
+import LoadingScreen from '@/components/LoadingScreen';
+import { Cliente, ClienteFlatList } from '@/types/screens/cliente';
+import {
+  Box,
+  Button,
+  ButtonIcon,
+  ButtonText,
+  Card,
+  CheckIcon,
+  FlatList,
+  Heading,
+  HStack,
+  Text,
+  VStack,
+} from '@gluestack-ui/themed';
+import React from 'react';
+import { ListRenderItem } from 'react-native';
+
+const SelectCliente: React.FC = ({ navigation }) => {
+  const [isLaoding, setIsLoading] = React.useState(true);
+  const [clientes, setClientes] = React.useState<Array<Cliente>>([
+    {
+      id: 1,
+      nome: '',
+      cpf: '',
+      data_nascimento: '',
+    },
+    {
+      id: 2,
+      nome: '',
+      cpf: '',
+      data_nascimento: '',
+    },
+  ]);
+  const [cliente, setCliente] = React.useState<Cliente>(clientes[0]);
+
+  const FlatListCliente = FlatList as ClienteFlatList;
+
+  React.useEffect(() => {
+    async function StartScreen() {
+      try {
+        setClientes([
+          ...clientes,
+          {
+            id: 3,
+            nome: '',
+            cpf: '',
+            data_nascimento: '',
+          },
+        ]);
+        setIsLoading(false);
+      } catch (error) {}
+    }
+    StartScreen();
+  }, []);
+
+  const ListRenderCliente: ListRenderItem<Cliente> = ({ item }) => {
+    return (
+      <Card>
+        <HStack>
+          <VStack>
+            <Box>
+              <Heading>{item.nome}</Heading>
+            </Box>
+            <Box>
+              <Text>{item.cpf}</Text>
+            </Box>
+            <Box>
+              <Text>{item.data_nascimento}</Text>
+            </Box>
+          </VStack>
+          <VStack>
+            <Button
+              isDisabled={item.id === cliente.id}
+              onPress={() => {
+                setCliente(item);
+              }}
+            >
+              <ButtonText>
+                {item.id === cliente.id ? 'Selecionado' : 'Selecionar'}
+              </ButtonText>
+              {item.id === cliente.id && <ButtonIcon as={CheckIcon} />}
+            </Button>
+          </VStack>
+        </HStack>
+      </Card>
+    );
+  };
+
+  if (isLaoding) {
+    return <LoadingScreen />;
+  }
+
+  return (
+    <Box h="$full" w="$full">
+      <Box my="$8">
+        <Heading textAlign="center" size="xl">
+          Selecione o cliente abaixo:
+        </Heading>
+      </Box>
+      <Box>
+        <FlatListCliente data={clientes} renderItem={ListRenderCliente} />
+        <Box>
+          <Button
+            onPress={() => {
+              navigation?.navigate(screen, { cliente });
+            }}
+          >
+            <ButtonText>Selecionar Cliente</ButtonText>
+          </Button>
+        </Box>
+      </Box>
+    </Box>
+  );
+};
+
+export default SelectCliente;

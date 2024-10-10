@@ -1,3 +1,5 @@
+import { Cliente } from "../screens/cliente";
+
 export type RootStackParamList = {
   'code-scanner'?: { screen: ParamListCodeScanner };
   'screens-produtos'?: object;
@@ -121,3 +123,90 @@ export type ParamListCodeScanner =
   | 'cadastrar-produto'
   | 'visualizar-produtos'
   | 'cadastrar-venda';
+
+export type ProdutosStackParamList = {
+  'code-scanner'?: { screen: ParamListCodeScanner };
+  'screens-produtos'?: object;
+  'screens-tipos-produtos'?: object;
+  'screens-categorias'?: object;
+  'screens-empresas'?: object;
+  'screens-marcas'?: object;
+  'screens-uas'?: object;
+  'screens-ums'?: object;
+  'screens-vendas'?: object;
+  'screens-tipos-uas'?: object;
+  'screens-ramos'?: object;
+  'screens-itens-venda'?: object;
+  'visualizar-produtos'?: { code?: string; result?: boolean };
+  'cadastrar-produto'?: { code?: string; result?: boolean };
+  'detalhes-produto'?: { id: number | string };
+  'atualizar-produto'?: { id: number | string };
+};
+
+export type EmpresasStackParamList = {
+  'screens-produtos'?: object;
+  'screens-tipos-produtos'?: object;
+  'screens-categorias'?: object;
+  'screens-empresas'?: object;
+  'screens-marcas'?: object;
+  'screens-uas'?: object;
+  'screens-ums'?: object;
+  'screens-vendas'?: object;
+  'screens-tipos-uas'?: object;
+  'screens-ramos'?: object;
+  'screens-itens-venda'?: object;
+  'visualizar-empresas'?: object;
+  'cadastrar-empresa'?: object;
+  'detalhes-empresa'?: { id: number | string };
+  'atualizar-empresa'?: { id: number | string };
+};
+
+export type ClientesStackParamList = {
+  'screens-produtos'?: object;
+  'screens-tipos-produtos'?: object;
+  'screens-categorias'?: object;
+  'screens-empresas'?: object;
+  'screens-marcas'?: object;
+  'screens-uas'?: object;
+  'screens-ums'?: object;
+  'screens-vendas'?: object;
+  'screens-tipos-uas'?: object;
+  'screens-ramos'?: object;
+  'screens-itens-venda'?: object;
+};
+
+export type VendasStackParamList = {
+  'code-scanner'?: { screen: ParamListCodeScanner };
+  'detalhes-venda'?: { id: number | string };
+  'cadastrar-venda'?: { cliente?: Cliente };
+  'screens-produtos'?: object;
+  'screens-tipos-produtos'?: object;
+  'screens-categorias'?: object;
+  'screens-empresas'?: object;
+  'screens-marcas'?: object;
+  'screens-uas'?: object;
+  'screens-ums'?: object;
+  'screens-vendas'?: object;
+  'screens-tipos-uas'?: object;
+  'screens-ramos'?: object;
+  'screens-itens-venda'?: object;
+  'selecionar-cliente'?: object;
+};
+
+export type UasStackParamList = {
+  'screens-produtos'?: object;
+  'screens-tipos-produtos'?: object;
+  'screens-categorias'?: object;
+  'screens-empresas'?: object;
+  'screens-marcas'?: object;
+  'screens-uas'?: object;
+  'screens-ums'?: object;
+  'screens-vendas'?: object;
+  'screens-tipos-uas'?: object;
+  'screens-ramos'?: object;
+  'screens-itens-venda'?: object;
+  'cadastrar-ua'?: object;
+  'visualizar-uas'?: object;
+  'detalhes-ua'?: { id: number | string };
+  'atualizar-ua'?: { id: number | string };
+};

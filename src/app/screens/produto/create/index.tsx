@@ -310,7 +310,9 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                           $dark-bgColor="$blueGray400"
                           $light-bgColor="$blueGray600"
                         >
-                          <Text $light-color="$white" $dark-color="$black" >R$</Text>
+                          <Text $light-color="$white" $dark-color="$black">
+                            R$
+                          </Text>
                         </Box>
                         <InputField
                           type="text"
@@ -400,9 +402,7 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                     </FormControl>
                     <Box>
                       <Button>
-                        <ButtonText>
-                          Cadastrar Produto
-                        </ButtonText>
+                        <ButtonText>Cadastrar Produto</ButtonText>
                       </Button>
                     </Box>
                   </>
