@@ -24,32 +24,27 @@ const SelectPessoa: React.FC<ISlectPessoaProps> = ({ navigation, route }) => {
     navigation?.goBack();
     return null;
   }
-
   const screen = route.params.screen;
   const [pessoas, setPessoas] = React.useState<Array<Pessoa>>([
     ...route.params.pessoas,
   ]);
-  const [pessoa, setPessoa] = React.useState<Pessoa>(pessoas[0]);
+  const selectedPessoa = route.params.pessoaSelecionada
+    ? route.params.pessoaSelecionada
+    : pessoas[0];
+  const [pessoa, setPessoa] = React.useState<Pessoa>(selectedPessoa);
   const [isLoading, setIsLoading] = React.useState(true);
 
-  React.useEffect(() => {
-    async function startScreen() {
-      try {
-        setPessoas([
-          ...pessoas,
-          {
-            id: 3,
-            nome: 'Pedro',
-            data_nascimento: '15-06-1998',
-            cpf: '11111111111',
-          },
-        ]);
-        setIsLoading(false);
-      } catch (error) {
-        setIsLoading(false);
-        throw error;
-      }
+  const startScreen = React.useCallback(async () => {
+    try {
+      setPessoas([...pessoas]);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      throw error;
     }
+  }, []);
+
+  React.useEffect(() => {
     startScreen();
   }, []);
 
@@ -57,30 +52,35 @@ const SelectPessoa: React.FC<ISlectPessoaProps> = ({ navigation, route }) => {
 
   const ListRenderPessoas: ListRenderItem<Pessoa> = ({ item }) => {
     return (
-      <Card>
-        <HStack>
-          <VStack>
-            <Box>
-              <Heading>{item.nome}</Heading>
-            </Box>
-            <Box>
-              <Text>
-                {new Date(item.data_nascimento).toLocaleDateString('PT-BR')}
-              </Text>
-            </Box>
-            <Box>
-              <Text>{item.cpf}</Text>
-            </Box>
-          </VStack>
-          <VStack>
-            <Button onPress={() => setPessoa(item)}>
-              <ButtonText>
-                {item.id === pessoa.id ? 'selcionado' : 'selecionar'}
-              </ButtonText>
-            </Button>
-          </VStack>
-        </HStack>
-      </Card>
+      <Box>
+        <Card my="$5">
+          <HStack justifyContent="space-between">
+            <VStack>
+              <Box>
+                <Heading>{item.nome}</Heading>
+              </Box>
+              <Box>
+                <Text>
+                  {new Date(item.data_nascimento).toLocaleDateString()}
+                </Text>
+              </Box>
+              <Box>
+                <Text>{item.cpf}</Text>
+              </Box>
+            </VStack>
+            <VStack>
+              <Button
+                isDisabled={item.id === pessoa.id}
+                onPress={() => setPessoa(item)}
+              >
+                <ButtonText>
+                  {item.id === pessoa.id ? 'selcionado' : 'selecionar'}
+                </ButtonText>
+              </Button>
+            </VStack>
+          </HStack>
+        </Card>
+      </Box>
     );
   };
 
@@ -90,22 +90,21 @@ const SelectPessoa: React.FC<ISlectPessoaProps> = ({ navigation, route }) => {
 
   return (
     <Box h="$full" w="$full">
-      <Box>
+      <Box mt="$5">
         <Heading size="2xl" textAlign="center">
           Selecionar Pessoa:
         </Heading>
       </Box>
-      <Box>
-        <FlatListPessoas
-          data={pessoas}
-          renderItem={ListRenderPessoas}
-          keyExtractor={(item) => String(item.id)}
-        />
-        <Box>
-          <Button onPress={() => navigation?.navigate(screen, { pessoa })}>
-            <ButtonText>Selecionar Pessoa</ButtonText>
-          </Button>
-        </Box>
+      <FlatListPessoas
+        px="$5"
+        data={pessoas}
+        renderItem={ListRenderPessoas}
+        keyExtractor={(item) => String(item.id)}
+      />
+      <Box my="$5" mx="$5">
+        <Button onPress={() => navigation?.navigate(screen, { pessoa })}>
+          <ButtonText>Selecionar Pessoa</ButtonText>
+        </Button>
       </Box>
     </Box>
   );

@@ -154,6 +154,7 @@ export type ProdutosStackParamList = {
     tipo_produto?: TipoProduto;
     ua?: Ua;
     um?: Um;
+    empresa?: Empresa;
   };
   'detalhes-produto'?: { id: number | string };
   'atualizar-produto'?: { id: number | string };
@@ -161,6 +162,7 @@ export type ProdutosStackParamList = {
   'selecionar-tipo-produto'?: { screen: 'cadastrar-produto' };
   'selecionar-ua'?: { screen: 'cadastrar-produto' };
   'selecionar-um'?: { screen: 'cadastrar-produto' };
+  'selecionar-empresa'?: { screen: 'cadastrar-produto' };
 };
 
 export type EmpresasStackParamList = {
@@ -180,10 +182,11 @@ export type EmpresasStackParamList = {
   'detalhes-empresa'?: { id: number | string };
   'atualizar-empresa'?: { id: number | string };
   'selecionar-pessoa'?: {
-    screens: 'cadastrar-empresa';
+    screen: 'cadastrar-empresa';
     pessoas: Array<Pessoa>;
+    pessoaSelecionada?: Pessoa;
   };
-  'selecionar-ramo'?: { screens: 'cadastrar-empresa' };
+  'selecionar-ramo'?: { screen: 'cadastrar-empresa' };
 };
 
 export type ClientesStackParamList = {
@@ -200,7 +203,11 @@ export type ClientesStackParamList = {
   'screens-itens-venda'?: object;
   'cadastrar-cliente'?: { pessoa: Pessoa };
   'atualizar-cliente'?: { id: number | string };
-  'selecionar-pessoa'?: { screen: 'cadastrar-cliente'; pessoas: Array<Pessoa> };
+  'selecionar-pessoa'?: {
+    screen: 'cadastrar-cliente';
+    pessoas: Array<Pessoa>;
+    pessoaSelecionada?: Pessoa;
+  };
   'visualizar-clientes'?: object;
   'detalhes-cliente'?: { id: number | string };
 };
@@ -260,6 +267,7 @@ export type PessoasStackParamList = {
   'selecionar-pessoa'?: {
     screen: 'cadastrar-cliente' | 'cadastrar-empresa';
     pessoas: Array<Pessoa>;
+    pessoaSelecionada: Pessoa;
   };
   'cadastrar-cliente'?: { pessoa?: Pessoa };
   'cadastrar-empresa'?: { pessoa?: Pessoa };

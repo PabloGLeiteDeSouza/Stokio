@@ -63,16 +63,65 @@ import { CalendarDaysIcon } from '@gluestack-ui/themed';
 import { ScrollView } from '@gluestack-ui/themed';
 import { Pessoa } from '@/types/screens/cliente';
 import { CadastrarEmpresaScreen } from '@/interfaces/empresa';
+import formatDate from '../../../../../utils/formatDate';
 const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
   const [pessoas, setPessoas] = React.useState<Array<Pessoa>>([
     {
       id: 1,
       nome: 'João',
-      data_nascimento: '05-04-2000',
+      data_nascimento: '2000-04-05',
       cpf: '12345678901',
     },
     {
       id: 2,
+      nome: 'Maria',
+      data_nascimento: '02-03-1999',
+      cpf: '98765432101',
+    },
+    {
+      id: 3,
+      nome: 'Pedro',
+      data_nascimento: '02-03-1999',
+      cpf: '98765432101',
+    },
+    {
+      id: 4,
+      nome: 'Maria',
+      data_nascimento: '02-03-1999',
+      cpf: '98765432101',
+    },
+    {
+      id: 5,
+      nome: 'Maria',
+      data_nascimento: '02-03-1999',
+      cpf: '98765432101',
+    },
+    {
+      id: 6,
+      nome: 'Maria',
+      data_nascimento: '02-03-1999',
+      cpf: '98765432101',
+    },
+    {
+      id: 7,
+      nome: 'Maria',
+      data_nascimento: '02-03-1999',
+      cpf: '98765432101',
+    },
+    {
+      id: 8,
+      nome: 'Maria',
+      data_nascimento: '02-03-1999',
+      cpf: '98765432101',
+    },
+    {
+      id: 9,
+      nome: 'Maria',
+      data_nascimento: '02-03-1999',
+      cpf: '98765432101',
+    },
+    {
+      id: 10,
       nome: 'Maria',
       data_nascimento: '02-03-1999',
       cpf: '98765432101',
@@ -89,10 +138,12 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
             <Formik
               initialValues={{
                 id: '',
-                id_pessoa: '',
-                nome: '',
-                data_nascimento: new Date(),
-                cpf: '',
+                pessoa: {
+                  id: '',
+                  nome: '',
+                  data_nascimento: new Date(),
+                  cpf: '',
+                },
                 cnpj: '',
                 nome_fantasia: '',
                 razao_social: '',
@@ -127,26 +178,26 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                 React.useEffect(() => {
                   if (route && route.params && route.params.pessoa) {
                     const person = route.params.pessoa;
-                    setFieldValue('id_pessoa', person.id);
-                    setFieldValue('nome', person.nome);
+                    setFieldValue('pessoa.id', person.id);
+                    setFieldValue('pessoa.nome', person.nome);
                     setFieldValue(
-                      'data_nascimento',
+                      'pessoa.data_nascimento',
                       new Date(person.data_nascimento),
                     );
-                    setFieldValue('cpf', person.cpf);
+                    setFieldValue('pessoa.cpf', person.cpf);
                   }
                 }, [route?.params?.pessoa]);
 
                 return (
                   <Box gap="$5">
-                    {values.id_pessoa === '' && pessoas.length > 0 ? (
-                      <Box>
-                        <Text size="md">Selecione uma pessoa:</Text>
+                    {values.pessoa.id === '' && pessoas.length > 0 ? (
+                      <Box gap="$5" mt="$5">
+                        <Heading size="md">Selecione uma pessoa:</Heading>
                         <Box>
                           <Button
                             onPress={() =>
                               navigation?.navigate('selecionar-pessoa', {
-                                screens: 'cadastrar-empresa',
+                                screen: 'cadastrar-empresa',
                                 pessoas,
                               })
                             }
@@ -155,27 +206,45 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                           </Button>
                         </Box>
                       </Box>
-                    ) : values.id_pessoa !== '' ? (
+                    ) : values.pessoa.id !== '' ? (
                       <Box>
                         <Card>
                           <HStack>
                             <VStack>
                               <Box>
-                                <Heading>{values.nome}</Heading>
+                                <Heading>{values.pessoa.nome}</Heading>
                               </Box>
                               <Box>
                                 <Text>
                                   {new Date(
-                                    values.data_nascimento,
+                                    values.pessoa.data_nascimento,
                                   ).toLocaleDateString('PT-BR')}
                                 </Text>
                               </Box>
                               <Box>
-                                <Text>{values.cpf}</Text>
+                                <Text>{values.pessoa.cpf}</Text>
                               </Box>
                             </VStack>
                           </HStack>
                         </Card>
+                        <Box>
+                          <Button
+                            onPress={() =>
+                              navigation?.navigate('selecionar-pessoa', {
+                                pessoas,
+                                screen: 'cadastrar-empresa',
+                                pessoaSelecionada: {
+                                  ...values.pessoa,
+                                  data_nascimento: String(
+                                    values.pessoa.data_nascimento,
+                                  ),
+                                },
+                              })
+                            }
+                          >
+                            <ButtonText>Alterar Pessoa</ButtonText>
+                          </Button>
+                        </Box>
                       </Box>
                     ) : (
                       <>
@@ -192,7 +261,8 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                             <InputField
                               type="text"
                               placeholder="Nome Completo do Clinente"
-                              onChangeText={handleChange('nome')}
+                              onChangeText={handleChange('pessoa.nome')}
+                              value={values.pessoa.nome}
                             />
                           </Input>
 
@@ -205,7 +275,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                           <FormControlError>
                             <FormControlErrorIcon as={AlertCircleIcon} />
                             <FormControlErrorText>
-                              {errors.nome}
+                              {errors?.pessoa?.nome}
                             </FormControlErrorText>
                           </FormControlError>
                         </FormControl>
@@ -226,7 +296,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                               value={values.data_nascimento.toLocaleDateString(
                                 'PT-BR',
                               )}
-                              placeholder="password"
+                              placeholder="05/05/2003"
                             />
                             <Button>
                               <ButtonIcon as={CalendarDaysIcon} />
@@ -258,7 +328,8 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                           <Input>
                             <InputField
                               type="text"
-                              value={values.cpf}
+                              value={values.pessoa.cpf}
+                              onChangeText={handleChange('pessoa.cpf')}
                               placeholder="123.123.123.12"
                             />
                           </Input>
@@ -272,7 +343,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                           <FormControlError>
                             <FormControlErrorIcon as={AlertCircleIcon} />
                             <FormControlErrorText>
-                              {errors.cpf}
+                              {errors.pessoa.cpf}
                             </FormControlErrorText>
                           </FormControlError>
                         </FormControl>
@@ -282,13 +353,14 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                     {values.ramo.id === '' ? (
                       <Box>
                         <Box>
-                          <Heading>Selecione o Ramo</Heading>
+                          <Heading>Selecione o ramo</Heading>
                         </Box>
                         <Box>
                           <Button
                             onPress={() =>
                               navigation?.navigate('selecionar-ramo', {
-                                screens: 'cadastrar-empresa',
+                                screen: 'cadastrar-empresa',
+                                ramoSelecionado: values.ramo,
                               })
                             }
                           >
@@ -314,8 +386,8 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                       <Input>
                         <InputField
                           type="text"
-                          placeholder="Nome Completo do Clinente"
-                          onChangeText={handleChange('nome')}
+                          placeholder="Nome Fantasia"
+                          onChangeText={handleChange('nome_fantasia')}
                         />
                       </Input>
 
@@ -347,7 +419,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                         <InputField
                           type="text"
                           placeholder="Nome Completo do Clinente"
-                          onChangeText={handleChange('nome')}
+                          onChangeText={handleChange('razao_social')}
                         />
                       </Input>
 
@@ -376,7 +448,8 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                       <Input>
                         <InputField
                           type="text"
-                          value={values.cpf}
+                          value={values.cnpj}
+                          onChangeText={handleChange('cnpj')}
                           placeholder="123.123.123.12"
                         />
                       </Input>
@@ -404,7 +477,12 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                         <FormControlLabelText>Cep</FormControlLabelText>
                       </FormControlLabel>
                       <Input>
-                        <InputField type="text" placeholder="password" />
+                        <InputField
+                          value={values.endereco.cep}
+                          onChangeText={handleChange('endereco.cep')}
+                          type="text"
+                          placeholder="password"
+                        />
                       </Input>
 
                       <FormControlHelper>
@@ -430,7 +508,12 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                         <FormControlLabelText>Rua</FormControlLabelText>
                       </FormControlLabel>
                       <Input>
-                        <InputField type="text" placeholder="password" />
+                        <InputField
+                          value={values.endereco.rua}
+                          onChangeText={handleChange('endereco.rua')}
+                          type="text"
+                          placeholder="password"
+                        />
                       </Input>
 
                       <FormControlHelper>
@@ -456,7 +539,13 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                         <FormControlLabelText>Numero</FormControlLabelText>
                       </FormControlLabel>
                       <Input>
-                        <InputField type="text" placeholder="password" />
+                        <InputField
+                          value={values.endereco.numero}
+                          onChangeText={handleChange('endereco.numero')}
+                          type="text"
+                          placeholder="password"
+                          keyboardType="number-pad"
+                        />
                       </Input>
 
                       <FormControlHelper>
@@ -482,7 +571,12 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                         <FormControlLabelText>Complemento</FormControlLabelText>
                       </FormControlLabel>
                       <Input>
-                        <InputField type="text" placeholder="password" />
+                        <InputField
+                          value={values.endereco.complemento}
+                          onChangeText={handleChange('endereco.complemento')}
+                          type="text"
+                          placeholder="password"
+                        />
                       </Input>
 
                       <FormControlHelper>
@@ -508,7 +602,12 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                         <FormControlLabelText>Bairro</FormControlLabelText>
                       </FormControlLabel>
                       <Input>
-                        <InputField type="text" placeholder="password" />
+                        <InputField
+                          value={values.endereco.bairro}
+                          onChangeText={handleChange('endereco.bairro')}
+                          type="text"
+                          placeholder="password"
+                        />
                       </Input>
 
                       <FormControlHelper>
@@ -534,7 +633,12 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                         <FormControlLabelText>Cidade</FormControlLabelText>
                       </FormControlLabel>
                       <Input>
-                        <InputField type="text" placeholder="password" />
+                        <InputField
+                          values={values.endereco.cidade}
+                          onChangeText={handleChange('endereco.cidade')}
+                          type="text"
+                          placeholder="password"
+                        />
                       </Input>
 
                       <FormControlHelper>
@@ -559,7 +663,11 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                       <FormControlLabel>
                         <FormControlLabelText>UF</FormControlLabelText>
                       </FormControlLabel>
-                      <Select isInvalid={false} isDisabled={false}>
+                      <Select
+                        onValueChange={handleChange('endereco.uf')}
+                        isInvalid={false}
+                        isDisabled={false}
+                      >
                         <SelectTrigger size={'md'} variant={'rounded'}>
                           <SelectInput placeholder="Selecione uma UF" />
                           <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
@@ -609,32 +717,49 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                       </FormControlError>
                     </FormControl>
                     <Box gap="$2.5">
-                      <FormControl
-                        isInvalid={false}
-                        size={'md'}
-                        isDisabled={false}
-                        isRequired={true}
-                      >
-                        <FormControlLabel>
-                          <FormControlLabelText>Telefone</FormControlLabelText>
-                        </FormControlLabel>
-                        <Input>
-                          <InputField type="text" placeholder="password" />
-                        </Input>
+                      {values.telefones.map((telefone, i) => {
+                        return (
+                          <>
+                            <FormControl
+                              isInvalid={false}
+                              size={'md'}
+                              isDisabled={false}
+                              isRequired={true}
+                            >
+                              <FormControlLabel>
+                                <FormControlLabelText>
+                                  Telefone
+                                </FormControlLabelText>
+                              </FormControlLabel>
+                              <Input>
+                                <InputField
+                                  value={telefone.numero}
+                                  onChangeText={handleChange(
+                                    `telefones[${i}].numero`,
+                                  )}
+                                  type="text"
+                                  keyboardType="number-pad"
+                                  placeholder="password"
+                                />
+                              </Input>
 
-                        <FormControlHelper>
-                          <FormControlHelperText>
-                            Must be atleast 6 characters.
-                          </FormControlHelperText>
-                        </FormControlHelper>
+                              <FormControlHelper>
+                                <FormControlHelperText>
+                                  Must be atleast 6 characters.
+                                </FormControlHelperText>
+                              </FormControlHelper>
 
-                        <FormControlError>
-                          <FormControlErrorIcon as={AlertCircleIcon} />
-                          <FormControlErrorText>
-                            Atleast 6 characters are required.
-                          </FormControlErrorText>
-                        </FormControlError>
-                      </FormControl>
+                              <FormControlError>
+                                <FormControlErrorIcon as={AlertCircleIcon} />
+                                <FormControlErrorText>
+                                  Atleast 6 characters are required.
+                                </FormControlErrorText>
+                              </FormControlError>
+                            </FormControl>
+                          </>
+                        );
+                      })}
+
                       <Button action="positive">
                         <ButtonIcon as={AddIcon} />
                       </Button>
@@ -644,32 +769,49 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                     </Box>
 
                     <Box gap="$2.5">
-                      <FormControl
-                        isInvalid={false}
-                        size={'md'}
-                        isDisabled={false}
-                        isRequired={true}
-                      >
-                        <FormControlLabel>
-                          <FormControlLabelText>Email</FormControlLabelText>
-                        </FormControlLabel>
-                        <Input>
-                          <InputField type="text" placeholder="password" />
-                        </Input>
+                      {values.email.map((e, i) => {
+                        return (
+                          <>
+                            <FormControl
+                              isInvalid={false}
+                              size={'md'}
+                              isDisabled={false}
+                              isRequired={true}
+                            >
+                              <FormControlLabel>
+                                <FormControlLabelText>
+                                  Email
+                                </FormControlLabelText>
+                              </FormControlLabel>
+                              <Input>
+                                <InputField
+                                  value={e.endereco}
+                                  type="text"
+                                  onChangeText={handleChange(
+                                    `email[${i}].endereco`,
+                                  )}
+                                  placeholder="teste@teste.com"
+                                  keyboardType="email-address"
+                                />
+                              </Input>
 
-                        <FormControlHelper>
-                          <FormControlHelperText>
-                            Must be atleast 6 characters.
-                          </FormControlHelperText>
-                        </FormControlHelper>
+                              <FormControlHelper>
+                                <FormControlHelperText>
+                                  Must be atleast 6 characters.
+                                </FormControlHelperText>
+                              </FormControlHelper>
 
-                        <FormControlError>
-                          <FormControlErrorIcon as={AlertCircleIcon} />
-                          <FormControlErrorText>
-                            Atleast 6 characters are required.
-                          </FormControlErrorText>
-                        </FormControlError>
-                      </FormControl>
+                              <FormControlError>
+                                <FormControlErrorIcon as={AlertCircleIcon} />
+                                <FormControlErrorText>
+                                  Atleast 6 characters are required.
+                                </FormControlErrorText>
+                              </FormControlError>
+                            </FormControl>
+                          </>
+                        );
+                      })}
+
                       <Button action="positive">
                         <ButtonIcon as={AddIcon} />
                       </Button>

@@ -311,7 +311,7 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
       <FlatListProduto
         data={produtos}
         renderItem={ListRenderProduto}
-        keyExtractor={(v) => v.id}
+        keyExtractor={(v) => String(v.id)}
       />
     </Box>
   );

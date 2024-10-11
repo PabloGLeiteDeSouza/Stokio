@@ -45,51 +45,56 @@ const SelectCliente: React.FC<ISlectClienteProps> = ({ navigation, route }) => {
   React.useEffect(() => {
     async function StartScreen() {
       try {
-        setClientes([
-          ...clientes,
-          {
-            id: 3,
-            nome: '',
-            cpf: '',
-            data_nascimento: '',
-          },
-        ]);
+        setClientes([...clientes]);
         setIsLoading(false);
       } catch (error) {}
     }
     StartScreen();
   }, []);
 
-  const ListRenderCliente: ListRenderItem<Cliente> = ({ item }) => {
+  const ListRenderCliente: ListRenderItem<Cliente> = ({ item, index }) => {
     return (
-      <Card>
-        <HStack>
-          <VStack>
-            <Box>
-              <Heading>{item.nome}</Heading>
-            </Box>
-            <Box>
-              <Text>{item.cpf}</Text>
-            </Box>
-            <Box>
-              <Text>{item.data_nascimento}</Text>
-            </Box>
-          </VStack>
-          <VStack>
+      <>
+        <Card>
+          <HStack>
+            <VStack>
+              <Box>
+                <Heading>{item.nome}</Heading>
+              </Box>
+              <Box>
+                <Text>{item.cpf}</Text>
+              </Box>
+              <Box>
+                <Text>{item.data_nascimento}</Text>
+              </Box>
+            </VStack>
+            <VStack>
+              <Button
+                isDisabled={item.id === cliente.id}
+                onPress={() => {
+                  setCliente(item);
+                }}
+              >
+                <ButtonText>
+                  {item.id === cliente.id ? 'Selecionado' : 'Selecionar'}
+                </ButtonText>
+                {item.id === cliente.id && <ButtonIcon as={CheckIcon} />}
+              </Button>
+            </VStack>
+          </HStack>
+        </Card>
+        {index === clientes.length - 1 && (
+          <Box>
             <Button
-              isDisabled={item.id === cliente.id}
               onPress={() => {
-                setCliente(item);
+                navigation?.navigate(screen, { cliente });
               }}
             >
-              <ButtonText>
-                {item.id === cliente.id ? 'Selecionado' : 'Selecionar'}
-              </ButtonText>
-              {item.id === cliente.id && <ButtonIcon as={CheckIcon} />}
+              <ButtonText>Selecionar Cliente</ButtonText>
             </Button>
-          </VStack>
-        </HStack>
-      </Card>
+          </Box>
+        )}
+      </>
     );
   };
 
@@ -106,15 +111,6 @@ const SelectCliente: React.FC<ISlectClienteProps> = ({ navigation, route }) => {
       </Box>
       <Box>
         <FlatListCliente data={clientes} renderItem={ListRenderCliente} />
-        <Box>
-          <Button
-            onPress={() => {
-              navigation?.navigate(screen, { cliente });
-            }}
-          >
-            <ButtonText>Selecionar Cliente</ButtonText>
-          </Button>
-        </Box>
       </Box>
     </Box>
   );

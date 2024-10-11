@@ -55,7 +55,7 @@ const ProdutoScreens: React.FC = () => {
         options={{ title: 'Selecione uma Unidade de Medida' }}
       />
       <Stack.Screen
-        name="selecionar-pessoa"
+        name="selecionar-ua"
         component={SelectUa}
         options={{ title: 'Selecione uma Unidade de Armazenamento' }}
       />

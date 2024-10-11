@@ -37,6 +37,61 @@ import { CadastrarClienteScreen } from '@/interfaces/cliente';
 import { Pessoa } from '@/types/screens/cliente';
 import LoadingScreen from '@/components/LoadingScreen';
 import { Alert } from 'react-native';
+import * as Yup from 'yup';
+
+const validationSchema = Yup.object().shape({
+  id_pessoa: Yup.string(),
+  nome: Yup.string().when('id_pessoa', (id_pessoa, schema) =>
+    id_pessoa ? schema.required('Nome é obrigatório') : schema,
+  ),
+  data_nascimento: Yup.date().when('id_pessoa', (id_pessoa, schema) =>
+    id_pessoa ? schema.required('Data de nascimento é obrigatória') : schema,
+  ),
+  cpf: Yup.string().when('id_pessoa', (id_pessoa, schema) =>
+    id_pessoa ? schema.required('CPF é obrigatório') : schema,
+  ),
+  telefones: Yup.array().of(
+    Yup.object().shape({
+      numero: Yup.string().when('id_pessoa', (id_pessoa, schema) =>
+        id_pessoa
+          ? schema.required('Número de telefone é obrigatório')
+          : schema,
+      ),
+    }),
+  ),
+  endereco: Yup.object().shape({
+    cep: Yup.string().when('id_pessoa', (id_pessoa, schema) =>
+      id_pessoa ? schema.required('CEP é obrigatório') : schema,
+    ),
+    rua: Yup.string().when('id_pessoa', (id_pessoa, schema) =>
+      id_pessoa ? schema.required('Rua é obrigatória') : schema,
+    ),
+    numero: Yup.string().when('id_pessoa', (id_pessoa, schema) =>
+      id_pessoa ? schema.required('Número é obrigatório') : schema,
+    ),
+    complemento: Yup.string().when('id_pessoa', (id_pessoa, schema) =>
+      id_pessoa ? schema.required('Complemento é obrigatório') : schema,
+    ),
+    bairro: Yup.string().when('id_pessoa', (id_pessoa, schema) =>
+      id_pessoa ? schema.required('Bairro é obrigatório') : schema,
+    ),
+    cidade: Yup.string().when('id_pessoa', (id_pessoa, schema) =>
+      id_pessoa ? schema.required('Cidade é obrigatória') : schema,
+    ),
+    uf: Yup.string().when('id_pessoa', (id_pessoa, schema) =>
+      id_pessoa ? schema.required('UF é obrigatório') : schema,
+    ),
+  }),
+  email: Yup.array().of(
+    Yup.object().shape({
+      endereco: Yup.string().when('id_pessoa', (id_pessoa, schema) =>
+        id_pessoa ? schema.required('Endereço de email é obrigatório') : schema,
+      ),
+    }),
+  ),
+  limite: Yup.string().required('Limite é obrigatório'),
+});
+
 const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
   const [pessoas, setPessoas] = React.useState<Array<Pessoa>>([
     {
@@ -89,6 +144,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
           </Box>
           <Box>
             <Formik
+              validationSchema={validationSchema}
               initialValues={{
                 id_pessoa: '',
                 nome: '',
@@ -231,7 +287,9 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                           <FormControlError>
                             <FormControlErrorIcon as={AlertCircleIcon} />
                             <FormControlErrorText>
-                              {errors.data_nascimento}
+                              {errors.data_nascimento
+                                ? errors.data_nascimento
+                                : ''}
                             </FormControlErrorText>
                           </FormControlError>
                         </FormControl>

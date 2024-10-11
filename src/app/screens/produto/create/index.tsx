@@ -140,7 +140,24 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                   if (route && route.params?.code) {
                     setFieldValue('codigo_de_barras', route.params.code);
                   }
-                }, [route]);
+                }, [route?.params?.code]);
+
+                React.useEffect(() => {
+                  if (route && route.params?.empresa) {
+                    const emp = route.params.empresa;
+                    setFieldValue('empresa.id', emp.id);
+                    setFieldValue('empresa.nome', emp.nome_fantasia);
+                  }
+                }, [route?.params?.empresa]);
+
+                React.useEffect(() => {
+                  if (route && route.params?.marca) {
+                    const marca = route.params.marca;
+                    setFieldValue('marca.id', marca.id);
+                    setFieldValue('marca.nome', marca.nome);
+                  }
+                }, [route?.params?.marca]);
+
                 return (
                   <>
                     {values.empresa.id != '' && (
@@ -159,13 +176,17 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                       isDisabled={false}
                       isRequired={true}
                     >
-                      <ModalSelectEmpresa
-                        onChangeEmpresa={(emp) => {
-                          setFieldValue('empresa.nome', emp.nome_fantasia);
-                          setFieldValue('empresa.id', emp.id);
-                        }}
-                      />
-
+                      <Box>
+                        <Button
+                          onPress={() =>
+                            navigation?.navigate('selecionar-empresa', {
+                              screen: 'cadastrar-produto',
+                            })
+                          }
+                        >
+                          <ButtonText>Selecionar empresa</ButtonText>
+                        </Button>
+                      </Box>
                       <FormControlHelper>
                         <FormControlHelperText>
                           Você deve selecionar a empresa.
