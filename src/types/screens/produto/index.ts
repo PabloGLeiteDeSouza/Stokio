@@ -1,56 +1,60 @@
-import { RootStackParamList } from '$types/param-list';
+import { ProdutosStackParamList } from '$types/param-list';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { ViewStyle } from '@expo/html-elements/build/primitives/View';
 import { StyledComponentProps } from '@gluestack-style/react/lib/typescript/types';
 import { FlatList, FlatListProps, StyleProp } from 'react-native';
+import { Empresa } from '../empresa';
 
 export type VisualisarProdutoScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
+  ProdutosStackParamList,
   'visualizar-produtos'
 >;
 
 export type VisualisarProdutoScreenRouterProp = RouteProp<
-  RootStackParamList,
+  ProdutosStackParamList,
   'visualizar-produtos'
 >;
 
 export type CadastrarProdutoScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
+  ProdutosStackParamList,
   'cadastrar-produto'
 >;
 
 export type CadastrarProdutoScreenRouterProp = RouteProp<
-  RootStackParamList,
+  ProdutosStackParamList,
   'cadastrar-produto'
 >;
 
 export type AtualizarProdutoScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
+  ProdutosStackParamList,
   'atualizar-produto'
 >;
 
 export type AtualizarProdutoScreenRouterProp = RouteProp<
-  RootStackParamList,
+  ProdutosStackParamList,
   'atualizar-produto'
 >;
 
 export type DetalhesProdutoScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
+  ProdutosStackParamList,
   'detalhes-produto'
 >;
 
 export type DetalhesProdutoScreenRouterProp = RouteProp<
-  RootStackParamList,
+  ProdutosStackParamList,
   'detalhes-produto'
 >;
 
 export type Produto = {
   id: number | string;
+  codigo_de_barras: string;
   nome: string;
   data_validade: string;
   tipo: string;
   marca: string;
+  empresa: string;
+  quantidade: string;
 };
 
 export type ProdutoObject = {
@@ -60,6 +64,7 @@ export type ProdutoObject = {
   data_validade: string;
   valor: string;
   quantidate: string;
+  empresa: Empresa;
   tipo_produto: {
     id: number | string;
     nome: string;

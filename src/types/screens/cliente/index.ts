@@ -1,4 +1,4 @@
-import { RootStackParamList } from '$types/param-list';
+import { ClientesStackParamList, RootStackParamList } from '$types/param-list';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { ViewStyle } from '@expo/html-elements/build/primitives/View';
@@ -11,22 +11,22 @@ export type VisualisarClienteScreenNavigationProp = StackNavigationProp<
 >;
 
 export type VisualisarClienteScreenRouterProp = RouteProp<
-  RootStackParamList,
+  ClientesStackParamList,
   'visualizar-clientes'
 >;
 
 export type CadastrarClienteScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
+  ClientesStackParamList,
   'cadastrar-cliente'
 >;
 
 export type CadastrarClienteScreenRouterProp = RouteProp<
-  RootStackParamList,
+  ClientesStackParamList,
   'cadastrar-cliente'
 >;
 
 export type AtualizarClienteScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
+  ClientesStackParamList,
   'atualizar-cliente'
 >;
 
@@ -36,12 +36,12 @@ export type AtualizarClienteScreenRouterProp = RouteProp<
 >;
 
 export type DetalhesClienteScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
+  ClientesStackParamList,
   'detalhes-cliente'
 >;
 
 export type DetalhesClienteScreenRouterProp = RouteProp<
-  RootStackParamList,
+  ClientesStackParamList,
   'detalhes-cliente'
 >;
 

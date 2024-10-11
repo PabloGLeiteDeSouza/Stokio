@@ -11,20 +11,8 @@ import {
   FormControlErrorText,
   Input,
   InputField,
-  Radio,
-  RadioGroup,
-  RadioIcon,
-  RadioIndicator,
-  RadioLabel,
   Button,
   ButtonText,
-  Checkbox,
-  CheckboxGroup,
-  CheckboxIndicator,
-  CheckboxIcon,
-  CheckboxLabel,
-  Textarea,
-  TextareaInput,
   Select,
   SelectTrigger,
   SelectInput,
@@ -35,24 +23,7 @@ import {
   SelectDragIndicatorWrapper,
   SelectDragIndicator,
   SelectItem,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  Switch,
-  Modal,
-  ModalBackdrop,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
   HStack,
-  VStack,
-  Center,
-  Icon,
-  CircleIcon,
-  CheckIcon,
   AlertCircleIcon,
   ChevronDownIcon,
   ButtonIcon,
@@ -62,11 +33,11 @@ import { Formik } from 'formik';
 import { CalendarDaysIcon } from '@gluestack-ui/themed';
 import { ScrollView } from '@gluestack-ui/themed';
 import { TrashIcon } from '@gluestack-ui/themed';
-import { CloseIcon } from '@gluestack-ui/themed';
-import { Pessoa, PessoaFlatList } from '@/types/screens/cliente';
-import { FlatList } from '@gluestack-ui/themed';
-import { ListRenderItem, Touchable, TouchableHighlight } from 'react-native';
-const Create: React.FC = () => {
+import { CadastrarClienteScreen } from '@/interfaces/cliente';
+import { Pessoa } from '@/types/screens/cliente';
+import LoadingScreen from '@/components/LoadingScreen';
+import { Alert } from 'react-native';
+const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
   const [pessoas, setPessoas] = React.useState<Array<Pessoa>>([
     {
       id: 1,
@@ -81,9 +52,33 @@ const Create: React.FC = () => {
       data_nascimento: '06-15-1999',
     },
   ]);
-  const [showModal, setShowModal] = React.useState(false);
-  const ref = React.useRef(null);
-  const FlastListPessoa = FlatList as PessoaFlatList;
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    async function startScreen() {
+      try {
+        setPessoas([
+          ...pessoas,
+          {
+            id: 3,
+            nome: 'Pedro',
+            cpf: '3243243279234',
+            data_nascimento: '10-25-1999',
+          },
+        ]);
+        setIsLoading(false);
+      } catch (error) {
+        Alert.alert('Erro', (error as Error).message);
+        setIsLoading(false);
+        throw error;
+      }
+    }
+    startScreen();
+  }, []);
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <Box w="$full" h="$full">
@@ -123,88 +118,33 @@ const Create: React.FC = () => {
               onSubmit={() => {}}
             >
               {({ handleChange, setFieldValue, values, errors }) => {
-                const onSetPerson = (s: boolean, item: Pessoa) => {
-                  if (s) {
-                    setFieldValue('id_pessoa', item.id);
-                    setFieldValue('nome', item.nome);
-                    setFieldValue('data_nascimento', item.data_nascimento);
-                    setFieldValue('cpf', item.cpf);
-                  } else {
-                    setFieldValue('id_pessoa', '');
-                    setFieldValue('nome', '');
-                    setFieldValue('data_nascimento', new Date());
-                    setFieldValue('cpf', '');
+                React.useEffect(() => {
+                  if (route?.params?.pessoa) {
+                    const pessoa = route.params.pessoa;
+                    setFieldValue('id_pessoa', pessoa.id);
+                    setFieldValue('nome', pessoa.nome);
+                    setFieldValue(
+                      'data_nascimento',
+                      new Date(pessoa.data_nascimento),
+                    );
+                    setFieldValue('cpf', pessoa.cpf);
                   }
-                };
-
-                const ListRenderPessoa: ListRenderItem<Pessoa> = ({ item }) => {
-                  return (
-                    <Checkbox
-                      size="md"
-                      isInvalid={false}
-                      isDisabled={false}
-                      value=""
-                      onChange={(s) => onSetPerson(s, item)}
-                    >
-                      <Card my="$2.5">
-                        <HStack space="md">
-                          <Box justifyContent="center">
-                            <CheckboxIndicator mr="$2">
-                              <CheckboxIcon as={CheckIcon} />
-                            </CheckboxIndicator>
-                          </Box>
-                          <Box>
-                            <Box>
-                              <Heading>{item.nome}</Heading>
-                            </Box>
-                            <Box>
-                              <Text size="md">{item.cpf}</Text>
-                              <Text>{item.data_nascimento}</Text>
-                            </Box>
-                          </Box>
-                        </HStack>
-                      </Card>
-                    </Checkbox>
-                  );
-                };
+                }, [route?.params?.pessoa]);
 
                 return (
                   <Box gap="$5">
                     {values.id_pessoa == '' && pessoas.length > 0 ? (
                       <Box>
-                        <Box gap="$5">
-                          <Text>Selecione uma pessoa:</Text>
-                          <Button onPress={() => setShowModal(true)} ref={ref}>
-                            <ButtonText>Selecionar Pessoa</ButtonText>
-                          </Button>
-                        </Box>
-                        <Modal
-                          h="$full"
-                          size="lg"
-                          isOpen={showModal}
-                          onClose={() => {
-                            setShowModal(false);
-                          }}
-                          finalFocusRef={ref}
+                        <Button
+                          onPress={() =>
+                            navigation?.navigate('selecionar-pessoa', {
+                              screen: 'cadastrar-cliente',
+                              pessoas,
+                            })
+                          }
                         >
-                          <ModalBackdrop />
-                          <ModalContent>
-                            <ModalHeader>
-                              <Heading size="lg">Selecione uma pessoa</Heading>
-                              <ModalCloseButton>
-                                <Icon as={CloseIcon} />
-                              </ModalCloseButton>
-                            </ModalHeader>
-                            <ModalBody>
-                              <FlastListPessoa
-                                data={pessoas}
-                                renderItem={ListRenderPessoa}
-                                keyExtractor={(item) => String(item.id)}
-                              />
-                            </ModalBody>
-                            <ModalFooter />
-                          </ModalContent>
-                        </Modal>
+                          <ButtonText>Selecionar Pessoa</ButtonText>
+                        </Button>
                       </Box>
                     ) : values.id_pessoa ? (
                       <Card my="$5">

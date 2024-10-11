@@ -3,6 +3,8 @@ import View from './view';
 import Create from './create';
 import Update from './update';
 import Details from './view/details';
+import SelectPessoa from '@/components/Custom/Screens/SelectPessoa';
+import SelectRamo from '@/components/Custom/Screens/SelectRamo';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +30,16 @@ const EmpresasScreens: React.FC = () => {
         name="detalhes-empresa"
         component={Details}
         options={{ title: 'Detalhes da Empresa' }}
+      />
+      <Stack.Screen
+        name="selecionar-pessoa"
+        component={SelectPessoa}
+        options={{ title: 'Selecione uma pessoa' }}
+      />
+      <Stack.Screen
+        name="selecionar-ramo"
+        component={SelectRamo}
+        options={{ title: 'Selecione uma ramo' }}
       />
     </Stack.Navigator>
   );

@@ -91,7 +91,7 @@ const SelectTipoProduto: React.FC<ISelectTipoProdutoProps> = ({
     <Box h="$full" w="$full">
       <Box>
         <Heading size="2xl" textAlign="center">
-          Selecionar Pessoa:
+          Selecionar Tipo de Produto:
         </Heading>
       </Box>
       <Box>

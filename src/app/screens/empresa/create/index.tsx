@@ -1,4 +1,4 @@
-import { AddIcon, Heading, RemoveIcon } from '@gluestack-ui/themed';
+import { AddIcon, Card, Heading, RemoveIcon } from '@gluestack-ui/themed';
 import React from 'react';
 import {
   FormControl,
@@ -61,7 +61,23 @@ import { Box, Text } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import { CalendarDaysIcon } from '@gluestack-ui/themed';
 import { ScrollView } from '@gluestack-ui/themed';
-const Create: React.FC = () => {
+import { Pessoa } from '@/types/screens/cliente';
+import { CadastrarEmpresaScreen } from '@/interfaces/empresa';
+const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
+  const [pessoas, setPessoas] = React.useState<Array<Pessoa>>([
+    {
+      id: 1,
+      nome: 'João',
+      data_nascimento: '05-04-2000',
+      cpf: '12345678901',
+    },
+    {
+      id: 2,
+      nome: 'Maria',
+      data_nascimento: '02-03-1999',
+      cpf: '98765432101',
+    },
+  ]);
   return (
     <Box w="$full" h="$full">
       <ScrollView w="$full">
@@ -108,38 +124,182 @@ const Create: React.FC = () => {
               onSubmit={() => {}}
             >
               {({ handleChange, setFieldValue, values, errors }) => {
+                React.useEffect(() => {
+                  if (route && route.params && route.params.pessoa) {
+                    const person = route.params.pessoa;
+                    setFieldValue('id_pessoa', person.id);
+                    setFieldValue('nome', person.nome);
+                    setFieldValue(
+                      'data_nascimento',
+                      new Date(person.data_nascimento),
+                    );
+                    setFieldValue('cpf', person.cpf);
+                  }
+                }, [route?.params?.pessoa]);
+
                 return (
                   <Box gap="$5">
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>Nome</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <InputField
-                          type="text"
-                          placeholder="Nome Completo do Clinente"
-                          onChangeText={handleChange('nome')}
-                        />
-                      </Input>
+                    {values.id_pessoa === '' && pessoas.length > 0 ? (
+                      <Box>
+                        <Text size="md">Selecione uma pessoa:</Text>
+                        <Box>
+                          <Button
+                            onPress={() =>
+                              navigation?.navigate('selecionar-pessoa', {
+                                screens: 'cadastrar-empresa',
+                                pessoas,
+                              })
+                            }
+                          >
+                            <ButtonText>Selecionar Pessoa</ButtonText>
+                          </Button>
+                        </Box>
+                      </Box>
+                    ) : values.id_pessoa !== '' ? (
+                      <Box>
+                        <Card>
+                          <HStack>
+                            <VStack>
+                              <Box>
+                                <Heading>{values.nome}</Heading>
+                              </Box>
+                              <Box>
+                                <Text>
+                                  {new Date(
+                                    values.data_nascimento,
+                                  ).toLocaleDateString('PT-BR')}
+                                </Text>
+                              </Box>
+                              <Box>
+                                <Text>{values.cpf}</Text>
+                              </Box>
+                            </VStack>
+                          </HStack>
+                        </Card>
+                      </Box>
+                    ) : (
+                      <>
+                        <FormControl
+                          isInvalid={false}
+                          size={'md'}
+                          isDisabled={false}
+                          isRequired={true}
+                        >
+                          <FormControlLabel>
+                            <FormControlLabelText>Nome</FormControlLabelText>
+                          </FormControlLabel>
+                          <Input>
+                            <InputField
+                              type="text"
+                              placeholder="Nome Completo do Clinente"
+                              onChangeText={handleChange('nome')}
+                            />
+                          </Input>
 
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
+                          <FormControlHelper>
+                            <FormControlHelperText>
+                              Must be atleast 6 characters.
+                            </FormControlHelperText>
+                          </FormControlHelper>
 
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          {errors.nome}
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
+                          <FormControlError>
+                            <FormControlErrorIcon as={AlertCircleIcon} />
+                            <FormControlErrorText>
+                              {errors.nome}
+                            </FormControlErrorText>
+                          </FormControlError>
+                        </FormControl>
+                        <FormControl
+                          isInvalid={false}
+                          size={'md'}
+                          isDisabled={false}
+                          isRequired={true}
+                        >
+                          <FormControlLabel>
+                            <FormControlLabelText>
+                              Data de nascimento
+                            </FormControlLabelText>
+                          </FormControlLabel>
+                          <Input isReadOnly={true}>
+                            <InputField
+                              type="text"
+                              value={values.data_nascimento.toLocaleDateString(
+                                'PT-BR',
+                              )}
+                              placeholder="password"
+                            />
+                            <Button>
+                              <ButtonIcon as={CalendarDaysIcon} />
+                            </Button>
+                          </Input>
+
+                          <FormControlHelper>
+                            <FormControlHelperText>
+                              Must be atleast 6 characters.
+                            </FormControlHelperText>
+                          </FormControlHelper>
+
+                          <FormControlError>
+                            <FormControlErrorIcon as={AlertCircleIcon} />
+                            <FormControlErrorText>
+                              {errors.data_nascimento}
+                            </FormControlErrorText>
+                          </FormControlError>
+                        </FormControl>
+                        <FormControl
+                          isInvalid={false}
+                          size={'md'}
+                          isDisabled={false}
+                          isRequired={true}
+                        >
+                          <FormControlLabel>
+                            <FormControlLabelText>CPF</FormControlLabelText>
+                          </FormControlLabel>
+                          <Input>
+                            <InputField
+                              type="text"
+                              value={values.cpf}
+                              placeholder="123.123.123.12"
+                            />
+                          </Input>
+
+                          <FormControlHelper>
+                            <FormControlHelperText>
+                              Must be atleast 6 characters.
+                            </FormControlHelperText>
+                          </FormControlHelper>
+
+                          <FormControlError>
+                            <FormControlErrorIcon as={AlertCircleIcon} />
+                            <FormControlErrorText>
+                              {errors.cpf}
+                            </FormControlErrorText>
+                          </FormControlError>
+                        </FormControl>
+                      </>
+                    )}
+
+                    {values.ramo.id === '' ? (
+                      <Box>
+                        <Box>
+                          <Heading>Selecione o Ramo</Heading>
+                        </Box>
+                        <Box>
+                          <Button
+                            onPress={() =>
+                              navigation?.navigate('selecionar-ramo', {
+                                screens: 'cadastrar-empresa',
+                              })
+                            }
+                          >
+                            <ButtonText>Selecionar Ramo</ButtonText>
+                          </Button>
+                        </Box>
+                      </Box>
+                    ) : (
+                      <></>
+                    )}
+
                     <FormControl
                       isInvalid={false}
                       size={'md'}
@@ -201,74 +361,6 @@ const Create: React.FC = () => {
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
                           {errors.razao_social}
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
-
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>
-                          Data de nascimento
-                        </FormControlLabelText>
-                      </FormControlLabel>
-                      <Input isReadOnly={true}>
-                        <InputField
-                          type="text"
-                          value={values.data_nascimento.toLocaleDateString(
-                            'PT-BR',
-                          )}
-                          placeholder="password"
-                        />
-                        <Button>
-                          <ButtonIcon as={CalendarDaysIcon} />
-                        </Button>
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          {errors.data_nascimento}
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>CPF</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <InputField
-                          type="text"
-                          value={values.cpf}
-                          placeholder="123.123.123.12"
-                        />
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          {errors.cpf}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>

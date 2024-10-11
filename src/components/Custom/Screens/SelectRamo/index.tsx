@@ -86,7 +86,7 @@ const SelectRamo: React.FC<ISelectRamoProps> = ({ navigation, route }) => {
     <Box h="$full" w="$full">
       <Box>
         <Heading size="2xl" textAlign="center">
-          Selecionar Pessoa:
+          Selecionar Ramo:
         </Heading>
       </Box>
       <Box>

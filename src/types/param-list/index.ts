@@ -40,7 +40,7 @@ export type RootStackParamList = {
   'detalhes-venda'?: { id: number | string };
   'detalhes-ua'?: { id: number | string };
   'cadastrar-produto'?: { code?: string; result?: boolean };
-  'cadastrar-cliente'?: { nome?: string };
+  'cadastrar-cliente'?: { pessoa: Pessoa };
   'cadastrar-empresa'?: object;
   'cadastrar-categoria'?: object;
   'cadastrar-marca'?: object;
@@ -176,10 +176,13 @@ export type EmpresasStackParamList = {
   'screens-ramos'?: object;
   'screens-itens-venda'?: object;
   'visualizar-empresas'?: object;
-  'cadastrar-empresa'?: object;
+  'cadastrar-empresa'?: { pessoa: Pessoa };
   'detalhes-empresa'?: { id: number | string };
   'atualizar-empresa'?: { id: number | string };
-  'selecionar-pessoa'?: { screens: 'cadastrar-empresa' };
+  'selecionar-pessoa'?: {
+    screens: 'cadastrar-empresa';
+    pessoas: Array<Pessoa>;
+  };
   'selecionar-ramo'?: { screens: 'cadastrar-empresa' };
 };
 
@@ -195,6 +198,11 @@ export type ClientesStackParamList = {
   'screens-tipos-uas'?: object;
   'screens-ramos'?: object;
   'screens-itens-venda'?: object;
+  'cadastrar-cliente'?: { pessoa: Pessoa };
+  'atualizar-cliente'?: { id: number | string };
+  'selecionar-pessoa'?: { screen: 'cadastrar-cliente'; pessoas: Array<Pessoa> };
+  'visualizar-clientes'?: object;
+  'detalhes-cliente'?: { id: number | string };
 };
 
 export type SelecionarPessoaStackParamList = {
@@ -215,7 +223,7 @@ export type SelecionarRamoStackParamList = {
 
 export type SelecionarProdutoStackParamList = {
   'selecionar-produto'?: { screen: 'cadastrar-venda' };
-  'cadastrar-venda'?: { produto: Produto; quantidade: number };
+  'cadastrar-venda'?: { produto: Produto; quantidade: string };
 };
 
 export type SelecionarTipoProdutoStackParamList = {
@@ -245,11 +253,14 @@ export type SelecionarClienteStackParamList = {
 
 export type SelecionarEmpresaStackParamList = {
   'selecionar-empresa'?: { screen: 'cadastrar-produto' };
-  'cadastrar-produto'?: { empresa?: Empresa };
+  'cadastrar-produto'?: { empresa: Empresa };
 };
 
 export type PessoasStackParamList = {
-  'selecionar-pessoa'?: { screen: 'cadastrar-cliente' | 'cadastrar-empresa' };
+  'selecionar-pessoa'?: {
+    screen: 'cadastrar-cliente' | 'cadastrar-empresa';
+    pessoas: Array<Pessoa>;
+  };
   'cadastrar-cliente'?: { pessoa?: Pessoa };
   'cadastrar-empresa'?: { pessoa?: Pessoa };
 };

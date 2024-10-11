@@ -101,7 +101,7 @@ const SelectCliente: React.FC<ISlectClienteProps> = ({ navigation, route }) => {
     <Box h="$full" w="$full">
       <Box my="$8">
         <Heading textAlign="center" size="xl">
-          Selecione o cliente abaixo:
+          Selecionar cliente:
         </Heading>
       </Box>
       <Box>

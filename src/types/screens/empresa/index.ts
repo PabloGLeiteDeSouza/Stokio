@@ -1,4 +1,4 @@
-import { RootStackParamList } from '$types/param-list';
+import { EmpresasStackParamList } from '$types/param-list';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { ViewStyle } from '@expo/html-elements/build/primitives/View';
@@ -6,42 +6,42 @@ import { StyledComponentProps } from '@gluestack-style/react/lib/typescript/type
 import { FlatList, FlatListProps, StyleProp } from 'react-native';
 
 export type VisualisarEmpresaScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
+  EmpresasStackParamList,
   'visualizar-empresas'
 >;
 
 export type VisualisarEmpresaScreenRouterProp = RouteProp<
-  RootStackParamList,
+  EmpresasStackParamList,
   'visualizar-empresas'
 >;
 
 export type CadastrarEmpresaScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
+  EmpresasStackParamList,
   'cadastrar-empresa'
 >;
 
 export type CadastrarEmpresaScreenRouterProp = RouteProp<
-  RootStackParamList,
+  EmpresasStackParamList,
   'cadastrar-empresa'
 >;
 
 export type AtualizarEmpresaScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
+  EmpresasStackParamList,
   'atualizar-empresa'
 >;
 
 export type AtualizarEmpresaScreenRouterProp = RouteProp<
-  RootStackParamList,
+  EmpresasStackParamList,
   'atualizar-empresa'
 >;
 
 export type DetalhesEmpresaScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
+  EmpresasStackParamList,
   'detalhes-empresa'
 >;
 
 export type DetalhesEmpresaScreenRouterProp = RouteProp<
-  RootStackParamList,
+  EmpresasStackParamList,
   'detalhes-empresa'
 >;
 

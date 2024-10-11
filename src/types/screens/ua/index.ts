@@ -1,4 +1,4 @@
-import { RootStackParamList } from '$types/param-list';
+import { UasStackParamList } from '$types/param-list';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { ViewStyle } from '@expo/html-elements/build/primitives/View';
@@ -6,42 +6,42 @@ import { StyledComponentProps } from '@gluestack-style/react/lib/typescript/type
 import { FlatList, FlatListProps, StyleProp } from 'react-native';
 
 export type VisualisarUaScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
+  UasStackParamList,
   'visualizar-uas'
 >;
 
 export type VisualisarUaScreenRouterProp = RouteProp<
-  RootStackParamList,
+  UasStackParamList,
   'visualizar-uas'
 >;
 
 export type CadastrarUaScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
+  UasStackParamList,
   'cadastrar-ua'
 >;
 
 export type CadastrarUaScreenRouterProp = RouteProp<
-  RootStackParamList,
+  UasStackParamList,
   'cadastrar-ua'
 >;
 
 export type AtualizarUaScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
+  UasStackParamList,
   'atualizar-ua'
 >;
 
 export type AtualizarUaScreenRouterProp = RouteProp<
-  RootStackParamList,
+  UasStackParamList,
   'atualizar-ua'
 >;
 
 export type DetalhesUaScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
+  UasStackParamList,
   'detalhes-ua'
 >;
 
 export type DetalhesUaScreenRouterProp = RouteProp<
-  RootStackParamList,
+  UasStackParamList,
   'detalhes-ua'
 >;
 

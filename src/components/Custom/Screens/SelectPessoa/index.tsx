@@ -20,20 +20,14 @@ const SelectPessoa: React.FC<ISlectPessoaProps> = ({ navigation, route }) => {
     navigation?.goBack();
     return null;
   }
+  if (!route || !route.params || !route.params.pessoas) {
+    navigation?.goBack();
+    return null;
+  }
+
   const screen = route.params.screen;
   const [pessoas, setPessoas] = React.useState<Array<Pessoa>>([
-    {
-      id: 1,
-      nome: 'João',
-      data_nascimento: '05-04-2000',
-      cpf: '12345678901',
-    },
-    {
-      id: 2,
-      nome: 'Maria',
-      data_nascimento: '02-03-1999',
-      cpf: '98765432101',
-    },
+    ...route.params.pessoas,
   ]);
   const [pessoa, setPessoa] = React.useState<Pessoa>(pessoas[0]);
   const [isLoading, setIsLoading] = React.useState(true);
