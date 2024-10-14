@@ -27,15 +27,15 @@ const SelectCliente: React.FC<ISlectClienteProps> = ({ navigation, route }) => {
   const [clientes, setClientes] = React.useState<Array<Cliente>>([
     {
       id: '1',
-      nome: '',
-      cpf: '',
-      data_nascimento: '',
+      nome: 'José',
+      cpf: '123.123.123-12',
+      data_nascimento: '2000-05-05',
     },
     {
       id: '2',
-      nome: '',
-      cpf: '',
-      data_nascimento: '',
+      nome: 'Maria',
+      cpf: '424.342.564.87',
+      data_nascimento: '1999-06-15',
     },
   ]);
   const [cliente, setCliente] = React.useState<Cliente>(clientes[0]);
@@ -54,7 +54,7 @@ const SelectCliente: React.FC<ISlectClienteProps> = ({ navigation, route }) => {
 
   const ListRenderCliente: ListRenderItem<Cliente> = ({ item, index }) => {
     return (
-      <Card mt={index === 0 ? '$5' : '$2.5'} mb="$2.5">
+      <Card mt={index === 0 ? '$5' : '$2.5'} mb="$2.5" mx="$5">
         <HStack justifyContent="space-between">
           <VStack>
             <Box>

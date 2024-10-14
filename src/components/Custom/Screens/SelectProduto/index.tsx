@@ -19,53 +19,58 @@ const SelectProduto: React.FC<ISelectProdutoProps> = ({
   navigation,
   route,
 }) => {
-  if (!route || !route.params || !route.params.screen) {
+  if (!route || !route.params || !route.params.screen || !route.params.type) {
     navigation?.goBack();
     return null;
   }
+
   const screen = route.params.screen;
+  const indexUpdated = route.params.indexUpdated
+    ? route.params.indexUpdated
+    : 0;
+  const type = route.params.type;
   const [produtos, setProdutos] = React.useState<Array<Produto>>([
     {
-      id: 1,
+      id: '1',
       codigo_de_barras: '7324623784632324',
       nome: 'KAIAK AVENTURA DESODORANTE COLONIA',
       data_validade: '10-25-2026',
       marca: 'KAIAK',
       tipo: 'DESODORANTE COLONIA',
       empresa: 'NATURA',
+      valor: '5.00',
       quantidade: '15',
     },
     {
-      id: 2,
+      id: '2',
       codigo_de_barras: '3459765398563487',
       nome: 'MEU PRIMEIRO HUMOR DESODORANTE COLONIA',
       data_validade: '08-17-2025',
       marca: 'HUMOR',
       tipo: 'DESODORANTE COLONIA',
       empresa: 'NATURA',
+      valor: '10.00',
       quantidade: '25',
+    },
+    {
+      id: '3',
+      codigo_de_barras: '2345320958347982456',
+      nome: `KAIAK DESODORANTE ROLL'ON`,
+      data_validade: '11-09-2026',
+      empresa: 'NATURA',
+      marca: 'KAIAK',
+      tipo: `DESODORANTE ROLL'ON`,
+      valor: '12.99',
+      quantidade: '50',
     },
   ]);
   const [produto, setProduto] = React.useState<Produto>(produtos[0]);
   const [isLoading, setIsLoading] = React.useState(true);
-  const [quantidade, setQuantidade] = React.useState('');
 
   React.useEffect(() => {
     async function startScreen() {
       try {
-        setProdutos([
-          ...produtos,
-          {
-            id: 3,
-            codigo_de_barras: '2345320958347982456',
-            nome: `KAIAK DESODORANTE ROLL'ON`,
-            data_validade: '11-09-2026',
-            empresa: 'NATURA',
-            marca: 'KAIAK',
-            tipo: `DESODORANTE ROLL'ON`,
-            quantidade: '50',
-          },
-        ]);
+        setProdutos([...produtos]);
         setIsLoading(false);
       } catch (error) {
         setIsLoading(false);
@@ -79,9 +84,9 @@ const SelectProduto: React.FC<ISelectProdutoProps> = ({
 
   const ListRenderProdutos: ListRenderItem<Produto> = ({ item }) => {
     return (
-      <Card>
-        <HStack>
-          <VStack>
+      <Card my="$5" mx="$5">
+        <HStack justifyContent="space-between">
+          <VStack w="$3/6" gap="$2.5">
             <Box>
               <Heading>{item.nome}</Heading>
             </Box>
@@ -115,13 +120,16 @@ const SelectProduto: React.FC<ISelectProdutoProps> = ({
               <Heading>Quantidade</Heading>
               <Text>{item.quantidade}</Text>
             </Box>
+            <Box>
+              <Heading>Valor</Heading>
+              <Text>R$ {item.valor}</Text>
+            </Box>
           </VStack>
-          <VStack>
+          <VStack w="$2/6">
             <Button
               isDisabled={item.id === produto.id}
               onPress={() => {
                 setProduto(item);
-                setQuantidade(item.quantidade);
               }}
             >
               <ButtonText>
@@ -140,26 +148,28 @@ const SelectProduto: React.FC<ISelectProdutoProps> = ({
 
   return (
     <Box h="$full" w="$full">
-      <Box>
+      <Box my="$2.5">
         <Heading size="2xl" textAlign="center">
           Selecionar Produto:
         </Heading>
       </Box>
-      <Box>
-        <FlatListProdutos
-          data={produtos}
-          renderItem={ListRenderProdutos}
-          keyExtractor={(item) => String(item.id)}
-        />
-        <Box>
-          <Button
-            onPress={() =>
-              navigation?.navigate(screen, { produto, quantidade })
-            }
-          >
-            <ButtonText>Selecionar Produto</ButtonText>
-          </Button>
-        </Box>
+      <FlatListProdutos
+        data={produtos}
+        renderItem={ListRenderProdutos}
+        keyExtractor={(item) => String(item.id)}
+      />
+      <Box my="$5">
+        <Button
+          onPress={() =>
+            navigation?.navigate(screen, {
+              produto,
+              indexUpdated,
+              type,
+            })
+          }
+        >
+          <ButtonText>Selecionar Produto</ButtonText>
+        </Button>
       </Box>
     </Box>
   );

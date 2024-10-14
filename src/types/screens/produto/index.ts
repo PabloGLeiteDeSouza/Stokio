@@ -55,6 +55,7 @@ export type Produto = {
   marca: string;
   empresa: string;
   quantidade: string;
+  valor: string;
 };
 
 export type ProdutoObject = {

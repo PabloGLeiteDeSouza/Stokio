@@ -65,21 +65,10 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
     navigation?.goBack();
     return null;
   }
-  const [clientes, setClientes] = React.useState([
-    {
-      id: '1',
-      nome: 'Cliente 1',
-      cpf: '213.213.321.23',
-    },
-  ]);
-  React.useEffect(() => {
-    async function Start() {
-      try {
-        setClientes([...clientes]);
-      } catch (error) {}
-    }
-    Start();
-  }, []);
+  const [isLoading, setIsLoading] = React.useState(true);
+
+
+
   return (
     <Box w="$full" h="$full">
       <ScrollView>
@@ -117,106 +106,6 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
               {({ values, errors, handleChange, handleSubmit }) => {
                 return (
                   <>
-                    <Box gap="$5">
-                      {values.cliente.id !== '' && (
-                        <Card>
-                          <HStack>
-                            <VStack gap="$8">
-                              <Heading size="lg">Cliente</Heading>
-                              <Text size="lg">{values.cliente.nome}</Text>
-                              <Text size="lg">{values.cliente.cpf}</Text>
-                            </VStack>
-                          </HStack>
-                        </Card>
-                      )}
-                      {clientes.length > 0 && (
-                        <Button
-                          onPress={() =>
-                            navigation?.navigate('selecionar-cliente', {
-                              screen: 'cadastrar-venda',
-                            })
-                          }
-                        >
-                          <ButtonText>Selecionar Cliente</ButtonText>
-                        </Button>
-                      )}
-                      <Button
-                        onPress={() => navigation?.navigate('screens-clientes')}
-                      >
-                        <ButtonText>Cadastrar Cliente</ButtonText>
-                      </Button>
-                    </Box>
-
-                    <Box gap="$5">
-                      {values.produtos.length > 0 && (
-                        <Heading>Produtos:</Heading>
-                      )}
-                      {values.produtos.map((produto, i) => {
-                        if (produto.id !== '') {
-                          return (
-                            <Box key={`produto-${i}`}>
-                              <Card>
-                                <HStack>
-                                  <VStack>
-                                    <Heading size="lg">{produto.nome}</Heading>
-                                    <Text size="lg">{produto.marca}</Text>
-                                    <Text size="lg">{produto.tipoProduto}</Text>
-                                    <Text>{produto.quantidade} unidades</Text>
-                                    <Text>{produto.valor} reais</Text>
-                                  </VStack>
-                                </HStack>
-                              </Card>
-                              <FormControl
-                                isInvalid={false}
-                                size={'md'}
-                                isDisabled={false}
-                                isRequired={true}
-                              >
-                                <FormControlLabel>
-                                  <FormControlLabelText>
-                                    Quantidade
-                                  </FormControlLabelText>
-                                </FormControlLabel>
-                                <Input>
-                                  <InputField
-                                    type="text"
-                                    value={values.produtos[i].quantidade}
-                                    placeholder="12"
-                                    onChangeText={handleChange(
-                                      `produtos[${i}].quantidade`,
-                                    )}
-                                  />
-                                </Input>
-
-                                <FormControlHelper>
-                                  <FormControlHelperText>
-                                    Must be atleast 6 characters.
-                                  </FormControlHelperText>
-                                </FormControlHelper>
-
-                                <FormControlError>
-                                  <FormControlErrorIcon as={AlertCircleIcon} />
-                                  <FormControlErrorText>
-                                    Atleast 6 characters are required.
-                                  </FormControlErrorText>
-                                </FormControlError>
-                              </FormControl>
-                              <Button onPress={() => navigation?.navigate('selecionar-produto', { screen: 'atualizar-venda',  })}>
-                                <ButtonText>
-                                  Atualizar Produto
-                                </ButtonText>
-                              </Button>
-                            </Box>
-                          );
-                        }
-                      })}
-                      <Button
-                        onPress={() => navigation?.navigate('screens-produtos')}
-                      >
-                        <ButtonText>Cadastrar Produto</ButtonText>
-                      </Button>
-                    </Box>
-
                     <InputDatePicker
                       onChangeDate={handleChange('data_venda')}
                       title="Data da Venda"

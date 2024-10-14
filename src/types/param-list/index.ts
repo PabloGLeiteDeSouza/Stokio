@@ -264,8 +264,14 @@ export type SelecionarProdutoStackParamList = {
   'selecionar-produto'?: {
     screen: 'cadastrar-venda';
     produtoSelecionado?: Produto;
+    indexUpdated?: number;
+    type: 'update' | 'create';
   };
-  'cadastrar-venda'?: { produto: Produto; quantidade: string };
+  'cadastrar-venda'?: {
+    produto: Produto;
+    indexUpdated?: number;
+    type: 'update' | 'create';
+  };
 };
 
 export type SelecionarTipoProdutoStackParamList = {
@@ -339,12 +345,17 @@ export type VendasStackParamList = {
     };
     produto?: {
       id: string;
+      codigo_de_barras: string;
       nome: string;
-      marca: string;
-      tipoProduto: string;
       data_validade: string;
+      tipo: string;
+      marca: string;
+      empresa: string;
+      quantidade: string;
       valor: string;
     };
+    type?: 'update' | 'create';
+    indexUpdated?: number;
   };
   'atualizar-venda'?: { id: string };
   'visualizar-vendas'?: object;
@@ -353,15 +364,10 @@ export type VendasStackParamList = {
     clienteSelecionado?: { id: string; nome: string; cpf: string };
   };
   'selecionar-produto'?: {
-    screen: 'cadastrar-venda' | 'atualizar-venda';
-    produtoSelecionado?: {
-      id: string;
-      nome: string;
-      marca: string;
-      tipoProduto: string;
-      data_validade: string;
-      valor: string;
-    };
+    screen: 'cadastrar-venda';
+    produtoSelecionado?: Produto;
+    type: 'update' | 'create';
+    indexUpdated?: number;
   };
 };
 

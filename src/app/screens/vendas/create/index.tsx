@@ -55,12 +55,16 @@ import {
   AlertCircleIcon,
   ChevronDownIcon,
   Card,
+  ButtonIcon,
+  RemoveIcon,
+  AddIcon,
 } from '@gluestack-ui/themed';
 import { Box, Heading, ScrollView, Text } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import { CadastrarVendaScreen } from '@/interfaces/venda';
 import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
-const Create: React.FC<CadastrarVendaScreen> = ({ navigation }) => {
+import { Alert } from 'react-native';
+const Create: React.FC<CadastrarVendaScreen> = ({ navigation, route }) => {
   const [clientes, setClientes] = React.useState([
     {
       id: '1',
@@ -91,11 +95,16 @@ const Create: React.FC<CadastrarVendaScreen> = ({ navigation }) => {
                 produtos: [
                   {
                     id: '',
+                    codigo_de_barras: '',
                     nome: '',
+                    data_validade: '',
                     marca: '',
-                    tipoProduto: '',
+                    tipo: '',
+                    valor_total: '',
                     valor: '',
+                    empresa: '',
                     quantidade: '',
+                    qtd: '',
                   },
                 ],
                 cliente: {
@@ -110,14 +119,63 @@ const Create: React.FC<CadastrarVendaScreen> = ({ navigation }) => {
               }}
               onSubmit={() => {}}
             >
-              {({ values, errors, handleChange, handleSubmit }) => {
+              {({
+                values,
+                errors,
+                handleChange,
+                setFieldValue,
+                handleSubmit,
+              }) => {
+                React.useEffect(() => {
+                  if (route && route.params && route.params.cliente) {
+                    setFieldValue('cliente', { ...route.params.cliente });
+                  }
+                }, [route?.params?.cliente]);
+
+                React.useEffect(() => {
+                  if (
+                    route &&
+                    route.params &&
+                    route.params.produto &&
+                    route.params.type &&
+                    route.params.indexUpdated
+                  ) {
+                    console.log('hello');
+                    const prod = route.params.produto;
+                    const prods = values.produtos;
+                    if (
+                      route.params.type === 'create' &&
+                      route.params.indexUpdated === 0
+                    ) {
+                      prods[route.params.indexUpdated] = {
+                        ...prod,
+                        valor_total: prod.valor,
+                        qtd: '1',
+                      };
+                      setFieldValue('produtos', [...prods]);
+                    } else if (route.params.type === 'create') {
+                      setFieldValue('produtos', [
+                        ...prods,
+                        { ...prod, valor_tota: prod.valor, qtd: '1' },
+                      ]);
+                    } else {
+                      prods[route.params.indexUpdated] = {
+                        ...prod,
+                        valor_total: prod.valor,
+                        qtd: '1',
+                      };
+                      setFieldValue('produtos', [...prods]);
+                    }
+                  }
+                }, [route?.params?.produto]);
+
                 return (
                   <>
                     <Box gap="$5">
                       {values.cliente.id !== '' && (
                         <Card>
                           <HStack>
-                            <VStack gap="$8">
+                            <VStack>
                               <Heading size="lg">Cliente</Heading>
                               <Text size="lg">{values.cliente.nome}</Text>
                               <Text size="lg">{values.cliente.cpf}</Text>
@@ -133,13 +191,244 @@ const Create: React.FC<CadastrarVendaScreen> = ({ navigation }) => {
                             })
                           }
                         >
-                          <ButtonText>Selecionar Cliente</ButtonText>
+                          <ButtonText>
+                            {values.cliente.id === ''
+                              ? 'Selecionar Cliente'
+                              : 'Atualizar Cliente'}
+                          </ButtonText>
                         </Button>
                       )}
                       <Button
                         onPress={() => navigation?.navigate('screens-clientes')}
                       >
                         <ButtonText>Cadastrar Cliente</ButtonText>
+                      </Button>
+                    </Box>
+
+                    <Box gap="$5">
+                      {values.produtos.length > 0 ? (
+                        <>
+                          <Heading textAlign="center">Produtos</Heading>
+                          {values.produtos.map(
+                            ({ qtd, valor_total, ...produto }, i) => {
+                              if (produto.id !== '') {
+                                return (
+                                  <Box key={`produto-${i}`}>
+                                    <Card>
+                                      <HStack>
+                                        <VStack>
+                                          <Heading size="lg">
+                                            {produto.nome}
+                                          </Heading>
+                                          <Text size="lg">{produto.marca}</Text>
+                                          <Text size="lg">{produto.tipo}</Text>
+                                          <Text>{qtd} unidades</Text>
+                                          <Text>{valor_total} reais</Text>
+                                        </VStack>
+                                      </HStack>
+                                    </Card>
+                                    <FormControl
+                                      isInvalid={false}
+                                      size={'md'}
+                                      isDisabled={false}
+                                      isRequired={true}
+                                    >
+                                      <FormControlLabel>
+                                        <FormControlLabelText>
+                                          Quantidade
+                                        </FormControlLabelText>
+                                      </FormControlLabel>
+                                      <Input>
+                                        <Button
+                                          onPress={() => {
+                                            if (
+                                              Number(qtd) <=
+                                              Number(produto.quantidade)
+                                            ) {
+                                              setFieldValue(
+                                                `produto[${i}].qtd`,
+                                                `${Number(qtd) + 1}`,
+                                              );
+                                            } else {
+                                              Alert.alert(
+                                                'Aviso',
+                                                'Quantidade indisponível',
+                                              );
+                                            }
+                                          }}
+                                          action="positive"
+                                        >
+                                          <ButtonIcon as={AddIcon} />
+                                        </Button>
+                                        <InputField
+                                          textAlign="center"
+                                          type="text"
+                                          value={values.produtos[i].qtd}
+                                          placeholder="12"
+                                          onChangeText={(text) => {
+                                            if (
+                                              Number(text) <=
+                                              Number(produto.quantidade)
+                                            ) {
+                                              setFieldValue(
+                                                `produtos[${i}].qtd`,
+                                                text,
+                                              );
+                                            } else if (
+                                              Number(text) >
+                                              Number(produto.quantidade)
+                                            ) {
+                                              Alert.alert(
+                                                'Aviso',
+                                                'Quantidade indisponível',
+                                              );
+                                            } else if (Number(text) == 0) {
+                                              Alert.alert(
+                                                'Aviso',
+                                                'Deseja remover esse produto?',
+                                                [
+                                                  {
+                                                    text: 'Sim',
+                                                    onPress: () => {
+                                                      setFieldValue(
+                                                        'produtos',
+                                                        values.produtos.splice(
+                                                          i,
+                                                          1,
+                                                        ),
+                                                      );
+                                                    },
+                                                  },
+                                                  {
+                                                    text: 'Não',
+                                                    onPress: () =>
+                                                      Alert.alert(
+                                                        'Aviso',
+                                                        'Operação cancelada!',
+                                                      ),
+                                                  },
+                                                ],
+                                              );
+                                            }
+                                          }}
+                                          keyboardType="number-pad"
+                                        />
+                                        <Button
+                                          onPress={() => {
+                                            if (Number(qtd) > 1) {
+                                              setFieldValue(
+                                                `produto[${i}].qtd`,
+                                                `${Number(qtd) - 1}`,
+                                              );
+                                            } else {
+                                              Alert.alert(
+                                                'Aviso',
+                                                'Deseja remover esse produto?',
+                                                [
+                                                  {
+                                                    text: 'Sim',
+                                                    onPress: () => {
+                                                      setFieldValue(
+                                                        'produtos',
+                                                        values.produtos.splice(
+                                                          i,
+                                                          1,
+                                                        ),
+                                                      );
+                                                    },
+                                                  },
+                                                  {
+                                                    text: 'Não',
+                                                    onPress: () =>
+                                                      Alert.alert(
+                                                        'Aviso',
+                                                        'Operação cancelada!',
+                                                      ),
+                                                  },
+                                                ],
+                                              );
+                                            }
+                                          }}
+                                          action="negative"
+                                        >
+                                          <ButtonIcon as={RemoveIcon} />
+                                        </Button>
+                                      </Input>
+
+                                      <FormControlHelper>
+                                        <FormControlHelperText>
+                                          Must be atleast 6 characters.
+                                        </FormControlHelperText>
+                                      </FormControlHelper>
+
+                                      <FormControlError>
+                                        <FormControlErrorIcon
+                                          as={AlertCircleIcon}
+                                        />
+                                        <FormControlErrorText>
+                                          Atleast 6 characters are required.
+                                        </FormControlErrorText>
+                                      </FormControlError>
+                                    </FormControl>
+                                    <Button
+                                      onPress={() => {
+                                        navigation?.navigate(
+                                          'selecionar-produto',
+                                          {
+                                            screen: 'cadastrar-venda',
+                                            produtoSelecionado: produto,
+                                            type: 'update',
+                                            indexUpdated: i,
+                                          },
+                                        );
+                                      }}
+                                    >
+                                      <ButtonText>Atualizar Produto</ButtonText>
+                                    </Button>
+                                  </Box>
+                                );
+                              } else {
+                                return (
+                                  <Box key={`prduto-vazio-${i}`}>
+                                    <Button
+                                      onPress={() =>
+                                        navigation?.navigate(
+                                          'selecionar-produto',
+                                          {
+                                            screen: 'cadastrar-venda',
+                                            type: 'create',
+                                          },
+                                        )
+                                      }
+                                    >
+                                      <ButtonText>
+                                        Selecionar Produto
+                                      </ButtonText>
+                                    </Button>
+                                  </Box>
+                                );
+                              }
+                            },
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <Button
+                            onPress={() =>
+                              navigation?.navigate('selecionar-produto', {
+                                screen: 'cadastrar-venda',
+                                type: 'create',
+                              })
+                            }
+                          >
+                            <ButtonText>Selecionar Produto</ButtonText>
+                          </Button>
+                        </>
+                      )}
+                      <Button
+                        onPress={() => navigation?.navigate('screens-produtos')}
+                      >
+                        <ButtonText>Cadastrar Produto</ButtonText>
                       </Button>
                     </Box>
 
