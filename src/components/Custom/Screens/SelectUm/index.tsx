@@ -22,11 +22,11 @@ const SelectUm: React.FC<ISelectUmProps> = ({ navigation, route }) => {
   const screen = route.params.screen;
   const [ums, setUms] = React.useState<Array<Um>>([
     {
-      id: 1,
+      id: '1',
       nome: 'João',
     },
     {
-      id: 2,
+      id: '2',
       nome: 'Maria',
     },
   ]);
@@ -39,7 +39,7 @@ const SelectUm: React.FC<ISelectUmProps> = ({ navigation, route }) => {
         setUms([
           ...ums,
           {
-            id: 3,
+            id: '3',
             nome: 'Pedro',
           },
         ]);
@@ -57,7 +57,7 @@ const SelectUm: React.FC<ISelectUmProps> = ({ navigation, route }) => {
   const ListRenderUms: ListRenderItem<Um> = ({ item }) => {
     return (
       <Card>
-        <HStack>
+        <HStack justifyContent="space-between">
           <VStack>
             <Box>
               <Heading>{item.nome}</Heading>
@@ -81,22 +81,21 @@ const SelectUm: React.FC<ISelectUmProps> = ({ navigation, route }) => {
 
   return (
     <Box h="$full" w="$full">
-      <Box>
+      <Box my="$5">
         <Heading size="2xl" textAlign="center">
-          Selecionar Unidade de Armazenamento:
+          Selecionar Unidade de Medida:
         </Heading>
       </Box>
+
+      <FlatListUms
+        data={ums}
+        renderItem={ListRenderUms}
+        keyExtractor={(item) => String(item.id)}
+      />
       <Box>
-        <FlatListUms
-          data={ums}
-          renderItem={ListRenderUms}
-          keyExtractor={(item) => String(item.id)}
-        />
-        <Box>
-          <Button onPress={() => navigation?.navigate(screen, { um })}>
-            <ButtonText>Selecionar Um</ButtonText>
-          </Button>
-        </Box>
+        <Button onPress={() => navigation?.navigate(screen, { um })}>
+          <ButtonText>Selecionar Um</ButtonText>
+        </Button>
       </Box>
     </Box>
   );

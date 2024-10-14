@@ -22,27 +22,24 @@ const SelectRamo: React.FC<ISelectRamoProps> = ({ navigation, route }) => {
   const screen = route.params.screen;
   const [ramos, setRamos] = React.useState<Array<Ramo>>([
     {
-      id: 1,
+      id: '1',
       nome: 'João',
     },
     {
-      id: 2,
+      id: '2',
       nome: 'Maria',
     },
   ]);
-  const [ramo, setRamo] = React.useState<Ramo>(ramos[0]);
+  const selectedRamo = route.params.ramoSelecionado
+    ? route.params.ramoSelecionado
+    : ramos[0];
+  const [ramo, setRamo] = React.useState<Ramo>(selectedRamo);
   const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
     async function startScreen() {
       try {
-        setRamos([
-          ...ramos,
-          {
-            id: 3,
-            nome: 'Pedro',
-          },
-        ]);
+        setRamos([...ramos]);
         setIsLoading(false);
       } catch (error) {
         setIsLoading(false);
@@ -54,10 +51,10 @@ const SelectRamo: React.FC<ISelectRamoProps> = ({ navigation, route }) => {
 
   const FlatListRamos = FlatList as RamoFlatList;
 
-  const ListRenderRamos: ListRenderItem<Ramo> = ({ item }) => {
+  const ListRenderRamos: ListRenderItem<Ramo> = ({ item, index }) => {
     return (
-      <Card>
-        <HStack>
+      <Card mt={index === 0 ? '$5' : '$2.5'} mb="$2.5">
+        <HStack justifyContent="space-between">
           <VStack>
             <Box>
               <Heading>{item.nome}</Heading>
@@ -89,17 +86,17 @@ const SelectRamo: React.FC<ISelectRamoProps> = ({ navigation, route }) => {
           Selecionar Ramo:
         </Heading>
       </Box>
-      <Box>
-        <FlatListRamos
-          data={ramos}
-          renderItem={ListRenderRamos}
-          keyExtractor={(item) => String(item.id)}
-        />
-        <Box>
-          <Button onPress={() => navigation?.navigate(screen, { ramo })}>
-            <ButtonText>Selecionar Ramo</ButtonText>
-          </Button>
-        </Box>
+      <FlatListRamos
+        px="$5"
+        rowGap="$10"
+        data={ramos}
+        renderItem={ListRenderRamos}
+        keyExtractor={(item) => String(item.id)}
+      />
+      <Box my="$5" mx="$2.5">
+        <Button onPress={() => navigation?.navigate(screen, { ramo })}>
+          <ButtonText>Selecionar Ramo</ButtonText>
+        </Button>
       </Box>
     </Box>
   );

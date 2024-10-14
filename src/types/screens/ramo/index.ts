@@ -36,7 +36,7 @@ export type AtualizarRamoScreenRouterProp = RouteProp<
 >;
 
 export type Ramo = {
-  id: number | string;
+  id: string;
   nome: string;
 };
 

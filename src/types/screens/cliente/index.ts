@@ -46,20 +46,20 @@ export type DetalhesClienteScreenRouterProp = RouteProp<
 >;
 
 export type Cliente = {
-  id: number | string;
+  id: string;
   nome: string;
   cpf: string;
   data_nascimento: string;
 };
 
 export type ClienteObject = {
-  id: number | string;
+  id: string;
   nome: string;
   cpf: string;
   data_nascimento: string;
   saldo: string;
   endereco: {
-    id: number | string;
+    id: string;
     cep: string;
     rua: string;
     numero: string;
@@ -73,7 +73,7 @@ export type ClienteObject = {
 };
 
 export type Pessoa = {
-  id: number | string;
+  id: string;
   nome: string;
   cpf: string;
   data_nascimento: string;

@@ -46,7 +46,7 @@ export type DetalhesEmpresaScreenRouterProp = RouteProp<
 >;
 
 export type Empresa = {
-  id: number | string;
+  id: string;
   nome_fantasia: string;
   razao_social: string;
   cpf: string;
@@ -54,13 +54,13 @@ export type Empresa = {
 };
 
 export type EmpresaObject = {
-  id: number | string;
+  id: string;
   nome_fantasia: string;
   razao_social: string;
   cnpj?: string;
   saldo: string;
   endereco: {
-    id: number | string;
+    id: string;
     cep: string;
     rua: string;
     numero: string;

@@ -36,7 +36,7 @@ export type AtualizarTipoProdutoScreenRouterProp = RouteProp<
 >;
 
 export type TipoProduto = {
-  id: number | string;
+  id: string;
   nome: string;
 };
 

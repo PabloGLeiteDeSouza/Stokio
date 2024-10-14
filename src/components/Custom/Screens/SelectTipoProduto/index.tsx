@@ -22,20 +22,28 @@ const SelectTipoProduto: React.FC<ISelectTipoProdutoProps> = ({
     navigation?.goBack();
     return null;
   }
+
+  if (!route || !route.params || !route.params.tipoProdutoSelecionado) {
+    navigation?.goBack();
+    return null;
+  }
+
   const screen = route.params.screen;
   const [tipoProdutos, setTipoProdutos] = React.useState<Array<TipoProduto>>([
     {
-      id: 1,
+      id: '1',
       nome: 'João',
     },
     {
-      id: 2,
+      id: '2',
       nome: 'Maria',
     },
   ]);
-  const [tipo_produto, setTipoProduto] = React.useState<TipoProduto>(
-    tipoProdutos[0],
-  );
+  const TipoProdutos = route.params.tipoProdutoSelecionado
+    ? route.params.tipoProdutoSelecionado
+    : tipoProdutos[0];
+  const [tipo_produto, setTipoProduto] =
+    React.useState<TipoProduto>(TipoProdutos);
   const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -44,7 +52,7 @@ const SelectTipoProduto: React.FC<ISelectTipoProdutoProps> = ({
         setTipoProdutos([
           ...tipoProdutos,
           {
-            id: 3,
+            id: '3',
             nome: 'Pedro',
           },
         ]);
@@ -62,7 +70,7 @@ const SelectTipoProduto: React.FC<ISelectTipoProdutoProps> = ({
   const ListRenderTipoProdutos: ListRenderItem<TipoProduto> = ({ item }) => {
     return (
       <Card>
-        <HStack>
+        <HStack justifyContent="space-between">
           <VStack>
             <Box>
               <Heading>{item.nome}</Heading>
@@ -94,19 +102,15 @@ const SelectTipoProduto: React.FC<ISelectTipoProdutoProps> = ({
           Selecionar Tipo de Produto:
         </Heading>
       </Box>
+      <FlatListTipoProdutos
+        data={tipoProdutos}
+        renderItem={ListRenderTipoProdutos}
+        keyExtractor={(item) => String(item.id)}
+      />
       <Box>
-        <FlatListTipoProdutos
-          data={tipoProdutos}
-          renderItem={ListRenderTipoProdutos}
-          keyExtractor={(item) => String(item.id)}
-        />
-        <Box>
-          <Button
-            onPress={() => navigation?.navigate(screen, { tipo_produto })}
-          >
-            <ButtonText>Selecionar Tipo de Produto</ButtonText>
-          </Button>
-        </Box>
+        <Button onPress={() => navigation?.navigate(screen, { tipo_produto })}>
+          <ButtonText>Selecionar Tipo de Produto</ButtonText>
+        </Button>
       </Box>
     </Box>
   );

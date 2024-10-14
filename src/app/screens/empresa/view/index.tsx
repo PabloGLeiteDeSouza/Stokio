@@ -107,7 +107,7 @@ const View: React.FC<VisualizarEmpresaScreen> = ({ navigation }) => {
       </Card>
     );
   };
-  const [empresas, setEmpresas] = React.useState<Array<Empresa>>([]);
+  const [empresas, setEmpresas] = React.useState<Array<Empresa>>([...Empresas]);
 
   return empresas.length < 1 ? (
     <Box h="$full" w="$full" alignItems="center" justifyContent="center">
@@ -129,6 +129,7 @@ const View: React.FC<VisualizarEmpresaScreen> = ({ navigation }) => {
             busca: '',
             tipo: '',
           }}
+          onSubmit={() => {}}
         >
           {({ values, handleChange, setFieldValue }) => {
             return (

@@ -53,7 +53,7 @@ const Screens: React.FC = () => {
         }}
       />
       <Tab.Screen
-        name="screens-ua"
+        name="screens-uas"
         component={UaScreens}
         options={{
           tabBarIcon: (props) => (

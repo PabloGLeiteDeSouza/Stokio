@@ -52,10 +52,6 @@ const ModalSelectCliente: React.FC<IModalSelectClienteProps> = ({
     }
   }
 
-  useFocusEffect(() => {
-    start();
-  }, []);
-
   React.useEffect(() => {
     start();
   }, []);

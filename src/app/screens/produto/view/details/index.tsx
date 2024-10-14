@@ -86,7 +86,11 @@ const Details: React.FC<DetalhesProdutoScreen> = ({ navigation, route }) => {
               <Text>Caixa</Text>
             </Box>
             <Box gap="$5">
-              <Button onPress={() => navigation?.navigate('atualizar-produto')}>
+              <Button
+                onPress={() =>
+                  navigation?.navigate('atualizar-produto', { id: '1' })
+                }
+              >
                 <ButtonText>Editar</ButtonText>
               </Button>
               <Button action="negative">

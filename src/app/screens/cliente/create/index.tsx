@@ -32,7 +32,6 @@ import { Box, Text } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import { CalendarDaysIcon } from '@gluestack-ui/themed';
 import { ScrollView } from '@gluestack-ui/themed';
-import { TrashIcon } from '@gluestack-ui/themed';
 import { CadastrarClienteScreen } from '@/interfaces/cliente';
 import { Pessoa } from '@/types/screens/cliente';
 import LoadingScreen from '@/components/LoadingScreen';
@@ -40,53 +39,35 @@ import { Alert } from 'react-native';
 import * as Yup from 'yup';
 
 const validationSchema = Yup.object().shape({
-  id_pessoa: Yup.string(),
-  nome: Yup.string().when('id_pessoa', (id_pessoa, schema) =>
-    id_pessoa ? schema.required('Nome é obrigatório') : schema,
-  ),
-  data_nascimento: Yup.date().when('id_pessoa', (id_pessoa, schema) =>
-    id_pessoa ? schema.required('Data de nascimento é obrigatória') : schema,
-  ),
-  cpf: Yup.string().when('id_pessoa', (id_pessoa, schema) =>
-    id_pessoa ? schema.required('CPF é obrigatório') : schema,
-  ),
+  pessoa: Yup.object().shape({
+    id: Yup.string(),
+    nome: Yup.string().when('pessoa.id', (id_pessoa, schema) =>
+      id_pessoa ? schema.required('Nome é obrigatório') : schema,
+    ),
+    data_nascimento: Yup.date().when('pessoa.id', (id_pessoa, schema) =>
+      id_pessoa ? schema.required('Data de nascimento é obrigatória') : schema,
+    ),
+    cpf: Yup.string().when('pessoa.id', (id_pessoa, schema) =>
+      id_pessoa ? schema.required('CPF é obrigatório') : schema,
+    ),
+  }),
   telefones: Yup.array().of(
     Yup.object().shape({
-      numero: Yup.string().when('id_pessoa', (id_pessoa, schema) =>
-        id_pessoa
-          ? schema.required('Número de telefone é obrigatório')
-          : schema,
-      ),
+      numero: Yup.string().required('Número de telefone é obrigatório'),
     }),
   ),
   endereco: Yup.object().shape({
-    cep: Yup.string().when('id_pessoa', (id_pessoa, schema) =>
-      id_pessoa ? schema.required('CEP é obrigatório') : schema,
-    ),
-    rua: Yup.string().when('id_pessoa', (id_pessoa, schema) =>
-      id_pessoa ? schema.required('Rua é obrigatória') : schema,
-    ),
-    numero: Yup.string().when('id_pessoa', (id_pessoa, schema) =>
-      id_pessoa ? schema.required('Número é obrigatório') : schema,
-    ),
-    complemento: Yup.string().when('id_pessoa', (id_pessoa, schema) =>
-      id_pessoa ? schema.required('Complemento é obrigatório') : schema,
-    ),
-    bairro: Yup.string().when('id_pessoa', (id_pessoa, schema) =>
-      id_pessoa ? schema.required('Bairro é obrigatório') : schema,
-    ),
-    cidade: Yup.string().when('id_pessoa', (id_pessoa, schema) =>
-      id_pessoa ? schema.required('Cidade é obrigatória') : schema,
-    ),
-    uf: Yup.string().when('id_pessoa', (id_pessoa, schema) =>
-      id_pessoa ? schema.required('UF é obrigatório') : schema,
-    ),
+    cep: Yup.string().required('CEP é obrigatório'),
+    rua: Yup.string().required('Rua é obrigatória'),
+    numero: Yup.string().required('Número é obrigatório'),
+    complemento: Yup.string().required('Complemento é obrigatório'),
+    bairro: Yup.string().required('Bairro é obrigatório'),
+    cidade: Yup.string().required('Cidade é obrigatória'),
+    uf: Yup.string().required('UF é obrigatório'),
   }),
   email: Yup.array().of(
     Yup.object().shape({
-      endereco: Yup.string().when('id_pessoa', (id_pessoa, schema) =>
-        id_pessoa ? schema.required('Endereço de email é obrigatório') : schema,
-      ),
+      endereco: Yup.string().required('Endereço de email é obrigatório'),
     }),
   ),
   limite: Yup.string().required('Limite é obrigatório'),
@@ -107,6 +88,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
       data_nascimento: '06-15-1999',
     },
   ]);
+  const [isNewPerson, setIsNewPerson] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -146,10 +128,12 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
             <Formik
               validationSchema={validationSchema}
               initialValues={{
-                id_pessoa: '',
-                nome: '',
-                data_nascimento: new Date(),
-                cpf: '',
+                pessoa: {
+                  id: '',
+                  nome: '',
+                  cpf: '',
+                  data_nascimento: new Date(),
+                },
                 telefones: [
                   {
                     numero: '',
@@ -177,20 +161,22 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                 React.useEffect(() => {
                   if (route?.params?.pessoa) {
                     const pessoa = route.params.pessoa;
-                    setFieldValue('id_pessoa', pessoa.id);
-                    setFieldValue('nome', pessoa.nome);
+                    setFieldValue('pessoa.id', pessoa.id);
+                    setFieldValue('pessoa.nome', pessoa.nome);
                     setFieldValue(
-                      'data_nascimento',
+                      'pessoa.data_nascimento',
                       new Date(pessoa.data_nascimento),
                     );
-                    setFieldValue('cpf', pessoa.cpf);
+                    setFieldValue('pessoa.cpf', pessoa.cpf);
                   }
                 }, [route?.params?.pessoa]);
 
                 return (
                   <Box gap="$5">
-                    {values.id_pessoa == '' && pessoas.length > 0 ? (
-                      <Box>
+                    {values.pessoa.id == '' &&
+                    !isNewPerson &&
+                    pessoas.length > 0 ? (
+                      <Box gap="$5" mt="$5">
                         <Button
                           onPress={() =>
                             navigation?.navigate('selecionar-pessoa', {
@@ -201,27 +187,67 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                         >
                           <ButtonText>Selecionar Pessoa</ButtonText>
                         </Button>
+                        <Button onPress={() => setIsNewPerson(true)}>
+                          <ButtonText>Cadastrar Pessoa</ButtonText>
+                        </Button>
                       </Box>
-                    ) : values.id_pessoa ? (
-                      <Card my="$5">
-                        <HStack>
-                          <Box gap="$2.5">
-                            <Box>
-                              <Heading>{values.nome}</Heading>
+                    ) : values.pessoa.id != '' && !isNewPerson ? (
+                      <Box gap="$2.5" mt="$5">
+                        <Heading textAlign="center" size="xl">
+                          Pessoa selecionada:{' '}
+                        </Heading>
+                        <Card my="$5">
+                          <HStack>
+                            <Box gap="$2.5">
+                              <Box>
+                                <Heading>{values.pessoa.nome}</Heading>
+                              </Box>
+                              <Box>
+                                <Text>{values.pessoa.cpf}</Text>
+                              </Box>
+                              <Box>
+                                <Text>
+                                  {new Date(
+                                    values.pessoa.data_nascimento,
+                                  ).toLocaleDateString('PT-BR')}
+                                </Text>
+                              </Box>
                             </Box>
-                            <Box>
-                              <Text>{values.cpf}</Text>
-                            </Box>
-                            <Box>
-                              <Text>
-                                {new Date(
-                                  values.data_nascimento,
-                                ).toLocaleDateString('PT-BR')}
-                              </Text>
-                            </Box>
-                          </Box>
-                        </HStack>
-                      </Card>
+                          </HStack>
+                        </Card>
+                        <Button
+                          onPress={() => {
+                            const pessoaSelecionada = {
+                              id: values.pessoa.id,
+                              nome: values.pessoa.nome,
+                              cpf: values.pessoa.cpf,
+                              data_nascimento: String(
+                                values.pessoa.data_nascimento,
+                              ),
+                            };
+                            navigation?.navigate('selecionar-pessoa', {
+                              screen: 'cadastrar-cliente',
+                              pessoas,
+                              pessoaSelecionada,
+                            });
+                          }}
+                        >
+                          <ButtonText>Alterar Pessoa</ButtonText>
+                        </Button>
+                        <Button
+                          onPress={() => {
+                            setFieldValue('pessoa', {
+                              id: '',
+                              nome: '',
+                              cpf: '',
+                              data_nascimento: new Date(),
+                            });
+                            setIsNewPerson(true);
+                          }}
+                        >
+                          <ButtonText>Cadastrar Nova Pessoa</ButtonText>
+                        </Button>
+                      </Box>
                     ) : (
                       <>
                         <FormControl
@@ -237,7 +263,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                             <InputField
                               type="text"
                               placeholder="Nome Completo do Clinente"
-                              onChangeText={handleChange('nome')}
+                              onChangeText={handleChange('pessoa.nome')}
                             />
                           </Input>
 
@@ -250,7 +276,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                           <FormControlError>
                             <FormControlErrorIcon as={AlertCircleIcon} />
                             <FormControlErrorText>
-                              {errors.nome}
+                              {errors.pessoa?.nome}
                             </FormControlErrorText>
                           </FormControlError>
                         </FormControl>
@@ -268,7 +294,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                           <Input isReadOnly={true}>
                             <InputField
                               type="text"
-                              value={values.data_nascimento.toLocaleDateString(
+                              value={values.pessoa.data_nascimento.toLocaleDateString(
                                 'PT-BR',
                               )}
                               placeholder="password"
@@ -287,8 +313,8 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                           <FormControlError>
                             <FormControlErrorIcon as={AlertCircleIcon} />
                             <FormControlErrorText>
-                              {errors.data_nascimento
-                                ? errors.data_nascimento
+                              {errors.pessoa && errors.pessoa.data_nascimento
+                                ? errors.pessoa.data_nascimento
                                 : ''}
                             </FormControlErrorText>
                           </FormControlError>
@@ -305,8 +331,10 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                           <Input>
                             <InputField
                               type="text"
-                              value={values.cpf}
+                              value={values.pessoa.cpf}
                               placeholder="123.123.123.12"
+                              onChangeText={handleChange('pessoa.cpf')}
+                              keyboardType="number-pad"
                             />
                           </Input>
 
@@ -319,7 +347,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                           <FormControlError>
                             <FormControlErrorIcon as={AlertCircleIcon} />
                             <FormControlErrorText>
-                              {errors.cpf}
+                              {errors.pessoa?.cpf}
                             </FormControlErrorText>
                           </FormControlError>
                         </FormControl>
@@ -333,7 +361,12 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                             <FormControlLabelText>Cep</FormControlLabelText>
                           </FormControlLabel>
                           <Input>
-                            <InputField type="text" placeholder="password" />
+                            <InputField
+                              onChangeText={handleChange('endereco.cep')}
+                              type="text"
+                              placeholder="12.123-123"
+                              keyboardType="number-pad"
+                            />
                           </Input>
 
                           <FormControlHelper>
@@ -359,7 +392,11 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                             <FormControlLabelText>Rua</FormControlLabelText>
                           </FormControlLabel>
                           <Input>
-                            <InputField type="text" placeholder="password" />
+                            <InputField
+                              onChangeText={handleChange('endereco.rua')}
+                              type="text"
+                              placeholder="adadasdasdas"
+                            />
                           </Input>
 
                           <FormControlHelper>
@@ -385,7 +422,12 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                             <FormControlLabelText>Numero</FormControlLabelText>
                           </FormControlLabel>
                           <Input>
-                            <InputField type="text" placeholder="password" />
+                            <InputField
+                              onChangeText={handleChange('endereco.numero')}
+                              type="text"
+                              placeholder="dasdasdasdasdasd"
+                              keyboardType="number-pad"
+                            />
                           </Input>
 
                           <FormControlHelper>
@@ -413,7 +455,13 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                             </FormControlLabelText>
                           </FormControlLabel>
                           <Input>
-                            <InputField type="text" placeholder="password" />
+                            <InputField
+                              onChangeText={handleChange(
+                                'endereco.complemento',
+                              )}
+                              type="text"
+                              placeholder="asdsadasdas"
+                            />
                           </Input>
 
                           <FormControlHelper>
@@ -439,7 +487,11 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                             <FormControlLabelText>Bairro</FormControlLabelText>
                           </FormControlLabel>
                           <Input>
-                            <InputField type="text" placeholder="password" />
+                            <InputField
+                              onChangeText={handleChange('endereco.bairro')}
+                              type="text"
+                              placeholder="asdasdasdas"
+                            />
                           </Input>
 
                           <FormControlHelper>
@@ -465,7 +517,11 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                             <FormControlLabelText>Cidade</FormControlLabelText>
                           </FormControlLabel>
                           <Input>
-                            <InputField type="text" placeholder="password" />
+                            <InputField
+                              onChangeText={handleChange('endereco.cidade')}
+                              type="text"
+                              placeholder="adasdasdasdas"
+                            />
                           </Input>
 
                           <FormControlHelper>
@@ -544,80 +600,147 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                           </FormControlError>
                         </FormControl>
                         <Box gap="$2.5">
-                          <FormControl
-                            isInvalid={false}
-                            size={'md'}
-                            isDisabled={false}
-                            isRequired={true}
+                          {values.telefones.map((telefone, i) => {
+                            return (
+                              <Box key={`telefone-${i}`}>
+                                <FormControl
+                                  isInvalid={false}
+                                  size={'md'}
+                                  isDisabled={false}
+                                  isRequired={true}
+                                >
+                                  <FormControlLabel>
+                                    <FormControlLabelText>
+                                      Telefone
+                                    </FormControlLabelText>
+                                  </FormControlLabel>
+                                  <Input>
+                                    <InputField
+                                      onChangeText={handleChange(
+                                        `telefones[${i}].endereco`,
+                                      )}
+                                      type="text"
+                                      placeholder="12312321312"
+                                      keyboardType="number-pad"
+                                    />
+                                  </Input>
+
+                                  <FormControlHelper>
+                                    <FormControlHelperText>
+                                      Must be atleast 6 characters.
+                                    </FormControlHelperText>
+                                  </FormControlHelper>
+
+                                  <FormControlError>
+                                    <FormControlErrorIcon
+                                      as={AlertCircleIcon}
+                                    />
+                                    <FormControlErrorText>
+                                      Atleast 6 characters are required.
+                                    </FormControlErrorText>
+                                  </FormControlError>
+                                </FormControl>
+                              </Box>
+                            );
+                          })}
+                          <Button
+                            onPress={() => {
+                              setFieldValue('telefones', [
+                                ...values.telefones,
+                                { numero: '' },
+                              ]);
+                            }}
+                            action="positive"
                           >
-                            <FormControlLabel>
-                              <FormControlLabelText>
-                                Telefone
-                              </FormControlLabelText>
-                            </FormControlLabel>
-                            <Input>
-                              <InputField type="text" placeholder="password" />
-                            </Input>
-
-                            <FormControlHelper>
-                              <FormControlHelperText>
-                                Must be atleast 6 characters.
-                              </FormControlHelperText>
-                            </FormControlHelper>
-
-                            <FormControlError>
-                              <FormControlErrorIcon as={AlertCircleIcon} />
-                              <FormControlErrorText>
-                                Atleast 6 characters are required.
-                              </FormControlErrorText>
-                            </FormControlError>
-                          </FormControl>
-                          <Button action="positive">
                             <ButtonIcon as={AddIcon} />
                           </Button>
-                          <Button action="negative">
+                          <Button
+                            onPress={() => {
+                              if (values.telefones.length > 1) {
+                                setFieldValue('telefones', [
+                                  ...values.telefones.slice(0, -1),
+                                ]);
+                              } else {
+                                Alert.alert(
+                                  'Aviso',
+                                  'Nao existem mais telefones a serem removidos',
+                                );
+                              }
+                            }}
+                            action="negative"
+                          >
                             <ButtonIcon as={RemoveIcon} />
-                          </Button>
-                          <Button action="negative">
-                            <ButtonIcon as={TrashIcon} />
                           </Button>
                         </Box>
 
                         <Box gap="$2.5">
-                          <FormControl
-                            isInvalid={false}
-                            size={'md'}
-                            isDisabled={false}
-                            isRequired={true}
+                          {values.email.map((tel, i) => {
+                            return (
+                              <Box key={`telefone-${i}`}>
+                                <FormControl
+                                  isInvalid={false}
+                                  size={'md'}
+                                  isDisabled={false}
+                                  isRequired={true}
+                                >
+                                  <FormControlLabel>
+                                    <FormControlLabelText>
+                                      Email
+                                    </FormControlLabelText>
+                                  </FormControlLabel>
+                                  <Input>
+                                    <InputField
+                                      type="text"
+                                      placeholder="password"
+                                    />
+                                  </Input>
+
+                                  <FormControlHelper>
+                                    <FormControlHelperText>
+                                      Must be atleast 6 characters.
+                                    </FormControlHelperText>
+                                  </FormControlHelper>
+
+                                  <FormControlError>
+                                    <FormControlErrorIcon
+                                      as={AlertCircleIcon}
+                                    />
+                                    <FormControlErrorText>
+                                      Atleast 6 characters are required.
+                                    </FormControlErrorText>
+                                  </FormControlError>
+                                </FormControl>
+                              </Box>
+                            );
+                          })}
+
+                          <Button
+                            onPress={() => {
+                              setFieldValue('email', [
+                                ...values.email,
+                                { endereco: '' },
+                              ]);
+                            }}
+                            action="positive"
                           >
-                            <FormControlLabel>
-                              <FormControlLabelText>Email</FormControlLabelText>
-                            </FormControlLabel>
-                            <Input>
-                              <InputField type="text" placeholder="password" />
-                            </Input>
-
-                            <FormControlHelper>
-                              <FormControlHelperText>
-                                Must be atleast 6 characters.
-                              </FormControlHelperText>
-                            </FormControlHelper>
-
-                            <FormControlError>
-                              <FormControlErrorIcon as={AlertCircleIcon} />
-                              <FormControlErrorText>
-                                Atleast 6 characters are required.
-                              </FormControlErrorText>
-                            </FormControlError>
-                          </FormControl>
-                          <Button action="positive">
                             <ButtonIcon as={AddIcon} />
                           </Button>
-                          <Button action="negative">
+                          <Button
+                            onPress={() => {
+                              if (values.email.length > 1) {
+                                setFieldValue('email', [
+                                  ...values.email.slice(0, -1),
+                                ]);
+                              } else {
+                                Alert.alert(
+                                  'Aviso',
+                                  'Nao ha mais emails a serem removidos',
+                                );
+                              }
+                            }}
+                            action="negative"
+                          >
                             <ButtonIcon as={RemoveIcon} />
-                          </Button>
-                          <Button action="negative">
-                            <ButtonIcon as={TrashIcon} />
                           </Button>
                         </Box>
                       </>
@@ -632,7 +755,11 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                         <FormControlLabelText>Limite</FormControlLabelText>
                       </FormControlLabel>
                       <Input>
-                        <InputField type="text" placeholder="password" />
+                        <InputField
+                          onChangeText={handleChange('limite')}
+                          type="text"
+                          placeholder="password"
+                        />
                       </Input>
 
                       <FormControlHelper>

@@ -36,7 +36,7 @@ export type AtualizarTipoUaScreenRouterProp = RouteProp<
 >;
 
 export type TipoUa = {
-  id: string | number;
+  id: string;
   nome: string;
 };
 

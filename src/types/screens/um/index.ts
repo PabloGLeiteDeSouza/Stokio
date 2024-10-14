@@ -36,7 +36,7 @@ export type AtualizarUmScreenRouterProp = RouteProp<
 >;
 
 export type Um = {
-  id: string | number;
+  id: string;
   nome: string;
 };
 

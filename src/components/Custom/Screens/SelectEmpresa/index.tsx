@@ -26,13 +26,13 @@ const SelectEmpresa: React.FC<ISelectEmpresaProps> = ({
   const screen = route.params.screen;
   const [empresas, setEmpresas] = React.useState<Array<Empresa>>([
     {
-      id: 1,
+      id: '1',
       nome_fantasia: 'João',
       razao_social: 'Joao',
       cpf: '21347298146327',
     },
     {
-      id: 2,
+      id: '2',
       nome_fantasia: 'Maria',
       razao_social: 'Maria',
       cpf: '21382194763289',
@@ -47,7 +47,7 @@ const SelectEmpresa: React.FC<ISelectEmpresaProps> = ({
         setEmpresas([
           ...empresas,
           {
-            id: 3,
+            id: '3',
             nome_fantasia: 'Comercio de Eletronicos ATA e CIA',
             razao_social: 'Comercio de Eletronicos ATA e CIA',
             cpf: '21347298146327',
@@ -64,11 +64,11 @@ const SelectEmpresa: React.FC<ISelectEmpresaProps> = ({
 
   const FlatListEmpresas = FlatList as EmpresaFlatList;
 
-  const ListRenderEmpresas: ListRenderItem<Empresa> = ({ item }) => {
+  const ListRenderEmpresas: ListRenderItem<Empresa> = ({ item, index }) => {
     return (
-      <Card>
-        <HStack>
-          <VStack>
+      <Card mt={index === 0 ? '$5' : '$2.5'} mb={'$2.5'}>
+        <HStack justifyContent="space-between">
+          <VStack space="xl" w="$3/5">
             <Box>
               <Heading>{item.nome_fantasia}</Heading>
             </Box>
@@ -79,13 +79,15 @@ const SelectEmpresa: React.FC<ISelectEmpresaProps> = ({
               <Text>{item.razao_social}</Text>
             </Box>
           </VStack>
-          <VStack>
+          <VStack w="$24">
             <Button
+              h="$10"
+              size="xs"
               isDisabled={item.id === empresa.id}
               onPress={() => setEmpresa(item)}
             >
               <ButtonText>
-                {item.id === empresa.id ? 'selcionado' : 'selecionar'}
+                {item.id === empresa.id ? 'SELECIONADO' : 'SELECIONAR'}
               </ButtonText>
             </Button>
           </VStack>
@@ -105,17 +107,16 @@ const SelectEmpresa: React.FC<ISelectEmpresaProps> = ({
           Selecionar Empresa:
         </Heading>
       </Box>
-      <Box>
-        <FlatListEmpresas
-          data={empresas}
-          renderItem={ListRenderEmpresas}
-          keyExtractor={(item) => String(item.id)}
-        />
-        <Box>
-          <Button onPress={() => navigation?.navigate(screen, { empresa })}>
-            <ButtonText>Selecionar Empresa</ButtonText>
-          </Button>
-        </Box>
+      <FlatListEmpresas
+        mx="$5"
+        data={empresas}
+        renderItem={ListRenderEmpresas}
+        keyExtractor={(item) => String(item.id)}
+      />
+      <Box m="$5">
+        <Button onPress={() => navigation?.navigate(screen, { empresa })}>
+          <ButtonText>Selecionar Empresa</ButtonText>
+        </Button>
       </Box>
     </Box>
   );

@@ -1,4 +1,4 @@
-import { RootStackParamList } from '$types/param-list';
+import { VendasStackParamList } from '$types/param-list';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { ViewStyle } from '@expo/html-elements/build/primitives/View';
@@ -6,47 +6,47 @@ import { StyledComponentProps } from '@gluestack-style/react/lib/typescript/type
 import { FlatList, FlatListProps, StyleProp } from 'react-native';
 
 export type VisualisarVendaScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
+  VendasStackParamList,
   'visualizar-vendas'
 >;
 
 export type VisualisarVendaScreenRouterProp = RouteProp<
-  RootStackParamList,
+  VendasStackParamList,
   'visualizar-vendas'
 >;
 
 export type CadastrarVendaScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
+  VendasStackParamList,
   'cadastrar-venda'
 >;
 
 export type CadastrarVendaScreenRouterProp = RouteProp<
-  RootStackParamList,
+  VendasStackParamList,
   'cadastrar-venda'
 >;
 
 export type AtualizarVendaScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
+  VendasStackParamList,
   'atualizar-venda'
 >;
 
 export type AtualizarVendaScreenRouterProp = RouteProp<
-  RootStackParamList,
+  VendasStackParamList,
   'atualizar-venda'
 >;
 
 export type DetalhesVendaScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
+  VendasStackParamList,
   'detalhes-venda'
 >;
 
 export type DetalhesVendaScreenRouterProp = RouteProp<
-  RootStackParamList,
+  VendasStackParamList,
   'detalhes-venda'
 >;
 
 export type Venda = {
-  id: number | string;
+  id: string;
   data_venda: string;
   data_atualizacao: string;
   valor: number;
@@ -54,7 +54,7 @@ export type Venda = {
 };
 
 export type VendaObject = {
-  id: number | string;
+  id: string;
   valor: string;
   data_venda: string;
   data_atualizacao: string;

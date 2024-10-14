@@ -22,11 +22,11 @@ const SelectMarca: React.FC<ISelectMarcaProps> = ({ navigation, route }) => {
   const screen = route.params.screen;
   const [ramos, setMarcas] = React.useState<Array<Marca>>([
     {
-      id: 1,
+      id: '1',
       nome: 'João',
     },
     {
-      id: 2,
+      id: '2',
       nome: 'Maria',
     },
   ]);
@@ -39,7 +39,7 @@ const SelectMarca: React.FC<ISelectMarcaProps> = ({ navigation, route }) => {
         setMarcas([
           ...ramos,
           {
-            id: 3,
+            id: '3',
             nome: 'Pedro',
           },
         ]);
@@ -89,17 +89,16 @@ const SelectMarca: React.FC<ISelectMarcaProps> = ({ navigation, route }) => {
           Selecionar Marca:
         </Heading>
       </Box>
-      <Box>
-        <FlatListMarcas
-          data={ramos}
-          renderItem={ListRenderMarcas}
-          keyExtractor={(item) => String(item.id)}
-        />
-        <Box>
-          <Button onPress={() => navigation?.navigate(screen, { marca })}>
-            <ButtonText>Selecionar Marca</ButtonText>
-          </Button>
-        </Box>
+      <FlatListMarcas
+        mx="$8"
+        data={ramos}
+        renderItem={ListRenderMarcas}
+        keyExtractor={(item) => String(item.id)}
+      />
+      <Box my="$5" mx="$8">
+        <Button onPress={() => navigation?.navigate(screen, { marca })}>
+          <ButtonText>Selecionar Marca</ButtonText>
+        </Button>
       </Box>
     </Box>
   );
