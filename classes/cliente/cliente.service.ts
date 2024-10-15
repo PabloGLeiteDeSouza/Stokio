@@ -21,8 +21,11 @@ export class ClienteService {
     try {
       const idPessoa = await this.createOrFetchPessoa(data);
       const idEndereco = await this.createEndereco(data.endereco);
-      const idCliente = await this.createCliente(data.limite, idEndereco);
-      await this.linkPessoaToCliente(idPessoa, idCliente);
+      const idCliente = await this.createCliente(
+        data.limite,
+        idEndereco,
+        idPessoa,
+      );
       await this.createEmails(data.emails, idCliente);
       await this.createTelefones(data.telefones, idCliente);
     } catch (error) {
@@ -89,12 +92,14 @@ export class ClienteService {
   private async createCliente(
     limite: number,
     idEndereco: number,
+    id_pessoa: number,
   ): Promise<number> {
     const res = await this.db.runAsync(
-      'INSERT INTO cliente (limite, id_endereco) VALUES ($limite, $id_endereco)',
+      'INSERT INTO cliente (limite, id_endereco, id_pessoa) VALUES ($limite, $id_endereco, $id_pessoa)',
       {
         $limite: limite,
         $id_endereco: idEndereco,
+        $id_pessoa: id_pessoa,
       },
     );
 
@@ -103,23 +108,6 @@ export class ClienteService {
     }
 
     return res.lastInsertRowId;
-  }
-
-  private async linkPessoaToCliente(
-    idPessoa: number,
-    idCliente: number,
-  ): Promise<void> {
-    const res = await this.db.runAsync(
-      'INSERT INTO pessoa_cliente (id_pessoa, id_cliente) VALUES ($id_pessoa, $id_cliente)',
-      {
-        $id_pessoa: idPessoa,
-        $id_cliente: idCliente,
-      },
-    );
-
-    if (res.changes < 1) {
-      throw new Error('Não foi possível vincular a pessoa ao cliente');
-    }
   }
 
   private async createEmails(
@@ -266,5 +254,101 @@ export class ClienteService {
         }
       }),
     );
+  }
+
+  // Método de deleção de cliente
+  async deleteCliente(id: number): Promise<void> {
+    try {
+      await this.db.runAsync(
+        'DELETE FROM cliente_telefone WHERE id_cliente = $id',
+        { $id: id },
+      );
+      await this.db.runAsync(
+        'DELETE FROM cliente_email WHERE id_cliente = $id',
+        { $id: id },
+      );
+
+      const enderecoResult = await this.db.getFirstAsync<{
+        id_endereco: number;
+      }>('SELECT id_endereco FROM cliente WHERE id = $id', { $id: id });
+
+      await this.db.runAsync('DELETE FROM endereco WHERE id = $id_endereco', {
+        $id_endereco: Number(enderecoResult?.id_endereco),
+      });
+
+      await this.db.runAsync(
+        'DELETE FROM pessoa WHERE id = (SELECT id_pessoa FROM cliente WHERE id = $id)',
+        { $id: id },
+      );
+      await this.db.runAsync('DELETE FROM cliente WHERE id = $id', { $id: id });
+    } catch (error) {
+      throw new Error(`Erro ao deletar cliente: ${(error as Error).message}`);
+    }
+  }
+
+  // Consultas personalizadas
+  async findClienteByName(nome: string): Promise<Array<unknown>> {
+    try {
+      const result = await this.db.getAllAsync(
+        `SELECT * FROM cliente 
+         INNER JOIN pessoa ON cliente.id_pessoa = pessoa.id 
+         WHERE pessoa.nome LIKE '%' || $nome || '%'`,
+        { $nome: nome },
+      );
+      return result;
+    } catch (error) {
+      throw new Error(
+        `Erro ao buscar cliente por nome: ${(error as Error).message}`,
+      );
+    }
+  }
+
+  async findClienteByCPF(cpf: string): Promise<unknown> {
+    try {
+      const result = await this.db.getAllAsync(
+        `SELECT * FROM cliente 
+         INNER JOIN pessoa ON cliente.id_pessoa = pessoa.id 
+         WHERE pessoa.cpf = $cpf`,
+        { $cpf: cpf },
+      );
+      return result;
+    } catch (error) {
+      throw new Error(
+        `Erro ao buscar cliente por CPF: ${(error as Error).message}`,
+      );
+    }
+  }
+
+  async findClienteByDataNascimento(
+    dataDeNascimento: string,
+  ): Promise<unknown> {
+    try {
+      const result = await this.db.getAllAsync(
+        `SELECT * FROM cliente 
+         INNER JOIN pessoa ON cliente.id_pessoa = pessoa.id 
+         WHERE pessoa.data_de_nascimento = $dataDeNascimento`,
+        { $dataDeNascimento: dataDeNascimento },
+      );
+      return result;
+    } catch (error) {
+      throw new Error(
+        `Erro ao buscar cliente por data de nascimento: ${(error as Error).message}`,
+      );
+    }
+  }
+
+  async findAllClientes(): Promise<Array<unknown>> {
+    try {
+      const result = await this.db.getAllAsync(
+        `SELECT cliente.*, pessoa.nome, pessoa.cpf, pessoa.data_de_nascimento
+         FROM cliente
+         INNER JOIN pessoa ON cliente.id_pessoa = pessoa.id`,
+      );
+      return result;
+    } catch (error) {
+      throw new Error(
+        `Erro ao buscar todos os clientes: ${(error as Error).message}`,
+      );
+    }
   }
 }

@@ -216,6 +216,7 @@ export type EmpresasStackParamList = {
 };
 
 export type ClientesStackParamList = {
+  'screens-clientes'?: object;
   'screens-produtos'?: object;
   'screens-tipos-produtos'?: object;
   'screens-categorias'?: object;
@@ -263,13 +264,13 @@ export type SelecionarRamoStackParamList = {
 export type SelecionarProdutoStackParamList = {
   'selecionar-produto'?: {
     screen: 'cadastrar-venda';
-    produtoSelecionado?: Produto;
     indexUpdated?: number;
     type: 'update' | 'create';
+    selectedsProdutos?: Array<Produto>;
   };
   'cadastrar-venda'?: {
     produto: Produto;
-    indexUpdated?: number;
+    indexUpdated: number;
     type: 'update' | 'create';
   };
 };
@@ -365,9 +366,9 @@ export type VendasStackParamList = {
   };
   'selecionar-produto'?: {
     screen: 'cadastrar-venda';
-    produtoSelecionado?: Produto;
     type: 'update' | 'create';
     indexUpdated?: number;
+    selectedsProdutos?: Array<Produto>;
   };
 };
 

@@ -15,6 +15,7 @@
       "$assets/*": ["./assets/*"],
       "@constants/*": ["./src/constants/*"],
       "$providers/*": ["./src/providers/*"],
+      "@classes/*": ["./src/classes/*"],
     }
   }
 }

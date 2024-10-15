@@ -70,15 +70,33 @@ import CLIENTES from './clientes.json';
 import { SearchIcon } from '@gluestack-ui/themed';
 import { VisualizarClienteScreen } from '@/interfaces/cliente';
 import { FlatList } from '@gluestack-ui/themed';
-import { ListRenderItem } from 'react-native';
-import { Cliente, ClientFlatList } from './types';
+import { Alert, ListRenderItem } from 'react-native';
+import { ClienteObject, ClientFlatList } from './types';
+import { useSQLiteContext } from 'expo-sqlite';
+import { ClienteService } from '@/classes/cliente/cliente.service';
 
 const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
-  const [clientes, setClientes] = React.useState<Array<Cliente>>([]);
+  const [clientes, setClientes] = React.useState<Array<ClienteObject>>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const db = useSQLiteContext();
 
   const FlatListClient = FlatList as ClientFlatList;
 
-  const ListRenderCliente: ListRenderItem<Cliente> = ({ item }) => {
+  React.useEffect(() => {
+    async function start() {
+      try {
+        const clientes = await new ClienteService(db).findAllClientes();
+        setClientes([...clientes]);
+        setIsLoading(false);
+      } catch (error) {
+        Alert.alert('Erro', (error as Error).message);
+        setIsLoading(false);
+      }
+    }
+    start();
+  }, []);
+
+  const ListRenderCliente: ListRenderItem<ClienteObject> = ({ item }) => {
     return (
       <Card size="md" variant="elevated" m="$3">
         <HStack justifyContent="space-between">

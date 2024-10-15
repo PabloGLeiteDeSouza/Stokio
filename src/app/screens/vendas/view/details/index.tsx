@@ -14,7 +14,7 @@ const Details: React.FC<DetalhesVendaScreen> = ({ navigation }) => {
   return (
     <Box h="$full" w="$full">
       <ScrollView mx="$1">
-        <VStack space="3xl" p="$8">
+        <VStack space="3xl" p="$8" gap="$5">
           <Box>
             <Heading size="xl">Detalhes da Venda</Heading>
           </Box>
@@ -40,6 +40,36 @@ const Details: React.FC<DetalhesVendaScreen> = ({ navigation }) => {
               <Box gap="$5">
                 <Box>
                   <Text>Nome:</Text>
+                  <Text>Aadasdsad</Text>
+                </Box>
+                <Box>
+                  <Text>Marca:</Text>
+                  <Text>Aadasdsad</Text>
+                </Box>
+                <Box>
+                  <Text>Tipo:</Text>
+                  <Text>Aadasdsad</Text>
+                </Box>
+                <Box>
+                  <Text>Quantidade:</Text>
+                  <Text>1</Text>
+                </Box>
+                <Box>
+                  <Text>Preço:</Text>
+                  <Text>25,00</Text>
+                </Box>
+              </Box>
+              <Box gap="$5">
+                <Box>
+                  <Text>Nome:</Text>
+                  <Text>Aadasdsad</Text>
+                </Box>
+                <Box>
+                  <Text>Marca:</Text>
+                  <Text>Aadasdsad</Text>
+                </Box>
+                <Box>
+                  <Text>Tipo:</Text>
                   <Text>Aadasdsad</Text>
                 </Box>
                 <Box>

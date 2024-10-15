@@ -20,6 +20,16 @@ export type Cliente = {
   emails: Array<{ endereco: string }>;
 };
 
+export type ClienteObject = {
+  id: string;
+  nome: string;
+  cpf: string;
+  data_nascimento: string;
+  limite: string;
+  id_endereco: string;
+  id_pessoa: string;
+};
+
 export type ClientFlatList = React.ForwardRefExoticComponent<
   StyledComponentProps<
     StyleProp<ViewStyle>,

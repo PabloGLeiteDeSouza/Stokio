@@ -30,11 +30,6 @@ const ClienteScreens: React.FC = () => {
         component={Details}
         options={{ title: 'Detalhes do cliente' }}
       />
-      <Stack.Screen
-        name="selecionar-pessoa"
-        component={SelectPessoa}
-        options={{ title: 'Selecione uma pessoa' }}
-      />
     </Stack.Navigator>
   );
 };

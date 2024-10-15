@@ -24,6 +24,13 @@ const SelectProduto: React.FC<ISelectProdutoProps> = ({
     return null;
   }
 
+  const selectedProducts = route.params.selectedsProdutos
+    ? route.params.selectedsProdutos
+    : [
+        {
+          id: '',
+        },
+      ];
   const screen = route.params.screen;
   const indexUpdated = route.params.indexUpdated
     ? route.params.indexUpdated
@@ -64,7 +71,17 @@ const SelectProduto: React.FC<ISelectProdutoProps> = ({
       quantidade: '50',
     },
   ]);
-  const [produto, setProduto] = React.useState<Produto>(produtos[0]);
+  const [produto, setProduto] = React.useState<Produto>({
+    id: '',
+    codigo_de_barras: '',
+    nome: '',
+    data_validade: '',
+    marca: '',
+    tipo: '',
+    empresa: '',
+    valor: '',
+    quantidade: '',
+  });
   const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -127,13 +144,21 @@ const SelectProduto: React.FC<ISelectProdutoProps> = ({
           </VStack>
           <VStack w="$2/6">
             <Button
-              isDisabled={item.id === produto.id}
+              isDisabled={
+                selectedProducts.find((prod) => prod.id === item.id)
+                  ? true
+                  : item.id === produto.id
+              }
               onPress={() => {
                 setProduto(item);
               }}
             >
               <ButtonText>
-                {item.id === produto.id ? 'selcionado' : 'selecionar'}
+                {selectedProducts.find((prod) => prod.id === item.id)
+                  ? 'Ja usado'
+                  : item.id === produto.id
+                    ? 'Selecionado'
+                    : 'Selecionar'}
               </ButtonText>
             </Button>
           </VStack>

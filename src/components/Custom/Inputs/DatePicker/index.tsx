@@ -83,6 +83,7 @@ const InputDatePicker: React.FC<IInputDatePicker> = ({
         <Input>
           <InputField
             readOnly={true}
+            editable={false}
             type="text"
             placeholder="01/01/1999"
             value={new Date(value).toLocaleDateString()}
