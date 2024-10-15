@@ -2,7 +2,7 @@
 CREATE TABLE unidade_de_medida (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome TEXT NOT NULL,
-    valor TEXT, NOT NULL
+    valor TEXT NOT NULL
 );
 
 -- Tabela unidade_de_armazenamento
@@ -27,11 +27,13 @@ CREATE TABLE tipo_de_unidade_de_armazenamento (
 -- Tabela endereco (auxiliar)
 CREATE TABLE endereco (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    rua TEXT NOT NULL,
-    numero INT NOT NULL,
+    cep TEXT NOT NULL,
+    logradouro TEXT NOT NULL,
+    numero INTEGER NOT NULL,
+    complemento TEXT,
+    bairro TEXT NOT NULL,
     cidade TEXT NOT NULL,
-    estado VARCHAR(2) NOT NULL,
-    cep TEXT NOT NULL
+    uf TEXT(2) NOT NULL
 );
 
 -- Tabela ramo (auxiliar)
@@ -63,15 +65,12 @@ CREATE TABLE pessoa (
 -- Tabela cliente
 CREATE TABLE cliente (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    limite DECIMAL(10, 2),
+    limite REAL,
     id_endereco INTEGER NOT NULL,
-    id_pessoa   INTEGER NOT NULL,
-    FOREIGN KEY (id_endereco) REFERENCES endereco(id)
+    id_pessoa INTEGER NOT NULL,
+    FOREIGN KEY (id_endereco) REFERENCES endereco(id),
+    FOREIGN KEY (id_pessoa) REFERENCES pessoa(id)
 );
-
-CREATE INDEX idx_cliente_id_endereco ON endereco(id);
-CREATE INDEX idx_cliente_id_pessoa ON pessoa(id);
-
 
 -- Tabela telefone
 CREATE TABLE telefone (
@@ -79,7 +78,7 @@ CREATE TABLE telefone (
     numero TEXT NOT NULL UNIQUE -- Telefone com restrição de unicidade
 );
 
--- Tabela pessoa_cliente_telefone
+-- Tabela cliente_telefone
 CREATE TABLE cliente_telefone (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     id_cliente INTEGER NOT NULL,
@@ -88,7 +87,7 @@ CREATE TABLE cliente_telefone (
     FOREIGN KEY (id_telefone) REFERENCES telefone(id)
 );
 
--- Índices nas chaves estrangeiras da tabela pessoa_cliente_telefone
+-- Índices nas chaves estrangeiras da tabela cliente_telefone
 CREATE INDEX idx_cliente_telefone_id_cliente ON cliente_telefone(id_cliente);
 CREATE INDEX idx_cliente_telefone_id_telefone ON cliente_telefone(id_telefone);
 
@@ -107,14 +106,14 @@ CREATE TABLE cliente_email (
     FOREIGN KEY (id_email) REFERENCES email(id)
 );
 
--- Índices nas chaves estrangeiras da tabela pessoa_cliente_email
+-- Índices nas chaves estrangeiras da tabela cliente_email
 CREATE INDEX idx_cliente_email_id_cliente ON cliente_email(id_cliente);
 CREATE INDEX idx_cliente_email_id_email ON cliente_email(id_email);
 
 -- Tabela empresa
 CREATE TABLE empresa (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nome TEXT NOT NULL NOT NULL,
+    nome TEXT NOT NULL,
     nome_fantasia TEXT NOT NULL,
     razao_social TEXT NOT NULL,
     cnpj TEXT UNIQUE, -- CNPJ com restrição de unicidade
@@ -157,11 +156,6 @@ CREATE TABLE empresa_email (
 CREATE INDEX idx_empresa_email_id_empresa ON empresa_email(id_empresa);
 CREATE INDEX idx_empresa_email_id_email ON empresa_email(id_email);
 
-
--- Índices nas chaves estrangeiras da tabela empresa_endereco
-
-CREATE INDEX idx_empresa_endereco_id_endereco ON empresa_endereco(id);
-
 -- Tabela produto
 CREATE TABLE produto (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -169,7 +163,7 @@ CREATE TABLE produto (
     data_de_validade DATE,
     nome TEXT NOT NULL,
     descricao TEXT,
-    valor DECIMAL(10, 2),
+    valor REAL,
     quantidade INTEGER NOT NULL,
     tamanho INTEGER,
     id_marca INTEGER,
@@ -192,7 +186,7 @@ CREATE INDEX idx_produto_id_unidade_de_armazenamento ON produto(id_unidade_de_ar
 CREATE TABLE venda (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     descricao TEXT,
-    valor DECIMAL(10, 2),
+    valor REAL,
     createdAt DATE,
     updatedAt DATE,
     status TEXT,
@@ -209,7 +203,7 @@ CREATE TABLE item_de_venda (
     id_venda INTEGER NOT NULL,
     id_produto INTEGER NOT NULL,
     quantidade INTEGER NOT NULL,
-    valor DECIMAL(10, 2),
+    valor REAL,
     createdAt DATE,
     updatedAt DATE,
     FOREIGN KEY (id_venda) REFERENCES venda(id),

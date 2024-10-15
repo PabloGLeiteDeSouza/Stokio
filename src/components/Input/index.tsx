@@ -10,21 +10,8 @@ import {
   FormControlErrorText,
   Input,
   InputField,
-  Radio,
-  RadioGroup,
-  RadioIcon,
-  RadioIndicator,
-  RadioLabel,
   Button,
-  ButtonText,
   Box,
-  Checkbox,
-  CheckboxGroup,
-  CheckboxIndicator,
-  CheckboxIcon,
-  CheckboxLabel,
-  Textarea,
-  TextareaInput,
   Select,
   SelectTrigger,
   SelectInput,
@@ -35,40 +22,25 @@ import {
   SelectDragIndicatorWrapper,
   SelectDragIndicator,
   SelectItem,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  Switch,
-  Modal,
-  ModalBackdrop,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  HStack,
-  VStack,
-  Heading,
-  Text,
-  Center,
   Icon,
-  CircleIcon,
-  CheckIcon,
   AlertCircleIcon,
   ChevronDownIcon,
 } from '@gluestack-ui/themed';
 import { IInputTextProps } from './interfaces';
 import { SearchIcon } from '@gluestack-ui/themed';
-import { mask } from 'react-native-mask-text';
+import { mask, unmask } from '@/utils/mask';
 const InputText: React.FC<IInputTextProps> = ({
   inputType,
   onChangeValue,
   onSubmitedValues,
   customType,
+  value,
+  error,
 }) => {
-  const [value, setValue] = React.useState('');
-
+  const [data, setData] = React.useState(value ? value : '');
+  const [telefoneType, setTelefoneType] = React.useState<
+    undefined | 'fixo' | 'movel'
+  >();
   switch (inputType) {
     case 'cep':
       return (
@@ -86,11 +58,12 @@ const InputText: React.FC<IInputTextProps> = ({
               <InputField
                 type="text"
                 placeholder="11.111-111"
-                value={value}
+                keyboardType="number-pad"
+                value={mask(data, 'cep')}
                 onChangeText={(text) => {
-                  setValue(mask(text, '99.999-999'));
+                  setData(unmask(text));
                   if (onChangeValue) {
-                    onChangeValue(mask(text, '99.999-999'));
+                    onChangeValue(unmask(text));
                   }
                 }}
               />
@@ -99,7 +72,7 @@ const InputText: React.FC<IInputTextProps> = ({
                   <Button
                     onPress={() => {
                       if (onSubmitedValues) {
-                        onSubmitedValues(value);
+                        onSubmitedValues(unmask(data));
                       }
                     }}
                   >
@@ -115,9 +88,7 @@ const InputText: React.FC<IInputTextProps> = ({
 
             <FormControlError>
               <FormControlErrorIcon as={AlertCircleIcon} />
-              <FormControlErrorText>
-                {errors}
-              </FormControlErrorText>
+              <FormControlErrorText>{error}</FormControlErrorText>
             </FormControlError>
           </FormControl>
         </>
@@ -138,11 +109,12 @@ const InputText: React.FC<IInputTextProps> = ({
               <InputField
                 type="text"
                 placeholder="99.999.999/0001-99"
-                value={value}
+                keyboardType="number-pad"
+                value={mask(data, 'cnpj')}
                 onChangeText={(text) => {
-                  setValue(mask(text, '99.999.999/0001-99'));
+                  setData(unmask(text));
                   if (onChangeValue) {
-                    onChangeValue(mask(text, '99.999.999/0001-99'));
+                    onChangeValue(unmask(text));
                   }
                 }}
               />
@@ -151,7 +123,7 @@ const InputText: React.FC<IInputTextProps> = ({
                   <Button
                     onPress={() => {
                       if (onSubmitedValues) {
-                        onSubmitedValues(value);
+                        onSubmitedValues(data);
                       }
                     }}
                   >
@@ -167,9 +139,7 @@ const InputText: React.FC<IInputTextProps> = ({
 
             <FormControlError>
               <FormControlErrorIcon as={AlertCircleIcon} />
-              <FormControlErrorText>
-                Atleast 6 characters are required.
-              </FormControlErrorText>
+              <FormControlErrorText>{error}</FormControlErrorText>
             </FormControlError>
           </FormControl>
         </>
@@ -188,11 +158,88 @@ const InputText: React.FC<IInputTextProps> = ({
             </FormControlLabel>
             <Input>
               <InputField
-                type="password"
-                defaultValue="12345"
-                placeholder="password"
+                type="text"
+                placeholder="123.123.123-12"
+                keyboardType="number-pad"
+                value={mask(data, 'cpf')}
+                onChangeText={(text) => {
+                  setData(unmask(text));
+                  if (onChangeValue) {
+                    onChangeValue(unmask(data));
+                  }
+                }}
               />
+              {customType === 'search_input' && (
+                <Box>
+                  <Button
+                    onPress={() => {
+                      if (onSubmitedValues) {
+                        onSubmitedValues(unmask(data));
+                      }
+                    }}
+                  >
+                    <Icon as={SearchIcon} />
+                  </Button>
+                </Box>
+              )}
             </Input>
+
+            <FormControlHelper>
+              <FormControlHelperText>
+                Must be atleast 6 characters.
+              </FormControlHelperText>
+            </FormControlHelper>
+
+            <FormControlError>
+              <FormControlErrorIcon as={AlertCircleIcon} />
+              <FormControlErrorText>{error}</FormControlErrorText>
+            </FormControlError>
+          </FormControl>
+        </>
+      );
+      break;
+    case 'telefone':
+      return (
+        <Box gap="$5">
+          <FormControl
+            isInvalid={false}
+            size={'md'}
+            isDisabled={false}
+            isRequired={true}
+          >
+            <FormControlLabel>
+              <FormControlLabelText>Tipo de Telefone</FormControlLabelText>
+            </FormControlLabel>
+            <Select
+              onValueChange={(text) =>
+                setTelefoneType(text as 'fixo' | 'movel')
+              }
+              isInvalid={false}
+              isDisabled={false}
+            >
+              <SelectTrigger size={'lg'} variant={'rounded'}>
+                <SelectInput placeholder="Select option" />
+                <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
+              </SelectTrigger>
+              <SelectPortal>
+                <SelectBackdrop />
+                <SelectContent>
+                  <SelectDragIndicatorWrapper>
+                    <SelectDragIndicator />
+                  </SelectDragIndicatorWrapper>
+                  <SelectItem
+                    label="Residencial"
+                    value="fixo"
+                    isPressed={telefoneType === 'fixo'}
+                  />
+                  <SelectItem
+                    label="Celular"
+                    value="movel"
+                    isPressed={telefoneType === 'movel'}
+                  />
+                </SelectContent>
+              </SelectPortal>
+            </Select>
 
             <FormControlHelper>
               <FormControlHelperText>
@@ -207,12 +254,6 @@ const InputText: React.FC<IInputTextProps> = ({
               </FormControlErrorText>
             </FormControlError>
           </FormControl>
-        </>
-      );
-      break;
-    case 'telefone':
-      return (
-        <>
           <FormControl
             isInvalid={false}
             size={'md'}
@@ -224,10 +265,30 @@ const InputText: React.FC<IInputTextProps> = ({
             </FormControlLabel>
             <Input>
               <InputField
-                type="password"
-                defaultValue="12345"
-                placeholder="password"
+                type="text"
+                placeholder="+551199999-9999"
+                keyboardType="number-pad"
+                value={mask(data, 'telefone', telefoneType)}
+                onChangeText={(text) => {
+                  setData(unmask(mask(text, 'telefone', telefoneType)));
+                  if (onChangeValue) {
+                    onChangeValue(unmask(mask(text, 'telefone', telefoneType)));
+                  }
+                }}
               />
+              {customType === 'search_input' && (
+                <Box>
+                  <Button
+                    onPress={() => {
+                      if (onSubmitedValues) {
+                        onSubmitedValues(unmask(data));
+                      }
+                    }}
+                  >
+                    <Icon as={SearchIcon} />
+                  </Button>
+                </Box>
+              )}
             </Input>
 
             <FormControlHelper>
@@ -238,12 +299,10 @@ const InputText: React.FC<IInputTextProps> = ({
 
             <FormControlError>
               <FormControlErrorIcon as={AlertCircleIcon} />
-              <FormControlErrorText>
-                Atleast 6 characters are required.
-              </FormControlErrorText>
+              <FormControlErrorText>{error}</FormControlErrorText>
             </FormControlError>
           </FormControl>
-        </>
+        </Box>
       );
     case 'money':
       return (
@@ -308,9 +367,7 @@ const InputText: React.FC<IInputTextProps> = ({
 
             <FormControlError>
               <FormControlErrorIcon as={AlertCircleIcon} />
-              <FormControlErrorText>
-                Atleast 6 characters are required.
-              </FormControlErrorText>
+              <FormControlErrorText>{error}</FormControlErrorText>
             </FormControlError>
           </FormControl>
         </>

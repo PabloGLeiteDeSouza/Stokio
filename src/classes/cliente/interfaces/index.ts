@@ -1,19 +1,41 @@
-export interface IClienteCreate {
+export interface IPessoaCreate {
+  id?: string;
   nome: string;
-  dataDeNascimento: string;
   cpf: string;
+  data_nascimento: string;
+}
+
+export interface ISimpleCliente {
+  id: string;
+  id_pessoa: string;
+  id_endereco: string;
+  limite: string;
+}
+
+export interface IPessoaUpdate {
+  id: string;
+  nome: string;
+  cpf: string;
+  data_nascimento: string;
+}
+
+export interface IClienteSimpleRequest {
+  id: string;
+  pessoa: IPessoaCreate;
+  limite: string;
+}
+
+export interface IClienteCreate {
+  pessoa: IPessoaCreate;
   endereco: IEndereco;
-  limite: number;
+  limite: string;
   emails: IEmail[];
   telefones: ITelefone[];
 }
 
 export interface IClienteUpdate {
   id: number;
-  idPessoa: number;
-  nome: string;
-  dataDeNascimento: string;
-  cpf: string;
+  pessoa: IPessoaUpdate;
   endereco: IEnderecoUpdate;
   limite: number;
   emails: IEmailUpdate[];

@@ -40,15 +40,6 @@ export class ClienteService {
     );
 
     if (pessoaExistente) {
-      const clienteExistente = await this.db.getFirstAsync<{ id: number }>(
-        'SELECT cliente.id FROM cliente INNER JOIN pessoa_cliente ON pessoa_cliente.id_cliente = cliente.id WHERE pessoa_cliente.id_pessoa = $id_pessoa',
-        { $id_pessoa: pessoaExistente.id },
-      );
-
-      if (clienteExistente) {
-        throw new Error('Cliente já cadastrado!');
-      }
-
       return pessoaExistente.id;
     }
 

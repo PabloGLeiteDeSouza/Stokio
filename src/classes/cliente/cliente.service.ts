@@ -1,15 +1,17 @@
 import { SQLiteDatabase } from 'expo-sqlite';
 import {
   IClienteCreate,
+  IClienteSimpleRequest,
   IClienteUpdate,
   IEmail,
   IEmailUpdate,
   IEndereco,
   IEnderecoUpdate,
+  IPessoaUpdate,
+  ISimpleCliente,
   ITelefone,
   ITelefoneUpdate,
 } from './interfaces';
-import { ClienteObject } from '@/types/screens/cliente';
 
 export class ClienteService {
   private db: SQLiteDatabase;
@@ -20,7 +22,9 @@ export class ClienteService {
 
   async create(data: IClienteCreate): Promise<void> {
     try {
-      const idPessoa = await this.createOrFetchPessoa(data);
+      const idPessoa = data.pessoa.id
+        ? Number(data.pessoa.id)
+        : await this.createOrFetchPessoa(data);
       const idEndereco = await this.createEndereco(data.endereco);
       const idCliente = await this.createCliente(
         data.limite,
@@ -37,28 +41,19 @@ export class ClienteService {
   private async createOrFetchPessoa(data: IClienteCreate): Promise<number> {
     const pessoaExistente = await this.db.getFirstAsync<{ id: number }>(
       'SELECT id FROM pessoa WHERE cpf = $cpf',
-      { $cpf: data.cpf },
+      { $cpf: data.pessoa.cpf },
     );
 
     if (pessoaExistente) {
-      const clienteExistente = await this.db.getFirstAsync<{ id: number }>(
-        'SELECT cliente.id FROM cliente INNER JOIN pessoa_cliente ON pessoa_cliente.id_cliente = cliente.id WHERE pessoa_cliente.id_pessoa = $id_pessoa',
-        { $id_pessoa: pessoaExistente.id },
-      );
-
-      if (clienteExistente) {
-        throw new Error('Cliente já cadastrado!');
-      }
-
       return pessoaExistente.id;
     }
 
     const res = await this.db.runAsync(
       'INSERT INTO pessoa (nome, data_de_nascimento, cpf) VALUES ($nome, $data_de_nascimento, $cpf)',
       {
-        $nome: data.nome,
-        $data_de_nascimento: data.dataDeNascimento,
-        $cpf: data.cpf,
+        $nome: data.pessoa.nome,
+        $data_de_nascimento: data.pessoa.data_nascimento,
+        $cpf: data.pessoa.cpf,
       },
     );
 
@@ -91,7 +86,7 @@ export class ClienteService {
   }
 
   private async createCliente(
-    limite: number,
+    limite: string,
     idEndereco: number,
     id_pessoa: number,
   ): Promise<number> {
@@ -168,7 +163,7 @@ export class ClienteService {
   async update(data: IClienteUpdate): Promise<void> {
     try {
       await this.updateCliente(data);
-      await this.updatePessoa(data);
+      await this.updatePessoa(data.pessoa);
       await this.updateEndereco(data.endereco);
       await this.updateEmails(data.emails);
       await this.updateTelefones(data.telefones);
@@ -192,14 +187,14 @@ export class ClienteService {
     }
   }
 
-  private async updatePessoa(data: IClienteUpdate): Promise<void> {
+  private async updatePessoa(data: IPessoaUpdate): Promise<void> {
     const res = await this.db.runAsync(
       'UPDATE pessoa SET nome = $nome, data_de_nascimento = $data_de_nascimento, cpf = $cpf WHERE id = $id',
       {
         $nome: data.nome,
-        $data_de_nascimento: data.dataDeNascimento,
+        $data_de_nascimento: data.data_nascimento,
         $cpf: data.cpf,
-        $id: data.idPessoa,
+        $id: data.id,
       },
     );
 
@@ -288,9 +283,9 @@ export class ClienteService {
   }
 
   // Consultas personalizadas
-  async findClienteByName(nome: string): Promise<Array<unknown>> {
+  async findClienteByName(nome: string): Promise<IClienteSimpleRequest[]> {
     try {
-      const result = await this.db.getAllAsync(
+      const result = await this.db.getAllAsync<IClienteSimpleRequest>(
         `SELECT * FROM cliente 
          INNER JOIN pessoa ON cliente.id_pessoa = pessoa.id 
          WHERE pessoa.nome LIKE '%' || $nome || '%'`,
@@ -304,12 +299,12 @@ export class ClienteService {
     }
   }
 
-  async findClienteByCPF(cpf: string): Promise<unknown> {
+  async findAllClienteByCPF(cpf: string): Promise<IClienteSimpleRequest[]> {
     try {
-      const result = await this.db.getAllAsync(
+      const result = await this.db.getAllAsync<IClienteSimpleRequest>(
         `SELECT * FROM cliente 
          INNER JOIN pessoa ON cliente.id_pessoa = pessoa.id 
-         WHERE pessoa.cpf = $cpf`,
+         WHERE pessoa.cpf LIKE '%' || $cpf || '%'`,
         { $cpf: cpf },
       );
       return result;
@@ -320,11 +315,30 @@ export class ClienteService {
     }
   }
 
+  async findFirstClienteByCPF(cpf: string): Promise<IClienteSimpleRequest> {
+    try {
+      const result = await this.db.getFirstAsync<IClienteSimpleRequest>(
+        `SELECT * FROM cliente 
+         INNER JOIN pessoa ON cliente.id_pessoa = pessoa.id 
+         WHERE pessoa.cpf = $cpf`,
+        { $cpf: cpf },
+      );
+      if (!result) {
+        throw new Error('CPF não encontrado!');
+      }
+      return result;
+    } catch (error) {
+      throw new Error(
+        `Erro ao buscar cliente por CPF: ${(error as Error).message}`,
+      );
+    }
+  }
+
   async findClienteByDataNascimento(
     dataDeNascimento: string,
-  ): Promise<unknown> {
+  ): Promise<IClienteSimpleRequest[]> {
     try {
-      const result = await this.db.getAllAsync(
+      const result = await this.db.getAllAsync<IClienteSimpleRequest>(
         `SELECT * FROM cliente 
          INNER JOIN pessoa ON cliente.id_pessoa = pessoa.id 
          WHERE pessoa.data_de_nascimento = $dataDeNascimento`,
@@ -338,9 +352,9 @@ export class ClienteService {
     }
   }
 
-  async findAllClientes(): Promise<Array<ClienteObject>> {
+  async findAllClientes(): Promise<IClienteSimpleRequest[]> {
     try {
-      const result = await this.db.getAllAsync(
+      const result = await this.db.getAllAsync<IClienteSimpleRequest>(
         `SELECT cliente.*, pessoa.nome, pessoa.cpf, pessoa.data_de_nascimento
          FROM cliente
          INNER JOIN pessoa ON cliente.id_pessoa = pessoa.id`,
@@ -350,6 +364,66 @@ export class ClienteService {
       throw new Error(
         `Erro ao buscar todos os clientes: ${(error as Error).message}`,
       );
+    }
+  }
+
+  async findClienteById(id: string) {
+    try {
+      const cliente = await this.db.getFirstAsync<ISimpleCliente>(
+        `
+        SELECT * FROM cliente WHERE id = $id`,
+        { $id: id },
+      );
+      if (!cliente) {
+        throw new Error('Cliente não encontrado!');
+      }
+      const pessoa = await this.db.getFirstAsync<IPessoaUpdate>(
+        `
+        SELECT * FROM pessoa WHERE id == $id`,
+        { $id: cliente.id_pessoa },
+      );
+      if (!pessoa) {
+        throw new Error('Pessoa não encontrada!');
+      }
+      const endereco = await this.db.getFirstAsync<IEndereco>(
+        `SELECT * FROM endereco WHERE id = $id `,
+        { $id: cliente.id_endereco },
+      );
+      if (!endereco) {
+        throw new Error('Endereço do cliente não encontrado!');
+      }
+      const telefones = await this.db.getAllAsync<ITelefone>(
+        `SELECT telefone.*
+        WHERE telefone
+        INNER JOIN cliente_telefone as ct ON ct.id_telefone == telefone.id
+        INNER JOIN cliente ON cliente.id === ct.id_cliente
+        WHERE cliente.id == $id`,
+        { $id: cliente.id },
+      );
+      if (telefones.length < 1) {
+        throw new Error('Nenhum telefone para o cliente foi encontrado!');
+      }
+      const emails = await this.db.getAllAsync<IEmail>(
+        `
+        SELECT email.*
+        FROM email
+        INNER JOIN cliente_email as ce ON ce.id_email == email.id
+        INNER JOIN cliente ON cliente.id == ce.id_cliente
+        WHERE cliente.id == $id`,
+        { $id: cliente.id },
+      );
+      if (emails.length < 1) {
+        throw new Error('Nenhum e-mail para o cliente foi encontrado!');
+      }
+      return {
+        ...cliente,
+        pessoa,
+        endereco,
+        telefones,
+        emails,
+      };
+    } catch (error) {
+      throw new Error(`Erro ao buscar o cliente: ${(error as Error).message}`);
     }
   }
 }
