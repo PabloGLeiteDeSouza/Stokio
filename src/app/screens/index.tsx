@@ -6,6 +6,7 @@ import ConfigScreens from './config';
 import ClienteScreens from './cliente';
 import { FontAwesome6, Ionicons } from '@expo/vector-icons';
 import ProdutoScreens from './produto';
+import ComprasScreens from './compras';
 
 const Tab = createBottomTabNavigator();
 
@@ -50,6 +51,17 @@ const Screens: React.FC = () => {
           ),
           headerShown: false,
           title: 'Vendas',
+        }}
+      />
+      <Tab.Screen
+        name="screens-compras"
+        component={ComprasScreens}
+        options={{
+          tabBarIcon: (props) => (
+            <FontAwesome6 name="basket-shopping" {...props} />
+          ),
+          headerShown: false,
+          title: 'Compras',
         }}
       />
       <Tab.Screen

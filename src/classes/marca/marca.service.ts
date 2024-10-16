@@ -1,3 +1,1 @@
-export default class MarcaService {
-
-}
+export default class MarcaService {}

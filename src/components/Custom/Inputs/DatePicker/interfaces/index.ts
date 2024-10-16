@@ -5,4 +5,5 @@ export interface IInputDatePicker {
   error?: FormikErrors<Date>;
   value: Date;
   onChangeDate: (value: string) => void;
+  maximumDate?: Date;
 }

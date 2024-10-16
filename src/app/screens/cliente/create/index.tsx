@@ -266,6 +266,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                         error={errors.pessoa?.data_nascimento}
                         onChangeDate={handleChange('pessoa.data_nascimento')}
                         value={values.pessoa.data_nascimento}
+                        maximumDate={values.pessoa.data_nascimento}
                       />
                       <InputText
                         isRequired={true}

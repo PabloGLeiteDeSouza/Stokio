@@ -69,7 +69,21 @@ const InputDatePicker: React.FC<IInputDatePicker> = ({
   value,
   onChangeDate,
   error,
+  maximumDate,
 }) => {
+
+  const startPicker = () => {
+    DateTimePickerAndroid.open({
+      maximumDate: maximumDate,
+      value: value ? new Date(value) : new Date(),
+      onChange: (event, selectedDate) => {
+        if (selectedDate) {
+          onChangeDate(String(selectedDate));
+        }
+      },
+      mode: 'date',
+    });
+  };
   return (
     <>
       <FormControl
@@ -89,20 +103,7 @@ const InputDatePicker: React.FC<IInputDatePicker> = ({
             placeholder="01/01/1999"
             value={new Date(value).toLocaleDateString()}
           />
-          <Button
-            onPress={() => {
-              DateTimePickerAndroid.open({
-                maximumDate: getMinDateFor18YearsOld(),
-                value: getMinDateFor18YearsOld(),
-                onChange: (event, selectedDate) => {
-                  if (selectedDate) {
-                    onChangeDate(String(selectedDate));
-                  }
-                },
-                mode: 'date',
-              });
-            }}
-          >
+          <Button onPress={startPicker}>
             <ButtonIcon as={CalendarDaysIcon} />
           </Button>
         </Input>

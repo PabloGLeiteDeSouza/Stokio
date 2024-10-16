@@ -135,11 +135,7 @@ const Details: React.FC<DetalhesClienteScreen> = ({ navigation, route }) => {
             </Box>
             <Box gap="$5">
               <Button
-                onPress={() =>
-                  navigation?.navigate('atualizar-cliente', {
-                    
-                  })
-                }
+                onPress={() => navigation?.navigate('atualizar-cliente', {})}
               >
                 <ButtonText>Editar</ButtonText>
               </Button>
