@@ -16,8 +16,17 @@ import {
 } from '@gluestack-ui/themed';
 import { Box, Heading, ScrollView, VStack } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
-import { GestureResponderEvent } from 'react-native';
-const Update: React.FC = () => {
+import { Alert, GestureResponderEvent } from 'react-native';
+import UmService from '@/classes/um/um.service';
+import { useSQLiteContext } from 'expo-sqlite';
+import { AtualizarUmScreen } from '@/interfaces/um';
+const Update: React.FC<AtualizarUmScreen> = ({ navigation, route }) => {
+  const db = useSQLiteContext();
+  if (!route || !route.params || !route.params.um) {
+    navigation?.goBack();
+    return null;
+  }
+  const um = route.params.um;
   return (
     <Box h="$full" w="$full" px="$8" py="$8">
       <ScrollView w="$full">
@@ -26,17 +35,26 @@ const Update: React.FC = () => {
             <Heading size="xl">Atualizar Unidade de Medida:</Heading>
           </Box>
           <Formik
-            initialValues={{
-              id: '',
-              nome: '',
+            initialValues={um}
+            onSubmit={async (values) => {
+              try {
+                await new UmService(db).update(values);
+                Alert.alert(
+                  'Sucesso',
+                  'Unidade de Medida atualizada com sucesso!',
+                );
+                navigation?.goBack();
+              } catch (error) {
+                Alert.alert('Erro', (error as Error).message);
+                throw error;
+              }
             }}
-            onSubmit={() => {}}
           >
             {({ handleChange, handleSubmit, values, errors }) => {
               return (
                 <Box gap="$8">
                   <FormControl
-                    isInvalid={false}
+                    isInvalid={errors.nome ? true : false}
                     size={'md'}
                     isDisabled={false}
                     isRequired={true}
@@ -62,6 +80,37 @@ const Update: React.FC = () => {
                     <FormControlError>
                       <FormControlErrorIcon as={AlertCircleIcon} />
                       <FormControlErrorText>{errors.nome}</FormControlErrorText>
+                    </FormControlError>
+                  </FormControl>
+                  <FormControl
+                    isInvalid={errors.valor ? true : false}
+                    size={'md'}
+                    isDisabled={false}
+                    isRequired={true}
+                  >
+                    <FormControlLabel>
+                      <FormControlLabelText>Valor</FormControlLabelText>
+                    </FormControlLabel>
+                    <Input>
+                      <InputField
+                        type="text"
+                        value={values.valor}
+                        placeholder="cm"
+                        onChangeText={handleChange('valor')}
+                      />
+                    </Input>
+
+                    <FormControlHelper>
+                      <FormControlHelperText>
+                        Informe um valor para unidade de medida.
+                      </FormControlHelperText>
+                    </FormControlHelper>
+
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        {errors.valor}
+                      </FormControlErrorText>
                     </FormControlError>
                   </FormControl>
                   <Box>

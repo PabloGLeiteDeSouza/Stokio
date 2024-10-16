@@ -74,11 +74,18 @@ import { Alert, ListRenderItem } from 'react-native';
 import { ClienteObject, ClientFlatList } from './types';
 import { useSQLiteContext } from 'expo-sqlite';
 import { ClienteService } from '@/classes/cliente/cliente.service';
+import { useIsFocused } from '@react-navigation/native';
+import LoadingScreen from '@/components/LoadingScreen';
+import { IClienteSimpleRequest } from '@/classes/cliente/interfaces';
+import { mask } from '@/utils/mask';
 
 const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
-  const [clientes, setClientes] = React.useState<Array<ClienteObject>>([]);
+  const [clientes, setClientes] = React.useState<Array<IClienteSimpleRequest>>(
+    [],
+  );
   const [isLoading, setIsLoading] = React.useState(true);
   const db = useSQLiteContext();
+  const focused = useIsFocused();
 
   const FlatListClient = FlatList as ClientFlatList;
 
@@ -94,18 +101,31 @@ const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
       }
     }
     start();
-  }, []);
+  }, [focused]);
 
-  const ListRenderCliente: ListRenderItem<ClienteObject> = ({ item }) => {
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
+  const ListRenderCliente: ListRenderItem<IClienteSimpleRequest> = ({
+    item,
+  }) => {
     return (
       <Card size="md" variant="elevated" m="$3">
         <HStack justifyContent="space-between">
-          <Box w="$2/3">
-            <Heading mb="$1" size="md">
-              {item.nome}
-            </Heading>
-            <Text size="sm">{item.data_nascimento}</Text>
-            <Text size="sm">{item.cpf}</Text>
+          <Box w="$2/3" gap="$1.5">
+            <Heading size="md">Nome</Heading>
+            <Text size="sm">{item.nome}</Text>
+            <Heading>Data de nascimento</Heading>
+            <Text size="sm">
+              {Intl.DateTimeFormat('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+              }).format(new Date(item.data_nascimento))}
+            </Text>
+            <Heading size="md">CPF</Heading>
+            <Text size="sm">{mask(item.cpf, 'cpf')}</Text>
           </Box>
           <Box gap="$5">
             <Button

@@ -1,3 +1,4 @@
+import { IClienteSimpleRequest } from '@/classes/cliente/interfaces';
 import { ViewStyle } from '@expo/html-elements/build/primitives/View';
 import { StyledComponentProps } from '@gluestack-style/react/lib/typescript/types';
 import { FlatList, FlatListProps, StyleProp } from 'react-native';
@@ -33,8 +34,8 @@ export type ClienteObject = {
 export type ClientFlatList = React.ForwardRefExoticComponent<
   StyledComponentProps<
     StyleProp<ViewStyle>,
-    Cliente,
-    FlatListProps<Cliente>,
+    IClienteSimpleRequest,
+    FlatListProps<IClienteSimpleRequest>,
     'FlatList',
     typeof FlatList
   >

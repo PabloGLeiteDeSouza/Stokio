@@ -12,6 +12,7 @@ import {
   ITelefone,
   ITelefoneUpdate,
 } from './interfaces';
+import { Pessoa } from '@/types/screens/cliente';
 
 export class ClienteService {
   private db: SQLiteDatabase;
@@ -49,10 +50,10 @@ export class ClienteService {
     }
 
     const res = await this.db.runAsync(
-      'INSERT INTO pessoa (nome, data_de_nascimento, cpf) VALUES ($nome, $data_de_nascimento, $cpf)',
+      'INSERT INTO pessoa (nome, data_nascimento, cpf) VALUES ($nome, $data_nascimento, $cpf)',
       {
         $nome: data.pessoa.nome,
-        $data_de_nascimento: data.pessoa.data_nascimento,
+        $data_nascimento: data.pessoa.data_nascimento,
         $cpf: data.pessoa.cpf,
       },
     );
@@ -189,10 +190,10 @@ export class ClienteService {
 
   private async updatePessoa(data: IPessoaUpdate): Promise<void> {
     const res = await this.db.runAsync(
-      'UPDATE pessoa SET nome = $nome, data_de_nascimento = $data_de_nascimento, cpf = $cpf WHERE id = $id',
+      'UPDATE pessoa SET nome = $nome, data_nascimento = $data_nascimento, cpf = $cpf WHERE id = $id',
       {
         $nome: data.nome,
-        $data_de_nascimento: data.data_nascimento,
+        $data_nascimento: data.data_nascimento,
         $cpf: data.cpf,
         $id: data.id,
       },
@@ -341,7 +342,7 @@ export class ClienteService {
       const result = await this.db.getAllAsync<IClienteSimpleRequest>(
         `SELECT * FROM cliente 
          INNER JOIN pessoa ON cliente.id_pessoa = pessoa.id 
-         WHERE pessoa.data_de_nascimento = $dataDeNascimento`,
+         WHERE pessoa.data_nascimento = $dataDeNascimento`,
         { $dataDeNascimento: dataDeNascimento },
       );
       return result;
@@ -355,7 +356,7 @@ export class ClienteService {
   async findAllClientes(): Promise<IClienteSimpleRequest[]> {
     try {
       const result = await this.db.getAllAsync<IClienteSimpleRequest>(
-        `SELECT cliente.*, pessoa.nome, pessoa.cpf, pessoa.data_de_nascimento
+        `SELECT cliente.*, pessoa.nome, pessoa.cpf, pessoa.data_nascimento as data_nascimento
          FROM cliente
          INNER JOIN pessoa ON cliente.id_pessoa = pessoa.id`,
       );
@@ -370,13 +371,13 @@ export class ClienteService {
   async findClienteById(id: string) {
     try {
       const cliente = await this.db.getFirstAsync<ISimpleCliente>(
-        `
-        SELECT * FROM cliente WHERE id = $id`,
+        `SELECT * FROM cliente WHERE id = $id`,
         { $id: id },
       );
       if (!cliente) {
         throw new Error('Cliente não encontrado!');
       }
+
       const pessoa = await this.db.getFirstAsync<IPessoaUpdate>(
         `
         SELECT * FROM pessoa WHERE id == $id`,
@@ -385,25 +386,25 @@ export class ClienteService {
       if (!pessoa) {
         throw new Error('Pessoa não encontrada!');
       }
-      const endereco = await this.db.getFirstAsync<IEndereco>(
+      const endereco = await this.db.getFirstAsync<IEnderecoUpdate>(
         `SELECT * FROM endereco WHERE id = $id `,
         { $id: cliente.id_endereco },
       );
       if (!endereco) {
         throw new Error('Endereço do cliente não encontrado!');
       }
-      const telefones = await this.db.getAllAsync<ITelefone>(
+      const telefones = await this.db.getAllAsync<ITelefoneUpdate>(
         `SELECT telefone.*
-        WHERE telefone
+        FROM telefone
         INNER JOIN cliente_telefone as ct ON ct.id_telefone == telefone.id
-        INNER JOIN cliente ON cliente.id === ct.id_cliente
+        INNER JOIN cliente ON cliente.id == ct.id_cliente
         WHERE cliente.id == $id`,
         { $id: cliente.id },
       );
       if (telefones.length < 1) {
         throw new Error('Nenhum telefone para o cliente foi encontrado!');
       }
-      const emails = await this.db.getAllAsync<IEmail>(
+      const emails = await this.db.getAllAsync<IEmailUpdate>(
         `
         SELECT email.*
         FROM email
@@ -424,6 +425,20 @@ export class ClienteService {
       };
     } catch (error) {
       throw new Error(`Erro ao buscar o cliente: ${(error as Error).message}`);
+    }
+  }
+
+  async findAllPessoas() {
+    try {
+      const data = await this.db.getAllAsync<Pessoa>(
+        'SELECT * FROM pessoa INNER JOIN cliente ON cliente.id_pessoa != pessoa.id',
+      );
+      if (data.length < 1) {
+        throw new Error('Nenhuma pessoa foi encontrada!');
+      }
+      return data;
+    } catch (error) {
+      throw new Error('Erro ao buscar pessoas: ' + (error as Error).message);
     }
   }
 }

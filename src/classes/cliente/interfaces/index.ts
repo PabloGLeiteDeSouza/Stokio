@@ -7,9 +7,9 @@ export interface IPessoaCreate {
 
 export interface ISimpleCliente {
   id: string;
+  limite: string;
   id_pessoa: string;
   id_endereco: string;
-  limite: string;
 }
 
 export interface IPessoaUpdate {
@@ -21,8 +21,12 @@ export interface IPessoaUpdate {
 
 export interface IClienteSimpleRequest {
   id: string;
-  pessoa: IPessoaCreate;
+  nome: string;
+  cpf: string;
+  data_nascimento: string;
   limite: string;
+  id_pessoa: string;
+  id_endereco: string;
 }
 
 export interface IClienteCreate {

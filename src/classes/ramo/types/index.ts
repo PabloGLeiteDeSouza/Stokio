@@ -1,15 +1,13 @@
 export interface RamoCreateData {
   nome: string;
-  descricao?: string;
 }
 
 export interface RamoUpdateData {
+  id: string;
   nome: string;
-  descricao?: string;
 }
 
 export interface RamoObject {
-  id: number;
+  id: string;
   nome: string;
-  descricao: string | null;
 }

@@ -2,7 +2,7 @@ import { RamoCreateData, RamoUpdateData, RamoObject } from '../types';
 
 export interface IRamoService {
   create(data: RamoCreateData): Promise<number>;
-  update(id: number, data: RamoUpdateData): Promise<void>;
+  update(data: RamoUpdateData): Promise<void>;
   findById(id: number): Promise<RamoObject | null>;
   findAll(): Promise<RamoObject[]>;
   delete(id: number): Promise<void>;
