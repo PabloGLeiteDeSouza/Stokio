@@ -50,6 +50,7 @@ import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
 import InputText from '@/components/Input';
 import SelectEstados from '@/components/Custom/Selects/SelectEstados';
 import formatDate from '@/utils/formatDate';
+import { getMinDateFor18YearsOld } from '@/utils';
 
 const validationSchema = Yup.object().shape({
   pessoa: Yup.object().shape({
@@ -57,32 +58,42 @@ const validationSchema = Yup.object().shape({
     nome: Yup.string().when('pessoa.id', (id_pessoa, schema) =>
       id_pessoa ? schema.required('Nome é obrigatório') : schema,
     ),
-    data_nascimento: Yup.date().when('pessoa.id', (id_pessoa, schema) =>
-      id_pessoa ? schema.required('Data de nascimento é obrigatória') : schema,
-    ),
+    data_nascimento: Yup.date().when('pessoa.id', {
+      is: (id_pessoa: string) => id_pessoa !== '',
+      then: (yup) => yup.required('Data de nascimento e obrigatorio'),
+    }),
     cpf: Yup.string().when('pessoa.id', (id_pessoa, schema) =>
       id_pessoa ? schema.required('CPF é obrigatório') : schema,
     ),
   }),
-  telefones: Yup.array().of(
-    Yup.object().shape({
-      numero: Yup.string().required('Número de telefone é obrigatório'),
-    }),
-  ),
   endereco: Yup.object().shape({
     cep: Yup.string().required('CEP é obrigatório'),
-    logradouto: Yup.string().required('Logradouto é obrigatório'),
+    logradouro: Yup.string().required('Logradouro é obrigatório'),
     numero: Yup.string().required('Número é obrigatório'),
-    complemento: Yup.string().required('Complemento é obrigatório'),
+    complemento: Yup.string(),
     bairro: Yup.string().required('Bairro é obrigatório'),
     cidade: Yup.string().required('Cidade é obrigatória'),
     uf: Yup.string().required('UF é obrigatório'),
   }),
-  email: Yup.array().of(
-    Yup.object().shape({
-      endereco: Yup.string().required('Endereço de email é obrigatório'),
-    }),
-  ),
+  telefones: Yup.array()
+    .of(
+      Yup.object().shape({
+        numero: Yup.string()
+          .required('Número de telefone é obrigatório')
+          .min(12, 'Número de telefone deve ter no mínimo 12 caracteres'),
+      }),
+    )
+    .min(1, 'É necessário informar ao menos um telefone'), // Adiciona uma validação para garantir ao menos um telefone
+
+  emails: Yup.array()
+    .of(
+      Yup.object().shape({
+        endereco: Yup.string()
+          .required('Endereço de email é obrigatório')
+          .email('Endereço de email inválido'),
+      }),
+    )
+    .min(1, 'É necessário informar ao menos um email'),
   limite: Yup.string().required('Limite é obrigatório'),
 });
 
@@ -146,7 +157,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                   id: '',
                   nome: '',
                   cpf: '',
-                  data_nascimento: new Date(),
+                  data_nascimento: getMinDateFor18YearsOld(),
                 },
                 telefones: [
                   {
@@ -172,7 +183,6 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
               onSubmit={async (values) => {
                 try {
                   const { pessoa, ...valores } = values;
-                  console.log('foi');
                   await new ClienteService(db).create({
                     pessoa: {
                       ...pessoa,
@@ -180,7 +190,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                     },
                     ...valores,
                   });
-                  navigation?.navigate('screens-clientes');
+                  navigation?.goBack();
                 } catch (error) {
                   Alert.alert('erro', (error as Error).message);
                   throw error;
@@ -202,7 +212,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                   ) {
                     return errors.telefones[i].numero;
                   } else {
-                    return '';
+                    return undefined;
                   }
                 };
 
@@ -214,14 +224,14 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                   ) {
                     return errors.emails[i].endereco;
                   } else {
-                    return '';
+                    return undefined;
                   }
                 };
                 return (
                   <Box gap="$5">
                     <>
                       <FormControl
-                        isInvalid={false}
+                        isInvalid={errors.pessoa?.nome ? true : false}
                         size={'md'}
                         isDisabled={false}
                         isRequired={true}
@@ -234,6 +244,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                             type="text"
                             placeholder="Nome Completo do Clinente"
                             onChangeText={handleChange('pessoa.nome')}
+                            value={values.pessoa.nome}
                           />
                         </Input>
 
@@ -258,6 +269,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                       />
                       <InputText
                         isRequired={true}
+                        isInvalid={errors.pessoa?.cpf ? true : false}
                         inputType="cpf"
                         value={values.pessoa.cpf}
                         onChangeValue={handleChange('pessoa.cpf')}
@@ -265,13 +277,14 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                       />
                       <InputText
                         isRequired={true}
+                        isInvalid={errors.endereco?.cep ? true : false}
                         inputType="cep"
                         onChangeValue={handleChange('endereco.cep')}
                         value={values.endereco.cep}
                         error={errors.endereco?.cep}
                       />
                       <FormControl
-                        isInvalid={values.endereco.logradouro ? true : false}
+                        isInvalid={errors.endereco?.logradouro ? true : false}
                         size={'md'}
                         isDisabled={false}
                         isRequired={true}
@@ -298,12 +311,12 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                         <FormControlError>
                           <FormControlErrorIcon as={AlertCircleIcon} />
                           <FormControlErrorText>
-                           {errors.endereco?.logradouro}
+                            {errors.endereco?.logradouro}
                           </FormControlErrorText>
                         </FormControlError>
                       </FormControl>
                       <FormControl
-                        isInvalid={false}
+                        isInvalid={errors.endereco?.numero ? true : false}
                         size={'md'}
                         isDisabled={false}
                         isRequired={true}
@@ -329,15 +342,15 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                         <FormControlError>
                           <FormControlErrorIcon as={AlertCircleIcon} />
                           <FormControlErrorText>
-                            Atleast 6 characters are required.
+                            {errors.endereco?.numero}
                           </FormControlErrorText>
                         </FormControlError>
                       </FormControl>
                       <FormControl
-                        isInvalid={false}
+                        isInvalid={errors.endereco?.complemento ? true : false}
                         size={'md'}
                         isDisabled={false}
-                        isRequired={true}
+                        isRequired={false}
                       >
                         <FormControlLabel>
                           <FormControlLabelText>
@@ -362,12 +375,12 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                         <FormControlError>
                           <FormControlErrorIcon as={AlertCircleIcon} />
                           <FormControlErrorText>
-                            Atleast 6 characters are required.
+                            {errors.endereco?.complemento}
                           </FormControlErrorText>
                         </FormControlError>
                       </FormControl>
                       <FormControl
-                        isInvalid={false}
+                        isInvalid={errors.endereco?.bairro ? true : false}
                         size={'md'}
                         isDisabled={false}
                         isRequired={true}
@@ -392,12 +405,12 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                         <FormControlError>
                           <FormControlErrorIcon as={AlertCircleIcon} />
                           <FormControlErrorText>
-                            Atleast 6 characters are required.
+                            {errors.endereco?.bairro}
                           </FormControlErrorText>
                         </FormControlError>
                       </FormControl>
                       <FormControl
-                        isInvalid={false}
+                        isInvalid={errors.endereco?.cidade ? true : false}
                         size={'md'}
                         isDisabled={false}
                         isRequired={true}
@@ -422,11 +435,14 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                         <FormControlError>
                           <FormControlErrorIcon as={AlertCircleIcon} />
                           <FormControlErrorText>
-                            Atleast 6 characters are required.
+                            {errors.endereco?.cidade}
                           </FormControlErrorText>
                         </FormControlError>
                       </FormControl>
                       <SelectEstados
+                        isRequired={true}
+                        isDisabled={false}
+                        isInvalid={errors.endereco?.uf ? true : false}
                         onChangeValue={handleChange('endereco.uf')}
                         value={values.endereco.uf}
                         error={errors.endereco?.uf}
@@ -436,6 +452,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                           return (
                             <Box key={`telefone-${i}`}>
                               <InputText
+                                isInvalid={ErrorsReturn(i) ? true : false}
                                 error={ErrorsReturn(i)}
                                 inputType="telefone"
                                 value={telefone.numero}
@@ -481,12 +498,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                           return (
                             <Box key={`email-${i}`}>
                               <FormControl
-                                isInvalid={
-                                  ErrorsReturnEmails(i) !== '' &&
-                                  typeof ErrorsReturnEmails(i) !== 'undefined'
-                                    ? true
-                                    : false
-                                }
+                                isInvalid={ErrorsReturnEmails(i) ? true : false}
                                 size={'md'}
                                 isDisabled={false}
                                 isRequired={true}
@@ -526,7 +538,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
 
                         <Button
                           onPress={() => {
-                            setFieldValue('email', [
+                            setFieldValue('emails', [
                               ...values.emails,
                               { endereco: '' },
                             ]);
@@ -538,7 +550,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                         <Button
                           onPress={() => {
                             if (values.emails.length > 1) {
-                              setFieldValue('email', [
+                              setFieldValue('emails', [
                                 ...values.emails.slice(0, -1),
                               ]);
                             } else {
@@ -589,13 +601,6 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                     </FormControl>
 
                     <Box gap="$5">
-                      <Button onPress={async () => {
-                          console.log(
-                            await db.getAllAsync(`SELECT * FROM sqlite_master WHERE type = 'table' AND name = 'endereco'`),
-                          );
-                      }}>
-                        <ButtonText>teste de envio</ButtonText>
-                      </Button>
                       <Button
                         onPress={
                           handleSubmit as unknown as (

@@ -71,11 +71,35 @@ import { EditIcon } from '@gluestack-ui/themed';
 import Ramos from './ramos.json';
 import { SearchIcon } from '@gluestack-ui/themed';
 import { Ramo, RamoFlatList } from '@/types/screens/ramo';
-import { ListRenderItem } from 'react-native';
+import { Alert, ListRenderItem } from 'react-native';
 import { VisualizarRamoScreen } from '@/interfaces/ramo';
+import { useIsFocused } from '@react-navigation/native';
+import { useSQLiteContext } from 'expo-sqlite';
+import { RamoService } from '@/classes/ramo/ramo.service';
+import LoadingScreen from '@/components/LoadingScreen';
 
 const View: React.FC<VisualizarRamoScreen> = ({ navigation }) => {
+  const db = useSQLiteContext();
   const [ramos, setRamos] = React.useState<Array<Ramo>>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const focused = useIsFocused();
+
+  async function start() {
+    try {
+      setIsLoading(true);
+      const rms = await new RamoService(db).findAll();
+      setRamos([...rms]);
+      setIsLoading(false);
+    } catch (error) {
+      Alert.alert('Error', (error as Error).message);
+      throw error;
+    }
+  }
+
+  React.useEffect(() => {
+    start();
+  }, [focused]);
+
   const FlatListRamo = FlatList as RamoFlatList;
   const ListRenderRamo: ListRenderItem<Ramo> = ({ item }) => {
     return (
@@ -89,7 +113,7 @@ const View: React.FC<VisualizarRamoScreen> = ({ navigation }) => {
           <Box gap="$5">
             <Button
               onPress={() =>
-                navigation?.navigate('atualizar-ramo', { id: String(item.id) })
+                navigation?.navigate('atualizar-ramo', { ramo: item })
               }
             >
               <ButtonIcon as={EditIcon} />
@@ -102,6 +126,10 @@ const View: React.FC<VisualizarRamoScreen> = ({ navigation }) => {
       </Card>
     );
   };
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return ramos.length < 1 ? (
     <Box h="$full" w="$full" alignItems="center" justifyContent="center">

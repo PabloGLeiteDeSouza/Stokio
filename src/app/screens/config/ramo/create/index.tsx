@@ -16,8 +16,12 @@ import {
 } from '@gluestack-ui/themed';
 import { Box, Heading, ScrollView, VStack } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
-import { GestureResponderEvent } from 'react-native';
-const Create: React.FC = () => {
+import { Alert, GestureResponderEvent } from 'react-native';
+import { RamoService } from '@/classes/ramo/ramo.service';
+import { useSQLiteContext } from 'expo-sqlite';
+import { CadastrarRamoScreen } from '@/interfaces/ramo';
+const Create: React.FC<CadastrarRamoScreen> = ({ navigation }) => {
+  const db = useSQLiteContext();
   return (
     <Box h="$full" w="$full" px="$8" py="$8">
       <ScrollView w="$full">
@@ -29,13 +33,22 @@ const Create: React.FC = () => {
             initialValues={{
               nome: '',
             }}
-            onSubmit={() => {}}
+            onSubmit={async (value) => {
+              try {
+                await new RamoService(db).create(value);
+                Alert.alert('Sucesso', 'Ramo criado com sucesso!');
+                navigation?.goBack();
+              } catch (error) {
+                Alert.alert('Error', (error as Error).message);
+                throw error;
+              }
+            }}
           >
             {({ handleChange, handleSubmit, values, errors }) => {
               return (
                 <Box gap="$8">
                   <FormControl
-                    isInvalid={false}
+                    isInvalid={errors.nome ? true : false}
                     size={'md'}
                     isDisabled={false}
                     isRequired={true}

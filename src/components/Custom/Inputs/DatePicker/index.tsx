@@ -62,6 +62,7 @@ import {
 } from '@gluestack-ui/themed';
 import { IInputDatePicker } from './interfaces';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+import { getMinDateFor18YearsOld } from '@/utils';
 
 const InputDatePicker: React.FC<IInputDatePicker> = ({
   title,
@@ -72,7 +73,7 @@ const InputDatePicker: React.FC<IInputDatePicker> = ({
   return (
     <>
       <FormControl
-        isInvalid={false}
+        isInvalid={typeof error != 'undefined' ? true : false}
         size={'md'}
         isDisabled={false}
         isRequired={true}
@@ -91,7 +92,8 @@ const InputDatePicker: React.FC<IInputDatePicker> = ({
           <Button
             onPress={() => {
               DateTimePickerAndroid.open({
-                value: new Date(value),
+                maximumDate: getMinDateFor18YearsOld(),
+                value: getMinDateFor18YearsOld(),
                 onChange: (event, selectedDate) => {
                   if (selectedDate) {
                     onChangeDate(String(selectedDate));

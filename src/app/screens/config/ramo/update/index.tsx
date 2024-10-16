@@ -16,8 +16,19 @@ import {
 } from '@gluestack-ui/themed';
 import { Box, Heading, ScrollView, VStack } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
-import { GestureResponderEvent } from 'react-native';
-const Update: React.FC = () => {
+import { Alert, GestureResponderEvent } from 'react-native';
+import { AtualizarRamoScreen } from '@/interfaces/ramo';
+import { useSQLiteContext } from 'expo-sqlite';
+import { RamoService } from '@/classes/ramo/ramo.service';
+const Update: React.FC<AtualizarRamoScreen> = ({ navigation, route }) => {
+  const db = useSQLiteContext();
+  if (!route || !route.params || !route.params.ramo) {
+    navigation?.goBack();
+    return null;
+  }
+
+  const ramo = route.params.ramo;
+
   return (
     <Box h="$full" w="$full" px="$8" py="$8">
       <ScrollView w="$full">
@@ -26,11 +37,17 @@ const Update: React.FC = () => {
             <Heading size="xl">Atualizar Ramo:</Heading>
           </Box>
           <Formik
-            initialValues={{
-              id: '',
-              nome: '',
+            initialValues={ramo}
+            onSubmit={async (values) => {
+              try {
+                await new RamoService(db).update(values);
+                Alert.alert('Sucesso', 'Ramo atualizado com sucesso!');
+                navigation?.goBack();
+              } catch (error) {
+                Alert.alert('Erro', (error as Error).message);
+                throw error;
+              }
             }}
-            onSubmit={() => {}}
           >
             {({ handleChange, handleSubmit, values, errors }) => {
               return (

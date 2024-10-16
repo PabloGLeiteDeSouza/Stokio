@@ -36,20 +36,23 @@ const InputText: React.FC<IInputTextProps> = ({
   customType,
   value,
   error,
+  isDisabled,
+  isInvalid,
+  isRequired,
 }) => {
   const [data, setData] = React.useState(value ? value : '');
-  const [telefoneType, setTelefoneType] = React.useState<
-    undefined | 'fixo' | 'movel'
-  >();
+  const [telefoneType, setTelefoneType] = React.useState<'fixo' | 'movel'>(
+    'movel',
+  );
   switch (inputType) {
     case 'cep':
       return (
         <>
           <FormControl
-            isInvalid={false}
+            isInvalid={isInvalid}
+            isDisabled={isDisabled}
+            isRequired={isRequired}
             size={'md'}
-            isDisabled={false}
-            isRequired={true}
           >
             <FormControlLabel>
               <FormControlLabelText>cep</FormControlLabelText>
@@ -61,9 +64,9 @@ const InputText: React.FC<IInputTextProps> = ({
                 keyboardType="number-pad"
                 value={mask(data, 'cep')}
                 onChangeText={(text) => {
-                  setData(unmask(text));
+                  setData(unmask(mask(text, 'cep')));
                   if (onChangeValue) {
-                    onChangeValue(unmask(text));
+                    onChangeValue(unmask(mask(text, 'cep')));
                   }
                 }}
               />
@@ -97,10 +100,10 @@ const InputText: React.FC<IInputTextProps> = ({
       return (
         <>
           <FormControl
-            isInvalid={false}
+            isInvalid={isInvalid}
+            isDisabled={isDisabled}
+            isRequired={isRequired}
             size={'md'}
-            isDisabled={false}
-            isRequired={true}
           >
             <FormControlLabel>
               <FormControlLabelText>cnpj</FormControlLabelText>
@@ -112,9 +115,9 @@ const InputText: React.FC<IInputTextProps> = ({
                 keyboardType="number-pad"
                 value={mask(data, 'cnpj')}
                 onChangeText={(text) => {
-                  setData(unmask(text));
+                  setData(unmask(mask(text, 'cnpj')));
                   if (onChangeValue) {
-                    onChangeValue(unmask(text));
+                    onChangeValue(unmask(mask(text, 'cnpj')));
                   }
                 }}
               />
@@ -148,10 +151,10 @@ const InputText: React.FC<IInputTextProps> = ({
       return (
         <>
           <FormControl
-            isInvalid={false}
+            isInvalid={isInvalid}
+            isDisabled={isDisabled}
+            isRequired={isRequired}
             size={'md'}
-            isDisabled={false}
-            isRequired={true}
           >
             <FormControlLabel>
               <FormControlLabelText>Cpf</FormControlLabelText>
@@ -163,9 +166,9 @@ const InputText: React.FC<IInputTextProps> = ({
                 keyboardType="number-pad"
                 value={mask(data, 'cpf')}
                 onChangeText={(text) => {
-                  setData(unmask(text));
+                  setData(unmask(mask(text, 'cpf')));
                   if (onChangeValue) {
-                    onChangeValue(unmask(data));
+                    onChangeValue(unmask(mask(text, 'cpf')));
                   }
                 }}
               />
@@ -202,10 +205,10 @@ const InputText: React.FC<IInputTextProps> = ({
       return (
         <Box gap="$5">
           <FormControl
-            isInvalid={false}
+            isInvalid={isInvalid}
+            isDisabled={isDisabled}
+            isRequired={isRequired}
             size={'md'}
-            isDisabled={false}
-            isRequired={true}
           >
             <FormControlLabel>
               <FormControlLabelText>Tipo de Telefone</FormControlLabelText>
@@ -214,8 +217,12 @@ const InputText: React.FC<IInputTextProps> = ({
               onValueChange={(text) =>
                 setTelefoneType(text as 'fixo' | 'movel')
               }
-              isInvalid={false}
-              isDisabled={false}
+              isInvalid={isInvalid}
+              isDisabled={isDisabled}
+              isRequired={isRequired}
+              selectedValue={
+                telefoneType === 'fixo' ? 'Residencial' : 'Celular'
+              }
             >
               <SelectTrigger size={'lg'} variant={'rounded'}>
                 <SelectInput placeholder="Select option" />
@@ -249,16 +256,14 @@ const InputText: React.FC<IInputTextProps> = ({
 
             <FormControlError>
               <FormControlErrorIcon as={AlertCircleIcon} />
-              <FormControlErrorText>
-                Atleast 6 characters are required.
-              </FormControlErrorText>
+              <FormControlErrorText>{error}</FormControlErrorText>
             </FormControlError>
           </FormControl>
           <FormControl
-            isInvalid={false}
+            isInvalid={isInvalid}
+            isDisabled={isDisabled}
+            isRequired={isRequired}
             size={'md'}
-            isDisabled={false}
-            isRequired={true}
           >
             <FormControlLabel>
               <FormControlLabelText>Telefone</FormControlLabelText>
@@ -308,10 +313,10 @@ const InputText: React.FC<IInputTextProps> = ({
       return (
         <>
           <FormControl
-            isInvalid={false}
+            isInvalid={isInvalid}
+            isDisabled={isDisabled}
+            isRequired={isRequired}
             size={'md'}
-            isDisabled={false}
-            isRequired={true}
           >
             <FormControlLabel>
               <FormControlLabelText>Password</FormControlLabelText>
@@ -343,10 +348,10 @@ const InputText: React.FC<IInputTextProps> = ({
       return (
         <>
           <FormControl
-            isInvalid={false}
+            isInvalid={isInvalid}
+            isDisabled={isDisabled}
+            isRequired={isRequired}
             size={'md'}
-            isDisabled={false}
-            isRequired={true}
           >
             <FormControlLabel>
               <FormControlLabelText>Password</FormControlLabelText>

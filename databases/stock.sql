@@ -58,7 +58,7 @@ CREATE TABLE tipo_produto (
 CREATE TABLE pessoa (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome TEXT NOT NULL,
-    data_de_nascimento DATE NOT NULL,
+    data_nascimento DATE NOT NULL,
     cpf TEXT UNIQUE NOT NULL -- CPF com restrição de unicidade
 );
 

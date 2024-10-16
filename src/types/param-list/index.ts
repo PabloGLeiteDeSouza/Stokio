@@ -1,3 +1,4 @@
+import { UmUpdate } from '@/classes/um/interfaces';
 import { Cliente, Pessoa } from '../screens/cliente';
 import { Empresa } from '../screens/empresa';
 import { Marca } from '../screens/marca';
@@ -53,11 +54,11 @@ export type RootStackParamList = {
   'atualizar-produto'?: { id: number | string };
   'atualizar-empresa'?: { id: number | string };
   'atualizar-ua'?: { id: number | string };
-  'atualizar-um'?: { id: number | string };
+  'atualizar-um'?: { um: UmUpdate };
   'atualizar-marca'?: { id: number | string };
   'atualizar-tipo-produto'?: { id: number | string };
   'atualizar-tipo-ua'?: { id: number | string };
-  'atualizar-ramo'?: { id: number | string };
+  'atualizar-ramo'?: { ramo: Ramo };
   'atualizar-cliente'?: { id: number | string };
   'atualizar-venda'?: { id: number | string };
   'atualizar-venda-item'?: { id: number | string };
@@ -236,7 +237,7 @@ export type ClientesStackParamList = {
     pessoaSelecionada?: Pessoa;
   };
   'visualizar-clientes'?: object;
-  'detalhes-cliente'?: { id: number | string };
+  'detalhes-cliente'?: { id: string };
 };
 
 export type SelecionarPessoaStackParamList = {

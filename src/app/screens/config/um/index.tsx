@@ -19,7 +19,7 @@ const ScreensUM: React.FC = () => {
         options={{ title: 'Cadastrar Unidade de Medida' }}
       />
       <Stack.Screen
-        name="editar-um"
+        name="atualizar-um"
         component={Update}
         options={{ title: 'Atualizar Unidade de Medida' }}
       />

@@ -31,15 +31,18 @@ const SelectEstados: React.FC<ISelectEstados> = ({
   onChangeValue,
   label,
   error,
+  isDisabled,
+  isInvalid,
+  isRequired,
 }) => {
   const [valor, setValor] = React.useState(value ? value : '');
   return (
     <>
       <FormControl
-        isInvalid={false}
+        isInvalid={isInvalid}
         size={'md'}
-        isDisabled={false}
-        isRequired={true}
+        isDisabled={isDisabled}
+        isRequired={isRequired}
       >
         <FormControlLabel>
           <FormControlLabelText>{label ? label : 'UF'}</FormControlLabelText>
@@ -87,7 +90,7 @@ const SelectEstados: React.FC<ISelectEstados> = ({
 
         <FormControlError>
           <FormControlErrorIcon as={AlertCircleIcon} />
-          <FormControlErrorText>{error}.</FormControlErrorText>
+          <FormControlErrorText>{error}</FormControlErrorText>
         </FormControlError>
       </FormControl>
     </>

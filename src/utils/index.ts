@@ -5,6 +5,17 @@ export const formatStringDate = (data: string) => {
   const ano = date.getFullYear().toString().padStart(4, '0');
   return `${dia + '/' + mes + '/' + ano}`;
 };
+
+export function getMinDateFor18YearsOld(): Date {
+  const today = new Date();
+  const minDate = new Date(
+    today.getFullYear() - 18,
+    today.getMonth(),
+    today.getDate(),
+  );
+  return minDate;
+}
+
 export function verificarAtributosObjeto(obj: object) {
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {

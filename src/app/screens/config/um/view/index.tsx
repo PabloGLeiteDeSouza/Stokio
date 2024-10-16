@@ -10,89 +10,86 @@ import {
   FormControlErrorText,
   Input,
   InputField,
-  Radio,
-  RadioGroup,
-  RadioIcon,
-  RadioIndicator,
-  RadioLabel,
   Button,
   ButtonText,
-  Checkbox,
-  CheckboxGroup,
-  CheckboxIndicator,
-  CheckboxIcon,
-  CheckboxLabel,
-  Textarea,
-  TextareaInput,
-  Select,
-  SelectTrigger,
-  SelectInput,
-  SelectIcon,
-  SelectPortal,
-  SelectBackdrop,
-  SelectContent,
-  SelectDragIndicatorWrapper,
-  SelectDragIndicator,
-  SelectItem,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  Switch,
-  Modal,
-  ModalBackdrop,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
   HStack,
-  VStack,
   Heading,
   Text,
-  Center,
-  Icon,
-  CircleIcon,
-  CheckIcon,
   AlertCircleIcon,
-  ChevronDownIcon,
   Divider,
   ButtonIcon,
-  RemoveIcon,
   TrashIcon,
   AddIcon,
   FlatList,
 } from '@gluestack-ui/themed';
-import { Box, ScrollView } from '@gluestack-ui/themed';
+import { Box } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import { Card } from '@gluestack-ui/themed';
 import { EditIcon } from '@gluestack-ui/themed';
-import UMs from './ums.json';
 import { SearchIcon } from '@gluestack-ui/themed';
-import { Um, UmFlatList } from '@/types/screens/um';
-import { ListRenderItem } from 'react-native';
+import { UmFlatList } from '@/types/screens/um';
+import { Alert, ListRenderItem } from 'react-native';
 import { VisualizarUmScreen } from '@/interfaces/um';
+import { useIsFocused } from '@react-navigation/native';
+import UmService from '@/classes/um/um.service';
+import { useSQLiteContext } from 'expo-sqlite';
+import LoadingScreen from '@/components/LoadingScreen';
+import { UmUpdate } from '@/classes/um/interfaces';
 
 const View: React.FC<VisualizarUmScreen> = ({ navigation }) => {
-  const [ums, setUms] = React.useState<Array<Um>>(UMs);
+  const db = useSQLiteContext();
+  const [ums, setUms] = React.useState<Array<UmUpdate>>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
   const FlatListUms = FlatList as UmFlatList;
-  const ListRenderUms: ListRenderItem<Um> = ({ item }) => {
+  const focused = useIsFocused();
+
+  async function start() {
+    try {
+      setIsLoading(true);
+      const res = await new UmService(db).getAll();
+      setUms(res);
+      setIsLoading(false);
+    } catch (error) {
+      Alert.alert('Erro', (error as Error).message);
+      setIsLoading(false);
+      throw error;
+    }
+  }
+
+  React.useEffect(() => {
+    start();
+  }, [focused]);
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
+  const ListRenderUms: ListRenderItem<UmUpdate> = ({ item }) => {
     return (
       <Card size="md" variant="elevated" m="$3">
         <HStack justifyContent="space-between">
-          <Box w="$2/3">
-            <Heading mb="$1" size="md">
-              {item.nome}
-            </Heading>
+          <Box w="$2/3" gap="$5">
+            <Heading size="md">{item.nome}</Heading>
+            <Text size="md">{item.valor}</Text>
           </Box>
           <Box gap="$5">
-            <Button action="negative">
+            <Button
+              onPress={async () => {
+                try {
+                  await new UmService(db).delete(item.id);
+                  Alert.alert('Sucesso', 'Um deletado com sucesso!');
+                  start();
+                } catch (error) {
+                  Alert.alert('Erro', (error as Error).message);
+                  throw error;
+                }
+              }}
+              action="negative"
+            >
               <ButtonIcon as={TrashIcon} />
             </Button>
             <Button
-              onPress={() =>
-                navigation?.navigate('cadastrar-um', { id: item.id })
-              }
+              onPress={() => navigation?.navigate('atualizar-um', { um: item })}
             >
               <ButtonIcon as={EditIcon} />
             </Button>
@@ -120,9 +117,16 @@ const View: React.FC<VisualizarUmScreen> = ({ navigation }) => {
         <Formik
           initialValues={{
             busca: '',
-            tipo: '',
           }}
-          onSubmit={() => {}}
+          onSubmit={async (values) => {
+            try {
+              const resp = await new UmService(db).getByNome(values.busca);
+              setUms([...resp]);
+            } catch (error) {
+              Alert.alert('Erro', (error as Error).message);
+              throw error;
+            }
+          }}
         >
           {({ values, handleChange }) => {
             return (
