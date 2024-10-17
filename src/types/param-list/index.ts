@@ -142,11 +142,13 @@ export type ProdutosStackParamList = {
   'screens-produtos'?: object;
   'screens-comprar'?: object;
   'screens-tipos-produtos'?: object;
-  'screens-categorias'?: object;
+  'screens-config'?: object;
   'screens-empresas'?: object;
   'screens-marcas'?: object;
+  'cadastrar-marcas'?: object;
   'screens-uas'?: object;
   'screens-ums'?: object;
+  'cadastrar-ums'?: object;
   'screens-vendas'?: object;
   'screens-tipos-uas'?: object;
   'screens-ramos'?: object;

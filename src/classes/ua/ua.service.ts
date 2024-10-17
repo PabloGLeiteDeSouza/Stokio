@@ -4,7 +4,7 @@ import {
 } from './interfaces';
 import { SQLiteDatabase } from 'expo-sqlite';
 
-export class UnidadesDeArmazenamento {
+export default class UaService {
   constructor(private db: SQLiteDatabase) {}
 
   // Verifica se a unidade de armazenamento existe pelo ID
@@ -139,5 +139,12 @@ export class UnidadesDeArmazenamento {
         `Erro ao buscar tipo de unidade de armazenamento pelo ID: ${(error as Error).message}`,
       );
     }
+  }
+
+  async haveUas() {
+    const data = await this.db.getAllAsync(
+      'SELECT * FROM unidade_de_armazenamento',
+    );
+    return data.length > 0;
   }
 }

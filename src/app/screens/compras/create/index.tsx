@@ -60,7 +60,8 @@ import { Box, Heading, ScrollView } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import { GestureResponderEvent } from 'react-native';
 import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
-const Create: React.FC = () => {
+import { CadastrarCompraScreen } from '@/interfaces/compra';
+const Create: React.FC<CadastrarCompraScreen> = ({ navigation }) => {
   const [haveProducts, setHaveProducts] = React.useState(false);
   return (
     <Box w="$full" h="$full">
@@ -97,6 +98,13 @@ const Create: React.FC = () => {
               {({ values, errors, handleChange, handleSubmit }) => {
                 return (
                   <>
+                    <Button
+                      onPress={() => {
+                        navigation?.navigate('screens-produtos');
+                      }}
+                    >
+                      <ButtonText>Cadastrar produto</ButtonText>
+                    </Button>
                     <InputDatePicker
                       onChangeDate={handleChange('data')}
                       value={values.data}

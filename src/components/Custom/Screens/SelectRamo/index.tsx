@@ -13,6 +13,8 @@ import React from 'react';
 import { ListRenderItem } from 'react-native';
 import { ISelectRamoProps } from './interfaces';
 import { Ramo, RamoFlatList } from '@/types/screens/ramo';
+import { RamoService } from '@/classes/ramo/ramo.service';
+import { useSQLiteContext } from 'expo-sqlite';
 
 const SelectRamo: React.FC<ISelectRamoProps> = ({ navigation, route }) => {
   if (!route || !route.params || !route.params.screen) {
@@ -20,26 +22,19 @@ const SelectRamo: React.FC<ISelectRamoProps> = ({ navigation, route }) => {
     return null;
   }
   const screen = route.params.screen;
-  const [ramos, setRamos] = React.useState<Array<Ramo>>([
-    {
-      id: '1',
-      nome: 'João',
-    },
-    {
-      id: '2',
-      nome: 'Maria',
-    },
-  ]);
+  const [ramos, setRamos] = React.useState<Array<Ramo>>([]);
   const selectedRamo = route.params.ramoSelecionado
     ? route.params.ramoSelecionado
     : ramos[0];
   const [ramo, setRamo] = React.useState<Ramo>(selectedRamo);
   const [isLoading, setIsLoading] = React.useState(true);
+  const db = useSQLiteContext();
 
   React.useEffect(() => {
     async function startScreen() {
       try {
-        setRamos([...ramos]);
+        const rms = await new RamoService(db).findAll();
+        setRamos([...rms]);
         setIsLoading(false);
       } catch (error) {
         setIsLoading(false);

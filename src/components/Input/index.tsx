@@ -55,7 +55,7 @@ const InputText: React.FC<IInputTextProps> = ({
             size={'md'}
           >
             <FormControlLabel>
-              <FormControlLabelText>cep</FormControlLabelText>
+              <FormControlLabelText>CEP</FormControlLabelText>
             </FormControlLabel>
             <Input>
               <InputField
@@ -106,7 +106,7 @@ const InputText: React.FC<IInputTextProps> = ({
             size={'md'}
           >
             <FormControlLabel>
-              <FormControlLabelText>cnpj</FormControlLabelText>
+              <FormControlLabelText>CNPJ</FormControlLabelText>
             </FormControlLabel>
             <Input>
               <InputField

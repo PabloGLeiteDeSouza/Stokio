@@ -105,4 +105,9 @@ export class RamoService implements IRamoService {
       throw new Error(`Erro ao excluir ramo: ${(error as Error).message}`);
     }
   }
+
+  async haveRamos() {
+    const data = await this.db.getAllAsync('SELECT * FROM ramo');
+    return data.length > 0;
+  }
 }

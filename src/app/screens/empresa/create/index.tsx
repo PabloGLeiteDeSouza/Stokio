@@ -53,6 +53,10 @@ import formatDate from '@/utils/formatDate';
 import LoadingScreen from '@/components/LoadingScreen';
 import * as Yup from 'yup';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import { EmpresaService } from '@/classes/empresa/empresa.service';
+import { useSQLiteContext } from 'expo-sqlite';
+import { RamoService } from '@/classes/ramo/ramo.service';
+import InputText from '@/components/Input';
 
 const validationSchema = Yup.object().shape({
   pessoa: Yup.object().shape({
@@ -164,16 +168,25 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
   ]);
   const [isNewPerson, setIsNewPerson] = React.useState(false);
   const [isNewRamo, setIsNewRamo] = React.useState(false);
+  const db = useSQLiteContext();
 
-  React.useEffect(() => {
-    async function start() {
-      try {
-        setIsLoading(false);
-      } catch (error) {
-        setIsLoading(false);
-        throw error;
+  async function start() {
+    try {
+      const pss = await new EmpresaService(db).getAllPessoas();
+      const rm = await new RamoService(db).haveRamos();
+      if (pss.length < 1) {
+        setIsNewPerson(true);
+      } else {
+        setPessoas([...pss]);
       }
+      setIsNewRamo(!rm);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      throw error;
     }
+  }
+  React.useEffect(() => {
     start();
   }, []);
 
@@ -249,9 +262,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
 
                 return (
                   <Box gap="$5">
-                    {values.pessoa.id === '' &&
-                    !isNewPerson &&
-                    pessoas.length > 0 ? (
+                    {values.pessoa.id === '' && !isNewPerson && (
                       <Box gap="$5" mt="$5">
                         <Heading size="md">Selecione uma pessoa:</Heading>
                         <Box gap="$5">
@@ -270,7 +281,8 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                           </Button>
                         </Box>
                       </Box>
-                    ) : values.pessoa.id !== '' && !isNewPerson ? (
+                    )}
+                    {values.pessoa.id !== '' && !isNewPerson && (
                       <Box gap="$5">
                         <Card>
                           <HStack>
@@ -323,7 +335,9 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                           <ButtonText>Adicionar Pessoa</ButtonText>
                         </Button>
                       </Box>
-                    ) : (
+                    )}
+
+                    {isNewPerson && (
                       <>
                         <FormControl
                           isInvalid={false}
@@ -574,68 +588,25 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
+                    <InputText
+                      title="CNPJ"
+                      inputType="cnpj"
+                      value={values.cnpj}
+                      error={errors.cnpj}
+                      onChangeValue={handleChange('cnpj')}
+                      size="md"
+                      isInvalid={errors.cnpj ? true : false}
                       isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>CNPJ</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <InputField
-                          type="text"
-                          value={values.cnpj}
-                          onChangeText={handleChange('cnpj')}
-                          placeholder="123.123.123.12"
-                        />
-                      </Input>
+                    />
+                    <InputText
+                      size="md"
+                      isInvalid={errors.endereco?.cep ? true : false}
+                      inputType="cep"
+                      value={values.endereco.cep}
+                      error={errors.endereco?.cep}
+                      onChangeValue={handleChange('endereco.cep')}
+                    />
 
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          {errors.cnpj}
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>Cep</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <InputField
-                          value={values.endereco.cep}
-                          onChangeText={handleChange('endereco.cep')}
-                          type="text"
-                          placeholder="password"
-                        />
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          Atleast 6 characters are required.
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
                     <FormControl
                       isInvalid={false}
                       size={'md'}
@@ -858,42 +829,28 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                       {values.telefones.map((telefone, i) => {
                         return (
                           <Box key={`telefone-${i}`}>
-                            <FormControl
-                              isInvalid={false}
-                              size={'md'}
-                              isDisabled={false}
-                              isRequired={true}
-                            >
-                              <FormControlLabel>
-                                <FormControlLabelText>
-                                  Telefone
-                                </FormControlLabelText>
-                              </FormControlLabel>
-                              <Input>
-                                <InputField
-                                  value={telefone.numero}
-                                  onChangeText={handleChange(
-                                    `telefones[${i}].numero`,
-                                  )}
-                                  type="text"
-                                  keyboardType="number-pad"
-                                  placeholder="password"
-                                />
-                              </Input>
-
-                              <FormControlHelper>
-                                <FormControlHelperText>
-                                  Must be atleast 6 characters.
-                                </FormControlHelperText>
-                              </FormControlHelper>
-
-                              <FormControlError>
-                                <FormControlErrorIcon as={AlertCircleIcon} />
-                                <FormControlErrorText>
-                                  Atleast 6 characters are required.
-                                </FormControlErrorText>
-                              </FormControlError>
-                            </FormControl>
+                            <InputText
+                              isInvalid={
+                                errors.telefones &&
+                                typeof errors?.telefones[i] === 'object'
+                                  ? errors.telefones[i].numero
+                                    ? true
+                                    : false
+                                  : false
+                              }
+                              inputType="telefone"
+                              error={
+                                errors.telefones &&
+                                typeof errors?.telefones[i] === 'object'
+                                  ? errors.telefones[i].numero
+                                  : ''
+                              }
+                              value={values.telefones[i].numero}
+                              size="md"
+                              onChangeValue={handleChange(
+                                `telefones[${i}].numero`,
+                              )}
+                            />
                           </Box>
                         );
                       })}

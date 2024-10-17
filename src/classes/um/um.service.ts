@@ -74,6 +74,9 @@ export default class UmService {
     } catch (error) {
       throw new Error(
         'Erro ao buscar unidades de medida: ' + (error as Error).message,
+        {
+          cause: 'ERR_UM_GETALL',
+        },
       );
     }
   }
@@ -111,5 +114,13 @@ export default class UmService {
         `Erro ao deletar unidade de medida: ${(error as Error).message}`,
       );
     }
+  }
+
+  async haveUms() {
+    const data = await this.db.getAllAsync('SELECT * from unidade_de_medida');
+    if (data.length < 1) {
+      return false;
+    }
+    return true;
   }
 }

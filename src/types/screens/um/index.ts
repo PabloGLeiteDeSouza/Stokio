@@ -39,6 +39,7 @@ export type AtualizarUmScreenRouterProp = RouteProp<
 export type Um = {
   id: string;
   nome: string;
+  value: string;
 };
 
 export type UmFlatList = React.ForwardRefExoticComponent<

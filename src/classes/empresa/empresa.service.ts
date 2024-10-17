@@ -199,4 +199,19 @@ export class EmpresaService implements IEmpresaService {
       { $id_empresa: id_empresa, $id_endereco: id_endereco },
     );
   }
+
+  async getAllPessoas() {
+    const data = this.db.getAllAsync<{
+      id: string;
+      nome: string;
+      cpf: string;
+      data_nascimento: string;
+    }>('SELECT * FROM pessoa');
+    return data;
+  }
+
+  async haveEmpresa() {
+    const data = await this.db.getAllAsync('SELECT * FROM empresa');
+    return data.length > 0;
+  }
 }

@@ -33,6 +33,7 @@ const CodeScanner: React.FC<CodeScannerProps> = ({ navigation, route }) => {
   const [screen, setScreen] = React.useState<ParamListCodeScanner>(
     'visualizar-produtos',
   );
+  const [hideCamera, setHideCamera] = React.useState(false);
 
   React.useEffect(() => {
     async function start() {
@@ -69,6 +70,16 @@ const CodeScanner: React.FC<CodeScannerProps> = ({ navigation, route }) => {
     return (
       <CameraView
         onBarcodeScanned={(result) => {
+          if (!/^[0-9]*$/.test(result.data)) {
+            setHideCamera(true);
+            Alert.alert('Erro', 'código inválido', [
+              {
+                text: 'Ok',
+                onPress: () => navigation?.goBack(),
+              },
+            ]);
+            return;
+          }
           navigation?.navigate(screen, { code: result.data, result: true });
         }}
         {...props}
@@ -76,7 +87,7 @@ const CodeScanner: React.FC<CodeScannerProps> = ({ navigation, route }) => {
     );
   };
 
-  return <Box w="$full" h="$full" as={Camera}></Box>;
+  return hideCamera ? <></> : <Box w="$full" h="$full" as={Camera}></Box>;
 };
 
 export default CodeScanner;

@@ -1,3 +1,42 @@
+import {
+  Radio,
+  RadioGroup,
+  RadioIcon,
+  RadioIndicator,
+  RadioLabel,
+  Checkbox,
+  CheckboxGroup,
+  CheckboxIndicator,
+  CheckboxIcon,
+  CheckboxLabel,
+  Select,
+  SelectTrigger,
+  SelectInput,
+  SelectIcon,
+  SelectPortal,
+  SelectBackdrop,
+  SelectContent,
+  SelectDragIndicatorWrapper,
+  SelectDragIndicator,
+  SelectItem,
+  Slider,
+  SliderTrack,
+  SliderFilledTrack,
+  SliderThumb,
+  Switch,
+  Modal,
+  ModalBackdrop,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Center,
+  Icon,
+  CircleIcon,
+  CheckIcon,
+  ChevronDownIcon,
+} from '@gluestack-ui/themed';
 import React from 'react';
 import {
   FormControl,
@@ -28,6 +67,12 @@ import { CadastrarProdutoScreen } from '@/interfaces/produto';
 import * as Yup from 'yup';
 import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
 import LoadingScreen from '@/components/LoadingScreen';
+import UmService from '@/classes/um/um.service';
+import { useSQLiteContext } from 'expo-sqlite';
+import MarcaService from '@/classes/marca/marca.service';
+import TipoProdutoService from '@/classes/tipo_produto/tipo_produto.service';
+import UaService from '@/classes/ua/ua.service';
+import { EmpresaService } from '@/classes/empresa/empresa.service';
 const validationSchema = Yup.object().shape({
   codigo_de_barras: Yup.string().required('O código de barras é obrigatório'),
   nome: Yup.string().required('O nome é obrigatório'),
@@ -55,15 +100,49 @@ const validationSchema = Yup.object().shape({
 });
 const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
   const [isNewMarca, setIsNewMarca] = React.useState(false);
+  const [haveMarca, setHaveMarca] = React.useState(false);
   const [isNewTipoProduto, setIsNewTipoProduto] = React.useState(false);
+  const [haveTipoProduto, setHaveTipoProduto] = React.useState(false);
   const [isNewUnidadeDeMedida, setIsNewUnidadeDeMedida] = React.useState(false);
+  const [isHaveUnidadeDeMedida, setHaveUnidadeDeMedida] = React.useState(false);
+  const [isHaveUnidadeDeArmazenamento, setHaveUnidadeDeArmazenamento] =
+    React.useState(false);
+  const [isHaveEmpresa, setIsHaveEmpresa] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
+  const db = useSQLiteContext();
   React.useEffect(() => {
     async function start() {
       try {
+        const ums = await new UmService(db).haveUms();
+        if (ums) {
+          setHaveUnidadeDeMedida(true);
+        } else {
+          setIsNewUnidadeDeMedida(true);
+        }
+        const tipo_prod = await new TipoProdutoService(db).haveTipoProduto();
+        if (tipo_prod) {
+          setHaveTipoProduto(true);
+        } else {
+          setIsNewTipoProduto(true);
+        }
+        const marca = await new MarcaService(db).haveMarca();
+        if (marca) {
+          setHaveMarca(true);
+        } else {
+          setIsNewMarca(true);
+        }
+        const ua = await new UaService(db).haveUas();
+        if (ua) {
+          setHaveUnidadeDeArmazenamento(true);
+        }
+        const empresa = await new EmpresaService(db).haveEmpresa();
+        if (empresa) {
+          setIsHaveEmpresa(true);
+        }
         setIsLoading(false);
       } catch (error) {
         setIsLoading(false);
+        throw error;
       }
     }
     start();
@@ -89,7 +168,7 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                 descricao: '',
                 data_de_validade: new Date(),
                 valor: '',
-                quantidade: '',
+                quantidade: '0',
                 tamanho: '',
                 marca: {
                   id: '',
@@ -143,23 +222,23 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                     setFieldValue('tipo_produto', tipo);
                   }
                 }, [route?.params?.tipo_produto]);
-
                 React.useEffect(() => {
                   if (route && route.params?.um) {
                     const unidade = route.params.um;
                     setFieldValue('unidade_de_medida', unidade);
                   }
                 }, [route?.params?.um]);
-
                 React.useEffect(() => {
                   if (route && route.params?.ua) {
                     const unidade = route.params.ua;
                     setFieldValue('unidade_de_armazenamento', unidade);
                   }
                 }, [route?.params?.ua]);
-
                 return (
                   <>
+                    <Box>
+                      <Heading textAlign="center">Empresa Responsável</Heading>
+                    </Box>
                     {values.empresa.id != '' && (
                       <>
                         <Card>
@@ -189,36 +268,40 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                         </Card>
                       </>
                     )}
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <Box>
-                        <Button
-                          onPress={() =>
-                            navigation?.navigate('selecionar-empresa', {
-                              screen: 'cadastrar-produto',
-                            })
-                          }
+                    {isHaveEmpresa && (
+                      <>
+                        <FormControl
+                          isInvalid={false}
+                          size={'md'}
+                          isDisabled={false}
+                          isRequired={true}
                         >
-                          <ButtonText>Selecionar empresa</ButtonText>
-                        </Button>
-                      </Box>
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Você deve selecionar a empresa.
-                        </FormControlHelperText>
-                      </FormControlHelper>
+                          <Box>
+                            <Button
+                              onPress={() =>
+                                navigation?.navigate('selecionar-empresa', {
+                                  screen: 'cadastrar-produto',
+                                })
+                              }
+                            >
+                              <ButtonText>Selecionar empresa</ButtonText>
+                            </Button>
+                          </Box>
+                          <FormControlHelper>
+                            <FormControlHelperText>
+                              Você deve selecionar a empresa.
+                            </FormControlHelperText>
+                          </FormControlHelper>
 
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          {errors.empresa?.id}
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
+                          <FormControlError>
+                            <FormControlErrorIcon as={AlertCircleIcon} />
+                            <FormControlErrorText>
+                              {errors.empresa?.id}
+                            </FormControlErrorText>
+                          </FormControlError>
+                        </FormControl>
+                      </>
+                    )}
                     <Box>
                       <Button
                         onPress={() => {
@@ -228,41 +311,6 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                         <ButtonText>Cadastrar Empresa</ButtonText>
                       </Button>
                     </Box>
-                    {values.marca.id == '' && isNewMarca && (
-                      <>
-                        <FormControl
-                          isInvalid={false}
-                          size={'md'}
-                          isDisabled={false}
-                          isRequired={true}
-                        >
-                          <FormControlLabel>
-                            <FormControlLabelText>Marca</FormControlLabelText>
-                          </FormControlLabel>
-                          <Input>
-                            <InputField
-                              type="text"
-                              value={values.marca.nome}
-                              placeholder="Marca"
-                              onChangeText={handleChange('marca.nome')}
-                            />
-                          </Input>
-
-                          <FormControlHelper>
-                            <FormControlHelperText>
-                              Informe o nome da marca a ser cadastrada.
-                            </FormControlHelperText>
-                          </FormControlHelper>
-
-                          <FormControlError>
-                            <FormControlErrorIcon as={AlertCircleIcon} />
-                            <FormControlErrorText>
-                              Atleast 6 characters are required.
-                            </FormControlErrorText>
-                          </FormControlError>
-                        </FormControl>
-                      </>
-                    )}
                     <Box>
                       <Heading textAlign="center">Marca do Produto</Heading>
                     </Box>
@@ -282,33 +330,68 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                         </Card>
                       </Box>
                     )}
-                    <Box gap="$5">
-                      <Button
-                        onPress={() => {
-                          navigation?.navigate('selecionar-marca', {
-                            screen: 'cadastrar-produto',
-                            marcaSelecionada: values.marca,
-                          });
-                        }}
+                    {haveMarca && (
+                      <Box gap="$5">
+                        <Button
+                          onPress={() => {
+                            navigation?.navigate('selecionar-marca', {
+                              screen: 'cadastrar-produto',
+                              marcaSelecionada: values.marca,
+                            });
+                          }}
+                        >
+                          <ButtonText>
+                            {values.marca.id !== ''
+                              ? 'Atualizar Marca'
+                              : 'Selecionar Marca'}
+                          </ButtonText>
+                        </Button>
+                        {!isNewMarca && (
+                          <>
+                            <Button onPress={() => setIsNewMarca(true)}>
+                              <ButtonText>Cadastrar Marca</ButtonText>
+                            </Button>
+                          </>
+                        )}
+                      </Box>
+                    )}
+                    {isNewMarca && values.marca.id === '' && (
+                      <FormControl
+                        isInvalid={errors.marca?.nome ? true : false}
+                        size={'md'}
+                        isDisabled={false}
+                        isRequired={true}
                       >
-                        <ButtonText>
-                          {values.marca.id !== ''
-                            ? 'Atualizar Marca'
-                            : 'Selecionar Marca'}
-                        </ButtonText>
-                      </Button>
-                      {!isNewMarca && (
-                        <>
-                          <Button onPress={() => setIsNewMarca(true)}>
-                            <ButtonText>Cadastrar Marca</ButtonText>
-                          </Button>
-                        </>
-                      )}
-                    </Box>
+                        <FormControlLabel>
+                          <FormControlLabelText>Marca</FormControlLabelText>
+                        </FormControlLabel>
+                        <Input>
+                          <InputField
+                            type="text"
+                            value={values.marca.nome}
+                            placeholder="marca"
+                            onChangeText={handleChange('marca.nome')}
+                          />
+                        </Input>
+
+                        <FormControlHelper>
+                          <FormControlHelperText>
+                            Informe o nome da marca.
+                          </FormControlHelperText>
+                        </FormControlHelper>
+
+                        <FormControlError>
+                          <FormControlErrorIcon as={AlertCircleIcon} />
+                          <FormControlErrorText>
+                            {errors.marca?.nome}
+                          </FormControlErrorText>
+                        </FormControlError>
+                      </FormControl>
+                    )}
                     <Box>
                       <Heading textAlign="center">Tipo do Produto</Heading>
                     </Box>
-                    {values.tipo_produto.id !== '' && !isNewTipoProduto && (
+                    {values.tipo_produto.id !== '' && haveTipoProduto && (
                       <Box>
                         <Card>
                           <HStack>
@@ -322,37 +405,73 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                             </VStack>
                           </HStack>
                         </Card>
+                        <Box>
+                          <Button
+                            onPress={() => {
+                              navigation?.navigate('selecionar-tipo-produto', {
+                                screen: 'cadastrar-produto',
+                                tipoProdutoSelecionado: values.tipo_produto,
+                              });
+                            }}
+                          >
+                            <ButtonText>
+                              {values.marca.id !== ''
+                                ? 'Atualizar Tipo do Produto'
+                                : 'Selecionar Tipo do Produto'}
+                            </ButtonText>
+                          </Button>
+                        </Box>
                       </Box>
                     )}
-                    <Box gap="$5">
-                      <Button
-                        onPress={() => {
-                          navigation?.navigate('selecionar-tipo-produto', {
-                            screen: 'cadastrar-produto',
-                            tipoProdutoSelecionado: values.tipo_produto,
-                          });
-                        }}
-                      >
-                        <ButtonText>
-                          {values.marca.id !== ''
-                            ? 'Atualizar Tipo do Produto'
-                            : 'Selecionar Tipo do Produto'}
-                        </ButtonText>
-                      </Button>
-                      {!isNewMarca && (
-                        <>
-                          <Button onPress={() => setIsNewTipoProduto(true)}>
-                            <ButtonText>Cadastrar Tipo de Produto</ButtonText>
-                          </Button>
-                        </>
-                      )}
-                    </Box>
+                    {!isNewTipoProduto && (
+                      <Box gap="$5">
+                        <Button onPress={() => setIsNewTipoProduto(true)}>
+                          <ButtonText>Cadastrar Tipo de Produto</ButtonText>
+                        </Button>
+                      </Box>
+                    )}
+                    {isNewTipoProduto && (
+                      <Box>
+                        <FormControl
+                          isInvalid={errors.tipo_produto?.nome ? true : false}
+                          size={'md'}
+                          isDisabled={false}
+                          isRequired={true}
+                        >
+                          <FormControlLabel>
+                            <FormControlLabelText>
+                              Tipo de Produto
+                            </FormControlLabelText>
+                          </FormControlLabel>
+                          <Input>
+                            <InputField
+                              type="text"
+                              value={values.tipo_produto.nome}
+                              placeholder="Desodorante Roll'on"
+                              onChangeText={handleChange('tipo_produto.nome')}
+                            />
+                          </Input>
 
+                          <FormControlHelper>
+                            <FormControlHelperText>
+                              Informe o nome do tipo de produto.
+                            </FormControlHelperText>
+                          </FormControlHelper>
+
+                          <FormControlError>
+                            <FormControlErrorIcon as={AlertCircleIcon} />
+                            <FormControlErrorText>
+                              {errors.tipo_produto?.nome}
+                            </FormControlErrorText>
+                          </FormControlError>
+                        </FormControl>
+                      </Box>
+                    )}
                     <Box>
                       <Heading textAlign="center">Unidade de Medida</Heading>
                     </Box>
                     {values.unidade_de_medida.id !== '' &&
-                      !isNewUnidadeDeMedida && (
+                      isHaveUnidadeDeMedida && (
                         <Box>
                           <Card>
                             <HStack>
@@ -364,6 +483,7 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                                 </Box>
                                 <Box>
                                   <Text>{values.unidade_de_medida.nome}</Text>
+                                  <Text>{values.unidade_de_medida.value}</Text>
                                 </Box>
                               </VStack>
                             </HStack>
@@ -408,7 +528,9 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                           </FormControlError>
                         </FormControl>
                         <FormControl
-                          isInvalid={false}
+                          isInvalid={
+                            errors.unidade_de_medida?.value ? true : false
+                          }
                           size={'md'}
                           isDisabled={false}
                           isRequired={true}
@@ -423,6 +545,9 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                               type="text"
                               value={values.unidade_de_medida.value}
                               placeholder="cm"
+                              onChangeText={handleChange(
+                                'unidade_de_medida.value',
+                              )}
                             />
                           </Input>
 
@@ -442,33 +567,34 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                         </FormControl>
                       </Box>
                     )}
-
-                    <Box gap="$5">
-                      <Button
-                        onPress={() => {
-                          navigation?.navigate('selecionar-um', {
-                            screen: 'cadastrar-produto',
-                            umSelecionado: values.unidade_de_medida,
-                          });
-                        }}
-                      >
-                        <ButtonText>
-                          {values.marca.id !== ''
-                            ? 'Atualizar Unidade de Medida'
-                            : 'Selecionar Unidade de Medida'}
-                        </ButtonText>
-                      </Button>
-                      <Button onPress={() => setIsNewUnidadeDeMedida(true)}>
-                        <ButtonText>Cadastrar Unidade de Medida</ButtonText>
-                      </Button>
-                    </Box>
+                    {isHaveUnidadeDeMedida && (
+                      <Box gap="$5">
+                        <Button
+                          onPress={() => {
+                            navigation?.navigate('selecionar-um', {
+                              screen: 'cadastrar-produto',
+                              umSelecionado: values.unidade_de_medida,
+                            });
+                          }}
+                        >
+                          <ButtonText>
+                            {values.marca.id !== ''
+                              ? 'Atualizar Unidade de Medida'
+                              : 'Selecionar Unidade de Medida'}
+                          </ButtonText>
+                        </Button>
+                        <Button onPress={() => setIsNewUnidadeDeMedida(true)}>
+                          <ButtonText>Cadastrar Unidade de Medida</ButtonText>
+                        </Button>
+                      </Box>
+                    )}
 
                     <Box>
                       <Heading textAlign="center">
                         Unidade de Armazenamento
                       </Heading>
                     </Box>
-                    {values.unidade_de_medida.id !== '' && (
+                    {values.unidade_de_armazenamento.id !== '' && (
                       <Box>
                         <Card>
                           <HStack>
@@ -489,31 +615,37 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                       </Box>
                     )}
 
-                    <Box gap="$5">
-                      <Button
-                        onPress={() => {
-                          navigation?.navigate('selecionar-ua', {
-                            screen: 'cadastrar-produto',
-                            uaSelecionada: values.unidade_de_armazenamento,
-                          });
-                        }}
-                      >
-                        <ButtonText>
-                          {values.marca.id !== ''
-                            ? 'Atualizar Unidade de Armazenamento'
-                            : 'Selecionar Unidade de Armazenamento'}
-                        </ButtonText>
-                      </Button>
-                      <Button
-                        onPress={() => {
-                          navigation?.navigate('screens-uas');
-                        }}
-                      >
-                        <ButtonText>
-                          Cadastrar Unidade de Armazenamento
-                        </ButtonText>
-                      </Button>
-                    </Box>
+                    {isHaveUnidadeDeArmazenamento && (
+                      <Box gap="$5">
+                        <Button
+                          onPress={() => {
+                            navigation?.navigate('selecionar-ua', {
+                              screen: 'cadastrar-produto',
+                              uaSelecionada: values.unidade_de_armazenamento,
+                            });
+                          }}
+                        >
+                          <ButtonText>
+                            {values.marca.id !== ''
+                              ? 'Atualizar Unidade de Armazenamento'
+                              : 'Selecionar Unidade de Armazenamento'}
+                          </ButtonText>
+                        </Button>
+                      </Box>
+                    )}
+                    {!isHaveUnidadeDeArmazenamento && (
+                      <Box gap="$5">
+                        <Button
+                          onPress={() => {
+                            navigation?.navigate('screens-uas');
+                          }}
+                        >
+                          <ButtonText>
+                            Cadastrar Unidade de Armazenamento
+                          </ButtonText>
+                        </Button>
+                      </Box>
+                    )}
 
                     <InputDatePicker
                       value={values.data_de_validade}
@@ -679,38 +811,6 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                       isRequired={true}
                     >
                       <FormControlLabel>
-                        <FormControlLabelText>Quantidade</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <InputField
-                          type="text"
-                          value={values.quantidade}
-                          placeholder="500"
-                          onChangeText={handleChange('quantidade')}
-                          keyboardType="number-pad"
-                        />
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          Atleast 6 characters are required.
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
                         <FormControlLabelText>Tamanho</FormControlLabelText>
                       </FormControlLabel>
                       <Input>
@@ -721,6 +821,19 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                           onChangeText={handleChange('tamanho')}
                           keyboardType="number-pad"
                         />
+                        {values.unidade_de_medida.value && (
+                          <Box
+                            h="$full"
+                            justifyContent="center"
+                            px="$5"
+                            $light-bgColor="$blueGray700"
+                            $dark-bgColor="$blueGray300"
+                          >
+                            <Text $light-color="$white" $dark-color="$black">
+                              {values.unidade_de_medida.value}
+                            </Text>
+                          </Box>
+                        )}
                       </Input>
 
                       <FormControlHelper>
