@@ -71,7 +71,6 @@ const InputDatePicker: React.FC<IInputDatePicker> = ({
   error,
   maximumDate,
 }) => {
-
   const startPicker = () => {
     DateTimePickerAndroid.open({
       maximumDate: maximumDate,

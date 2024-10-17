@@ -99,14 +99,12 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
         <Box>
           <Formik
             initialValues={{
-                busca: '',
-                tipo: '',
-                data_inicio: '',
-                data_fim: '',
+              busca: '',
+              tipo: '',
+              data_inicio: '',
+              data_fim: '',
             }}
-            onSubmit={async () => {
-                
-            }}
+            onSubmit={async () => {}}
           >
             {({ values, handleChange, handleBlur, handleSubmit }) => {
               return (
