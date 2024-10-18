@@ -241,24 +241,27 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
               onSubmit={() => {}}
             >
               {({ handleChange, setFieldValue, values, errors }) => {
-                React.useEffect(() => {
-                  console.log('modify pessoa');
-                  if (route && route.params && route.params.pessoa) {
-                    const { data_nascimento, ...person } = route.params.pessoa;
-                    setFieldValue('pessoa', {
-                      ...person,
-                      data_nascimento: new Date(data_nascimento),
-                    });
-                  }
-                }, [route?.params?.pessoa]);
-
-                React.useEffect(() => {
-                  console.log('modify ramo');
-                  if (route && route.params && route.params.ramo) {
-                    const rm = route.params.ramo;
-                    setFieldValue('ramo', rm);
-                  }
-                }, [route?.params?.ramo]);
+                if (route?.params?.pessoa) {
+                  React.useEffect(() => {
+                    console.log('modify pessoa');
+                    if (route && route.params && route.params.pessoa) {
+                      const { data_nascimento, ...person } = route.params.pessoa;
+                      setFieldValue('pessoa', {
+                        ...person,
+                        data_nascimento: new Date(data_nascimento),
+                      });
+                    }
+                  }, [route?.params?.pessoa]);
+                }
+                if (route?.params?.ramo) {
+                  React.useEffect(() => {
+                    console.log('modify ramo');
+                    if (route && route.params && route.params.ramo) {
+                      const rm = route.params.ramo;
+                      setFieldValue('ramo', rm);
+                    }
+                  }, [route?.params?.ramo]);
+                }
 
                 return (
                   <Box gap="$5">
