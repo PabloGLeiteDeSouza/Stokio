@@ -15,17 +15,23 @@ export function mask(
       return maskCep(value);
     case 'data':
       return maskData(value);
+    case 'money':
+      return maskMoney(value);
     default:
       return value;
   }
 }
 
-export function unmask(value: string, type?: 'date'): string {
+export function unmask(value: string, type?: 'date' | 'money'): string {
   if (type && type === 'date') {
     const day = value.split('/')[0];
     const month = value.split('/')[1];
     const year = value.split('/')[2];
     return `${year}-${month}-${day}`;
+  }
+  if (type && type === 'money') {
+    const res = value.replace(/[^\d]/g, '');
+    return `${res.slice(0, -2)}.${res.slice(-2)}`;
   }
   return value.replace(/[^\d]/g, '');
 }
@@ -77,4 +83,11 @@ function maskData(value: string): string {
   const month = onlyNumbers.slice(2, 4);
   const year = onlyNumbers.slice(4, 8);
   return `${day}/${month}/${year}`;
+}
+
+function maskMoney(value: string) {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(Number(value));
 }

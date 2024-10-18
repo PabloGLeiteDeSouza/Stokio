@@ -1,13 +1,26 @@
 // Tipos relacionados ao cadastro e atualização de empresas
 export type EmpresaCreateData = {
-  nome: string;
-  nome_fantasia?: string;
-  razao_social?: string;
-  cnpj: string;
-  ramo?: RamoData;
+  pessoa: {
+    id?: string;
+    nome?: string;
+    data_nascimento?: Date;
+    cpf?: string;
+  };
+  nome_fantasia: string;
+  razao_social: string;
+  cnpj?: string;
+  ramo: RamoData;
   telefones: TelefoneData[];
   emails: EmailData[];
   endereco: EnderecoData;
+};
+
+export type EmpresaSimpleData = {
+  id: string;
+  nome_fantasia: string;
+  razao_social: string;
+  cpf: string;
+  cnpj?: string;
 };
 
 export type EmpresaUpdateData = {
@@ -34,7 +47,7 @@ export type EmpresaSearchCriteria = {
 // Tipo de dados de um ramo
 export type RamoData = {
   id?: string;
-  nome: string;
+  nome?: string;
 };
 
 // Tipo de dados de telefone

@@ -73,6 +73,7 @@ import MarcaService from '@/classes/marca/marca.service';
 import TipoProdutoService from '@/classes/tipo_produto/tipo_produto.service';
 import UaService from '@/classes/ua/ua.service';
 import { EmpresaService } from '@/classes/empresa/empresa.service';
+import InputText from '@/components/Input';
 const validationSchema = Yup.object().shape({
   codigo_de_barras: Yup.string().required('O código de barras é obrigatório'),
   nome: Yup.string().required('O nome é obrigatório'),
@@ -91,6 +92,7 @@ const validationSchema = Yup.object().shape({
   unidade_de_medida: Yup.object().shape({
     id: Yup.number().required('A unidade de medida é obrigatória'),
     nome: Yup.string().required('O nome é obrigatório'),
+    valor: Yup.string().required('O valor é obrigatório'),
   }),
   tamanho: Yup.number().required('O tamanho é obrigatório'),
   unidade_de_armazenamento: Yup.object().shape({
@@ -181,7 +183,7 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                 unidade_de_medida: {
                   id: '',
                   nome: '',
-                  value: '',
+                  valor: '',
                 },
                 unidade_de_armazenamento: {
                   id: '',
@@ -415,7 +417,7 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                             }}
                           >
                             <ButtonText>
-                              {values.marca.id !== ''
+                              {values.tipo_produto.id !== ''
                                 ? 'Atualizar Tipo do Produto'
                                 : 'Selecionar Tipo do Produto'}
                             </ButtonText>
@@ -490,10 +492,34 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                           </Card>
                         </Box>
                       )}
+                    {isHaveUnidadeDeMedida && (
+                      <Box gap="$5">
+                        <Button
+                          onPress={() => {
+                            navigation?.navigate('selecionar-um', {
+                              screen: 'cadastrar-produto',
+                              umSelecionado: values.unidade_de_medida,
+                            });
+                          }}
+                        >
+                          <ButtonText>
+                            {values.unidade_de_medida.id !== ''
+                              ? 'Atualizar Unidade de Medida'
+                              : 'Selecionar Unidade de Medida'}
+                          </ButtonText>
+                        </Button>
+                        <Button onPress={() => setIsNewUnidadeDeMedida(true)}>
+                          <ButtonText>Cadastrar Unidade de Medida</ButtonText>
+                        </Button>
+                      </Box>
+                    )}
+
                     {isNewUnidadeDeMedida && (
                       <Box gap="$5">
                         <FormControl
-                          isInvalid={false}
+                          isInvalid={
+                            errors.unidade_de_medida?.nome ? true : false
+                          }
                           size={'md'}
                           isDisabled={false}
                           isRequired={true}
@@ -510,7 +536,7 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                               onChangeText={handleChange(
                                 'unidade_de_medida.nome',
                               )}
-                              placeholder="password"
+                              placeholder="Nome"
                             />
                           </Input>
 
@@ -529,7 +555,7 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                         </FormControl>
                         <FormControl
                           isInvalid={
-                            errors.unidade_de_medida?.value ? true : false
+                            errors.unidade_de_medida?.valor ? true : false
                           }
                           size={'md'}
                           isDisabled={false}
@@ -543,10 +569,10 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                           <Input>
                             <InputField
                               type="text"
-                              value={values.unidade_de_medida.value}
+                              value={values.unidade_de_medida.calor}
                               placeholder="cm"
                               onChangeText={handleChange(
-                                'unidade_de_medida.value',
+                                'unidade_de_medida.valor',
                               )}
                             />
                           </Input>
@@ -565,27 +591,6 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                             </FormControlErrorText>
                           </FormControlError>
                         </FormControl>
-                      </Box>
-                    )}
-                    {isHaveUnidadeDeMedida && (
-                      <Box gap="$5">
-                        <Button
-                          onPress={() => {
-                            navigation?.navigate('selecionar-um', {
-                              screen: 'cadastrar-produto',
-                              umSelecionado: values.unidade_de_medida,
-                            });
-                          }}
-                        >
-                          <ButtonText>
-                            {values.marca.id !== ''
-                              ? 'Atualizar Unidade de Medida'
-                              : 'Selecionar Unidade de Medida'}
-                          </ButtonText>
-                        </Button>
-                        <Button onPress={() => setIsNewUnidadeDeMedida(true)}>
-                          <ButtonText>Cadastrar Unidade de Medida</ButtonText>
-                        </Button>
                       </Box>
                     )}
 
@@ -760,50 +765,15 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>Valor</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <Box
-                          h="$full"
-                          justifyContent="center"
-                          alignItems="center"
-                          px="$5"
-                          $dark-bgColor="$blueGray400"
-                          $light-bgColor="$blueGray600"
-                        >
-                          <Text $light-color="$white" $dark-color="$black">
-                            R$
-                          </Text>
-                        </Box>
-                        <InputField
-                          type="text"
-                          value={values.valor}
-                          placeholder="25.99"
-                          onChangeText={handleChange('valor')}
-                          keyboardType="number-pad"
-                        />
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          Atleast 6 characters are required.
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
+                    <InputText
+                      title="Valor"
+                      inputType="money"
+                      error={errors.valor}
+                      value={values.valor}
+                      onChangeValue={handleChange('valor')}
+                      isInvalid={errors.valor ? true : false}
+                      size="md"
+                    />
                     <FormControl
                       isInvalid={false}
                       size={'md'}

@@ -10,59 +10,13 @@ import {
   FormControlErrorText,
   Input,
   InputField,
-  Radio,
-  RadioGroup,
-  RadioIcon,
-  RadioIndicator,
-  RadioLabel,
   Button,
-  ButtonText,
-  Box,
-  Checkbox,
-  CheckboxGroup,
-  CheckboxIndicator,
-  CheckboxIcon,
-  CheckboxLabel,
-  Textarea,
-  TextareaInput,
-  Select,
-  SelectTrigger,
-  SelectInput,
-  SelectIcon,
-  SelectPortal,
-  SelectBackdrop,
-  SelectContent,
-  SelectDragIndicatorWrapper,
-  SelectDragIndicator,
-  SelectItem,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  Switch,
-  Modal,
-  ModalBackdrop,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  HStack,
-  VStack,
-  Heading,
-  Text,
-  Center,
-  Icon,
-  CircleIcon,
-  CheckIcon,
   AlertCircleIcon,
-  ChevronDownIcon,
   ButtonIcon,
   CalendarDaysIcon,
 } from '@gluestack-ui/themed';
 import { IInputDatePicker } from './interfaces';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
-import { getMinDateFor18YearsOld } from '@/utils';
 
 const InputDatePicker: React.FC<IInputDatePicker> = ({
   title,
@@ -70,26 +24,40 @@ const InputDatePicker: React.FC<IInputDatePicker> = ({
   onChangeDate,
   error,
   maximumDate,
+  minimumDate,
+  minuteInterval,
+  isInvalid,
+  size,
+  isDisabled,
+  isRequired,
+  isReadOnly,
+  ...props
 }) => {
   const startPicker = () => {
     DateTimePickerAndroid.open({
-      maximumDate: maximumDate,
+      minuteInterval,
+      minimumDate,
+      maximumDate,
       value: value ? new Date(value) : new Date(),
       onChange: (event, selectedDate) => {
-        if (selectedDate) {
-          onChangeDate(String(selectedDate));
+        if (event.type === 'set') {
+          if (selectedDate) {
+            onChangeDate(String(selectedDate));
+          }
         }
       },
       mode: 'date',
+      ...props,
     });
   };
   return (
     <>
       <FormControl
-        isInvalid={typeof error != 'undefined' ? true : false}
-        size={'md'}
-        isDisabled={false}
-        isRequired={true}
+        isInvalid={isInvalid}
+        size={size}
+        isDisabled={isDisabled}
+        isRequired={isRequired}
+        isReadOnly={isReadOnly}
       >
         <FormControlLabel>
           <FormControlLabelText>{title}</FormControlLabelText>
@@ -100,7 +68,11 @@ const InputDatePicker: React.FC<IInputDatePicker> = ({
             editable={false}
             type="text"
             placeholder="01/01/1999"
-            value={new Date(value).toLocaleDateString()}
+            value={new Intl.DateTimeFormat('pt-BR', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+            }).format(new Date(value))}
           />
           <Button onPress={startPicker}>
             <ButtonIcon as={CalendarDaysIcon} />
@@ -115,7 +87,7 @@ const InputDatePicker: React.FC<IInputDatePicker> = ({
 
         <FormControlError>
           <FormControlErrorIcon as={AlertCircleIcon} />
-          <FormControlErrorText>{error}</FormControlErrorText>
+          <FormControlErrorText>{String(error)}</FormControlErrorText>
         </FormControlError>
       </FormControl>
     </>

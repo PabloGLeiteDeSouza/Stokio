@@ -57,6 +57,10 @@ import { EmpresaService } from '@/classes/empresa/empresa.service';
 import { useSQLiteContext } from 'expo-sqlite';
 import { RamoService } from '@/classes/ramo/ramo.service';
 import InputText from '@/components/Input';
+import SelectEstados from '@/components/Custom/Selects/SelectEstados';
+import { GestureResponderEvent } from 'react-native';
+import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
+import { getMinDateFor18YearsOld } from '@/utils';
 
 const validationSchema = Yup.object().shape({
   pessoa: Yup.object().shape({
@@ -87,14 +91,14 @@ const validationSchema = Yup.object().shape({
   ),
   endereco: Yup.object().shape({
     cep: Yup.string().required('CEP é obrigatório'),
-    rua: Yup.string().required('Rua é obrigatória'),
+    logradouro: Yup.string().required('Logradouro é obrigatório'),
     numero: Yup.string().required('Número é obrigatório'),
     complemento: Yup.string(),
     bairro: Yup.string().required('Bairro é obrigatório'),
     cidade: Yup.string().required('Cidade é obrigatória'),
     uf: Yup.string().required('UF e obrigatorio!'),
   }),
-  email: Yup.array().of(
+  emails: Yup.array().of(
     Yup.object().shape({
       endereco: Yup.string().required('Endereço de email é obrigatório'),
     }),
@@ -102,70 +106,8 @@ const validationSchema = Yup.object().shape({
 });
 
 const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
-  const isFocused = useIsFocused();
   const [isLoading, setIsLoading] = React.useState(true);
-  const [pessoas, setPessoas] = React.useState<Array<Pessoa>>([
-    {
-      id: 1,
-      nome: 'João',
-      data_nascimento: '2000-04-05',
-      cpf: '12345678901',
-    },
-    {
-      id: 2,
-      nome: 'Maria',
-      data_nascimento: '1999-03-02',
-      cpf: '98765432101',
-    },
-    {
-      id: 3,
-      nome: 'Pedro',
-      data_nascimento: '1998-04-16',
-      cpf: '98765432101',
-    },
-    {
-      id: 4,
-      nome: 'Maria',
-      data_nascimento: '1975-07-20',
-      cpf: '98765432101',
-    },
-    {
-      id: 5,
-      nome: 'Maria',
-      data_nascimento: '1975-07-20',
-      cpf: '98765432101',
-    },
-    {
-      id: 6,
-      nome: 'Maria',
-      data_nascimento: '1975-07-20',
-      cpf: '98765432101',
-    },
-    {
-      id: 7,
-      nome: 'Maria',
-      data_nascimento: '1975-07-20',
-      cpf: '98765432101',
-    },
-    {
-      id: 8,
-      nome: 'Maria',
-      data_nascimento: '1975-07-20',
-      cpf: '98765432101',
-    },
-    {
-      id: 9,
-      nome: 'Maria',
-      data_nascimento: '1975-07-20',
-      cpf: '98765432101',
-    },
-    {
-      id: 10,
-      nome: 'Maria',
-      data_nascimento: '1975-07-20',
-      cpf: '98765432101',
-    },
-  ]);
+  const [pessoas, setPessoas] = React.useState<Array<Pessoa>>([]);
   const [isNewPerson, setIsNewPerson] = React.useState(false);
   const [isNewRamo, setIsNewRamo] = React.useState(false);
   const db = useSQLiteContext();
@@ -201,14 +143,14 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
           <Box w="$full" alignItems="center">
             <Text size="3xl">Cadastrar Empresa</Text>
           </Box>
-          <Box>
+          <Box gap="$5">
             <Formik
               validationSchema={validationSchema}
               initialValues={{
                 pessoa: {
                   id: '',
                   nome: '',
-                  data_nascimento: new Date(),
+                  data_nascimento: getMinDateFor18YearsOld(),
                   cpf: '',
                 },
                 cnpj: '',
@@ -220,7 +162,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                 },
                 endereco: {
                   cep: '',
-                  rua: '',
+                  logradouro: '',
                   numero: '',
                   complemento: '',
                   bairro: '',
@@ -232,20 +174,33 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                     numero: '',
                   },
                 ],
-                email: [
+                emails: [
                   {
                     endereco: '',
                   },
                 ],
               }}
-              onSubmit={() => {}}
+              onSubmit={async (values) => {
+                try {
+                  const res = new EmpresaService(db).create()
+                } catch (error) {
+                  
+                }
+              }}
             >
-              {({ handleChange, setFieldValue, values, errors }) => {
+              {({
+                handleChange,
+                handleSubmit,
+                setFieldValue,
+                values,
+                errors,
+              }) => {
                 if (route?.params?.pessoa) {
                   React.useEffect(() => {
                     console.log('modify pessoa');
                     if (route && route.params && route.params.pessoa) {
-                      const { data_nascimento, ...person } = route.params.pessoa;
+                      const { data_nascimento, ...person } =
+                        route.params.pessoa;
                       setFieldValue('pessoa', {
                         ...person,
                         data_nascimento: new Date(data_nascimento),
@@ -264,7 +219,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                 }
 
                 return (
-                  <Box gap="$5">
+                  <Box gap="$8">
                     {values.pessoa.id === '' && !isNewPerson && (
                       <Box gap="$5" mt="$5">
                         <Heading size="md">Selecione uma pessoa:</Heading>
@@ -343,7 +298,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                     {isNewPerson && (
                       <>
                         <FormControl
-                          isInvalid={false}
+                          isInvalid={errors.pessoa?.nome ? true : false}
                           size={'md'}
                           isDisabled={false}
                           isRequired={true}
@@ -362,7 +317,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
 
                           <FormControlHelper>
                             <FormControlHelperText>
-                              Must be atleast 6 characters.
+                              informe o nome da pessoa responsável.
                             </FormControlHelperText>
                           </FormControlHelper>
 
@@ -373,74 +328,21 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                             </FormControlErrorText>
                           </FormControlError>
                         </FormControl>
-                        <FormControl
-                          isInvalid={false}
-                          size={'md'}
-                          isDisabled={false}
-                          isRequired={true}
-                        >
-                          <FormControlLabel>
-                            <FormControlLabelText>
-                              Data de nascimento
-                            </FormControlLabelText>
-                          </FormControlLabel>
-                          <Input isReadOnly={true}>
-                            <InputField
-                              type="text"
-                              value={values.pessoa.data_nascimento.toLocaleDateString(
-                                'PT-BR',
-                              )}
-                              placeholder="05/05/2003"
-                            />
-                            <Button>
-                              <ButtonIcon as={CalendarDaysIcon} />
-                            </Button>
-                          </Input>
 
-                          <FormControlHelper>
-                            <FormControlHelperText>
-                              Must be atleast 6 characters.
-                            </FormControlHelperText>
-                          </FormControlHelper>
-
-                          <FormControlError>
-                            <FormControlErrorIcon as={AlertCircleIcon} />
-                            <FormControlErrorText>
-                              {errors.pessoa?.data_nascimento}
-                            </FormControlErrorText>
-                          </FormControlError>
-                        </FormControl>
-                        <FormControl
-                          isInvalid={false}
-                          size={'md'}
-                          isDisabled={false}
-                          isRequired={true}
-                        >
-                          <FormControlLabel>
-                            <FormControlLabelText>CPF</FormControlLabelText>
-                          </FormControlLabel>
-                          <Input>
-                            <InputField
-                              type="text"
-                              value={values.pessoa.cpf}
-                              onChangeText={handleChange('pessoa.cpf')}
-                              placeholder="123.123.123.12"
-                            />
-                          </Input>
-
-                          <FormControlHelper>
-                            <FormControlHelperText>
-                              Must be atleast 6 characters.
-                            </FormControlHelperText>
-                          </FormControlHelper>
-
-                          <FormControlError>
-                            <FormControlErrorIcon as={AlertCircleIcon} />
-                            <FormControlErrorText>
-                              {errors.pessoa?.cpf}
-                            </FormControlErrorText>
-                          </FormControlError>
-                        </FormControl>
+                        <InputDatePicker
+                          title="Data de nascimento"
+                          maximumDate={getMinDateFor18YearsOld()}
+                          value={values.pessoa.data_nascimento}
+                          onChangeDate={handleChange('pessoa.data_nascimento')}
+                          error={errors.pessoa?.data_nascimento}
+                        />
+                        <InputText
+                          isInvalid={errors.pessoa?.cpf ? true : false}
+                          error={errors.pessoa?.cpf}
+                          value={values.pessoa.cpf}
+                          onChangeValue={handleChange('pessoa.cpf')}
+                          inputType="cpf"
+                        />
                       </>
                     )}
 
@@ -494,7 +396,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                     ) : (
                       <Box>
                         <FormControl
-                          isInvalid={false}
+                          isInvalid={errors.ramo?.nome ? true : false}
                           size={'md'}
                           isDisabled={false}
                           isRequired={true}
@@ -513,14 +415,14 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
 
                           <FormControlHelper>
                             <FormControlHelperText>
-                              Must be atleast 6 characters.
+                              Informe o nome do ramo.
                             </FormControlHelperText>
                           </FormControlHelper>
 
                           <FormControlError>
                             <FormControlErrorIcon as={AlertCircleIcon} />
                             <FormControlErrorText>
-                              Atleast 6 characters are required.
+                              {errors.ramo?.nome}
                             </FormControlErrorText>
                           </FormControlError>
                         </FormControl>
@@ -528,7 +430,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                     )}
 
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={errors.nome_fantasia ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
@@ -548,7 +450,9 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          {
+                            'Informe o nome fantasia ou nome da pessoa (se caso for pessoa física).'
+                          }
                         </FormControlHelperText>
                       </FormControlHelper>
 
@@ -560,27 +464,28 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                       </FormControlError>
                     </FormControl>
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={errors.razao_social ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
                     >
                       <FormControlLabel>
                         <FormControlLabelText>
-                          Razao Social
+                          Razão Social
                         </FormControlLabelText>
                       </FormControlLabel>
                       <Input>
                         <InputField
                           type="text"
-                          placeholder="Nome Completo do Clinente"
+                          placeholder="Nome Completo ou Razão social da empresa"
                           onChangeText={handleChange('razao_social')}
                         />
                       </Input>
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Informe uma razão social de acorod com o que foi
+                          descrito.
                         </FormControlHelperText>
                       </FormControlHelper>
 
@@ -599,7 +504,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                       onChangeValue={handleChange('cnpj')}
                       size="md"
                       isInvalid={errors.cnpj ? true : false}
-                      isRequired={true}
+                      isRequired={false}
                     />
                     <InputText
                       size="md"
@@ -611,38 +516,39 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                     />
 
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={errors.endereco?.logradouro ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
                     >
                       <FormControlLabel>
-                        <FormControlLabelText>Rua</FormControlLabelText>
+                        <FormControlLabelText>Logradouro</FormControlLabelText>
                       </FormControlLabel>
                       <Input>
                         <InputField
-                          value={values.endereco.rua}
-                          onChangeText={handleChange('endereco.rua')}
+                          value={values.endereco.logradouro}
+                          onChangeText={handleChange('endereco.logradouro')}
                           type="text"
-                          placeholder="password"
+                          placeholder="Logradouro"
                         />
                       </Input>
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Informe o logradouro.
                         </FormControlHelperText>
                       </FormControlHelper>
 
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          Atleast 6 characters are required.
+                          {errors.endereco?.logradouro}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
+
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={errors.endereco?.numero ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
@@ -655,26 +561,26 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                           value={values.endereco.numero}
                           onChangeText={handleChange('endereco.numero')}
                           type="text"
-                          placeholder="password"
+                          placeholder="123"
                           keyboardType="number-pad"
                         />
                       </Input>
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Informe o número do endereço.
                         </FormControlHelperText>
                       </FormControlHelper>
 
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          Atleast 6 characters are required.
+                          {errors.endereco?.numero}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={errors.endereco?.complemento ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
@@ -682,30 +588,30 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                       <FormControlLabel>
                         <FormControlLabelText>Complemento</FormControlLabelText>
                       </FormControlLabel>
-                      <Input>
-                        <InputField
+                      <Textarea>
+                        <TextareaInput
                           value={values.endereco.complemento}
                           onChangeText={handleChange('endereco.complemento')}
                           type="text"
-                          placeholder="password"
+                          placeholder="Próxmimo á...."
                         />
-                      </Input>
+                      </Textarea>
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Informe o complemento do endereço.
                         </FormControlHelperText>
                       </FormControlHelper>
 
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          Atleast 6 characters are required.
+                          {errors.endereco?.complemento}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={errors.endereco?.bairro ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
@@ -718,25 +624,25 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                           value={values.endereco.bairro}
                           onChangeText={handleChange('endereco.bairro')}
                           type="text"
-                          placeholder="password"
+                          placeholder="Bairro"
                         />
                       </Input>
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Informe o bairro.
                         </FormControlHelperText>
                       </FormControlHelper>
 
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          Atleast 6 characters are required.
+                          {errors.endereco?.bairro}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={errors.endereco?.cidade ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
@@ -749,85 +655,29 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                           value={values.endereco.cidade}
                           onChangeText={handleChange('endereco.cidade')}
                           type="text"
-                          placeholder="password"
+                          placeholder="sua cidade"
                         />
                       </Input>
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Informe o nome da sua cidade.
                         </FormControlHelperText>
                       </FormControlHelper>
 
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          Atleast 6 characters are required.
+                          {errors.endereco?.cidade}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>UF</FormControlLabelText>
-                      </FormControlLabel>
-                      <Select
-                        onValueChange={handleChange('endereco.uf')}
-                        isInvalid={false}
-                        isDisabled={false}
-                      >
-                        <SelectTrigger size={'md'} variant={'rounded'}>
-                          <SelectInput placeholder="Selecione uma UF" />
-                          <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
-                        </SelectTrigger>
-                        <SelectPortal>
-                          <SelectBackdrop />
-                          <SelectContent>
-                            <SelectDragIndicatorWrapper>
-                              <SelectDragIndicator />
-                            </SelectDragIndicatorWrapper>
-                            <SelectItem
-                              label="UX Research"
-                              value="UX Research"
-                            />
-                            <SelectItem
-                              label="Web Development"
-                              value="Web Development"
-                            />
-                            <SelectItem
-                              label="Cross Platform Development Process"
-                              value="Cross Platform Development Process"
-                            />
-                            <SelectItem
-                              label="UI Designing"
-                              value="UI Designing"
-                              isDisabled={true}
-                            />
-                            <SelectItem
-                              label="Backend Development"
-                              value="Backend Development"
-                            />
-                          </SelectContent>
-                        </SelectPortal>
-                      </Select>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          Atleast 6 characters are required.
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
+                    <SelectEstados
+                      error={errors.endereco?.uf}
+                      value={values.endereco.uf}
+                      isInvalid={errors.endereco?.uf ? true : false}
+                      onChangeValue={handleChange('endereco.uf')}
+                    />
                     <Box gap="$2.5">
                       {values.telefones.map((telefone, i) => {
                         return (
@@ -867,7 +717,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                     </Box>
 
                     <Box gap="$2.5">
-                      {values.email.map((e, i) => {
+                      {values.emails.map((e, i) => {
                         return (
                           <Box key={`email-${i}`}>
                             <FormControl
@@ -886,7 +736,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                                   value={e.endereco}
                                   type="text"
                                   onChangeText={handleChange(
-                                    `email[${i}].endereco`,
+                                    `emails[${i}].endereco`,
                                   )}
                                   placeholder="teste@teste.com"
                                   keyboardType="email-address"
@@ -902,7 +752,12 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                               <FormControlError>
                                 <FormControlErrorIcon as={AlertCircleIcon} />
                                 <FormControlErrorText>
-                                  Atleast 6 characters are required.
+                                  {errors &&
+                                  errors.emails &&
+                                  errors.emails[i] &&
+                                  typeof errors.emails[i] === 'object'
+                                    ? errors.emails[i].endereco
+                                    : ''}
                                 </FormControlErrorText>
                               </FormControlError>
                             </FormControl>
@@ -919,7 +774,13 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                     </Box>
 
                     <Box>
-                      <Button>
+                      <Button
+                        onPress={
+                          handleSubmit as unknown as (
+                            event: GestureResponderEvent,
+                          ) => void
+                        }
+                      >
                         <ButtonText>Cadastrar</ButtonText>
                       </Button>
                     </Box>

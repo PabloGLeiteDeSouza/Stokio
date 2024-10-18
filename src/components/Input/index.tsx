@@ -39,6 +39,8 @@ const InputText: React.FC<IInputTextProps> = ({
   isDisabled,
   isInvalid,
   isRequired,
+  title,
+  size,
 }) => {
   const [data, setData] = React.useState(value ? value : '');
   const [telefoneType, setTelefoneType] = React.useState<'fixo' | 'movel'>(
@@ -157,7 +159,7 @@ const InputText: React.FC<IInputTextProps> = ({
             size={'md'}
           >
             <FormControlLabel>
-              <FormControlLabelText>Cpf</FormControlLabelText>
+              <FormControlLabelText>CPF</FormControlLabelText>
             </FormControlLabel>
             <Input>
               <InputField
@@ -188,9 +190,7 @@ const InputText: React.FC<IInputTextProps> = ({
             </Input>
 
             <FormControlHelper>
-              <FormControlHelperText>
-                Must be atleast 6 characters.
-              </FormControlHelperText>
+              <FormControlHelperText>Informe um cpf.</FormControlHelperText>
             </FormControlHelper>
 
             <FormControlError>
@@ -250,7 +250,7 @@ const InputText: React.FC<IInputTextProps> = ({
 
             <FormControlHelper>
               <FormControlHelperText>
-                Must be atleast 6 characters.
+                Selecione um tipo de telefone.
               </FormControlHelperText>
             </FormControlHelper>
 
@@ -297,9 +297,7 @@ const InputText: React.FC<IInputTextProps> = ({
             </Input>
 
             <FormControlHelper>
-              <FormControlHelperText>
-                Must be atleast 6 characters.
-              </FormControlHelperText>
+              <FormControlHelperText>Informe o telefone.</FormControlHelperText>
             </FormControlHelper>
 
             <FormControlError>
@@ -319,13 +317,24 @@ const InputText: React.FC<IInputTextProps> = ({
             size={'md'}
           >
             <FormControlLabel>
-              <FormControlLabelText>Password</FormControlLabelText>
+              <FormControlLabelText>{title}</FormControlLabelText>
             </FormControlLabel>
             <Input>
               <InputField
-                type="password"
-                defaultValue="12345"
-                placeholder="password"
+                type="text"
+                value={mask(data, 'money')}
+                placeholder="R$10,00"
+                keyboardType="number-pad"
+                onChangeText={(text) => {
+                  setData(
+                    unmask(mask(unmask(text, 'money'), 'money'), 'money'),
+                  );
+                  if (onChangeValue) {
+                    onChangeValue(
+                      unmask(mask(unmask(text, 'money'), 'money'), 'money'),
+                    );
+                  }
+                }}
               />
             </Input>
 

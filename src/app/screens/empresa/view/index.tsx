@@ -71,8 +71,10 @@ import { EditIcon } from '@gluestack-ui/themed';
 import Empresas from './empresas.json';
 import { SearchIcon } from '@gluestack-ui/themed';
 import { Empresa, EmpresaFlatList } from '@/types/screens/empresa';
-import { ListRenderItem } from 'react-native';
+import { Alert, ListRenderItem } from 'react-native';
 import { VisualizarEmpresaScreen } from '@/interfaces/empresa';
+import { EmpresaService } from '@/classes/empresa/empresa.service';
+import { useSQLiteContext } from 'expo-sqlite';
 
 const View: React.FC<VisualizarEmpresaScreen> = ({ navigation }) => {
   const FlatListEmpresa = FlatList as EmpresaFlatList;
@@ -107,7 +109,22 @@ const View: React.FC<VisualizarEmpresaScreen> = ({ navigation }) => {
       </Card>
     );
   };
-  const [empresas, setEmpresas] = React.useState<Array<Empresa>>([...Empresas]);
+  const [empresas, setEmpresas] = React.useState<Array<Empresa>>([]);
+  const db = useSQLiteContext();
+
+  async function start() {
+    try {
+      const emps = await new EmpresaService(db).getAllEmpresas();
+      setEmpresas([...emps]);
+    } catch (error) {
+      Alert.alert('ERRO', (error as Error).message);
+      throw error;
+    }
+  }
+
+  React.useEffect(() => {
+    start();
+  }, []);
 
   return empresas.length < 1 ? (
     <Box h="$full" w="$full" alignItems="center" justifyContent="center">

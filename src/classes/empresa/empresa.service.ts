@@ -9,6 +9,7 @@ import {
   RamoObject,
   EmpresaObject,
   SeachParamsEmpresa,
+  EmpresaSimpleData,
 } from './types';
 import { IEmpresaService } from './interfaces';
 
@@ -21,15 +22,27 @@ export class EmpresaService implements IEmpresaService {
 
   async create(dados: EmpresaCreateData) {
     try {
+      const id_pessoa =
+        typeof dados.pessoa.id !== 'undefined'
+          ? dados.pessoa.id
+          : (
+              await this.db.runAsync(
+                'INSERT into pessoa ( nome, data_nascimento, cpf ) VALUES ( $nome, $data_nascimento, $cpf )',
+                {
+                  $nome: String(dados.pessoa.nome),
+                  $data_nascimento: String(dados.pessoa.data_nascimento),
+                  $cpf: String(dados.pessoa.cpf),
+                },
+              )
+            ).lastInsertRowId.toString();
       const empresaExistente = await this.db.getFirstAsync(
         'SELECT id FROM empresa WHERE cnpj = $cnpj',
-        { $cnpj: dados.cnpj },
+        { $cnpj: String(dados.cnpj) },
       );
       if (empresaExistente)
         throw new Error('Empresa já cadastrada com este CNPJ!');
 
-      let id_ramo: number | null = null;
-      if (dados.ramo) id_ramo = await this.getOrCreateRamo(dados.ramo.nome);
+      const id_ramo = typeof dados.ramo.id
 
       const res_emp = await this.db.runAsync(
         'INSERT INTO empresa (nome, nome_fantasia, razao_social, cnpj, id_ramo) VALUES ($nome, $nome_fantasia, $razao_social, $cnpj, $id_ramo)',
@@ -207,6 +220,13 @@ export class EmpresaService implements IEmpresaService {
       cpf: string;
       data_nascimento: string;
     }>('SELECT * FROM pessoa');
+    return data;
+  }
+
+  async getAllEmpresas() {
+    const data = await this.db.getAllAsync<EmpresaSimpleData>(
+      'SELECT emp.razao_social, emp.nome_fantasia, emp.cnpj, emp.id, pessoa.cpf FROM empresa as emp INNER JOIN pessoa ON pessoa.id == emp.id_pessoa',
+    );
     return data;
   }
 
