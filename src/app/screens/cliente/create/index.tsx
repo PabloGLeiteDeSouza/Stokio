@@ -66,15 +66,13 @@ const validationSchema = Yup.object().shape({
       id_pessoa ? schema.required('CPF é obrigatório') : schema,
     ),
   }),
-  endereco: Yup.object().shape({
-    cep: Yup.string().required('CEP é obrigatório'),
-    logradouro: Yup.string().required('Logradouro é obrigatório'),
-    numero: Yup.string().required('Número é obrigatório'),
-    complemento: Yup.string(),
-    bairro: Yup.string().required('Bairro é obrigatório'),
-    cidade: Yup.string().required('Cidade é obrigatória'),
-    uf: Yup.string().required('UF é obrigatório'),
-  }),
+  cep: Yup.string().required('CEP é obrigatório'),
+  logradouro: Yup.string().required('Logradouro é obrigatório'),
+  numero: Yup.string().required('Número é obrigatório'),
+  complemento: Yup.string(),
+  bairro: Yup.string().required('Bairro é obrigatório'),
+  cidade: Yup.string().required('Cidade é obrigatória'),
+  uf: Yup.string().required('UF é obrigatório'),
   telefones: Yup.array()
     .of(
       Yup.object().shape({
@@ -164,15 +162,13 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                     numero: '',
                   },
                 ],
-                endereco: {
-                  cep: '',
-                  logradouro: '',
-                  numero: '',
-                  complemento: '',
-                  bairro: '',
-                  cidade: '',
-                  uf: '',
-                },
+                cep: '',
+                logradouro: '',
+                numero: '',
+                complemento: '',
+                bairro: '',
+                cidade: '',
+                uf: '',
                 emails: [
                   {
                     endereco: '',
@@ -182,14 +178,9 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
               }}
               onSubmit={async (values) => {
                 try {
-                  const { pessoa, ...valores } = values;
-                  await new ClienteService(db).create({
-                    pessoa: {
-                      ...pessoa,
-                      data_nascimento: String(pessoa.data_nascimento),
-                    },
-                    ...valores,
-                  });
+                  values;
+                  await new ClienteService(db).create(values);
+                  Alert.alert('Sucesso', 'Cliente cadastrardo com sucesso!');
                   navigation?.goBack();
                 } catch (error) {
                   Alert.alert('erro', (error as Error).message);
@@ -264,9 +255,11 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                       <InputDatePicker
                         title="Data de Nascimento"
                         error={errors.pessoa?.data_nascimento}
-                        onChangeDate={handleChange('pessoa.data_nascimento')}
+                        onChangeDate={(date) =>
+                          setFieldValue('pessoa.data_nascimento', date)
+                        }
                         value={values.pessoa.data_nascimento}
-                        maximumDate={values.pessoa.data_nascimento}
+                        maximumDate={getMinDateFor18YearsOld()}
                       />
                       <InputText
                         isRequired={true}
@@ -278,14 +271,14 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                       />
                       <InputText
                         isRequired={true}
-                        isInvalid={errors.endereco?.cep ? true : false}
+                        isInvalid={errors.cep ? true : false}
                         inputType="cep"
-                        onChangeValue={handleChange('endereco.cep')}
-                        value={values.endereco.cep}
-                        error={errors.endereco?.cep}
+                        onChangeValue={handleChange('cep')}
+                        value={values.cep}
+                        error={errors.cep}
                       />
                       <FormControl
-                        isInvalid={errors.endereco?.logradouro ? true : false}
+                        isInvalid={errors.logradouro ? true : false}
                         size={'md'}
                         isDisabled={false}
                         isRequired={true}
@@ -297,7 +290,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                         </FormControlLabel>
                         <Input>
                           <InputField
-                            onChangeText={handleChange('endereco.logradouro')}
+                            onChangeText={handleChange('logradouro')}
                             type="text"
                             placeholder="adadasdasdas"
                           />
@@ -312,12 +305,12 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                         <FormControlError>
                           <FormControlErrorIcon as={AlertCircleIcon} />
                           <FormControlErrorText>
-                            {errors.endereco?.logradouro}
+                            {errors.logradouro}
                           </FormControlErrorText>
                         </FormControlError>
                       </FormControl>
                       <FormControl
-                        isInvalid={errors.endereco?.numero ? true : false}
+                        isInvalid={errors.numero ? true : false}
                         size={'md'}
                         isDisabled={false}
                         isRequired={true}
@@ -327,7 +320,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                         </FormControlLabel>
                         <Input>
                           <InputField
-                            onChangeText={handleChange('endereco.numero')}
+                            onChangeText={handleChange('numero')}
                             type="text"
                             placeholder="dasdasdasdasdasd"
                             keyboardType="number-pad"
@@ -343,12 +336,12 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                         <FormControlError>
                           <FormControlErrorIcon as={AlertCircleIcon} />
                           <FormControlErrorText>
-                            {errors.endereco?.numero}
+                            {errors.numero}
                           </FormControlErrorText>
                         </FormControlError>
                       </FormControl>
                       <FormControl
-                        isInvalid={errors.endereco?.complemento ? true : false}
+                        isInvalid={errors.complemento ? true : false}
                         size={'md'}
                         isDisabled={false}
                         isRequired={false}
@@ -360,10 +353,10 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                         </FormControlLabel>
                         <Textarea>
                           <TextareaInput
-                            onChangeText={handleChange('endereco.complemento')}
+                            onChangeText={handleChange('complemento')}
                             type="text"
                             placeholder="asdsadasdas"
-                            value={values.endereco.complemento}
+                            value={values.complemento}
                           />
                         </Textarea>
 
@@ -376,12 +369,12 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                         <FormControlError>
                           <FormControlErrorIcon as={AlertCircleIcon} />
                           <FormControlErrorText>
-                            {errors.endereco?.complemento}
+                            {errors.complemento}
                           </FormControlErrorText>
                         </FormControlError>
                       </FormControl>
                       <FormControl
-                        isInvalid={errors.endereco?.bairro ? true : false}
+                        isInvalid={errors.bairro ? true : false}
                         size={'md'}
                         isDisabled={false}
                         isRequired={true}
@@ -391,7 +384,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                         </FormControlLabel>
                         <Input>
                           <InputField
-                            onChangeText={handleChange('endereco.bairro')}
+                            onChangeText={handleChange('bairro')}
                             type="text"
                             placeholder="asdasdasdas"
                           />
@@ -406,12 +399,12 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                         <FormControlError>
                           <FormControlErrorIcon as={AlertCircleIcon} />
                           <FormControlErrorText>
-                            {errors.endereco?.bairro}
+                            {errors.bairro}
                           </FormControlErrorText>
                         </FormControlError>
                       </FormControl>
                       <FormControl
-                        isInvalid={errors.endereco?.cidade ? true : false}
+                        isInvalid={errors.cidade ? true : false}
                         size={'md'}
                         isDisabled={false}
                         isRequired={true}
@@ -421,7 +414,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                         </FormControlLabel>
                         <Input>
                           <InputField
-                            onChangeText={handleChange('endereco.cidade')}
+                            onChangeText={handleChange('cidade')}
                             type="text"
                             placeholder="adasdasdasdas"
                           />
@@ -436,17 +429,17 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                         <FormControlError>
                           <FormControlErrorIcon as={AlertCircleIcon} />
                           <FormControlErrorText>
-                            {errors.endereco?.cidade}
+                            {errors.cidade}
                           </FormControlErrorText>
                         </FormControlError>
                       </FormControl>
                       <SelectEstados
                         isRequired={true}
                         isDisabled={false}
-                        isInvalid={errors.endereco?.uf ? true : false}
-                        onChangeValue={handleChange('endereco.uf')}
-                        value={values.endereco.uf}
-                        error={errors.endereco?.uf}
+                        isInvalid={errors.uf ? true : false}
+                        onChangeValue={handleChange('uf')}
+                        value={values.uf}
+                        error={errors.uf}
                       />
                       <Box gap="$2.5">
                         {values.telefones.map((telefone, i) => {

@@ -38,11 +38,11 @@ const InputDatePicker: React.FC<IInputDatePicker> = ({
       minuteInterval,
       minimumDate,
       maximumDate,
-      value: value ? new Date(value) : new Date(),
+      value: value ? value : maximumDate ? maximumDate : new Date(),
       onChange: (event, selectedDate) => {
         if (event.type === 'set') {
           if (selectedDate) {
-            onChangeDate(String(selectedDate));
+            onChangeDate(selectedDate);
           }
         }
       },
@@ -72,7 +72,7 @@ const InputDatePicker: React.FC<IInputDatePicker> = ({
               day: '2-digit',
               month: '2-digit',
               year: 'numeric',
-            }).format(new Date(value))}
+            }).format(value)}
           />
           <Button onPress={startPicker}>
             <ButtonIcon as={CalendarDaysIcon} />

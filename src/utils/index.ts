@@ -16,6 +16,18 @@ export function getMinDateFor18YearsOld(): Date {
   return minDate;
 }
 
+export function getStringFromDate(data: Date) {
+  return `${data.getFullYear()}-${data.getMonth()}-${data.getDate() + 1}`;
+}
+
+export function getDateFromString(data: string) {
+  return new Date(
+    Number(data.split('-')[0]),
+    Number(data.split('-')[1]),
+    Number(data.split('-')[2]),
+  );
+}
+
 export function verificarAtributosObjeto(obj: object) {
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {

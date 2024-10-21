@@ -28,7 +28,7 @@ export type EmailObject = {
 export type PessoaObject = {
   id: string;
   nome: string;
-  data_de_nascimento: string;
+  data_de_nascimento: Date;
   cpf: string;
 };
 

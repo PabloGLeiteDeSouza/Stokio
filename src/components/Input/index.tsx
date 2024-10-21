@@ -64,7 +64,7 @@ const InputText: React.FC<IInputTextProps> = ({
                 type="text"
                 placeholder="11.111-111"
                 keyboardType="number-pad"
-                value={mask(data, 'cep')}
+                value={mask(value ? value : data, 'cep')}
                 onChangeText={(text) => {
                   setData(unmask(mask(text, 'cep')));
                   if (onChangeValue) {
@@ -115,7 +115,7 @@ const InputText: React.FC<IInputTextProps> = ({
                 type="text"
                 placeholder="99.999.999/0001-99"
                 keyboardType="number-pad"
-                value={mask(data, 'cnpj')}
+                value={mask(value ? value : data, 'cnpj')}
                 onChangeText={(text) => {
                   setData(unmask(mask(text, 'cnpj')));
                   if (onChangeValue) {
@@ -166,7 +166,7 @@ const InputText: React.FC<IInputTextProps> = ({
                 type="text"
                 placeholder="123.123.123-12"
                 keyboardType="number-pad"
-                value={mask(data, 'cpf')}
+                value={mask(value ? value : data, 'cpf')}
                 onChangeText={(text) => {
                   setData(unmask(mask(text, 'cpf')));
                   if (onChangeValue) {
@@ -273,7 +273,7 @@ const InputText: React.FC<IInputTextProps> = ({
                 type="text"
                 placeholder="+551199999-9999"
                 keyboardType="number-pad"
-                value={mask(data, 'telefone', telefoneType)}
+                value={mask(value ? value : data, 'telefone', telefoneType)}
                 onChangeText={(text) => {
                   setData(unmask(mask(text, 'telefone', telefoneType)));
                   if (onChangeValue) {

@@ -58,7 +58,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { RamoService } from '@/classes/ramo/ramo.service';
 import InputText from '@/components/Input';
 import SelectEstados from '@/components/Custom/Selects/SelectEstados';
-import { GestureResponderEvent } from 'react-native';
+import { Alert, GestureResponderEvent } from 'react-native';
 import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
 import { getMinDateFor18YearsOld } from '@/utils';
 
@@ -89,15 +89,13 @@ const validationSchema = Yup.object().shape({
       numero: Yup.string().required('Número de telefone é obrigatório'),
     }),
   ),
-  endereco: Yup.object().shape({
-    cep: Yup.string().required('CEP é obrigatório'),
-    logradouro: Yup.string().required('Logradouro é obrigatório'),
-    numero: Yup.string().required('Número é obrigatório'),
-    complemento: Yup.string(),
-    bairro: Yup.string().required('Bairro é obrigatório'),
-    cidade: Yup.string().required('Cidade é obrigatória'),
-    uf: Yup.string().required('UF e obrigatorio!'),
-  }),
+  cep: Yup.string().required('CEP é obrigatório'),
+  logradouro: Yup.string().required('Logradouro é obrigatório'),
+  numero: Yup.string().required('Número é obrigatório'),
+  complemento: Yup.string(),
+  bairro: Yup.string().required('Bairro é obrigatório'),
+  cidade: Yup.string().required('Cidade é obrigatória'),
+  uf: Yup.string().required('UF e obrigatorio!'),
   emails: Yup.array().of(
     Yup.object().shape({
       endereco: Yup.string().required('Endereço de email é obrigatório'),
@@ -160,15 +158,13 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                   id: '',
                   nome: '',
                 },
-                endereco: {
-                  cep: '',
-                  logradouro: '',
-                  numero: '',
-                  complemento: '',
-                  bairro: '',
-                  cidade: '',
-                  uf: '',
-                },
+                cep: '',
+                logradouro: '',
+                numero: '',
+                complemento: '',
+                bairro: '',
+                cidade: '',
+                uf: '',
                 telefones: [
                   {
                     numero: '',
@@ -182,9 +178,12 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
               }}
               onSubmit={async (values) => {
                 try {
-                  const res = new EmpresaService(db).create()
+                  await new EmpresaService(db).create(values);
+                  Alert.alert('Sucesso', 'Empresa cadastrada com sucesso!');
+                  navigation?.navigate('visualizar-empresas');
                 } catch (error) {
-                  
+                  Alert.alert('Erro', (error as Error).message);
+                  throw error;
                 }
               }}
             >
@@ -508,15 +507,15 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                     />
                     <InputText
                       size="md"
-                      isInvalid={errors.endereco?.cep ? true : false}
+                      isInvalid={errors.cep ? true : false}
                       inputType="cep"
-                      value={values.endereco.cep}
-                      error={errors.endereco?.cep}
-                      onChangeValue={handleChange('endereco.cep')}
+                      value={values.cep}
+                      error={errors.cep}
+                      onChangeValue={handleChange('cep')}
                     />
 
                     <FormControl
-                      isInvalid={errors.endereco?.logradouro ? true : false}
+                      isInvalid={errors.logradouro ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
@@ -526,8 +525,8 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                       </FormControlLabel>
                       <Input>
                         <InputField
-                          value={values.endereco.logradouro}
-                          onChangeText={handleChange('endereco.logradouro')}
+                          value={values.logradouro}
+                          onChangeText={handleChange('logradouro')}
                           type="text"
                           placeholder="Logradouro"
                         />
@@ -542,13 +541,13 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          {errors.endereco?.logradouro}
+                          {errors.logradouro}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
 
                     <FormControl
-                      isInvalid={errors.endereco?.numero ? true : false}
+                      isInvalid={errors.numero ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
@@ -558,8 +557,8 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                       </FormControlLabel>
                       <Input>
                         <InputField
-                          value={values.endereco.numero}
-                          onChangeText={handleChange('endereco.numero')}
+                          value={values.numero}
+                          onChangeText={handleChange('numero')}
                           type="text"
                           placeholder="123"
                           keyboardType="number-pad"
@@ -575,12 +574,12 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          {errors.endereco?.numero}
+                          {errors.numero}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
                     <FormControl
-                      isInvalid={errors.endereco?.complemento ? true : false}
+                      isInvalid={errors.complemento ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
@@ -590,8 +589,8 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                       </FormControlLabel>
                       <Textarea>
                         <TextareaInput
-                          value={values.endereco.complemento}
-                          onChangeText={handleChange('endereco.complemento')}
+                          value={values.complemento}
+                          onChangeText={handleChange('complemento')}
                           type="text"
                           placeholder="Próxmimo á...."
                         />
@@ -606,12 +605,12 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          {errors.endereco?.complemento}
+                          {errors.complemento}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
                     <FormControl
-                      isInvalid={errors.endereco?.bairro ? true : false}
+                      isInvalid={errors.bairro ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
@@ -621,8 +620,8 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                       </FormControlLabel>
                       <Input>
                         <InputField
-                          value={values.endereco.bairro}
-                          onChangeText={handleChange('endereco.bairro')}
+                          value={values.bairro}
+                          onChangeText={handleChange('bairro')}
                           type="text"
                           placeholder="Bairro"
                         />
@@ -637,12 +636,12 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          {errors.endereco?.bairro}
+                          {errors.bairro}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
                     <FormControl
-                      isInvalid={errors.endereco?.cidade ? true : false}
+                      isInvalid={errors.cidade ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
@@ -652,8 +651,8 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                       </FormControlLabel>
                       <Input>
                         <InputField
-                          value={values.endereco.cidade}
-                          onChangeText={handleChange('endereco.cidade')}
+                          value={values.cidade}
+                          onChangeText={handleChange('cidade')}
                           type="text"
                           placeholder="sua cidade"
                         />
@@ -668,15 +667,15 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          {errors.endereco?.cidade}
+                          {errors.cidade}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
                     <SelectEstados
-                      error={errors.endereco?.uf}
-                      value={values.endereco.uf}
-                      isInvalid={errors.endereco?.uf ? true : false}
-                      onChangeValue={handleChange('endereco.uf')}
+                      error={errors.uf}
+                      value={values.uf}
+                      isInvalid={errors.uf ? true : false}
+                      onChangeValue={handleChange('uf')}
                     />
                     <Box gap="$2.5">
                       {values.telefones.map((telefone, i) => {

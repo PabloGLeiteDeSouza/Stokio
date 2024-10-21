@@ -9,10 +9,16 @@ export type EmpresaCreateData = {
   nome_fantasia: string;
   razao_social: string;
   cnpj?: string;
+  cep: string;
+  logradouro: string;
+  numero: string;
+  complemento?: string;
+  bairro: string;
+  cidade: string;
+  uf: string;
   ramo: RamoData;
   telefones: TelefoneData[];
   emails: EmailData[];
-  endereco: EnderecoData;
 };
 
 export type EmpresaSimpleData = {
@@ -23,16 +29,46 @@ export type EmpresaSimpleData = {
   cnpj?: string;
 };
 
+export type EmpresaSimpleDataResult = {
+  id: string;
+  nome_fantasia: string;
+  razao_social: string;
+  cpf: string;
+  cnpj?: string;
+  id_endereco: string;
+  id_pessoa: string;
+  id_ramo: string;
+};
+
+export type PessoaDataResult = {
+  id: string;
+  nome: string;
+  data_nascimento: string;
+  cpf: string;
+};
+
+export type EnderecoDataResult = {
+  id: string;
+  cep: string;
+  logradouro: string;
+  numero: string;
+  complemento: string;
+  bairro: string;
+  cidade: string;
+  uf: string;
+};
+
 export type EmpresaUpdateData = {
   id: string;
   nome: string;
-  nome_fantasia?: string;
-  razao_social?: string;
+  nome_fantasia: string;
+  razao_social: string;
   cnpj: string;
-  ramo?: RamoData;
-  telefones: TelefoneData[];
-  emails: EmailData[];
-  endereco: EnderecoData;
+  pessoa: PessoaDataResult;
+  ramo: RamoDataUpdate;
+  telefones: TelefoneDataUpdate[];
+  emails: EmailDataUpdate[];
+  endereco: EnderecoDataUpdate;
 };
 
 // Tipos de critério de busca de empresa
@@ -50,8 +86,18 @@ export type RamoData = {
   nome?: string;
 };
 
+export type RamoDataUpdate = {
+  id: string;
+  nome: string;
+};
+
 // Tipo de dados de telefone
 export type TelefoneData = {
+  numero: string;
+};
+
+export type TelefoneDataUpdate = {
+  id: string;
   numero: string;
 };
 
@@ -60,8 +106,26 @@ export type EmailData = {
   endereco: string;
 };
 
+// Tipo de dados de email
+export type EmailDataUpdate = {
+  id: string;
+  endereco: string;
+};
+
 // Tipo de dados de endereço
 export type EnderecoData = {
+  cep: string;
+  logradouro: string;
+  numero: string;
+  complemento?: string;
+  bairro: string;
+  cidade: string;
+  uf: string;
+};
+
+// Tipo de dados de endereço Update
+export type EnderecoDataUpdate = {
+  id: string;
   cep: string;
   logradouro: string;
   numero: string;
@@ -114,4 +178,14 @@ export type SeachParamsEmpresa = {
   $nome?: string;
   $nome_fantasia?: string;
   $razao_social?: string;
+};
+
+export type EmpresaDataTableResult = {
+  id: string;
+  nome_fantasia: string;
+  razao_social: string;
+  cnpj: string;
+  id_ramo: string;
+  id_pessoa: string;
+  id_endereco: string;
 };

@@ -55,6 +55,11 @@ import * as Yup from 'yup';
 import { useIsFocused } from '@react-navigation/native';
 import formatDate from '@utils/formatDate';
 import { Pessoa } from '@/types/screens/cliente';
+import { EmpresaService } from '@/classes/empresa/empresa.service';
+import { useSQLiteContext } from 'expo-sqlite';
+import { EmpresaUpdateData } from '@/classes/empresa/types';
+import InputText from '@/components/Input';
+import SelectEstados from '@/components/Custom/Selects/SelectEstados';
 
 const validationSchema = Yup.object().shape({
   pessoa: Yup.object().shape({
@@ -98,7 +103,11 @@ const validationSchema = Yup.object().shape({
 });
 
 const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
-  const isFocused = useIsFocused();
+  if (!route || !route.params || !route.params.id) {
+    navigation?.goBack();
+    return null;
+  }
+  const { id } = route.params;
   const [isLoading, setIsLoading] = React.useState(true);
   const [pessoas, setPessoas] = React.useState<Array<Pessoa>>([
     {
@@ -164,11 +173,12 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
   ]);
   const [isNewPerson, setIsNewPerson] = React.useState(false);
   const [isNewRamo, setIsNewRamo] = React.useState(false);
-  const [empresa, setEmpresa] = React.useState({
+  const [empresa, setEmpresa] = React.useState<EmpresaUpdateData>({
+    id: '',
     pessoa: {
       id: '',
       nome: '',
-      data_nascimento: new Date(),
+      data_nascimento: String(new Date()),
       cpf: '',
     },
     cnpj: '',
@@ -180,34 +190,42 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
     },
     telefones: [
       {
+        id: '',
         numero: '',
       },
     ],
     endereco: {
+      id: '',
       cep: '',
-      rua: '',
+      logradouro: '',
       numero: '',
       complemento: '',
       bairro: '',
       cidade: '',
       uf: '',
     },
-    email: [
+    emails: [
       {
+        id: '',
         endereco: '',
       },
     ],
   });
+  const db = useSQLiteContext();
+
+  async function start() {
+    try {
+      const Emp = await new EmpresaService(db).getById(id);
+      setEmpresa(Emp);
+      setIsLoading(false);
+    } catch (error) {
+      navigation?.goBack();
+      setIsLoading(false);
+      throw error;
+    }
+  }
 
   React.useEffect(() => {
-    async function start() {
-      try {
-        setIsLoading(false);
-      } catch (error) {
-        setIsLoading(false);
-        throw error;
-      }
-    }
     start();
   }, []);
 
@@ -357,6 +375,7 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                             </FormControlErrorText>
                           </FormControlError>
                         </FormControl>
+
                         <FormControl
                           isInvalid={false}
                           size={'md'}
@@ -527,6 +546,7 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                           type="text"
                           placeholder="Nome Fantasia"
                           onChangeText={handleChange('nome_fantasia')}
+                          value={values.nome_fantasia}
                         />
                       </Input>
 
@@ -559,6 +579,7 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                           type="text"
                           placeholder="Nome Completo do Clinente"
                           onChangeText={handleChange('razao_social')}
+                          value={values.razao_social}
                         />
                       </Input>
 
@@ -575,68 +596,21 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
+                    <InputText
+                      inputType="cnpj"
+                      value={values.cnpj}
+                      onChangeValue={handleChange('cnpj')}
+                      error={errors.cnpj}
+                      isInvalid={errors.cnpj ? true : false}
+                    />
+                    <InputText
+                      inputType="cep"
+                      error={errors.endereco?.cep}
+                      value={values.endereco?.cep}
+                      onChangeValue={handleChange('endereco.cep')}
+                      isInvalid={errors.endereco?.cep ? true : false}
                       isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>CNPJ</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <InputField
-                          type="text"
-                          value={values.cnpj}
-                          onChangeText={handleChange('cnpj')}
-                          placeholder="123.123.123.12"
-                        />
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          {errors.cnpj}
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>Cep</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <InputField
-                          value={values.endereco.cep}
-                          onChangeText={handleChange('endereco.cep')}
-                          type="text"
-                          placeholder="password"
-                        />
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          Atleast 6 characters are required.
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
+                    />
                     <FormControl
                       isInvalid={false}
                       size={'md'}
@@ -648,8 +622,8 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                       </FormControlLabel>
                       <Input>
                         <InputField
-                          value={values.endereco.rua}
-                          onChangeText={handleChange('endereco.rua')}
+                          value={values.endereco.logradouro}
+                          onChangeText={handleChange('endereco.logradouro')}
                           type="text"
                           placeholder="password"
                         />
@@ -679,24 +653,24 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                       </FormControlLabel>
                       <Input>
                         <InputField
-                          value={values.endereco.numero}
+                          value={String(values.endereco.numero)}
                           onChangeText={handleChange('endereco.numero')}
                           type="text"
-                          placeholder="password"
+                          placeholder="123"
                           keyboardType="number-pad"
                         />
                       </Input>
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Infome o numero da residencia.
                         </FormControlHelperText>
                       </FormControlHelper>
 
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          Atleast 6 characters are required.
+                          {errors.endereco?.numero}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
@@ -709,14 +683,14 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                       <FormControlLabel>
                         <FormControlLabelText>Complemento</FormControlLabelText>
                       </FormControlLabel>
-                      <Input>
-                        <InputField
+                      <Textarea>
+                        <TextareaInput
                           value={values.endereco.complemento}
                           onChangeText={handleChange('endereco.complemento')}
                           type="text"
-                          placeholder="password"
+                          placeholder="Proximo a ..."
                         />
-                      </Input>
+                      </Textarea>
 
                       <FormControlHelper>
                         <FormControlHelperText>
@@ -793,72 +767,31 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
+                    <SelectEstados
+                      error={errors.endereco?.uf}
+                      value={values.endereco.uf}
+                      onChangeValue={handleChange('endereco.uf')}
+                      isInvalid={errors.endereco?.uf ? true : false}
                       isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>UF</FormControlLabelText>
-                      </FormControlLabel>
-                      <Select
-                        onValueChange={handleChange('endereco.uf')}
-                        isInvalid={false}
-                        isDisabled={false}
-                      >
-                        <SelectTrigger size={'md'} variant={'rounded'}>
-                          <SelectInput placeholder="Selecione uma UF" />
-                          <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
-                        </SelectTrigger>
-                        <SelectPortal>
-                          <SelectBackdrop />
-                          <SelectContent>
-                            <SelectDragIndicatorWrapper>
-                              <SelectDragIndicator />
-                            </SelectDragIndicatorWrapper>
-                            <SelectItem
-                              label="UX Research"
-                              value="UX Research"
-                            />
-                            <SelectItem
-                              label="Web Development"
-                              value="Web Development"
-                            />
-                            <SelectItem
-                              label="Cross Platform Development Process"
-                              value="Cross Platform Development Process"
-                            />
-                            <SelectItem
-                              label="UI Designing"
-                              value="UI Designing"
-                              isDisabled={true}
-                            />
-                            <SelectItem
-                              label="Backend Development"
-                              value="Backend Development"
-                            />
-                          </SelectContent>
-                        </SelectPortal>
-                      </Select>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          Atleast 6 characters are required.
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
+                    />
                     <Box gap="$2.5">
                       {values.telefones.map((telefone, i) => {
                         return (
                           <Box key={`telefone-${i}`}>
+                            <InputText
+                              inputType="telefone"
+                              error={
+                                typeof errors.telefones !== 'undefined' &&
+                                typeof errors.telefones[i] === 'object' &&
+                                typeof errors.telefones[i] !== 'string'
+                                  ? errors.telefones[i].numero
+                                  : ''
+                              }
+                              value={values.telefones[i].numero}
+                              onChangeValue={handleChange(
+                                `telefones[${i}].numero`,
+                              )}
+                            />
                             <FormControl
                               isInvalid={false}
                               size={'md'}
@@ -908,7 +841,7 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                     </Box>
 
                     <Box gap="$2.5">
-                      {values.email.map((e, i) => {
+                      {values.emails.map((e, i) => {
                         return (
                           <Box key={`email-${i}`}>
                             <FormControl
@@ -927,7 +860,7 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                                   value={e.endereco}
                                   type="text"
                                   onChangeText={handleChange(
-                                    `email[${i}].endereco`,
+                                    `emails[${i}].endereco`,
                                   )}
                                   placeholder="teste@teste.com"
                                   keyboardType="email-address"
