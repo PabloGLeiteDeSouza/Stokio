@@ -241,8 +241,8 @@ export type ClientesStackParamList = {
   'cadastrar-cliente'?: { pessoa: Pessoa };
   'atualizar-cliente'?: { id: number | string; pessoa: Pessoa };
   'selecionar-pessoa'?: {
-    screen: 'cadastrar-cliente';
-    pessoas: Array<Pessoa>;
+    screen: 'cadastrar-cliente' | 'atualizar-cliente';
+    pessoas: Pessoa[];
     pessoaSelecionada?: Pessoa;
   };
   'visualizar-clientes'?: object;

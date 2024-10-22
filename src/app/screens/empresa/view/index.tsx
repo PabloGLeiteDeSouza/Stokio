@@ -75,8 +75,11 @@ import { Alert, ListRenderItem } from 'react-native';
 import { VisualizarEmpresaScreen } from '@/interfaces/empresa';
 import { EmpresaService } from '@/classes/empresa/empresa.service';
 import { useSQLiteContext } from 'expo-sqlite';
+import { useIsFocused } from '@react-navigation/native';
+import { mask } from '@/utils/mask';
 
 const View: React.FC<VisualizarEmpresaScreen> = ({ navigation }) => {
+  const focused = useIsFocused();
   const FlatListEmpresa = FlatList as EmpresaFlatList;
   const ListRenderEmpresa: ListRenderItem<Empresa> = ({ item }) => {
     return (
@@ -88,11 +91,11 @@ const View: React.FC<VisualizarEmpresaScreen> = ({ navigation }) => {
             </Heading>
             {item.cnpj ? (
               <Text mb="$1" size="sm">
-                {item.cnpj}
+                {mask(item.cnpj, 'cnpj')}
               </Text>
             ) : (
               <Text mb="$1" size="sm">
-                {item.cpf}
+                {mask(item.cpf, 'cpf')}
               </Text>
             )}
           </Box>
@@ -123,8 +126,10 @@ const View: React.FC<VisualizarEmpresaScreen> = ({ navigation }) => {
   }
 
   React.useEffect(() => {
-    start();
-  }, []);
+    if (focused) {
+      start();
+    }
+  }, [focused]);
 
   return empresas.length < 1 ? (
     <Box h="$full" w="$full" alignItems="center" justifyContent="center">

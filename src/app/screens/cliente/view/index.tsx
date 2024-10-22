@@ -66,12 +66,11 @@ import {
 import { Box } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import { Card } from '@gluestack-ui/themed';
-import CLIENTES from './clientes.json';
 import { SearchIcon } from '@gluestack-ui/themed';
 import { VisualizarClienteScreen } from '@/interfaces/cliente';
 import { FlatList } from '@gluestack-ui/themed';
 import { Alert, ListRenderItem } from 'react-native';
-import { ClienteObject, ClientFlatList } from './types';
+import { ClientFlatList } from './types';
 import { useSQLiteContext } from 'expo-sqlite';
 import { ClienteService } from '@/classes/cliente/cliente.service';
 import { useIsFocused } from '@react-navigation/native';

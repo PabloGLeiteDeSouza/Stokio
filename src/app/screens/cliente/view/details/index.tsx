@@ -1,5 +1,6 @@
 import { ClienteService } from '@/classes/cliente/cliente.service';
 import {
+  IClienteUpdate,
   IEmailUpdate,
   IEnderecoUpdate,
   IPessoaUpdate,
@@ -11,10 +12,13 @@ import { mask } from '@/utils/mask';
 import {
   Box,
   Button,
+  ButtonIcon,
   ButtonText,
+  EditIcon,
   Heading,
   ScrollView,
   Text,
+  TrashIcon,
 } from '@gluestack-ui/themed';
 import { useSQLiteContext } from 'expo-sqlite';
 import React from 'react';
@@ -28,16 +32,7 @@ const Details: React.FC<DetalhesClienteScreen> = ({ navigation, route }) => {
   const id = route?.params?.id;
   const db = useSQLiteContext();
   const [isLoading, setIsLoading] = React.useState(true);
-  const [cliente, setCliente] = React.useState<{
-    pessoa: IPessoaUpdate;
-    endereco: IEnderecoUpdate;
-    telefones: ITelefoneUpdate[];
-    emails: IEmailUpdate[];
-    id: string;
-    limite: string;
-    id_pessoa: string;
-    id_endereco: string;
-  } | null>(null);
+  const [cliente, setCliente] = React.useState<IClienteUpdate | null>(null);
 
   React.useEffect(() => {
     async function start() {
@@ -94,27 +89,27 @@ const Details: React.FC<DetalhesClienteScreen> = ({ navigation, route }) => {
               <Heading>Endereço:</Heading>
               <Box gap="$1.5">
                 <Heading>Logradouro:</Heading>
-                <Text>{cliente.endereco.logradouro}</Text>
+                <Text>{cliente.logradouro}</Text>
               </Box>
               <Box gap="$1.5">
                 <Heading>Número:</Heading>
-                <Text>{cliente.endereco.numero}</Text>
+                <Text>{cliente.numero}</Text>
               </Box>
               <Box gap="$1.5">
                 <Heading>Complemento:</Heading>
-                <Text>{cliente.endereco.complemento}</Text>
+                <Text>{cliente.complemento}</Text>
               </Box>
               <Box gap="$1.5">
                 <Heading>Bairro:</Heading>
-                <Text>{cliente.endereco.bairro}</Text>
+                <Text>{cliente.bairro}</Text>
               </Box>
               <Box gap="$1.5">
                 <Heading>Cidade:</Heading>
-                <Text size="xl">{cliente.endereco.bairro}</Text>
+                <Text size="xl">{cliente.bairro}</Text>
               </Box>
               <Box gap="$1.5">
                 <Heading>UF:</Heading>
-                <Text size="xl">{cliente.endereco.uf}</Text>
+                <Text size="xl">{cliente.uf}</Text>
               </Box>
             </Box>
             <Box gap="$1.5">
@@ -135,11 +130,16 @@ const Details: React.FC<DetalhesClienteScreen> = ({ navigation, route }) => {
             </Box>
             <Box gap="$5">
               <Button
-                onPress={() => navigation?.navigate('atualizar-cliente', {})}
+                gap="$2.5"
+                onPress={() =>
+                  navigation?.navigate('atualizar-cliente', { id: cliente.id })
+                }
               >
+                <ButtonIcon as={EditIcon} />
                 <ButtonText>Editar</ButtonText>
               </Button>
-              <Button action="negative">
+              <Button gap="$2.5" action="negative">
+                <ButtonIcon as={TrashIcon} />
                 <ButtonText>Excluir</ButtonText>
               </Button>
             </Box>

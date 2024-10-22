@@ -1,18 +1,19 @@
 import { SQLiteDatabase } from 'expo-sqlite';
 import {
   IClienteCreate,
+  IClienteCreateOnly,
   IClienteSimpleRequest,
   IClienteUpdate,
+  IClienteUpdateOnly,
   IEmail,
   IEmailUpdate,
-  IEndereco,
-  IEnderecoUpdate,
+  IPessoaCreate,
   IPessoaUpdate,
   ISimpleCliente,
   ITelefone,
   ITelefoneUpdate,
 } from './interfaces';
-import { Pessoa } from '@/types/screens/cliente';
+import { getStringFromDate } from '@/utils';
 
 export class ClienteService {
   private db: SQLiteDatabase;
@@ -23,26 +24,22 @@ export class ClienteService {
 
   async create(data: IClienteCreate): Promise<void> {
     try {
+      const { emails, telefones, pessoa, ...dados } = data;
       const idPessoa = data.pessoa.id
         ? Number(data.pessoa.id)
-        : await this.createOrFetchPessoa(data);
-      const idEndereco = await this.createEndereco(data.endereco);
-      const idCliente = await this.createCliente(
-        data.limite,
-        idEndereco,
-        idPessoa,
-      );
-      await this.createEmails(data.emails, idCliente);
-      await this.createTelefones(data.telefones, idCliente);
+        : await this.createOrFetchPessoa(pessoa);
+      const idCliente = await this.createCliente(dados, idPessoa);
+      await this.createEmails(emails, idCliente);
+      await this.createTelefones(telefones, idCliente);
     } catch (error) {
       throw new Error(`Erro ao criar cliente: ${(error as Error).message}`);
     }
   }
 
-  private async createOrFetchPessoa(data: IClienteCreate): Promise<number> {
+  private async createOrFetchPessoa(pessoa: IPessoaCreate): Promise<number> {
     const pessoaExistente = await this.db.getFirstAsync<{ id: number }>(
       'SELECT id FROM pessoa WHERE cpf = $cpf',
-      { $cpf: data.pessoa.cpf },
+      { $cpf: pessoa.cpf },
     );
 
     if (pessoaExistente) {
@@ -52,9 +49,9 @@ export class ClienteService {
     const res = await this.db.runAsync(
       'INSERT INTO pessoa (nome, data_nascimento, cpf) VALUES ($nome, $data_nascimento, $cpf)',
       {
-        $nome: data.pessoa.nome,
-        $data_nascimento: data.pessoa.data_nascimento,
-        $cpf: data.pessoa.cpf,
+        $nome: pessoa.nome,
+        $data_nascimento: getStringFromDate(pessoa.data_nascimento),
+        $cpf: pessoa.cpf,
       },
     );
 
@@ -65,37 +62,21 @@ export class ClienteService {
     return res.lastInsertRowId;
   }
 
-  private async createEndereco(endereco: IEndereco): Promise<number> {
-    const res = await this.db.runAsync(
-      'INSERT INTO endereco (cep, logradouro, numero, complemento, bairro, cidade, uf) VALUES ($cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf)',
-      {
-        $cep: endereco.cep,
-        $logradouro: endereco.logradouro,
-        $numero: endereco.numero,
-        $complemento: endereco.complemento || '',
-        $bairro: endereco.bairro,
-        $cidade: endereco.cidade,
-        $uf: endereco.uf,
-      },
-    );
-
-    if (res.changes < 1) {
-      throw new Error('Não foi possível criar o endereço');
-    }
-
-    return res.lastInsertRowId;
-  }
-
   private async createCliente(
-    limite: string,
-    idEndereco: number,
+    cliente: IClienteCreateOnly,
     id_pessoa: number,
   ): Promise<number> {
     const res = await this.db.runAsync(
-      'INSERT INTO cliente (limite, id_endereco, id_pessoa) VALUES ($limite, $id_endereco, $id_pessoa)',
+      'INSERT INTO cliente (saldo, cep, logradouro, numero, complemento, bairro, cidade, uf, id_pessoa) VALUES ($saldo, $cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf, $id_pessoa)',
       {
-        $limite: limite,
-        $id_endereco: idEndereco,
+        $saldo: cliente.saldo,
+        $cep: cliente.cep,
+        $logradouro: cliente.logradouro,
+        $numero: cliente.numero,
+        $complemento: cliente.complemento || '',
+        $bairro: cliente.bairro,
+        $cidade: cliente.cidade,
+        $uf: cliente.uf,
         $id_pessoa: id_pessoa,
       },
     );
@@ -114,21 +95,12 @@ export class ClienteService {
     await Promise.all(
       emails.map(async (email) => {
         const resEmail = await this.db.runAsync(
-          'INSERT INTO email (endereco) VALUES ($endereco)',
-          { $endereco: email.endereco },
+          'INSERT INTO email (endereco, id_cliente) VALUES ($endereco, $id_cliente)',
+          { $endereco: email.endereco, $id_cliente: idCliente },
         );
 
         if (resEmail.changes < 1) {
           throw new Error('Não foi possível criar o e-mail');
-        }
-
-        const resClienteEmail = await this.db.runAsync(
-          'INSERT INTO cliente_email (id_cliente, id_email) VALUES ($id_cliente, $id_email)',
-          { $id_cliente: idCliente, $id_email: resEmail.lastInsertRowId },
-        );
-
-        if (resClienteEmail.changes < 1) {
-          throw new Error('Não foi possível vincular o e-mail ao cliente');
         }
       }),
     );
@@ -141,21 +113,12 @@ export class ClienteService {
     await Promise.all(
       telefones.map(async (telefone) => {
         const resTelefone = await this.db.runAsync(
-          'INSERT INTO telefone (numero) VALUES ($numero)',
-          { $numero: telefone.numero },
+          'INSERT INTO telefone ( numero, id_cliente ) VALUES ( $numero, $id_cliente )',
+          { $numero: telefone.numero, $id_cliente: idCliente },
         );
 
         if (resTelefone.changes < 1) {
           throw new Error('Não foi possível criar o telefone');
-        }
-
-        const resClienteTelefone = await this.db.runAsync(
-          'INSERT INTO cliente_telefone (id_cliente, id_telefone) VALUES ($id_cliente, $id_telefone)',
-          { $id_cliente: idCliente, $id_telefone: resTelefone.lastInsertRowId },
-        );
-
-        if (resClienteTelefone.changes < 1) {
-          throw new Error('Não foi possível vincular o telefone ao cliente');
         }
       }),
     );
@@ -163,23 +126,33 @@ export class ClienteService {
 
   async update(data: IClienteUpdate): Promise<void> {
     try {
-      await this.updateCliente(data);
-      await this.updatePessoa(data.pessoa);
-      await this.updateEndereco(data.endereco);
-      await this.updateEmails(data.emails);
-      await this.updateTelefones(data.telefones);
+      const { pessoa, emails, telefones, ...dados } = data;
+      await this.updatePessoa(pessoa);
+      await this.updateCliente(pessoa.id, dados);
+      await this.updateEmails(emails);
+      await this.updateTelefones(telefones);
     } catch (error) {
       throw new Error(`Erro ao atualizar cliente: ${(error as Error).message}`);
     }
   }
 
-  private async updateCliente(data: IClienteUpdate): Promise<void> {
+  private async updateCliente(
+    id_pessoa: string,
+    data: IClienteUpdateOnly,
+  ): Promise<void> {
     const res = await this.db.runAsync(
-      'UPDATE cliente SET limite = $limite, id_endereco = $id_endereco WHERE id = $id',
+      'UPDATE cliente SET saldo = $saldo, cep = $cep, logradouro = $logradouro, numero = $numero, complemento = $complemento, bairro = $bairro, cidade = $cidade, uf = $uf, id_pessoa = $id_pessoa WHERE id = $id',
       {
         $id: data.id,
-        $limite: data.limite,
-        $id_endereco: data.endereco.id,
+        $saldo: data.saldo,
+        $cep: data.cep,
+        $logradouro: data.logradouro,
+        $numero: data.numero,
+        $complemento: data.complemento || '',
+        $bairro: data.bairro,
+        $cidade: data.cidade,
+        $uf: data.uf,
+        $id_pessoa: id_pessoa,
       },
     );
 
@@ -193,7 +166,7 @@ export class ClienteService {
       'UPDATE pessoa SET nome = $nome, data_nascimento = $data_nascimento, cpf = $cpf WHERE id = $id',
       {
         $nome: data.nome,
-        $data_nascimento: data.data_nascimento,
+        $data_nascimento: getStringFromDate(data.data_nascimento),
         $cpf: data.cpf,
         $id: data.id,
       },
@@ -201,25 +174,6 @@ export class ClienteService {
 
     if (res.changes < 1) {
       throw new Error('Não foi possível atualizar a pessoa');
-    }
-  }
-
-  private async updateEndereco(endereco: IEnderecoUpdate): Promise<void> {
-    const res = await this.db.runAsync(
-      'UPDATE endereco SET logradouro = $logradouro, numero = $numero, complemento = $complemento, bairro = $bairro, cidade = $cidade, uf = $uf WHERE id = $id',
-      {
-        $logradouro: endereco.logradouro,
-        $numero: endereco.numero,
-        $complemento: endereco.complemento || '',
-        $bairro: endereco.bairro,
-        $cidade: endereco.cidade,
-        $uf: endereco.uf,
-        $id: endereco.id,
-      },
-    );
-
-    if (res.changes < 1) {
-      throw new Error('Não foi possível atualizar o endereço');
     }
   }
 
@@ -257,27 +211,16 @@ export class ClienteService {
   async deleteCliente(id: number): Promise<void> {
     try {
       await this.db.runAsync(
-        'DELETE FROM cliente_telefone WHERE id_cliente = $id',
-        { $id: id },
-      );
-      await this.db.runAsync(
-        'DELETE FROM cliente_email WHERE id_cliente = $id',
-        { $id: id },
-      );
-
-      const enderecoResult = await this.db.getFirstAsync<{
-        id_endereco: number;
-      }>('SELECT id_endereco FROM cliente WHERE id = $id', { $id: id });
-
-      await this.db.runAsync('DELETE FROM endereco WHERE id = $id_endereco', {
-        $id_endereco: Number(enderecoResult?.id_endereco),
-      });
-
-      await this.db.runAsync(
         'DELETE FROM pessoa WHERE id = (SELECT id_pessoa FROM cliente WHERE id = $id)',
         { $id: id },
       );
       await this.db.runAsync('DELETE FROM cliente WHERE id = $id', { $id: id });
+      await this.db.runAsync('DELETE FROM telefone WHERE id_cliente = $id', {
+        $id: id,
+      });
+      await this.db.runAsync('DELETE FROM email WHERE id_cliente = $id', {
+        $id: id,
+      });
     } catch (error) {
       throw new Error(`Erro ao deletar cliente: ${(error as Error).message}`);
     }
@@ -292,7 +235,9 @@ export class ClienteService {
          WHERE pessoa.nome LIKE '%' || $nome || '%'`,
         { $nome: nome },
       );
-      return result;
+      return result.map((item) => {
+        return { ...item, data_nascimento: new Date(item.data_nascimento) };
+      });
     } catch (error) {
       throw new Error(
         `Erro ao buscar cliente por nome: ${(error as Error).message}`,
@@ -308,7 +253,9 @@ export class ClienteService {
          WHERE pessoa.cpf LIKE '%' || $cpf || '%'`,
         { $cpf: cpf },
       );
-      return result;
+      return result.map((item) => {
+        return { ...item, data_nascimento: new Date(item.data_nascimento) };
+      });
     } catch (error) {
       throw new Error(
         `Erro ao buscar cliente por CPF: ${(error as Error).message}`,
@@ -368,7 +315,7 @@ export class ClienteService {
     }
   }
 
-  async findClienteById(id: string) {
+  async findClienteById(id: string): Promise<IClienteUpdate> {
     try {
       const cliente = await this.db.getFirstAsync<ISimpleCliente>(
         `SELECT * FROM cliente WHERE id = $id`,
@@ -386,19 +333,10 @@ export class ClienteService {
       if (!pessoa) {
         throw new Error('Pessoa não encontrada!');
       }
-      const endereco = await this.db.getFirstAsync<IEnderecoUpdate>(
-        `SELECT * FROM endereco WHERE id = $id `,
-        { $id: cliente.id_endereco },
-      );
-      if (!endereco) {
-        throw new Error('Endereço do cliente não encontrado!');
-      }
       const telefones = await this.db.getAllAsync<ITelefoneUpdate>(
-        `SELECT telefone.*
+        `SELECT *
         FROM telefone
-        INNER JOIN cliente_telefone as ct ON ct.id_telefone == telefone.id
-        INNER JOIN cliente ON cliente.id == ct.id_cliente
-        WHERE cliente.id == $id`,
+        WHERE id_cliente == $id`,
         { $id: cliente.id },
       );
       if (telefones.length < 1) {
@@ -406,11 +344,9 @@ export class ClienteService {
       }
       const emails = await this.db.getAllAsync<IEmailUpdate>(
         `
-        SELECT email.*
+        SELECT *
         FROM email
-        INNER JOIN cliente_email as ce ON ce.id_email == email.id
-        INNER JOIN cliente ON cliente.id == ce.id_cliente
-        WHERE cliente.id == $id`,
+        WHERE id_cliente == $id`,
         { $id: cliente.id },
       );
       if (emails.length < 1) {
@@ -418,8 +354,10 @@ export class ClienteService {
       }
       return {
         ...cliente,
-        pessoa,
-        endereco,
+        pessoa: {
+          ...pessoa,
+          data_nascimento: new Date(pessoa.data_nascimento),
+        },
         telefones,
         emails,
       };
@@ -428,15 +366,20 @@ export class ClienteService {
     }
   }
 
-  async findAllPessoas() {
+  async findAllPessoas(): Promise<IPessoaUpdate[]> {
     try {
-      const data = await this.db.getAllAsync<Pessoa>(
+      const data = await this.db.getAllAsync<IPessoaUpdate>(
         'SELECT * FROM pessoa INNER JOIN cliente ON cliente.id_pessoa != pessoa.id',
       );
       if (data.length < 1) {
-        throw new Error('Nenhuma pessoa foi encontrada!');
+        return data;
       }
-      return data;
+      return data.map((item) => {
+        return {
+          ...item,
+          data_nascimento: new Date(item.data_nascimento),
+        };
+      });
     } catch (error) {
       throw new Error('Erro ao buscar pessoas: ' + (error as Error).message);
     }

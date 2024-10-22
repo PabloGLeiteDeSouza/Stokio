@@ -1,5 +1,8 @@
+import { EmpresaService } from '@/classes/empresa/empresa.service';
+import { EmpresaUpdateData } from '@/classes/empresa/types';
 import LoadingScreen from '@/components/LoadingScreen';
 import { DetalhesEmpresaScreen } from '@/interfaces/empresa';
+import { mask } from '@/utils/mask';
 import {
   Box,
   Button,
@@ -8,18 +11,37 @@ import {
   ScrollView,
   Text,
 } from '@gluestack-ui/themed';
+import { useSQLiteContext } from 'expo-sqlite';
 import React from 'react';
+import { Alert } from 'react-native';
 
 const Details: React.FC<DetalhesEmpresaScreen> = ({ navigation, route }) => {
   if (!route || !route.params || !route.params.id) {
     navigation?.navigate('visualizar-empresas');
+    return null;
+  }
+  const id = route.params.id;
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [empresa, setEmpresa] = React.useState<EmpresaUpdateData>({});
+  const db = useSQLiteContext();
+
+  async function start() {
+    try {
+      if (!isLoading) {
+        setIsLoading(true);
+      }
+      const Empresa = await new EmpresaService(db).getById(id);
+      setEmpresa(Empresa);
+      setIsLoading(false);
+    } catch (error) {
+      Alert.alert('Erro', (error as Error).message);
+      navigation?.goBack();
+      setIsLoading(false);
+    }
   }
 
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [empresa, setEmpresa] = React.useState({});
-
   React.useEffect(() => {
-    setIsLoading(false);
+    start();
   }, []);
 
   if (isLoading) {
@@ -36,65 +58,109 @@ const Details: React.FC<DetalhesEmpresaScreen> = ({ navigation, route }) => {
           <Box gap="$5">
             <Box gap="$1.5">
               <Heading>Nome:</Heading>
-              <Text>João</Text>
+              <Text>{empresa.pessoa.nome}</Text>
             </Box>
             <Box>
               <Heading>Razao Social:</Heading>
-              <Text>João</Text>
+              <Text>{empresa.razao_social}</Text>
             </Box>
             <Box>
               <Heading>Nome Fantasia:</Heading>
-              <Text>João</Text>
+              <Text>{empresa.nome_fantasia}</Text>
             </Box>
             <Box gap="$1.5">
               <Heading>Data de nascimento:</Heading>
-              <Text>01/01/1990</Text>
+              <Text>
+                {new Intl.DateTimeFormat('pt-BR', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                }).format(new Date(empresa.pessoa.data_nascimento))}
+              </Text>
             </Box>
-            <Box gap="$1.5">
-              <Heading>CPF:</Heading>
-              <Text>123456789</Text>
-            </Box>
-            <Box>
-              <Heading>CNPJ:</Heading>
-              <Text>12345678901234</Text>
-            </Box>
-            <Box gap="$1.5">
-              <Heading>Endereço:</Heading>
+            {empresa.cnpj === '' ? (
               <Box gap="$1.5">
-                <Heading>Rua:</Heading>
-                <Text>Rua João</Text>
+                <Heading>CPF:</Heading>
+                <Text>{mask(empresa.pessoa.cpf, 'cpf')}</Text>
+              </Box>
+            ) : (
+              <>
+                <Box gap="$1.5">
+                  <Heading>CPF:</Heading>
+                  <Text>{mask(empresa.pessoa.cpf, 'cpf')}</Text>
+                </Box>
+                <Box>
+                  <Heading>CNPJ:</Heading>
+                  <Text>{mask(empresa.cnpj, 'cnpj')}</Text>
+                </Box>
+              </>
+            )}
+
+            <Box gap="$1.5">
+              <Heading textAlign="center" size="xl">
+                Endereço
+              </Heading>
+              <Box gap="$1.5">
+                <Heading>Logradouro:</Heading>
+                <Text>{empresa.endereco.logradouro}</Text>
               </Box>
               <Box gap="$1.5">
                 <Heading>Número:</Heading>
-                <Text>123</Text>
+                <Text>{empresa.endereco.numero}</Text>
               </Box>
-              <Box gap="$1.5">
-                <Heading>Complemento:</Heading>
-                <Text>Complemento</Text>
-              </Box>
+              {empresa.endereco.complemento && (
+                <Box gap="$1.5">
+                  <Heading>Complemento:</Heading>
+                  <Text>{empresa.endereco.complemento}</Text>
+                </Box>
+              )}
               <Box gap="$1.5">
                 <Heading>Bairro:</Heading>
-                <Text>Bairro João</Text>
+                <Text>{empresa.endereco.bairro}</Text>
               </Box>
               <Box gap="$1.5">
                 <Heading>Cidade:</Heading>
-                <Text size="xl">Cidade João</Text>
+                <Text size="xl">{empresa.endereco.cidade}</Text>
               </Box>
               <Box gap="$1.5">
                 <Heading>UF:</Heading>
-                <Text size="xl">SP</Text>
+                <Text size="xl">{empresa.endereco.uf}</Text>
               </Box>
             </Box>
             <Box gap="$1.5">
-              <Heading>Telefones:</Heading>
-              <Text size="lg">123456789</Text>
+              <Heading size="xl" textAlign="center">
+                Telefones
+              </Heading>
+              {empresa.telefones.map((tel, i) => (
+                <Box key={`telefone-${tel.id}`} gap="$2.5">
+                  <Heading>Telefone {i + 1}:</Heading>
+                  <Text size="lg">
+                    {mask(
+                      tel.numero,
+                      'telefone',
+                      tel.numero.length > 12 ? 'movel' : 'fixo',
+                    )}
+                  </Text>
+                </Box>
+              ))}
             </Box>
             <Box gap="$1.5">
-              <Heading>Emails:</Heading>
-              <Text size="xl">joaojones@teste.com</Text>
+              <Heading size="xl" textAlign="center">
+                Emails
+              </Heading>
+              {empresa.emails.map((mail, i) => (
+                <Box key={`email-${mail.id}`} gap="$2.5">
+                  <Heading>Email {i + 1}:</Heading>
+                  <Text size="xl">{mail.endereco}</Text>
+                </Box>
+              ))}
             </Box>
             <Box gap="$5">
-              <Button onPress={() => navigation?.navigate('atualizar-empresa')}>
+              <Button
+                onPress={() =>
+                  navigation?.navigate('atualizar-empresa', { id: empresa.id })
+                }
+              >
                 <ButtonText>Editar</ButtonText>
               </Button>
               <Button action="negative">

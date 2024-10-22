@@ -2,12 +2,10 @@ export interface IPessoaCreate {
   id?: string;
   nome: string;
   cpf: string;
-  data_nascimento: string;
+  data_nascimento: Date;
 }
 
-export interface ISimpleCliente {
-  id: string;
-  limite: string;
+export interface ISimpleCliente extends IClienteUpdateOnly {
   id_pessoa: string;
   id_endereco: string;
 }
@@ -16,32 +14,50 @@ export interface IPessoaUpdate {
   id: string;
   nome: string;
   cpf: string;
-  data_nascimento: string;
+  data_nascimento: Date;
 }
 
 export interface IClienteSimpleRequest {
   id: string;
   nome: string;
   cpf: string;
-  data_nascimento: string;
-  limite: string;
+  data_nascimento: Date;
+  saldo: string;
   id_pessoa: string;
   id_endereco: string;
 }
 
-export interface IClienteCreate {
+export interface IClienteCreateOnly {
+  cep: string;
+  logradouro: string;
+  numero: string;
+  complemento?: string;
+  bairro: string;
+  cidade: string;
+  uf: string;
+  saldo: string;
+}
+
+export interface IClienteUpdateOnly {
+  id: string;
+  cep: string;
+  logradouro: string;
+  numero: string;
+  complemento?: string;
+  bairro: string;
+  cidade: string;
+  uf: string;
+  saldo: string;
+}
+
+export interface IClienteCreate extends IClienteCreateOnly {
   pessoa: IPessoaCreate;
-  endereco: IEndereco;
-  limite: string;
   emails: IEmail[];
   telefones: ITelefone[];
 }
 
-export interface IClienteUpdate {
-  id: number;
+export interface IClienteUpdate extends IClienteUpdateOnly {
   pessoa: IPessoaUpdate;
-  endereco: IEnderecoUpdate;
-  limite: number;
   emails: IEmailUpdate[];
   telefones: ITelefoneUpdate[];
 }
