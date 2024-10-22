@@ -22,7 +22,7 @@ export interface IClienteSimpleRequest {
   nome: string;
   cpf: string;
   data_nascimento: Date;
-  limite: string;
+  saldo: string;
   id_pessoa: string;
   id_endereco: string;
 }
@@ -35,7 +35,7 @@ export interface IClienteCreateOnly {
   bairro: string;
   cidade: string;
   uf: string;
-  limite: string;
+  saldo: string;
 }
 
 export interface IClienteUpdateOnly {
@@ -47,7 +47,7 @@ export interface IClienteUpdateOnly {
   bairro: string;
   cidade: string;
   uf: string;
-  limite: string;
+  saldo: string;
 }
 
 export interface IClienteCreate extends IClienteCreateOnly {

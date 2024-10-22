@@ -1,13 +1,8 @@
 // Tipos relacionados ao cadastro e atualização de empresas
-export type EmpresaCreateData = {
-  pessoa: {
-    id?: string;
-    nome?: string;
-    data_nascimento?: Date;
-    cpf?: string;
-  };
-  nome_fantasia: string;
+export type Empresa = {
+  id: number;
   razao_social: string;
+  nome_fantasia: string;
   cnpj?: string;
   cep: string;
   logradouro: string;
@@ -16,13 +11,48 @@ export type EmpresaCreateData = {
   bairro: string;
   cidade: string;
   uf: string;
-  ramo: RamoData;
-  telefones: TelefoneData[];
-  emails: EmailData[];
+  id_ramo: number;
+  id_pessoa: number;
 };
 
-export type EmpresaSimpleData = {
-  id: string;
+export type Pessoa = {
+  id: number;
+  nome: string;
+  data_nascimento: Date;
+  cpf: string;
+};
+
+export type Ramo = {
+  id: number;
+  nome: string;
+};
+
+export type Telefone = {
+  id: number;
+  numero: string;
+};
+
+export type Email = {
+  id: number;
+  endereco: string;
+};
+
+export type EmpresaCreate = Omit<Empresa, 'id'> & {
+  pessoa: Partial<Pessoa>;
+  ramo: Partial<Ramo>;
+  telefones: Array<Omit<Telefone, 'id'>>;
+  emails: Array<Omit<Email, 'id'>>;
+};
+
+export type EmpresaUpdate = Omit<Empresa, 'id_pessoa' | 'id_ramo'> & {
+  pessoa: Pessoa;
+  ramo: Ramo;
+  telefones: Array<Telefone>;
+  emails: Array<Email>;
+};
+
+export type EmpresaSearchRelatinalPessoa = {
+  id: number;
   nome_fantasia: string;
   razao_social: string;
   cpf: string;
@@ -30,25 +60,18 @@ export type EmpresaSimpleData = {
 };
 
 export type EmpresaSimpleDataResult = {
-  id: string;
+  id: number;
   nome_fantasia: string;
   razao_social: string;
   cpf: string;
   cnpj?: string;
-  id_endereco: string;
-  id_pessoa: string;
-  id_ramo: string;
-};
-
-export type PessoaDataResult = {
-  id: string;
-  nome: string;
-  data_nascimento: string;
-  cpf: string;
+  id_endereco: number;
+  id_pessoa: number;
+  id_ramo: number;
 };
 
 export type EnderecoDataResult = {
-  id: string;
+  id: number;
   cep: string;
   logradouro: string;
   numero: string;
@@ -56,19 +79,6 @@ export type EnderecoDataResult = {
   bairro: string;
   cidade: string;
   uf: string;
-};
-
-export type EmpresaUpdateData = {
-  id: string;
-  nome: string;
-  nome_fantasia: string;
-  razao_social: string;
-  cnpj: string;
-  pessoa: PessoaDataResult;
-  ramo: RamoDataUpdate;
-  telefones: TelefoneDataUpdate[];
-  emails: EmailDataUpdate[];
-  endereco: EnderecoDataUpdate;
 };
 
 // Tipos de critério de busca de empresa
@@ -82,12 +92,12 @@ export type EmpresaSearchCriteria = {
 
 // Tipo de dados de um ramo
 export type RamoData = {
-  id?: string;
+  id?: number;
   nome?: string;
 };
 
 export type RamoDataUpdate = {
-  id: string;
+  id: number;
   nome: string;
 };
 
@@ -97,7 +107,7 @@ export type TelefoneData = {
 };
 
 export type TelefoneDataUpdate = {
-  id: string;
+  id: number;
   numero: string;
 };
 
@@ -108,13 +118,13 @@ export type EmailData = {
 
 // Tipo de dados de email
 export type EmailDataUpdate = {
-  id: string;
+  id: number;
   endereco: string;
 };
 
 // Tipo de dados de endereço
 export type EnderecoData = {
-  cep: string;
+  cep: number;
   logradouro: string;
   numero: string;
   complemento?: string;
@@ -125,7 +135,7 @@ export type EnderecoData = {
 
 // Tipo de dados de endereço Update
 export type EnderecoDataUpdate = {
-  id: string;
+  id: number;
   cep: string;
   logradouro: string;
   numero: string;
@@ -181,11 +191,18 @@ export type SeachParamsEmpresa = {
 };
 
 export type EmpresaDataTableResult = {
-  id: string;
+  id: number;
   nome_fantasia: string;
   razao_social: string;
-  cnpj: string;
-  id_ramo: string;
-  id_pessoa: string;
-  id_endereco: string;
+  cnpj?: string;
+  cep: string;
+  logradouro: string;
+  numero: string;
+  complemento?: string;
+  bairro: string;
+  cidade: string;
+  uf: string;
+  id_ramo: number;
+  id_pessoa: number;
+  id_endereco: number;
 };

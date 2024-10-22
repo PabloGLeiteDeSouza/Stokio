@@ -53,9 +53,6 @@ CREATE TABLE pessoa (
 -- Tabela cliente
 CREATE TABLE cliente (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    saldo REAL,
-    id_endereco INTEGER NOT NULL,
-    id_pessoa INTEGER NOT NULL,
     cep TEXT NOT NULL,
     logradouro TEXT NOT NULL,
     numero INTEGER NOT NULL,
@@ -63,6 +60,9 @@ CREATE TABLE cliente (
     bairro TEXT NOT NULL,
     cidade TEXT NOT NULL,
     uf TEXT(2) NOT NULL,
+    saldo REAL,
+    id_endereco INTEGER NOT NULL,
+    id_pessoa INTEGER NOT NULL,
     FOREIGN KEY (id_pessoa) REFERENCES pessoa(id)
 );
 

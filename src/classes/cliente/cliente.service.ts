@@ -67,9 +67,9 @@ export class ClienteService {
     id_pessoa: number,
   ): Promise<number> {
     const res = await this.db.runAsync(
-      'INSERT INTO cliente (limite, cep, logradouro, numero, complemento, bairro, cidade, uf, id_pessoa) VALUES ($limite, $cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf, $id_pessoa)',
+      'INSERT INTO cliente (saldo, cep, logradouro, numero, complemento, bairro, cidade, uf, id_pessoa) VALUES ($saldo, $cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf, $id_pessoa)',
       {
-        $limite: cliente.limite,
+        $saldo: cliente.saldo,
         $cep: cliente.cep,
         $logradouro: cliente.logradouro,
         $numero: cliente.numero,
@@ -141,10 +141,10 @@ export class ClienteService {
     data: IClienteUpdateOnly,
   ): Promise<void> {
     const res = await this.db.runAsync(
-      'UPDATE cliente SET limite = $limite, cep = $cep, logradouro = $logradouro, numero = $numero, complemento = $complemento, bairro = $bairro, cidade = $cidade, uf = $uf, id_pessoa = $id_pessoa WHERE id = $id',
+      'UPDATE cliente SET saldo = $saldo, cep = $cep, logradouro = $logradouro, numero = $numero, complemento = $complemento, bairro = $bairro, cidade = $cidade, uf = $uf, id_pessoa = $id_pessoa WHERE id = $id',
       {
         $id: data.id,
-        $limite: data.limite,
+        $saldo: data.saldo,
         $cep: data.cep,
         $logradouro: data.logradouro,
         $numero: data.numero,

@@ -1,27 +1,23 @@
 import { SQLiteDatabase } from 'expo-sqlite';
 import {
-  EmpresaCreateData,
-  EmpresaUpdateData,
+  EmpresaCreate,
   EmpresaSearchCriteria,
   TelefoneData,
   EmailData,
-  EnderecoData,
   RamoObject,
   EmpresaObject,
   SeachParamsEmpresa,
-  EmpresaSimpleData,
-  EmpresaSimpleDataResult,
-  PessoaDataResult,
-  EnderecoDataResult,
-  TelefoneObject,
-  EmailObject,
   TelefoneDataUpdate,
   EmailDataUpdate,
   EnderecoDataUpdate,
   RamoDataUpdate,
   EmpresaDataTableResult,
+  EmpresaSearchRelatinalPessoa,
+  EmpresaUpdate,
+  Pessoa,
 } from './types';
 import { IEmpresaService } from './interfaces';
+import { getStringFromDate } from '@/utils';
 
 export class EmpresaService implements IEmpresaService {
   private db: SQLiteDatabase;
@@ -30,7 +26,7 @@ export class EmpresaService implements IEmpresaService {
     this.db = dbInstance;
   }
 
-  async create(dados: EmpresaCreateData) {
+  async create(dados: EmpresaCreate) {
     try {
       if (dados.cnpj) {
         const empresaExistente = await this.db.getFirstAsync(
@@ -59,7 +55,7 @@ export class EmpresaService implements IEmpresaService {
         if (!res) throw new Error('Ramo não encontrado');
       }
       const id_pessoa =
-        dados.pessoa.id !== '' && typeof dados.pessoa.id !== 'undefined'
+        typeof dados.pessoa.id !== 'undefined'
           ? dados.pessoa.id
           : (
               await this.db.runAsync(
@@ -70,10 +66,10 @@ export class EmpresaService implements IEmpresaService {
                   $cpf: String(dados.pessoa.cpf),
                 },
               )
-            ).lastInsertRowId.toString();
+            ).lastInsertRowId;
 
       const id_ramo =
-        dados.ramo.id !== '' && typeof dados.ramo.id !== 'undefined'
+        typeof dados.ramo.id !== 'undefined'
           ? dados.ramo.id
           : (
               await this.db.runAsync(
@@ -82,16 +78,7 @@ export class EmpresaService implements IEmpresaService {
                   $nome: String(dados.ramo.nome),
                 },
               )
-            ).lastInsertRowId.toString();
-
-      /* const id_endereco = (
-        await this.db.runAsync(
-          'INSERT INTO endereco (cep, logradouro, numero, complemento, bairro, cidade, uf) VALUES ($cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf)',
-          {
-            
-          },
-        )
-      ).lastInsertRowId.toString(); */
+            ).lastInsertRowId;
 
       const res_emp = await this.db.runAsync(
         'INSERT INTO empresa ( nome, nome_fantasia, razao_social, cnpj, cep, logradouro, numero, complemento, bairro, cidade, uf, id_ramo, id_pessoa ) VALUES ( $nome, $nome_fantasia, $razao_social, $cnpj, $cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf, $id_ramo, $id_pessoa )',
@@ -100,13 +87,13 @@ export class EmpresaService implements IEmpresaService {
           $nome_fantasia: dados.nome_fantasia,
           $razao_social: dados.razao_social,
           $cnpj: dados.cnpj || '',
-          $cep: dados.endereco.cep,
-          $logradouro: dados.endereco.logradouro,
-          $numero: dados.endereco.numero,
-          $complemento: dados.endereco.complemento || '',
-          $bairro: dados.endereco.bairro,
-          $cidade: dados.endereco.cidade,
-          $uf: dados.endereco.uf,
+          $cep: dados.cep,
+          $logradouro: dados.logradouro,
+          $numero: dados.numero,
+          $complemento: dados.complemento || '',
+          $bairro: dados.bairro,
+          $cidade: dados.cidade,
+          $uf: dados.uf,
           $id_ramo: id_ramo,
           $id_pessoa: id_pessoa,
         },
@@ -120,22 +107,21 @@ export class EmpresaService implements IEmpresaService {
     }
   }
 
-  async update(id: number, dados: EmpresaUpdateData) {
+  async update(id: number, dados: EmpresaUpdate) {
     try {
       const res_emp = await this.db.runAsync(
-        'UPDATE empresa SET nome = $nome, nome_fantasia = $nome_fantasia, razao_social = $razao_social, cnpj = $cnpj, cep = $cep, logradouro = $logradouro, numero = $numero, complemento = $complemento, bairro = $bairro, cidade $cidade, uf = $uf, limite = $limite, id_ramo = $id_ramo WHERE id = $id',
+        'UPDATE empresa SET nome_fantasia = $nome_fantasia, razao_social = $razao_social, cnpj = $cnpj, cep = $cep, logradouro = $logradouro, numero = $numero, complemento = $complemento, bairro = $bairro, cidade $cidade, uf = $uf, limite = $limite, id_ramo = $id_ramo WHERE id = $id',
         {
-          $nome: dados.nome,
-          $nome_fantasia: dados.nome_fantasia || null,
-          $razao_social: dados.razao_social || null,
-          $cnpj: dados.cnpj,
-          $cep: dados.endereco.cep,
-          $logradouro: dados.endereco.logradouro,
-          $numero: dados.endereco.numero,
-          $complemento: dados.endereco.complemento || null,
-          $bairro: dados.endereco.bairro,
-          $cidade: dados.endereco.cidade,
-          $uf: dados.endereco.uf,
+          $nome_fantasia: dados.nome_fantasia,
+          $razao_social: dados.razao_social,
+          $cnpj: dados.cnpj || null,
+          $cep: dados.cep,
+          $logradouro: dados.logradouro,
+          $numero: dados.numero,
+          $complemento: dados.complemento || null,
+          $bairro: dados.bairro,
+          $cidade: dados.cidade,
+          $uf: dados.uf,
           $id: id,
         },
       );
@@ -150,9 +136,60 @@ export class EmpresaService implements IEmpresaService {
           { $id_ramo: id_ramo, $id: id },
         );
       }
-
-      await this.vincularTelefones(id, dados.telefones);
-      await this.vincularEmails(id, dados.emails);
+      const res_pss = await this.db.runAsync(
+        'UPDATE pessoa SET nome = $nome, $cpf = cpf, data_nascimento = $data_nascimento WHERE id = $id',
+        {
+          $nome: dados.pessoa.nome,
+          $cpf: dados.pessoa.cpf,
+          $data_nascimento: getStringFromDate(dados.pessoa.data_nascimento),
+          $id: dados.pessoa.id,
+        },
+      );
+      if (res_pss.changes < 1) {
+        throw new Error('Pessoa não encontrada ou não atualizada!', {
+          cause: 'ERR_PESSOA_UPDATE',
+        });
+      }
+      await Promise.all(
+        dados.telefones.map(async (tel) => {
+          try {
+            const res = await this.db.runAsync(
+              'UPDATE telefone SET numero = $numero WHERE id = $id',
+              {
+                $numero: tel.numero,
+                $id: tel.id,
+              },
+            );
+            if (res.changes < 1) {
+              throw new Error('Telefone não encontrado ou não atualizado!', {
+                cause: 'ERR_TELEFONE_UPDATE',
+              });
+            }
+          } catch (error) {
+            throw error;
+          }
+        }),
+      );
+      await Promise.all(
+        dados.emails.map(async (mail) => {
+          try {
+            const res = await this.db.runAsync(
+              'UPDATE email SET endereco = $endereco WHERE id = $id',
+              {
+                $endereco: mail.endereco,
+                $id: mail.id,
+              },
+            );
+            if (res.changes < 1) {
+              throw new Error('Email não encontrado ou não atualizado!', {
+                cause: 'ERR_EMAIL_UPDATE',
+              });
+            }
+          } catch (error) {
+            throw error;
+          }
+        }),
+      );
     } catch (error) {
       throw new Error(`Erro ao atualizar empresa: ${(error as Error).message}`);
     }
@@ -250,18 +287,15 @@ export class EmpresaService implements IEmpresaService {
     );
   }
 
-  async getAllPessoas() {
-    const data = this.db.getAllAsync<{
-      id: string;
-      nome: string;
-      cpf: string;
-      data_nascimento: string;
-    }>('SELECT * FROM pessoa');
-    return data;
+  async getAllPessoas(): Promise<Pessoa[]> {
+    const data = await this.db.getAllAsync<Pessoa>('SELECT * FROM pessoa');
+    return data.map((pss) => {
+      return { ...pss, data_nascimento: new Date(pss.data_nascimento) };
+    });
   }
 
   async getAllEmpresas() {
-    const data = await this.db.getAllAsync<EmpresaSimpleData>(
+    const data = await this.db.getAllAsync<EmpresaSearchRelatinalPessoa>(
       'SELECT emp.razao_social, emp.nome_fantasia, emp.cnpj, emp.id, pessoa.cpf FROM empresa as emp INNER JOIN pessoa ON pessoa.id == emp.id_pessoa',
     );
     return data;
@@ -272,7 +306,7 @@ export class EmpresaService implements IEmpresaService {
     return data.length > 0;
   }
 
-  async getById(id: string): Promise<EmpresaUpdateData> {
+  async getById(id: string): Promise<EmpresaUpdate> {
     try {
       const empresa = await this.db.getFirstAsync<EmpresaDataTableResult>(
         'SELECT * from empresa WHERE id == $id',
@@ -290,7 +324,7 @@ export class EmpresaService implements IEmpresaService {
 
       if (!ramo) throw new Error('Não foi possível encontrar o ramo!');
 
-      const pessoa = await this.db.getFirstAsync<PessoaDataResult>(
+      const pessoa = await this.db.getFirstAsync<Pessoa>(
         'SELECT * FROM pessoa WHERE id == $id',
         {
           $id: empresa.id_pessoa,
@@ -325,8 +359,10 @@ export class EmpresaService implements IEmpresaService {
       return {
         ...empresa,
         ramo,
-        pessoa,
-        endereco,
+        pessoa: {
+          ...pessoa,
+          data_nascimento: new Date(pessoa.data_nascimento),
+        },
         telefones,
         emails,
       };
