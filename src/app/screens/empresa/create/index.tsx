@@ -47,7 +47,6 @@ import { Box, Text } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import { CalendarDaysIcon } from '@gluestack-ui/themed';
 import { ScrollView } from '@gluestack-ui/themed';
-import { Pessoa } from '@/types/screens/cliente';
 import { CadastrarEmpresaScreen } from '@/interfaces/empresa';
 import formatDate from '@/utils/formatDate';
 import LoadingScreen from '@/components/LoadingScreen';
@@ -61,6 +60,7 @@ import SelectEstados from '@/components/Custom/Selects/SelectEstados';
 import { Alert, GestureResponderEvent } from 'react-native';
 import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
 import { getMinDateFor18YearsOld } from '@/utils';
+import { Pessoa } from '@/classes/empresa/types';
 
 const validationSchema = Yup.object().shape({
   pessoa: Yup.object().shape({
@@ -105,7 +105,7 @@ const validationSchema = Yup.object().shape({
 
 const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = React.useState(true);
-  const [pessoas, setPessoas] = React.useState<Array<Pessoa>>([]);
+  const [pessoas, setPessoas] = React.useState<Pessoa[]>([]);
   const [isNewPerson, setIsNewPerson] = React.useState(false);
   const [isNewRamo, setIsNewRamo] = React.useState(false);
   const db = useSQLiteContext();
@@ -332,7 +332,9 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                           title="Data de nascimento"
                           maximumDate={getMinDateFor18YearsOld()}
                           value={values.pessoa.data_nascimento}
-                          onChangeDate={handleChange('pessoa.data_nascimento')}
+                          onChangeDate={(data) =>
+                            setFieldValue('pessoa.data_nascimento', data)
+                          }
                           error={errors.pessoa?.data_nascimento}
                         />
                         <InputText
