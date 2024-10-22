@@ -47,7 +47,7 @@ CREATE TABLE pessoa (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome TEXT NOT NULL,
     data_nascimento DATE NOT NULL,
-    cpf TEXT UNIQUE NOT NULL -- CPF com restrição de unicidade
+    cpf VARCHAR(11) UNIQUE NOT NULL -- CPF com restrição de unicidade
 );
 
 -- Tabela cliente
@@ -59,7 +59,7 @@ CREATE TABLE cliente (
     complemento TEXT,
     bairro TEXT NOT NULL,
     cidade TEXT NOT NULL,
-    uf TEXT(2) NOT NULL,
+    uf VARCHAR(2) NOT NULL,
     saldo REAL,
     id_endereco INTEGER NOT NULL,
     id_pessoa INTEGER NOT NULL,
@@ -72,10 +72,9 @@ CREATE INDEX idx_cliente_id_pessoa ON cliente(id_pessoa);
 -- Tabela empresa
 CREATE TABLE empresa (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nome TEXT NOT NULL,
     nome_fantasia TEXT NOT NULL,
     razao_social TEXT NOT NULL,
-    cnpj TEXT UNIQUE, -- CNPJ com restrição de unicidade
+    cnpj VARCHAR(14) UNIQUE, -- CNPJ com restrição de unicidade
     cep TEXT NOT NULL,
     logradouro TEXT NOT NULL,
     numero INTEGER NOT NULL,
@@ -151,9 +150,7 @@ CREATE INDEX idx_produto_id_unidade_de_armazenamento ON produto(id_unidade_de_ar
 CREATE TABLE venda (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     descricao TEXT,
-    valor REAL,
-    createdAt DATE,
-    updatedAt DATE,
+    data DATE,
     status TEXT,
     id_cliente INTEGER NOT NULL,
     FOREIGN KEY (id_cliente) REFERENCES cliente(id)
@@ -165,12 +162,10 @@ CREATE INDEX idx_venda_id_cliente ON venda(id_cliente);
 -- Tabela item_de_venda
 CREATE TABLE item_venda (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    quantidade INTEGER NOT NULL,
+    valor_unitario REAL,
     id_venda INTEGER NOT NULL,
     id_produto INTEGER NOT NULL,
-    quantidade INTEGER NOT NULL,
-    valor REAL,
-    createdAt DATE,
-    updatedAt DATE,
     FOREIGN KEY (id_venda) REFERENCES venda(id),
     FOREIGN KEY (id_produto) REFERENCES produto(id)
 );
@@ -178,37 +173,3 @@ CREATE TABLE item_venda (
 -- Índices nas chaves estrangeiras da tabela item_de_venda
 CREATE INDEX idx_item_venda_id_venda ON item_venda(id_venda);
 CREATE INDEX idx_item_venda_id_produto ON item_venda(id_produto);
-
--- Tabela venda
-CREATE TABLE compra (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    descricao TEXT,
-    valor REAL,
-    createdAt DATE,
-    updatedAt DATE,
-    status TEXT,
-    data_pagamento DATE,
-    valor_pago	REAL,
-    id_empresa INTEGER NOT NULL,
-    FOREIGN KEY (id_empresa) REFERENCES empresa(id)
-);
-
--- Índice na chave estrangeira da tabela venda
-CREATE INDEX idx_compra_id_cliente ON compra(id_empresa);
-
--- Tabela item_de_venda
-CREATE TABLE item_compra (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    id_compra INTEGER NOT NULL,
-    id_produto INTEGER NOT NULL,
-    quantidade INTEGER NOT NULL,
-    subtotal REAL,
-    createdAt DATE,
-    updatedAt DATE,
-    FOREIGN KEY (id_compra) REFERENCES compra(id),
-    FOREIGN KEY (id_produto) REFERENCES produto(id)
-);
-
--- Índices nas chaves estrangeiras da tabela item_de_venda
-CREATE INDEX idx_item_compra_id_compra ON item_compra(id_compra);
-CREATE INDEX idx_item_compra_id_produto ON item_compra(id_produto);
