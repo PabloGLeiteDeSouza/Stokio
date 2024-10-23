@@ -4,6 +4,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { ViewStyle } from '@expo/html-elements/build/primitives/View';
 import { StyledComponentProps } from '@gluestack-style/react/lib/typescript/types';
 import { FlatList, FlatListProps, StyleProp } from 'react-native';
+import { TipoUaUpdate } from '@/classes/tipo_ua/interfaces';
 
 export type VisualisarTipoUaScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -35,16 +36,11 @@ export type AtualizarTipoUaScreenRouterProp = RouteProp<
   'atualizar-tipo-ua'
 >;
 
-export type TipoUa = {
-  id: string;
-  nome: string;
-};
-
 export type TipoUaFlatList = React.ForwardRefExoticComponent<
   StyledComponentProps<
     StyleProp<ViewStyle>,
-    TipoUa,
-    FlatListProps<TipoUa>,
+    TipoUaUpdate,
+    FlatListProps<TipoUaUpdate>,
     'FlatList',
     typeof FlatList
   >

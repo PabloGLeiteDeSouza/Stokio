@@ -3,6 +3,6 @@ export interface TipoProdutoCreate {
 }
 
 export interface TipoProdutoUpdate {
-  id: string;
+  id: number;
   nome: string;
 }

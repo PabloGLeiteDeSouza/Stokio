@@ -53,6 +53,9 @@ CREATE TABLE pessoa (
 -- Tabela cliente
 CREATE TABLE cliente (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome TEXT NOT NULL,
+    data_nascimento DATE NOT NULL,
+    cpf VARCHAR(11) UNIQUE NOT NULL, 
     cep TEXT NOT NULL,
     logradouro TEXT NOT NULL,
     numero INTEGER NOT NULL,
@@ -72,6 +75,9 @@ CREATE INDEX idx_cliente_id_pessoa ON cliente(id_pessoa);
 -- Tabela empresa
 CREATE TABLE empresa (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome TEXT NOT NULL,
+    data_nascimento DATE NOT NULL,
+    cpf VARCHAR(11) UNIQUE NOT NULL ,
     nome_fantasia TEXT NOT NULL,
     razao_social TEXT NOT NULL,
     cnpj VARCHAR(14) UNIQUE, -- CNPJ com restrição de unicidade

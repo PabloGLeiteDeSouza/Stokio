@@ -16,23 +16,37 @@ import {
 } from '@gluestack-ui/themed';
 import { Box, Heading, ScrollView, VStack } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
-import { GestureResponderEvent } from 'react-native';
-const Update: React.FC = () => {
+import { Alert, GestureResponderEvent } from 'react-native';
+import TipoUaService from '@/classes/tipo_ua/tipo_ua.service';
+import { useSQLiteContext } from 'expo-sqlite';
+import { CadastrarTipoUaScreen } from '@/interfaces/tipo-ua';
+const Create: React.FC<CadastrarTipoUaScreen> = ({ navigation }) => {
+  const db = useSQLiteContext();
   return (
     <Box h="$full" w="$full" px="$8" py="$8">
       <ScrollView w="$full">
         <VStack w="$full" space="2xl">
           <Box w="$full" alignItems="center">
-            <Heading size="xl">
-              Atualizar Tipo de Unidade de Armazenamento:
+            <Heading size="xl" textAlign="center">
+              Cadastrar Tipo de Unidade de Armazenamento:
             </Heading>
           </Box>
           <Formik
             initialValues={{
-              id: '',
               nome: '',
             }}
-            onSubmit={() => {}}
+            onSubmit={async (values) => {
+              try {
+                await new TipoUaService(db).create(values);
+                Alert.alert(
+                  'Sucesso',
+                  'Tipo de Unidade de Armazenamento criado com sucesso!',
+                );
+                navigation?.navigate('visualizar-tipo-uas');
+              } catch (error) {
+                Alert.alert('Error', (error as Error).message);
+              }
+            }}
           >
             {({ handleChange, handleSubmit, values, errors }) => {
               return (
@@ -74,7 +88,7 @@ const Update: React.FC = () => {
                         ) => void
                       }
                     >
-                      <ButtonText>Atualizar</ButtonText>
+                      <ButtonText>Cadastrar</ButtonText>
                     </Button>
                   </Box>
                 </Box>
@@ -86,4 +100,4 @@ const Update: React.FC = () => {
     </Box>
   );
 };
-export default Update;
+export default Create;

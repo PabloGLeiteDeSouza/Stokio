@@ -10,75 +10,65 @@ import {
   FormControlErrorText,
   Input,
   InputField,
-  Radio,
-  RadioGroup,
-  RadioIcon,
-  RadioIndicator,
-  RadioLabel,
   Button,
   ButtonText,
-  Checkbox,
-  CheckboxGroup,
-  CheckboxIndicator,
-  CheckboxIcon,
-  CheckboxLabel,
-  Textarea,
-  TextareaInput,
-  Select,
-  SelectTrigger,
-  SelectInput,
-  SelectIcon,
-  SelectPortal,
-  SelectBackdrop,
-  SelectContent,
-  SelectDragIndicatorWrapper,
-  SelectDragIndicator,
-  SelectItem,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  Switch,
-  Modal,
-  ModalBackdrop,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
   HStack,
-  VStack,
   Heading,
   Text,
-  Center,
-  Icon,
-  CircleIcon,
-  CheckIcon,
   AlertCircleIcon,
-  ChevronDownIcon,
   Divider,
   ButtonIcon,
-  RemoveIcon,
   TrashIcon,
   AddIcon,
   FlatList,
   Box,
-  ScrollView,
   Card,
   EditIcon,
   SearchIcon,
 } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
-import Tipos_Produtos from './tipo_produto.json';
-import { TipoProduto, TipoProdutoFlatList } from '@/types/screens/tipo-produto';
-import { ListRenderItem } from 'react-native';
+import { TipoProdutoFlatList } from '@/types/screens/tipo-produto';
+import { Alert, GestureResponderEvent, ListRenderItem } from 'react-native';
 import { VisualizarTipoProdutoScreen } from '@/interfaces/tipo-produto';
+import { useSQLiteContext } from 'expo-sqlite';
+import TipoProdutoService from '@/classes/tipo_produto/tipo_produto.service';
+import { useIsFocused } from '@react-navigation/native';
+import { TipoProdutoUpdate } from '@/classes/tipo_produto/interfaces';
+import LoadingScreen from '@/components/LoadingScreen';
 
 const View: React.FC<VisualizarTipoProdutoScreen> = ({ navigation }) => {
-  const [tipos_produtos, setTipos_Produtos] =
-    React.useState<Array<TipoProduto>>(Tipos_Produtos);
+  const [tipos_produtos, setTipos_Produtos] = React.useState<
+    Array<TipoProdutoUpdate>
+  >([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const db = useSQLiteContext();
+  const isFocused = useIsFocused();
+
+  async function start() {
+    try {
+      if (!isLoading) {
+        setIsLoading(true);
+      }
+      const tp = await new TipoProdutoService(db).getAll();
+      setTipos_Produtos(tp);
+      setIsLoading(false);
+    } catch (error) {
+      Alert.alert('Error', (error as Error).message);
+      setTipos_Produtos([]);
+      setIsLoading(false);
+    }
+  }
+
+  React.useEffect(() => {
+    if (isFocused) {
+      start();
+    }
+  }, [isFocused]);
+
   const FlatListTipoProduto = FlatList as TipoProdutoFlatList;
-  const ListRenderTipoProduto: ListRenderItem<TipoProduto> = ({ item }) => {
+  const ListRenderTipoProduto: ListRenderItem<TipoProdutoUpdate> = ({
+    item,
+  }) => {
     return (
       <Card size="md" variant="elevated" m="$3">
         <HStack justifyContent="space-between">
@@ -94,7 +84,7 @@ const View: React.FC<VisualizarTipoProdutoScreen> = ({ navigation }) => {
             <Button
               onPress={() =>
                 navigation?.navigate('atualizar-tipo-produto', {
-                  id: Number(item.id),
+                  id: item.id,
                 })
               }
             >
@@ -105,6 +95,10 @@ const View: React.FC<VisualizarTipoProdutoScreen> = ({ navigation }) => {
       </Card>
     );
   };
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return tipos_produtos.length < 1 ? (
     <Box h="$full" w="$full" alignItems="center" justifyContent="center">
@@ -127,9 +121,19 @@ const View: React.FC<VisualizarTipoProdutoScreen> = ({ navigation }) => {
           initialValues={{
             busca: '',
           }}
-          onSubmit={() => {}}
+          onSubmit={async (values) => {
+            try {
+              const res = await new TipoProdutoService(db).getByNome(
+                values.busca,
+              );
+              setTipos_Produtos(res);
+            } catch (error) {
+              Alert.alert('Error', (error as Error).message);
+              throw error;
+            }
+          }}
         >
-          {({ values, handleChange, errors }) => {
+          {({ values, handleChange, handleSubmit, errors }) => {
             return (
               <>
                 <FormControl
@@ -148,7 +152,13 @@ const View: React.FC<VisualizarTipoProdutoScreen> = ({ navigation }) => {
                       placeholder="Buscar"
                       onChangeText={handleChange('busca')}
                     />
-                    <Button>
+                    <Button
+                      onPress={
+                        handleSubmit as unknown as (
+                          event: GestureResponderEvent,
+                        ) => void
+                      }
+                    >
                       <ButtonIcon as={SearchIcon} />
                     </Button>
                   </Input>
@@ -182,6 +192,18 @@ const View: React.FC<VisualizarTipoProdutoScreen> = ({ navigation }) => {
         data={tipos_produtos}
         renderItem={ListRenderTipoProduto}
         keyExtractor={(item) => String(item.id)}
+        refreshing={isLoading}
+        onRefresh={async () => {
+          try {
+            await start();
+          } catch (error) {
+            Alert.alert('Error', (error as Error).message);
+            if (isLoading) {
+              setIsLoading(false);
+            }
+            throw error;
+          }
+        }}
       />
     </Box>
   );

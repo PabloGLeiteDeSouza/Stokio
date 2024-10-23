@@ -9,9 +9,9 @@ const ScreensTipoUA: React.FC = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="visualizar-tipo-ua"
+        name="visualizar-tipo-uas"
         component={View}
-        options={{ title: 'Visualizar Tipo de U.A' }}
+        options={{ title: 'Visualizar Tipo de U.As' }}
       />
       <Stack.Screen
         name="cadastrar-tipo-ua"
@@ -19,7 +19,7 @@ const ScreensTipoUA: React.FC = () => {
         options={{ title: 'Cadastrar Tipo de U.A' }}
       />
       <Stack.Screen
-        name="editar-tipo-ua"
+        name="atualizar-tipo-ua"
         component={Update}
         options={{ title: 'Atualizar Tipo de U.A' }}
       />

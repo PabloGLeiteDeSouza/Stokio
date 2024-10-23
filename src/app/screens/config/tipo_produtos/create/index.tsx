@@ -16,8 +16,12 @@ import {
 } from '@gluestack-ui/themed';
 import { Box, Heading, ScrollView, VStack } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
-import { GestureResponderEvent } from 'react-native';
-const Create: React.FC = () => {
+import { Alert, GestureResponderEvent } from 'react-native';
+import { useSQLiteContext } from 'expo-sqlite';
+import TipoProdutoService from '@/classes/tipo_produto/tipo_produto.service';
+import { CadastrarTipoProdutoScreen } from '@/interfaces/tipo-produto';
+const Create: React.FC<CadastrarTipoProdutoScreen> = ({ navigation }) => {
+  const db = useSQLiteContext();
   return (
     <Box h="$full" w="$full" px="$8" py="$8">
       <ScrollView w="$full">
@@ -29,7 +33,16 @@ const Create: React.FC = () => {
             initialValues={{
               nome: '',
             }}
-            onSubmit={() => {}}
+            onSubmit={async (value) => {
+              try {
+                await new TipoProdutoService(db).create(value);
+                Alert.alert('Sucesso', 'Tipo de Produto criado com sucesso!');
+                navigation?.navigate('visualizar-tipo-produtos');
+              } catch (error) {
+                Alert.alert('Error', (error as Error).message);
+                throw error;
+              }
+            }}
           >
             {({ handleChange, handleSubmit, values, errors }) => {
               return (
