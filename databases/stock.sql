@@ -133,13 +133,13 @@ CREATE TABLE produto (
     data_de_validade DATE,
     nome TEXT NOT NULL,
     descricao TEXT,
-    valor REAL,
-    quantidade INTEGER NOT NULL,
-    tamanho INTEGER,
-    id_marca INTEGER,
-    id_tipo_produto INTEGER,
-    id_unidade_de_medida INTEGER,
-    id_unidade_de_armazenamento INTEGER,
+    valor REAL NOT NULL,
+    quantidade INTEGER,
+    tamanho INTEGER NOT NULL,
+    id_marca INTEGER NOT NULL,
+    id_tipo_produto INTEGER NOT NULL,
+    id_unidade_de_medida INTEGER NOT NULL,
+    id_unidade_de_armazenamento INTEGER NOT NULL,
     FOREIGN KEY (id_marca) REFERENCES marca(id),
     FOREIGN KEY (id_tipo_produto) REFERENCES tipo_produto(id),
     FOREIGN KEY (id_unidade_de_medida) REFERENCES unidade_de_medida(id),
@@ -179,3 +179,31 @@ CREATE TABLE item_venda (
 -- Índices nas chaves estrangeiras da tabela item_de_venda
 CREATE INDEX idx_item_venda_id_venda ON item_venda(id_venda);
 CREATE INDEX idx_item_venda_id_produto ON item_venda(id_produto);
+
+-- Tabela compra
+CREATE TABLE compra (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    descricao TEXT,
+    data DATE,
+    status TEXT,
+    id_empresa INTEGER NOT NULL,
+    FOREIGN KEY (id_empresa) REFERENCES empresa(id)
+);
+
+-- Índice na chave estrangeira da tabela compra
+CREATE INDEX idx_compra_id_empresa ON compra(id_empresa);
+
+-- Tabela item_de_compra
+CREATE TABLE item_compra (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    quantidade INTEGER NOT NULL,
+    valor_unitario REAL,
+    id_compra INTEGER NOT NULL,
+    id_produto INTEGER NOT NULL,
+    FOREIGN KEY (id_compra) REFERENCES compra(id),
+    FOREIGN KEY (id_produto) REFERENCES produto(id)
+);
+
+-- Índices nas chaves estrangeiras da tabela item_de_compra
+CREATE INDEX idx_item_compra_id_compra ON item_compra(id_compra);
+CREATE INDEX idx_item_compra_id_produto ON item_compra(id_produto);
