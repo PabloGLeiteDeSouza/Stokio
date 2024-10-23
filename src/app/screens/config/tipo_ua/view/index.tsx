@@ -10,73 +10,57 @@ import {
   FormControlErrorText,
   Input,
   InputField,
-  Radio,
-  RadioGroup,
-  RadioIcon,
-  RadioIndicator,
-  RadioLabel,
   Button,
   ButtonText,
-  Checkbox,
-  CheckboxGroup,
-  CheckboxIndicator,
-  CheckboxIcon,
-  CheckboxLabel,
-  Textarea,
-  TextareaInput,
-  Select,
-  SelectTrigger,
-  SelectInput,
-  SelectIcon,
-  SelectPortal,
-  SelectBackdrop,
-  SelectContent,
-  SelectDragIndicatorWrapper,
-  SelectDragIndicator,
-  SelectItem,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  Switch,
-  Modal,
-  ModalBackdrop,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
   HStack,
-  VStack,
   Heading,
   Text,
-  Center,
-  Icon,
-  CircleIcon,
-  CheckIcon,
   AlertCircleIcon,
-  ChevronDownIcon,
   Divider,
   ButtonIcon,
-  RemoveIcon,
   TrashIcon,
   AddIcon,
   FlatList,
+  Box,
+  Card,
+  EditIcon,
+  SearchIcon,
 } from '@gluestack-ui/themed';
-import { Box } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
-import { Card } from '@gluestack-ui/themed';
-import { EditIcon } from '@gluestack-ui/themed';
-import Tipos_Uas from './tipos_uas.json';
-import { SearchIcon } from '@gluestack-ui/themed';
-import { TipoUa, TipoUaFlatList } from '@/types/screens/tipo-ua';
-import { ListRenderItem } from 'react-native';
+import { TipoUaFlatList } from '@/types/screens/tipo-ua';
+import { Alert, GestureResponderEvent, ListRenderItem } from 'react-native';
 import { VisualizarTipoUaScreen } from '@/interfaces/tipo-ua';
+import { useSQLiteContext } from 'expo-sqlite';
+import TipoUaService from '@/classes/tipo_ua/tipo_ua.service';
+import { TipoUaUpdate } from '@/classes/tipo_ua/interfaces';
+import { useIsFocused } from '@react-navigation/native';
 
 const View: React.FC<VisualizarTipoUaScreen> = ({ navigation }) => {
-  const [tipos_Uas, setTipos_Uas] = React.useState<Array<TipoUa>>(Tipos_Uas);
+  const db = useSQLiteContext();
+  const [tipos_Uas, setTipos_Uas] = React.useState<Array<TipoUaUpdate>>([]);
+  const [isRefreshing, setIsRefreshing] = React.useState<boolean>(true);
   const FlatListTipoUa = FlatList as TipoUaFlatList;
-  const ListRenderTipoUa: ListRenderItem<TipoUa> = ({ item }) => {
+
+  const isFocused = useIsFocused();
+
+  async function start() {
+    try {
+      const tipos = await new TipoUaService(db).getAll();
+      setTipos_Uas([...tipos]);
+      setIsRefreshing(false);
+    } catch (error) {
+      Alert.alert('Error', (error as Error).message);
+      setTipos_Uas([]);
+    }
+  }
+
+  React.useEffect(() => {
+    if (isFocused) {
+      start();
+    }
+  }, [isFocused]);
+
+  const ListRenderTipoUa: ListRenderItem<TipoUaUpdate> = ({ item }) => {
     return (
       <Card size="md" variant="elevated" m="$3">
         <HStack justifyContent="space-between">
@@ -86,7 +70,42 @@ const View: React.FC<VisualizarTipoUaScreen> = ({ navigation }) => {
             </Heading>
           </Box>
           <Box gap="$5">
-            <Button action="negative">
+            <Button
+              onPress={async () => {
+                try {
+                  Alert.alert(
+                    'Aviso',
+                    `Voce deseja mesmo deletear o tipo: ${item.nome}`,
+                    [
+                      {
+                        text: 'Não',
+                        onPress: () =>
+                          Alert.alert('Aviso', 'Operacao cancelada'),
+                      },
+                      {
+                        text: 'Sim',
+                        onPress: async () => {
+                          try {
+                            await new TipoUaService(db).delete(item.id);
+                            Alert.alert(
+                              'Aviso',
+                              `Item ${item.nome} deletado com sucesso`,
+                            );
+                            start();
+                          } catch (error) {
+                            throw error;
+                          }
+                        },
+                      },
+                    ],
+                  );
+                } catch (error) {
+                  Alert.alert('Error', (error as Error).message);
+                  throw error;
+                }
+              }}
+              action="negative"
+            >
               <ButtonIcon as={TrashIcon} />
             </Button>
             <Button
@@ -102,7 +121,7 @@ const View: React.FC<VisualizarTipoUaScreen> = ({ navigation }) => {
     );
   };
 
-  return clientes.length < 1 ? (
+  return tipos_Uas.length < 1 ? (
     <Box h="$full" w="$full" alignItems="center" justifyContent="center">
       <Box gap="$5">
         <Heading textAlign="center">
@@ -123,9 +142,21 @@ const View: React.FC<VisualizarTipoUaScreen> = ({ navigation }) => {
           initialValues={{
             busca: '',
           }}
-          onSubmit={() => {}}
+          onSubmit={async (values) => {
+            try {
+              const res = await new TipoUaService(db).getNome(values.busca);
+              if (res.length > 0) {
+                setTipos_Uas(res);
+              } else {
+                throw new Error('Nenhum  tipo de UA encontrado');
+              }
+            } catch (error) {
+              Alert.alert('Error', (error as Error).message);
+              throw error;
+            }
+          }}
         >
-          {({ values, handleChange }) => {
+          {({ values, errors, handleChange, handleSubmit }) => {
             return (
               <>
                 <FormControl
@@ -142,9 +173,15 @@ const View: React.FC<VisualizarTipoUaScreen> = ({ navigation }) => {
                       type="text"
                       value={values.busca}
                       placeholder="Buscar"
-                      onChangeText={handleChange('buscar')}
+                      onChangeText={handleChange('busca')}
                     />
-                    <Button>
+                    <Button
+                      onPress={
+                        handleSubmit as unknown as (
+                          event: GestureResponderEvent,
+                        ) => void
+                      }
+                    >
                       <ButtonIcon as={SearchIcon} />
                     </Button>
                   </Input>
@@ -157,9 +194,7 @@ const View: React.FC<VisualizarTipoUaScreen> = ({ navigation }) => {
 
                   <FormControlError>
                     <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
+                    <FormControlErrorText>{errors.busca}</FormControlErrorText>
                   </FormControlError>
                 </FormControl>
               </>
@@ -180,6 +215,16 @@ const View: React.FC<VisualizarTipoUaScreen> = ({ navigation }) => {
         data={tipos_Uas}
         renderItem={ListRenderTipoUa}
         keyExtractor={(item) => String(item.id)}
+        refreshing={isRefreshing}
+        onRefresh={async () => {
+          try {
+            start();
+          } catch (error) {
+            Alert.alert('Erro', (error as Error).message);
+            setIsRefreshing(false);
+            throw error;
+          }
+        }}
       />
     </Box>
   );

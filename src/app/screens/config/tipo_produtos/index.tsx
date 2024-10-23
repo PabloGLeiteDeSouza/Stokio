@@ -9,7 +9,7 @@ const ScreensTipoProduto: React.FC = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="visualizar-tipo-produto"
+        name="visualizar-tipo-produtos"
         component={View}
         options={{ title: 'Visualizar Tipo de Produto' }}
       />
