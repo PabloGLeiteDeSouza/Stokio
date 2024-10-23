@@ -7,7 +7,7 @@ export default class UmService {
   async create(um: UmCreate) {
     try {
       const data = await this.db.runAsync(
-        'INSERT into unidade_de_medida ( nome, valor ) VALUES ( $nome, $valor )',
+        'INSERT into um ( nome, valor ) VALUES ( $nome, $valor )',
         {
           $nome: um.nome,
           $valor: um.valor,
@@ -27,7 +27,7 @@ export default class UmService {
   async update(um: UmUpdate) {
     try {
       const data = await this.db.runAsync(
-        'UPDATE unidade_de_medida SET  nome = $nome, valor = $valor WHERE id = $id',
+        'UPDATE um SET  nome = $nome, valor = $valor WHERE id = $id',
         {
           $nome: um.nome,
           $valor: um.valor,
@@ -48,7 +48,7 @@ export default class UmService {
   async getById(id: string) {
     try {
       const data = await this.db.getFirstAsync<UmUpdate>(
-        'SELECT * FROM unidade_de_medida WHERE id == $id',
+        'SELECT * FROM um WHERE id == $id',
         { $id: id },
       );
       if (!data) {
@@ -64,9 +64,7 @@ export default class UmService {
 
   async getAll() {
     try {
-      const data = await this.db.getAllAsync<UmUpdate>(
-        'SELECT * FROM unidade_de_medida',
-      );
+      const data = await this.db.getAllAsync<UmUpdate>('SELECT * FROM um');
       if (data.length < 1) {
         throw new Error('Nao foram encontradas unidades de medida!');
       }
@@ -84,7 +82,7 @@ export default class UmService {
   async getByNome(nome: string) {
     try {
       const data = await this.db.getAllAsync<UmUpdate>(
-        `SELECT * FROM unidade_de_medida WHERE nome LIKE '%' || $nome || '%'`,
+        `SELECT * FROM um WHERE nome LIKE '%' || $nome || '%'`,
         { $nome: nome },
       );
       if (data.length < 1) {
@@ -102,10 +100,9 @@ export default class UmService {
 
   async delete(id: string) {
     try {
-      const data = await this.db.runAsync(
-        `DELETE FROM unidade_de_medida WHERE id = $id`,
-        { $id: id },
-      );
+      const data = await this.db.runAsync(`DELETE FROM um WHERE id = $id`, {
+        $id: id,
+      });
       if (data.changes < 1) {
         throw new Error('Nao foi possivel deletar a unidade de medida!');
       }
@@ -117,7 +114,7 @@ export default class UmService {
   }
 
   async haveUms() {
-    const data = await this.db.getAllAsync('SELECT * from unidade_de_medida');
+    const data = await this.db.getAllAsync('SELECT * from um');
     if (data.length < 1) {
       return false;
     }

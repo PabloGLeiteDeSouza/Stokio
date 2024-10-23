@@ -57,7 +57,9 @@ const View: React.FC<VisualizarUmScreen> = ({ navigation }) => {
   }
 
   React.useEffect(() => {
-    start();
+    if (focused) {
+      start();
+    }
   }, [focused]);
 
   if (isLoading) {
