@@ -57,9 +57,11 @@ import formatDate from '@utils/formatDate';
 import { Pessoa } from '@/types/screens/cliente';
 import { EmpresaService } from '@/classes/empresa/empresa.service';
 import { useSQLiteContext } from 'expo-sqlite';
-import { EmpresaUpdateData } from '@/classes/empresa/types';
+import { EmpresaUpdate } from '@/classes/empresa/types';
 import InputText from '@/components/Input';
 import SelectEstados from '@/components/Custom/Selects/SelectEstados';
+import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
+import { Alert, GestureResponderEvent } from 'react-native';
 
 const validationSchema = Yup.object().shape({
   pessoa: Yup.object().shape({
@@ -85,15 +87,13 @@ const validationSchema = Yup.object().shape({
       numero: Yup.string().required('Número de telefone é obrigatório'),
     }),
   ),
-  endereco: Yup.object().shape({
-    cep: Yup.string().required('CEP é obrigatório'),
-    rua: Yup.string().required('Rua é obrigatória'),
-    numero: Yup.string().required('Número é obrigatório'),
-    complemento: Yup.string(),
-    bairro: Yup.string().required('Bairro é obrigatório'),
-    cidade: Yup.string().required('Cidade é obrigatória'),
-    uf: Yup.string().required('UF e obrigatorio!'),
-  }),
+  cep: Yup.string().required('CEP é obrigatório'),
+  rua: Yup.string().required('Rua é obrigatória'),
+  numero: Yup.string().required('Número é obrigatório'),
+  complemento: Yup.string(),
+  bairro: Yup.string().required('Bairro é obrigatório'),
+  cidade: Yup.string().required('Cidade é obrigatória'),
+  uf: Yup.string().required('UF e obrigatorio!'),
   email: Yup.array().of(
     Yup.object().shape({
       endereco: Yup.string().required('Endereço de email é obrigatório'),
@@ -109,104 +109,37 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
   }
   const { id } = route.params;
   const [isLoading, setIsLoading] = React.useState(true);
-  const [pessoas, setPessoas] = React.useState<Array<Pessoa>>([
-    {
-      id: 1,
-      nome: 'João',
-      data_nascimento: '2000-04-05',
-      cpf: '12345678901',
-    },
-    {
-      id: 2,
-      nome: 'Maria',
-      data_nascimento: '1999-03-02',
-      cpf: '98765432101',
-    },
-    {
-      id: 3,
-      nome: 'Pedro',
-      data_nascimento: '1998-04-16',
-      cpf: '98765432101',
-    },
-    {
-      id: 4,
-      nome: 'Maria',
-      data_nascimento: '1975-07-20',
-      cpf: '98765432101',
-    },
-    {
-      id: 5,
-      nome: 'Maria',
-      data_nascimento: '1975-07-20',
-      cpf: '98765432101',
-    },
-    {
-      id: 6,
-      nome: 'Maria',
-      data_nascimento: '1975-07-20',
-      cpf: '98765432101',
-    },
-    {
-      id: 7,
-      nome: 'Maria',
-      data_nascimento: '1975-07-20',
-      cpf: '98765432101',
-    },
-    {
-      id: 8,
-      nome: 'Maria',
-      data_nascimento: '1975-07-20',
-      cpf: '98765432101',
-    },
-    {
-      id: 9,
-      nome: 'Maria',
-      data_nascimento: '1975-07-20',
-      cpf: '98765432101',
-    },
-    {
-      id: 10,
-      nome: 'Maria',
-      data_nascimento: '1975-07-20',
-      cpf: '98765432101',
-    },
-  ]);
-  const [isNewPerson, setIsNewPerson] = React.useState(false);
-  const [isNewRamo, setIsNewRamo] = React.useState(false);
-  const [empresa, setEmpresa] = React.useState<EmpresaUpdateData>({
-    id: '',
+  const [empresa, setEmpresa] = React.useState<EmpresaUpdate>({
+    id: Number(null),
     pessoa: {
-      id: '',
+      id: Number(null),
       nome: '',
-      data_nascimento: String(new Date()),
+      data_nascimento: new Date(),
       cpf: '',
     },
     cnpj: '',
     nome_fantasia: '',
     razao_social: '',
     ramo: {
-      id: '',
+      id: Number(null),
       nome: '',
     },
     telefones: [
       {
-        id: '',
+        id: Number(null),
         numero: '',
       },
     ],
-    endereco: {
-      id: '',
-      cep: '',
-      logradouro: '',
-      numero: '',
-      complemento: '',
-      bairro: '',
-      cidade: '',
-      uf: '',
-    },
+    cep: '',
+    logradouro: '',
+    numero: '',
+    complemento: '',
+    bairro: '',
+    cidade: '',
+    uf: '',
     emails: [
       {
-        id: '',
+        id: Number(null),
         endereco: '',
       },
     ],
@@ -244,20 +177,29 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
             <Formik
               validationSchema={validationSchema}
               initialValues={empresa}
-              onSubmit={() => {}}
+              onSubmit={async (values) => {
+                try {
+                  await new EmpresaService(db).update(values);
+                  Alert.alert('Sucesso', 'Empresa Atualizada com Sucesso!', [
+                    {
+                      text: 'ok',
+                      onPress: () =>
+                        navigation?.navigate('visualizar-empresas'),
+                    },
+                  ]);
+                } catch (error) {
+                  Alert.alert('Erro', (error as Error).message);
+                  throw error;
+                }
+              }}
             >
-              {({ handleChange, setFieldValue, values, errors }) => {
-                React.useEffect(() => {
-                  console.log('modify pessoa');
-                  if (route && route.params && route.params.pessoa) {
-                    const { data_nascimento, ...person } = route.params.pessoa;
-                    setFieldValue('pessoa', {
-                      ...person,
-                      data_nascimento: new Date(data_nascimento),
-                    });
-                  }
-                }, [route?.params?.pessoa]);
-
+              {({
+                handleChange,
+                handleSubmit,
+                setFieldValue,
+                values,
+                errors,
+              }) => {
                 React.useEffect(() => {
                   console.log('modify ramo');
                   if (route && route.params && route.params.ramo) {
@@ -268,267 +210,86 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
 
                 return (
                   <Box gap="$5">
-                    {values.pessoa.id === '' &&
-                    !isNewPerson &&
-                    pessoas.length > 0 ? (
-                      <Box gap="$5" mt="$5">
-                        <Heading size="md">Selecione uma pessoa:</Heading>
-                        <Box gap="$5">
-                          <Button
-                            onPress={() => {
-                              navigation?.navigate('selecionar-pessoa', {
-                                screen: 'atualizar-empresa',
-                                pessoas,
-                              });
-                            }}
-                          >
-                            <ButtonText>Selecionar Pessoa</ButtonText>
-                          </Button>
-                          <Button onPress={() => setIsNewPerson(true)}>
-                            <ButtonText>Adicionar Pessoa</ButtonText>
-                          </Button>
-                        </Box>
-                      </Box>
-                    ) : values.pessoa.id !== '' && !isNewPerson ? (
-                      <Box gap="$5">
+                    <Text>
+                      Dados da Pessoa responsável pela Empresa ou da empresa
+                      sendo Pessoa Física
+                    </Text>
+                    <FormControl
+                      isInvalid={false}
+                      size={'md'}
+                      isDisabled={false}
+                      isRequired={true}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>Nome</FormControlLabelText>
+                      </FormControlLabel>
+                      <Input>
+                        <InputField
+                          type="text"
+                          placeholder="Nome Completo do Clinente"
+                          onChangeText={handleChange('pessoa.nome')}
+                          value={values.pessoa.nome}
+                        />
+                      </Input>
+
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          Must be atleast 6 characters.
+                        </FormControlHelperText>
+                      </FormControlHelper>
+
+                      <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
+                          {errors?.pessoa?.nome}
+                        </FormControlErrorText>
+                      </FormControlError>
+                    </FormControl>
+
+                    <InputDatePicker
+                      title="Data de Nascimento"
+                      onChangeDate={(data) =>
+                        setFieldValue('pessoa.data_nascimento', data)
+                      }
+                      value={values.pessoa.data_nascimento}
+                      size="md"
+                      error={errors.pessoa?.data_nascimento}
+                      isInvalid={errors.pessoa?.data_nascimento ? true : false}
+                      isRequired={true}
+                    />
+                    <InputText
+                      inputType="cpf"
+                      isInvalid={errors.pessoa?.cpf ? true : false}
+                      value={values.pessoa.cpf}
+                      onChangeValue={handleChange('pessoa.cpf')}
+                      error={errors.pessoa?.cpf}
+                      isRequired={true}
+                    />
+
+                    {values.ramo.id !== 0 && (
+                      <Box>
                         <Card>
                           <HStack>
-                            <VStack gap="$1.5">
-                              <Box>
-                                <Heading>Pessoa</Heading>
-                              </Box>
-                              <Box>
-                                <Text size="xl">{values.pessoa.nome}</Text>
-                              </Box>
-                              <Box>
-                                <Text>
-                                  {formatDate(values.pessoa.data_nascimento)}
-                                </Text>
-                              </Box>
-                              <Box>
-                                <Text>{values.pessoa.cpf}</Text>
-                              </Box>
+                            <VStack gap="$5">
+                              <Heading>Ramo:</Heading>
+                              <Text>{values.ramo.nome}</Text>
                             </VStack>
                           </HStack>
                         </Card>
-                        <Box gap="$5">
-                          <Button
-                            onPress={() => {
-                              navigation?.navigate('selecionar-pessoa', {
-                                pessoas,
-                                screen: 'atualizar-empresa',
-                                pessoaSelecionada: {
-                                  ...values.pessoa,
-                                  data_nascimento: String(
-                                    values.pessoa.data_nascimento,
-                                  ),
-                                },
-                              });
-                            }}
-                          >
-                            <ButtonText>Alterar Pessoa</ButtonText>
-                          </Button>
-                        </Box>
-                        <Button
-                          onPress={() => {
-                            setFieldValue('pessoa', {
-                              nome: '',
-                              data_nascimento: new Date(),
-                              cpf: '',
-                            });
-                            setIsNewPerson(true);
-                          }}
-                        >
-                          <ButtonText>Adicionar Pessoa</ButtonText>
-                        </Button>
-                      </Box>
-                    ) : (
-                      <>
-                        <FormControl
-                          isInvalid={false}
-                          size={'md'}
-                          isDisabled={false}
-                          isRequired={true}
-                        >
-                          <FormControlLabel>
-                            <FormControlLabelText>Nome</FormControlLabelText>
-                          </FormControlLabel>
-                          <Input>
-                            <InputField
-                              type="text"
-                              placeholder="Nome Completo do Clinente"
-                              onChangeText={handleChange('pessoa.nome')}
-                              value={values.pessoa.nome}
-                            />
-                          </Input>
-
-                          <FormControlHelper>
-                            <FormControlHelperText>
-                              Must be atleast 6 characters.
-                            </FormControlHelperText>
-                          </FormControlHelper>
-
-                          <FormControlError>
-                            <FormControlErrorIcon as={AlertCircleIcon} />
-                            <FormControlErrorText>
-                              {errors?.pessoa?.nome}
-                            </FormControlErrorText>
-                          </FormControlError>
-                        </FormControl>
-
-                        <FormControl
-                          isInvalid={false}
-                          size={'md'}
-                          isDisabled={false}
-                          isRequired={true}
-                        >
-                          <FormControlLabel>
-                            <FormControlLabelText>
-                              Data de nascimento
-                            </FormControlLabelText>
-                          </FormControlLabel>
-                          <Input isReadOnly={true}>
-                            <InputField
-                              type="text"
-                              value={values.pessoa.data_nascimento.toLocaleDateString(
-                                'PT-BR',
-                              )}
-                              placeholder="05/05/2003"
-                            />
-                            <Button>
-                              <ButtonIcon as={CalendarDaysIcon} />
-                            </Button>
-                          </Input>
-
-                          <FormControlHelper>
-                            <FormControlHelperText>
-                              Must be atleast 6 characters.
-                            </FormControlHelperText>
-                          </FormControlHelper>
-
-                          <FormControlError>
-                            <FormControlErrorIcon as={AlertCircleIcon} />
-                            <FormControlErrorText>
-                              {errors.pessoa?.data_nascimento}
-                            </FormControlErrorText>
-                          </FormControlError>
-                        </FormControl>
-                        <FormControl
-                          isInvalid={false}
-                          size={'md'}
-                          isDisabled={false}
-                          isRequired={true}
-                        >
-                          <FormControlLabel>
-                            <FormControlLabelText>CPF</FormControlLabelText>
-                          </FormControlLabel>
-                          <Input>
-                            <InputField
-                              type="text"
-                              value={values.pessoa.cpf}
-                              onChangeText={handleChange('pessoa.cpf')}
-                              placeholder="123.123.123.12"
-                            />
-                          </Input>
-
-                          <FormControlHelper>
-                            <FormControlHelperText>
-                              Must be atleast 6 characters.
-                            </FormControlHelperText>
-                          </FormControlHelper>
-
-                          <FormControlError>
-                            <FormControlErrorIcon as={AlertCircleIcon} />
-                            <FormControlErrorText>
-                              {errors.pessoa?.cpf}
-                            </FormControlErrorText>
-                          </FormControlError>
-                        </FormControl>
-                      </>
-                    )}
-
-                    {values.ramo.id === '' && !isNewRamo ? (
-                      <Box>
-                        <Box>
-                          <Heading>Selecione o ramo</Heading>
-                        </Box>
-                        <Box gap="$5">
-                          <Button
-                            onPress={() =>
-                              navigation?.navigate('selecionar-ramo', {
-                                screen: 'atualizar-empresa',
-                                ramoSelecionado: values.ramo,
-                              })
-                            }
-                          >
-                            <ButtonText>Selecionar Ramo</ButtonText>
-                          </Button>
-                          <Button onPress={() => setIsNewRamo(true)}>
-                            <ButtonText>Adicionar Ramo</ButtonText>
-                          </Button>
-                        </Box>
-                      </Box>
-                    ) : !isNewRamo ? (
-                      <Box gap="$5">
-                        <Card>
-                          <Box>
-                            <Heading>Ramo:</Heading>
-                          </Box>
-                          <Box>
-                            <Text>{values.ramo.nome}</Text>
-                          </Box>
-                        </Card>
-                        <Box gap="$5">
-                          <Button
-                            onPress={() =>
-                              navigation?.navigate('selecionar-ramo', {
-                                screen: 'atualizar-empresa',
-                                ramoSelecionado: values.ramo,
-                              })
-                            }
-                          >
-                            <ButtonText>Alterar Ramo</ButtonText>
-                          </Button>
-                          <Button onPress={() => setIsNewRamo(true)}>
-                            <ButtonText>Adicionar Ramo</ButtonText>
-                          </Button>
-                        </Box>
-                      </Box>
-                    ) : (
-                      <Box>
-                        <FormControl
-                          isInvalid={false}
-                          size={'md'}
-                          isDisabled={false}
-                          isRequired={true}
-                        >
-                          <FormControlLabel>
-                            <FormControlLabelText>Ramo</FormControlLabelText>
-                          </FormControlLabel>
-                          <Input>
-                            <InputField
-                              onChangeText={handleChange('ramo.nome')}
-                              type="text"
-                              placeholder="asdasdassadas"
-                              value={values.ramo.nome}
-                            />
-                          </Input>
-
-                          <FormControlHelper>
-                            <FormControlHelperText>
-                              Must be atleast 6 characters.
-                            </FormControlHelperText>
-                          </FormControlHelper>
-
-                          <FormControlError>
-                            <FormControlErrorIcon as={AlertCircleIcon} />
-                            <FormControlErrorText>
-                              Atleast 6 characters are required.
-                            </FormControlErrorText>
-                          </FormControlError>
-                        </FormControl>
                       </Box>
                     )}
+                    <Box gap="$5">
+                      <Button
+                        onPress={() =>
+                          navigation?.navigate('selecionar-ramo', {
+                            screen: 'atualizar-empresa',
+                            ramoSelecionado: values.ramo,
+                          })
+                        }
+                      >
+                        <ButtonText>Alterar Ramo</ButtonText>
+                      </Button>
+                    </Box>
 
                     <FormControl
                       isInvalid={false}
@@ -552,7 +313,7 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Atualize o nome fantasia da empresa.
                         </FormControlHelperText>
                       </FormControlHelper>
 
@@ -577,7 +338,7 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                       <Input>
                         <InputField
                           type="text"
-                          placeholder="Nome Completo do Clinente"
+                          placeholder="Razão social da empresa ou nome completo"
                           onChangeText={handleChange('razao_social')}
                           value={values.razao_social}
                         />
@@ -585,7 +346,7 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Atualize a Razão social da empresa.
                         </FormControlHelperText>
                       </FormControlHelper>
 
@@ -605,40 +366,40 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                     />
                     <InputText
                       inputType="cep"
-                      error={errors.endereco?.cep}
-                      value={values.endereco?.cep}
-                      onChangeValue={handleChange('endereco.cep')}
-                      isInvalid={errors.endereco?.cep ? true : false}
+                      error={errors.cep}
+                      value={values.cep}
+                      onChangeValue={handleChange('cep')}
+                      isInvalid={errors.cep ? true : false}
                       isRequired={true}
                     />
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={values.logradouro ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
                     >
                       <FormControlLabel>
-                        <FormControlLabelText>Rua</FormControlLabelText>
+                        <FormControlLabelText>Logradouro</FormControlLabelText>
                       </FormControlLabel>
                       <Input>
                         <InputField
-                          value={values.endereco.logradouro}
-                          onChangeText={handleChange('endereco.logradouro')}
+                          value={values.logradouro}
+                          onChangeText={handleChange('logradouro')}
                           type="text"
-                          placeholder="password"
+                          placeholder="josé canóvas de andreu"
                         />
                       </Input>
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Atualize o logradouro do endereço.
                         </FormControlHelperText>
                       </FormControlHelper>
 
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          Atleast 6 characters are required.
+                          {errors.logradouro}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
@@ -649,12 +410,12 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                       isRequired={true}
                     >
                       <FormControlLabel>
-                        <FormControlLabelText>Numero</FormControlLabelText>
+                        <FormControlLabelText>Número</FormControlLabelText>
                       </FormControlLabel>
                       <Input>
                         <InputField
-                          value={String(values.endereco.numero)}
-                          onChangeText={handleChange('endereco.numero')}
+                          value={String(values.numero)}
+                          onChangeText={handleChange('numero')}
                           type="text"
                           placeholder="123"
                           keyboardType="number-pad"
@@ -663,19 +424,19 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Infome o numero da residencia.
+                          Atualize o numero do endereço.
                         </FormControlHelperText>
                       </FormControlHelper>
 
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          {errors.endereco?.numero}
+                          {errors.numero}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={errors.complemento ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
@@ -685,8 +446,8 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                       </FormControlLabel>
                       <Textarea>
                         <TextareaInput
-                          value={values.endereco.complemento}
-                          onChangeText={handleChange('endereco.complemento')}
+                          value={values.complemento}
+                          onChangeText={handleChange('complemento')}
                           type="text"
                           placeholder="Proximo a ..."
                         />
@@ -694,19 +455,19 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Informe o complemento caso haja.
                         </FormControlHelperText>
                       </FormControlHelper>
 
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          Atleast 6 characters are required.
+                          {errors.complemento}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={errors.bairro ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
@@ -716,8 +477,8 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                       </FormControlLabel>
                       <Input>
                         <InputField
-                          value={values.endereco.bairro}
-                          onChangeText={handleChange('endereco.bairro')}
+                          value={values.bairro}
+                          onChangeText={handleChange('bairro')}
                           type="text"
                           placeholder="password"
                         />
@@ -725,19 +486,19 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Informe o bairro do endereco.
                         </FormControlHelperText>
                       </FormControlHelper>
 
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          Atleast 6 characters are required.
+                          {values.bairro}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={errors.cidade ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
@@ -747,31 +508,31 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                       </FormControlLabel>
                       <Input>
                         <InputField
-                          value={values.endereco.cidade}
-                          onChangeText={handleChange('endereco.cidade')}
+                          value={values.cidade}
+                          onChangeText={handleChange('cidade')}
                           type="text"
-                          placeholder="password"
+                          placeholder="Uberlândia"
                         />
                       </Input>
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Informe o nome da cidade.
                         </FormControlHelperText>
                       </FormControlHelper>
 
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          Atleast 6 characters are required.
+                          {errors.cidade}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
                     <SelectEstados
-                      error={errors.endereco?.uf}
-                      value={values.endereco.uf}
-                      onChangeValue={handleChange('endereco.uf')}
-                      isInvalid={errors.endereco?.uf ? true : false}
+                      error={errors.uf}
+                      value={values.uf}
+                      onChangeValue={handleChange('uf')}
+                      isInvalid={errors.uf ? true : false}
                       isRequired={true}
                     />
                     <Box gap="$2.5">
@@ -791,6 +552,14 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                               onChangeValue={handleChange(
                                 `telefones[${i}].numero`,
                               )}
+                              isInvalid={
+                                typeof errors.telefones !== 'undefined' &&
+                                typeof errors.telefones[i] === 'object' &&
+                                errors.telefones[i].numero
+                                  ? true
+                                  : false
+                              }
+                              isRequired={true}
                             />
                             <FormControl
                               isInvalid={false}
@@ -817,14 +586,17 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
 
                               <FormControlHelper>
                                 <FormControlHelperText>
-                                  Must be atleast 6 characters.
+                                  Atualize o número do telefone.
                                 </FormControlHelperText>
                               </FormControlHelper>
 
                               <FormControlError>
                                 <FormControlErrorIcon as={AlertCircleIcon} />
                                 <FormControlErrorText>
-                                  Atleast 6 characters are required.
+                                  {typeof errors.telefones !== 'undefined' &&
+                                  typeof errors.telefones[i] === 'object'
+                                    ? errors.telefones[i].numero
+                                    : ''}
                                 </FormControlErrorText>
                               </FormControlError>
                             </FormControl>
@@ -845,7 +617,13 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                         return (
                           <Box key={`email-${i}`}>
                             <FormControl
-                              isInvalid={false}
+                              isInvalid={
+                                typeof errors.emails !== 'undefined' &&
+                                typeof errors.emails[i] === 'object' &&
+                                errors.emails[i].endereco
+                                  ? true
+                                  : false
+                              }
                               size={'md'}
                               isDisabled={false}
                               isRequired={true}
@@ -869,14 +647,17 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
 
                               <FormControlHelper>
                                 <FormControlHelperText>
-                                  Must be atleast 6 characters.
+                                  Atualize o e-mail.
                                 </FormControlHelperText>
                               </FormControlHelper>
 
                               <FormControlError>
                                 <FormControlErrorIcon as={AlertCircleIcon} />
                                 <FormControlErrorText>
-                                  Atleast 6 characters are required.
+                                  {typeof errors.emails !== 'undefined' &&
+                                  typeof errors.emails[i] === 'object'
+                                    ? errors.emails[i].endereco
+                                    : ''}
                                 </FormControlErrorText>
                               </FormControlError>
                             </FormControl>
@@ -893,7 +674,13 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                     </Box>
 
                     <Box>
-                      <Button>
+                      <Button
+                        onPress={
+                          handleSubmit as unknown as (
+                            event: GestureResponderEvent,
+                          ) => void
+                        }
+                      >
                         <ButtonText>Atualizar</ButtonText>
                       </Button>
                     </Box>

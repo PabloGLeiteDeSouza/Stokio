@@ -37,13 +37,9 @@ export type Email = {
   endereco: string;
 };
 
-export type PessoaCreate = Omit<Pessoa, 'id'> & {
-  id: string;
-};
+export type PessoaCreate = Pessoa & {};
 
-export type RamoCreate = Omit<Ramo, 'id'> & {
-  id: string;
-};
+export type RamoCreate = Ramo & {};
 
 export type TelefoneCreate = Omit<Telefone, 'id'> & {
   id: string;
@@ -54,8 +50,8 @@ export type EmailCreate = Omit<Email, 'id'> & {
 };
 
 export type EmpresaCreate = Omit<Empresa, 'id' | 'id_ramo' | 'id_pessoa'> & {
-  pessoa: Partial<PessoaCreate>;
-  ramo: Partial<RamoCreate>;
+  pessoa: PessoaCreate;
+  ramo: RamoCreate;
   telefones: Array<Omit<Telefone, 'id'>>;
   emails: Array<Omit<Email, 'id'>>;
 };

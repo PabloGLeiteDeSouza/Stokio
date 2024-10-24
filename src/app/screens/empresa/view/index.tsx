@@ -68,20 +68,22 @@ import { Box, ScrollView } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import { Card } from '@gluestack-ui/themed';
 import { EditIcon } from '@gluestack-ui/themed';
-import Empresas from './empresas.json';
 import { SearchIcon } from '@gluestack-ui/themed';
-import { Empresa, EmpresaFlatList } from '@/types/screens/empresa';
+import { EmpresaFlatList } from '@/types/screens/empresa';
 import { Alert, ListRenderItem } from 'react-native';
 import { VisualizarEmpresaScreen } from '@/interfaces/empresa';
 import { EmpresaService } from '@/classes/empresa/empresa.service';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useIsFocused } from '@react-navigation/native';
 import { mask } from '@/utils/mask';
+import { EmpresaSearchRelatinalPessoa } from '@/classes/empresa/types';
 
 const View: React.FC<VisualizarEmpresaScreen> = ({ navigation }) => {
   const focused = useIsFocused();
   const FlatListEmpresa = FlatList as EmpresaFlatList;
-  const ListRenderEmpresa: ListRenderItem<Empresa> = ({ item }) => {
+  const ListRenderEmpresa: ListRenderItem<EmpresaSearchRelatinalPessoa> = ({
+    item,
+  }) => {
     return (
       <Card size="md" variant="elevated" m="$3">
         <HStack justifyContent="space-between">
@@ -112,7 +114,9 @@ const View: React.FC<VisualizarEmpresaScreen> = ({ navigation }) => {
       </Card>
     );
   };
-  const [empresas, setEmpresas] = React.useState<Array<Empresa>>([]);
+  const [empresas, setEmpresas] = React.useState<
+    Array<EmpresaSearchRelatinalPessoa>
+  >([]);
   const db = useSQLiteContext();
 
   async function start() {

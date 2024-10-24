@@ -1,14 +1,14 @@
 import {
-  EmpresaCreateData,
+  EmpresaCreate,
   EmpresaObject,
   EmpresaSearchCriteria,
-  EmpresaUpdateData,
+  EmpresaUpdate,
 } from '../types';
 
 // Interface do serviço de empresas
 export interface IEmpresaService {
-  create(dados: EmpresaCreateData): Promise<void>;
-  update(id: number, dados: EmpresaUpdateData): Promise<void>;
+  create(dados: EmpresaCreate): Promise<void>;
+  update(dados: EmpresaUpdate): Promise<void>;
   search(criteria: EmpresaSearchCriteria): Promise<EmpresaObject[]>;
   delete(id: number): Promise<void>;
 }

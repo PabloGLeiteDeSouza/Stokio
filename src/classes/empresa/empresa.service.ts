@@ -62,7 +62,9 @@ export class EmpresaService implements IEmpresaService {
                 'INSERT into pessoa ( nome, data_nascimento, cpf ) VALUES ( $nome, $data_nascimento, $cpf )',
                 {
                   $nome: String(dados.pessoa.nome),
-                  $data_nascimento: String(dados.pessoa.data_nascimento),
+                  $data_nascimento: getStringFromDate(
+                    dados.pessoa.data_nascimento,
+                  ),
                   $cpf: String(dados.pessoa.cpf),
                 },
               )
@@ -107,7 +109,7 @@ export class EmpresaService implements IEmpresaService {
     }
   }
 
-  async update(id: number, dados: EmpresaUpdate) {
+  async update(dados: EmpresaUpdate) {
     try {
       const res_emp = await this.db.runAsync(
         'UPDATE empresa SET nome_fantasia = $nome_fantasia, razao_social = $razao_social, cnpj = $cnpj, cep = $cep, logradouro = $logradouro, numero = $numero, complemento = $complemento, bairro = $bairro, cidade $cidade, uf = $uf, limite = $limite, id_ramo = $id_ramo WHERE id = $id',
@@ -122,7 +124,7 @@ export class EmpresaService implements IEmpresaService {
           $bairro: dados.bairro,
           $cidade: dados.cidade,
           $uf: dados.uf,
-          $id: id,
+          $id: dados.id,
         },
       );
 
@@ -133,7 +135,7 @@ export class EmpresaService implements IEmpresaService {
         const id_ramo = await this.getOrCreateRamo(dados.ramo.nome);
         await this.db.runAsync(
           'UPDATE empresa SET id_ramo = $id_ramo WHERE id = $id',
-          { $id_ramo: id_ramo, $id: id },
+          { $id_ramo: id_ramo, $id: dados.id },
         );
       }
       const res_pss = await this.db.runAsync(
@@ -306,7 +308,7 @@ export class EmpresaService implements IEmpresaService {
     return data.length > 0;
   }
 
-  async getById(id: string): Promise<EmpresaUpdate> {
+  async getById(id: number): Promise<EmpresaUpdate> {
     try {
       const empresa = await this.db.getFirstAsync<EmpresaDataTableResult>(
         'SELECT * from empresa WHERE id == $id',

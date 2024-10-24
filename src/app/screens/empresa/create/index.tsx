@@ -146,7 +146,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
               validationSchema={validationSchema}
               initialValues={{
                 pessoa: {
-                  id: '',
+                  id: Number(null),
                   nome: '',
                   data_nascimento: getMinDateFor18YearsOld(),
                   cpf: '',
@@ -155,7 +155,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                 nome_fantasia: '',
                 razao_social: '',
                 ramo: {
-                  id: '',
+                  id: Number(null),
                   nome: '',
                 },
                 cep: '',
@@ -219,7 +219,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
 
                 return (
                   <Box gap="$8">
-                    {values.pessoa.id === '' && !isNewPerson && (
+                    {values.pessoa.id === 0 && !isNewPerson && (
                       <Box gap="$5" mt="$5">
                         <Heading size="md">Selecione uma pessoa:</Heading>
                         <Box gap="$5">
@@ -239,7 +239,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                         </Box>
                       </Box>
                     )}
-                    {values.pessoa.id !== '' && !isNewPerson && (
+                    {values.pessoa.id !== 0 && !isNewPerson && (
                       <Box gap="$5">
                         <Card>
                           <HStack>
@@ -267,12 +267,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                               navigation?.navigate('selecionar-pessoa', {
                                 pessoas,
                                 screen: 'cadastrar-empresa',
-                                pessoaSelecionada: {
-                                  ...values.pessoa,
-                                  data_nascimento: String(
-                                    values.pessoa.data_nascimento,
-                                  ),
-                                },
+                                pessoaSelecionada: { ...values.pessoa },
                               });
                             }}
                           >
@@ -347,7 +342,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                       </>
                     )}
 
-                    {values.ramo.id === '' && !isNewRamo ? (
+                    {values.ramo.id === 0 && !isNewRamo ? (
                       <Box>
                         <Box>
                           <Heading>Selecione o ramo</Heading>

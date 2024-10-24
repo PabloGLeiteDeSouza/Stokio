@@ -1,5 +1,6 @@
 import { UmUpdate } from '@/classes/um/interfaces';
 import { Cliente, Pessoa } from '../screens/cliente';
+import { Pessoa as pessoa } from '@/classes/empresa/types';
 import { Empresa } from '../screens/empresa';
 import { Marca } from '../screens/marca';
 import { Produto } from '../screens/produto';
@@ -210,17 +211,17 @@ export type EmpresasStackParamList = {
   'screens-ramos'?: object;
   'screens-itens-venda'?: object;
   'visualizar-empresas'?: object;
-  'cadastrar-empresa'?: { pessoa?: Pessoa; ramo?: Ramo };
-  'detalhes-empresa'?: { id: string };
-  'atualizar-empresa'?: { id: string; pessoa?: Pessoa; ramo?: Ramo };
+  'cadastrar-empresa'?: { pessoa?: pessoa; ramo?: Ramo };
+  'detalhes-empresa'?: { id: number };
+  'atualizar-empresa'?: { id: number; pessoa?: pessoa; ramo?: Ramo };
   'selecionar-pessoa'?: {
     screen: 'cadastrar-empresa';
-    pessoas: Array<Pessoa>;
+    pessoas: Array<pessoa>;
     pessoaSelecionada?: Pessoa;
   };
   'selecionar-ramo'?: {
-    screen: 'cadastrar-empresa';
-    ramoSelecionado?: { id: string; nome: string };
+    screen: 'cadastrar-empresa' | 'atualizar-empresa';
+    ramoSelecionado?: { id: number; nome: string };
   };
 };
 

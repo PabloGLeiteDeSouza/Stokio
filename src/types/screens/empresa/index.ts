@@ -4,6 +4,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { ViewStyle } from '@expo/html-elements/build/primitives/View';
 import { StyledComponentProps } from '@gluestack-style/react/lib/typescript/types';
 import { FlatList, FlatListProps, StyleProp } from 'react-native';
+import { EmpresaSearchRelatinalPessoa } from '@/classes/empresa/types';
 
 export type VisualisarEmpresaScreenNavigationProp = StackNavigationProp<
   EmpresasStackParamList,
@@ -76,8 +77,8 @@ export type EmpresaObject = {
 export type EmpresaFlatList = React.ForwardRefExoticComponent<
   StyledComponentProps<
     StyleProp<ViewStyle>,
-    Empresa,
-    FlatListProps<Empresa>,
+    EmpresaSearchRelatinalPessoa,
+    FlatListProps<EmpresaSearchRelatinalPessoa>,
     'FlatList',
     typeof FlatList
   >
