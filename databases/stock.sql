@@ -53,9 +53,6 @@ CREATE TABLE pessoa (
 -- Tabela cliente
 CREATE TABLE cliente (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nome TEXT NOT NULL,
-    data_nascimento DATE NOT NULL,
-    cpf VARCHAR(11) UNIQUE NOT NULL, 
     cep TEXT NOT NULL,
     logradouro TEXT NOT NULL,
     numero INTEGER NOT NULL,
@@ -64,7 +61,6 @@ CREATE TABLE cliente (
     cidade TEXT NOT NULL,
     uf VARCHAR(2) NOT NULL,
     saldo REAL,
-    id_endereco INTEGER NOT NULL,
     id_pessoa INTEGER NOT NULL,
     FOREIGN KEY (id_pessoa) REFERENCES pessoa(id)
 );
@@ -75,9 +71,6 @@ CREATE INDEX idx_cliente_id_pessoa ON cliente(id_pessoa);
 -- Tabela empresa
 CREATE TABLE empresa (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nome TEXT NOT NULL,
-    data_nascimento DATE NOT NULL,
-    cpf VARCHAR(11) UNIQUE NOT NULL ,
     nome_fantasia TEXT NOT NULL,
     razao_social TEXT NOT NULL,
     cnpj VARCHAR(14) UNIQUE, -- CNPJ com restrição de unicidade
@@ -88,9 +81,8 @@ CREATE TABLE empresa (
     bairro TEXT NOT NULL,
     cidade TEXT NOT NULL,
     uf TEXT(2) NOT NULL,
-	 id_pessoa INTEGER NOT NULL,
+	id_pessoa INTEGER NOT NULL,
     id_ramo INTEGER NOT NULL,
-    id_endereco INTEGER NOT NULL,
     FOREIGN KEY (id_pessoa) REFERENCES pessoa(id),
     FOREIGN KEY (id_ramo) REFERENCES ramo(id)
 );
