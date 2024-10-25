@@ -5,6 +5,7 @@ import {
   RemoveIcon,
   Textarea,
   TextareaInput,
+  VStack,
 } from '@gluestack-ui/themed';
 import React from 'react';
 import {
@@ -50,7 +51,12 @@ import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
 import InputText from '@/components/Input';
 import SelectEstados from '@/components/Custom/Selects/SelectEstados';
 import formatDate from '@/utils/formatDate';
-import { getMinDateFor18YearsOld } from '@/utils';
+import {
+  getDateFromString,
+  getMinDateFor18YearsOld,
+  getStringFromDate,
+} from '@/utils';
+import { IPessoaUpdate } from '@/classes/cliente/interfaces';
 
 const validationSchema = Yup.object().shape({
   pessoa: Yup.object().shape({
@@ -92,47 +98,33 @@ const validationSchema = Yup.object().shape({
       }),
     )
     .min(1, 'É necessário informar ao menos um email'),
-  limite: Yup.string().required('Limite é obrigatório'),
+  saldo: Yup.string().required('Saldo é obrigatório'),
 });
 
 const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
-  const db = useSQLiteContext();
-  const [pessoas, setPessoas] = React.useState<Array<Pessoa>>([
-    {
-      id: '1',
-      nome: 'João',
-      cpf: '123.123.123-12',
-      data_nascimento: '05-20-2000',
-    },
-    {
-      id: '2',
-      nome: 'Lucas',
-      cpf: '234.234.234-23',
-      data_nascimento: '06-15-1999',
-    },
-  ]);
+  const [pessoas, setPessoas] = React.useState<Array<IPessoaUpdate>>([]);
   const [isNewPerson, setIsNewPerson] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
+  const db = useSQLiteContext();
 
-  React.useEffect(() => {
-    async function startScreen() {
-      try {
-        setPessoas([
-          ...pessoas,
-          {
-            id: '3',
-            nome: 'Pedro',
-            cpf: '3243243279234',
-            data_nascimento: '10-25-1999',
-          },
-        ]);
-        setIsLoading(false);
-      } catch (error) {
-        Alert.alert('Erro', (error as Error).message);
-        setIsLoading(false);
-        throw error;
+  async function startScreen() {
+    try {
+      const pss = await new ClienteService(db).findAllPessoas();
+      console.log('Pessoas', pss);
+      if (pss.length < 1) {
+        setIsNewPerson(true);
+      } else {
+        setIsNewPerson(false);
+        setPessoas([...pss]);
       }
+      setIsLoading(false);
+    } catch (error) {
+      Alert.alert('Erro', (error as Error).message);
+      setIsLoading(false);
+      throw error;
     }
+  }
+  React.useEffect(() => {
     startScreen();
   }, []);
 
@@ -152,7 +144,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
               validationSchema={validationSchema}
               initialValues={{
                 pessoa: {
-                  id: '',
+                  id: Number(null),
                   nome: '',
                   cpf: '',
                   data_nascimento: getMinDateFor18YearsOld(),
@@ -174,7 +166,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                     endereco: '',
                   },
                 ],
-                limite: '',
+                saldo: '',
               }}
               onSubmit={async (values) => {
                 try {
@@ -195,6 +187,17 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                 values,
                 errors,
               }) => {
+                React.useEffect(() => {
+                  if (route && route.params && route.params.pessoa) {
+                    const pessoa = {
+                      ...route.params.pessoa,
+                      data_nascimento: getDateFromString(
+                        route.params.pessoa.data_nascimento,
+                      ),
+                    };
+                    setFieldValue('pessoa', pessoa);
+                  }
+                }, [route?.params?.pessoa]);
                 const ErrorsReturn = (i: number) => {
                   if (
                     errors.telefones &&
@@ -219,56 +222,130 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                   }
                 };
                 return (
-                  <Box gap="$5">
+                  <Box gap="$5" mt="$5">
+                    {isNewPerson && (
+                      <>
+                        <FormControl
+                          isInvalid={errors.pessoa?.nome ? true : false}
+                          size={'md'}
+                          isDisabled={false}
+                          isRequired={true}
+                        >
+                          <FormControlLabel>
+                            <FormControlLabelText>Nome</FormControlLabelText>
+                          </FormControlLabel>
+                          <Input>
+                            <InputField
+                              type="text"
+                              placeholder="Nome Completo do Clinente"
+                              onChangeText={handleChange('pessoa.nome')}
+                              value={values.pessoa.nome}
+                            />
+                          </Input>
+
+                          <FormControlHelper>
+                            <FormControlHelperText>
+                              Nome completo do cliente.
+                            </FormControlHelperText>
+                          </FormControlHelper>
+
+                          <FormControlError>
+                            <FormControlErrorIcon as={AlertCircleIcon} />
+                            <FormControlErrorText>
+                              {errors.pessoa?.nome}
+                            </FormControlErrorText>
+                          </FormControlError>
+                        </FormControl>
+                        <InputDatePicker
+                          title="Data de Nascimento"
+                          error={errors.pessoa?.data_nascimento}
+                          onChangeDate={(date) =>
+                            setFieldValue('pessoa.data_nascimento', date)
+                          }
+                          value={values.pessoa.data_nascimento}
+                          maximumDate={getMinDateFor18YearsOld()}
+                        />
+                        <InputText
+                          isRequired={true}
+                          isInvalid={errors.pessoa?.cpf ? true : false}
+                          inputType="cpf"
+                          value={values.pessoa.cpf}
+                          onChangeValue={handleChange('pessoa.cpf')}
+                          error={errors.pessoa?.cpf}
+                        />
+                      </>
+                    )}
+                    {!isNewPerson && (
+                      <Box gap="$5">
+                        {values.pessoa.id !== 0 && (
+                          <Box>
+                            <Card>
+                              <HStack>
+                                <VStack>
+                                  <Heading>Pessoa</Heading>
+                                  <Box>
+                                    <Heading>Nome</Heading>
+                                    <Text>{values.pessoa.nome}</Text>
+                                  </Box>
+                                  <Box>
+                                    <Heading>Data de Nascimento</Heading>
+                                    <Text>
+                                      {new Intl.DateTimeFormat('pt-BR', {
+                                        day: '2-digit',
+                                        month: '2-digit',
+                                        year: 'numeric',
+                                      }).format(
+                                        new Date(values.pessoa.data_nascimento),
+                                      )}
+                                    </Text>
+                                  </Box>
+                                  <Box>
+                                    <Heading>CPF</Heading>
+                                    <Text>{values.pessoa.cpf}</Text>
+                                  </Box>
+                                </VStack>
+                              </HStack>
+                            </Card>
+                          </Box>
+                        )}
+                        <Box>
+                          <Button
+                            onPress={() =>
+                              navigation?.navigate('selecionar-pessoa', {
+                                pessoas: pessoas.map((pes) => {
+                                  return {
+                                    ...pes,
+                                    data_nascimento: getStringFromDate(
+                                      pes.data_nascimento,
+                                    ),
+                                  };
+                                }),
+                                screen: 'cadastrar-cliente',
+                                pessoaSelecionada: {
+                                  ...values.pessoa,
+                                  data_nascimento: getStringFromDate(
+                                    values.pessoa.data_nascimento,
+                                  ),
+                                },
+                              })
+                            }
+                          >
+                            <ButtonText>
+                              {values.pessoa.id === 0
+                                ? 'Selecionar Pessoa'
+                                : 'Atualizar Pessoa'}
+                            </ButtonText>
+                          </Button>
+                          <Button onPress={() => {
+                            setFieldValue('pessoa', { id: Number(null), nome: '', data_nascimento: getMinDateFor18YearsOld(), cpf: '' });
+                            setIsNewPerson(true);
+                          }}>
+                            <ButtonText>Cadastrar Pessoa</ButtonText>
+                          </Button>
+                        </Box>
+                      </Box>
+                    )}
                     <>
-                      <FormControl
-                        isInvalid={errors.pessoa?.nome ? true : false}
-                        size={'md'}
-                        isDisabled={false}
-                        isRequired={true}
-                      >
-                        <FormControlLabel>
-                          <FormControlLabelText>Nome</FormControlLabelText>
-                        </FormControlLabel>
-                        <Input>
-                          <InputField
-                            type="text"
-                            placeholder="Nome Completo do Clinente"
-                            onChangeText={handleChange('pessoa.nome')}
-                            value={values.pessoa.nome}
-                          />
-                        </Input>
-
-                        <FormControlHelper>
-                          <FormControlHelperText>
-                            Must be atleast 6 characters.
-                          </FormControlHelperText>
-                        </FormControlHelper>
-
-                        <FormControlError>
-                          <FormControlErrorIcon as={AlertCircleIcon} />
-                          <FormControlErrorText>
-                            {errors.pessoa?.nome}
-                          </FormControlErrorText>
-                        </FormControlError>
-                      </FormControl>
-                      <InputDatePicker
-                        title="Data de Nascimento"
-                        error={errors.pessoa?.data_nascimento}
-                        onChangeDate={(date) =>
-                          setFieldValue('pessoa.data_nascimento', date)
-                        }
-                        value={values.pessoa.data_nascimento}
-                        maximumDate={getMinDateFor18YearsOld()}
-                      />
-                      <InputText
-                        isRequired={true}
-                        isInvalid={errors.pessoa?.cpf ? true : false}
-                        inputType="cpf"
-                        value={values.pessoa.cpf}
-                        onChangeValue={handleChange('pessoa.cpf')}
-                        error={errors.pessoa?.cpf}
-                      />
                       <InputText
                         isRequired={true}
                         isInvalid={errors.cep ? true : false}
@@ -298,7 +375,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
 
                         <FormControlHelper>
                           <FormControlHelperText>
-                            Must be atleast 6 characters.
+                            Informe o logradouro do cliente.
                           </FormControlHelperText>
                         </FormControlHelper>
 
@@ -560,39 +637,16 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                         </Button>
                       </Box>
                     </>
-
-                    <FormControl
-                      isInvalid={errors.limite ? true : false}
-                      size={'md'}
-                      isDisabled={false}
+                    <InputText
+                      inputType='money'
+                      value={values.saldo}
+                      onChangeValue={handleChange('saldo')}
+                      error={errors.saldo}
+                      isInvalid={errors.saldo ? true : false}
                       isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>Limite</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <InputField
-                          onChangeText={handleChange('limite')}
-                          type="text"
-                          placeholder="1000"
-                          value={values.limite}
-                          keyboardType="number-pad"
-                        />
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          {errors.limite}
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
+                      size="md"
+                      title='Saldo do cliente'
+                    />
 
                     <Box gap="$5">
                       <Button

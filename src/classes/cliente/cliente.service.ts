@@ -368,9 +368,13 @@ export class ClienteService {
 
   async findAllPessoas(): Promise<IPessoaUpdate[]> {
     try {
-      const data = await this.db.getAllAsync<IPessoaUpdate>(
-        'SELECT * FROM pessoa INNER JOIN cliente ON cliente.id_pessoa != pessoa.id',
-      );
+      const clientes = await this.db.getAllAsync('SELECT * FROM cliente');
+      const data =
+        clientes.length > 0
+          ? await this.db.getAllAsync<IPessoaUpdate>(
+              'SELECT * FROM pessoa as p INNER JOIN cliente as c ON c.id_pessoa == p.id',
+            )
+          : await this.db.getAllAsync<IPessoaUpdate>('SELECT * FROM pessoa');
       if (data.length < 1) {
         return data;
       }

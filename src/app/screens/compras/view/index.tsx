@@ -52,6 +52,8 @@ import {
   CheckIcon,
   AlertCircleIcon,
   ChevronDownIcon,
+  ButtonIcon,
+  SearchIcon,
 } from '@gluestack-ui/themed';
 import LoadingScreen from '@/components/LoadingScreen';
 import { VisualizarCompraScreen } from '@/interfaces/compra';
@@ -62,6 +64,7 @@ import { Formik } from 'formik';
 import React from 'react';
 import { Alert } from 'react-native';
 const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
+  let selectIconSize = '';
   const [compras, setCompras] = React.useState<unknown[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   async function start() {
@@ -86,7 +89,7 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
   return compras.length < 1 ? (
     <Box h="$full" w="$full" alignItems="center" justifyContent="center">
       <Box gap="$5">
-        <Heading>Não Foi possivel encontrar compras</Heading>
+        <Heading>Não ha compras cadastradas</Heading>
         <Button onPress={() => navigation?.navigate('cadastrar-compra')}>
           <ButtonText>Cadastrar Compra</ButtonText>
         </Button>
@@ -106,66 +109,104 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
             }}
             onSubmit={async () => {}}
           >
-            {({ values, handleChange, handleBlur, handleSubmit }) => {
+            {({ values, errors, handleChange, handleBlur, handleSubmit }) => {
               return (
                 <>
                   <FormControl
-                    isInvalid={false}
+                    isInvalid={errors.tipo ? true : false}
                     size={'md'}
                     isDisabled={false}
                     isRequired={true}
                   >
                     <FormControlLabel>
-                      <FormControlLabelText>Password</FormControlLabelText>
+                      <FormControlLabelText>
+                        Selecione o tipo de busca
+                      </FormControlLabelText>
                     </FormControlLabel>
-                    <Input>
-                      <InputField
-                        type="password"
-                        defaultValue="12345"
-                        placeholder="password"
-                      />
-                    </Input>
+                    <Select
+                      isInvalid={errors.tipo ? true : false}
+                      isDisabled={false}
+                    >
+                      <SelectTrigger size={'lg'} variant={'rounded'}>
+                        <SelectInput placeholder="Select option" />
+                        <SelectIcon
+                          mr={'$3'}
+                          ml={0}
+                          as={ChevronDownIcon}
+                        />
+                      </SelectTrigger>
+                      <SelectPortal>
+                        <SelectBackdrop />
+                        <SelectContent>
+                          <SelectDragIndicatorWrapper>
+                            <SelectDragIndicator />
+                          </SelectDragIndicatorWrapper>
+                          <SelectItem label="UX Research" value="UX Research" />
+                          <SelectItem
+                            label="Web Development"
+                            value="Web Development"
+                          />
+                          <SelectItem
+                            label="Cross Platform Development Process"
+                            value="Cross Platform Development Process"
+                          />
+                          <SelectItem
+                            label="UI Designing"
+                            value="UI Designing"
+                            isDisabled={true}
+                          />
+                          <SelectItem
+                            label="Backend Development"
+                            value="Backend Development"
+                          />
+                        </SelectContent>
+                      </SelectPortal>
+                    </Select>
 
                     <FormControlHelper>
                       <FormControlHelperText>
-                        Must be atleast 6 characters.
+                        Selecione o tipo de busca desejado.
                       </FormControlHelperText>
                     </FormControlHelper>
 
                     <FormControlError>
                       <FormControlErrorIcon as={AlertCircleIcon} />
                       <FormControlErrorText>
-                        Atleast 6 characters are required.
+                        {errors.tipo}
                       </FormControlErrorText>
                     </FormControlError>
                   </FormControl>
                   <FormControl
-                    isInvalid={false}
+                    isInvalid={errors.busca ? true : false}
                     size={'md'}
                     isDisabled={false}
                     isRequired={true}
                   >
                     <FormControlLabel>
-                      <FormControlLabelText>Password</FormControlLabelText>
+                      <FormControlLabelText>Buscar</FormControlLabelText>
                     </FormControlLabel>
                     <Input>
                       <InputField
-                        type="password"
-                        defaultValue="12345"
-                        placeholder="password"
+                        type="text"
+                        value={values.busca}
+                        placeholder="Busca...."
+                        onChangeText={handleChange('busca')}
                       />
+                      <Button onPress={() => {}}>
+                        <ButtonIcon as={SearchIcon} />
+                      </Button>
                     </Input>
 
                     <FormControlHelper>
                       <FormControlHelperText>
-                        Must be atleast 6 characters.
+                        Insira o que deve ser buscado.
                       </FormControlHelperText>
                     </FormControlHelper>
 
                     <FormControlError>
                       <FormControlErrorIcon as={AlertCircleIcon} />
                       <FormControlErrorText>
-                        Atleast 6 characters are required.
+                        {errors.busca}
                       </FormControlErrorText>
                     </FormControlError>
                   </FormControl>

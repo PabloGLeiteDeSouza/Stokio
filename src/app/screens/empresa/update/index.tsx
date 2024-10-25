@@ -88,7 +88,7 @@ const validationSchema = Yup.object().shape({
     }),
   ),
   cep: Yup.string().required('CEP é obrigatório'),
-  rua: Yup.string().required('Rua é obrigatória'),
+  logradouro: Yup.string().required('Logradouro é obrigatório'),
   numero: Yup.string().required('Número é obrigatório'),
   complemento: Yup.string(),
   bairro: Yup.string().required('Bairro é obrigatório'),
@@ -99,7 +99,6 @@ const validationSchema = Yup.object().shape({
       endereco: Yup.string().required('Endereço de email é obrigatório'),
     }),
   ),
-  limite: Yup.string().required('Limite é obrigatório'),
 });
 
 const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
@@ -149,7 +148,10 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
   async function start() {
     try {
       const Emp = await new EmpresaService(db).getById(id);
-      setEmpresa(Emp);
+      setEmpresa({
+        ...Emp,
+        complemento: Emp.complemento ? Emp.complemento : '',
+      });
       setIsLoading(false);
     } catch (error) {
       navigation?.goBack();
@@ -373,7 +375,7 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                       isRequired={true}
                     />
                     <FormControl
-                      isInvalid={values.logradouro ? true : false}
+                      isInvalid={errors.logradouro ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
@@ -404,7 +406,7 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                       </FormControlError>
                     </FormControl>
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={errors.numero ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}

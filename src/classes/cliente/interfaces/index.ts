@@ -1,5 +1,5 @@
 export interface IPessoaCreate {
-  id?: string;
+  id?: number;
   nome: string;
   cpf: string;
   data_nascimento: Date;
@@ -11,14 +11,14 @@ export interface ISimpleCliente extends IClienteUpdateOnly {
 }
 
 export interface IPessoaUpdate {
-  id: string;
+  id: number;
   nome: string;
   cpf: string;
   data_nascimento: Date;
 }
 
 export interface IClienteSimpleRequest {
-  id: string;
+  id: number;
   nome: string;
   cpf: string;
   data_nascimento: Date;
@@ -39,7 +39,7 @@ export interface IClienteCreateOnly {
 }
 
 export interface IClienteUpdateOnly {
-  id: string;
+  id: number;
   cep: string;
   logradouro: string;
   numero: string;

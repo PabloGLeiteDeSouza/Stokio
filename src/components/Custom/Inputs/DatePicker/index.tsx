@@ -31,6 +31,7 @@ const InputDatePicker: React.FC<IInputDatePicker> = ({
   isDisabled,
   isRequired,
   isReadOnly,
+  placeholder,
   ...props
 }) => {
   const startPicker = () => {
@@ -67,7 +68,7 @@ const InputDatePicker: React.FC<IInputDatePicker> = ({
             readOnly={true}
             editable={false}
             type="text"
-            placeholder="01/01/1999"
+            placeholder={'01/01/1999' + ` ${placeholder}`}
             value={new Intl.DateTimeFormat('pt-BR', {
               day: '2-digit',
               month: '2-digit',

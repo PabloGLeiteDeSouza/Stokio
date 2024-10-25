@@ -1,24 +1,24 @@
 -- Tabela unidade_de_medida
-CREATE TABLE unidade_de_medida (
+CREATE TABLE um (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome TEXT NOT NULL,
     valor TEXT NOT NULL
 );
 
 -- Tabela unidade_de_armazenamento
-CREATE TABLE unidade_de_armazenamento (
+CREATE TABLE ua (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome TEXT NOT NULL,
     descricao TEXT,
-    id_tipo_de_unidade_de_armazenamento INTEGER,
-    FOREIGN KEY (id_tipo_de_unidade_de_armazenamento) REFERENCES tipo_de_unidade_de_armazenamento(id)
+    id_tipo_ua INTEGER,
+    FOREIGN KEY (id_tipo_ua) REFERENCES tipo_ua(id)
 );
 
 -- Índice na chave estrangeira da tabela unidade_de_armazenamento
-CREATE INDEX idx_unidade_de_armazenamento_id_tipo ON unidade_de_armazenamento(id_tipo_de_unidade_de_armazenamento);
+CREATE INDEX idx_ua_id_tipo ON ua(id_tipo_ua);
 
 -- Tabela tipo_de_unidade_de_armazenamento
-CREATE TABLE tipo_de_unidade_de_armazenamento (
+CREATE TABLE tipo_ua (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome TEXT NOT NULL,
     descricao TEXT
@@ -130,19 +130,19 @@ CREATE TABLE produto (
     tamanho INTEGER NOT NULL,
     id_marca INTEGER NOT NULL,
     id_tipo_produto INTEGER NOT NULL,
-    id_unidade_de_medida INTEGER NOT NULL,
-    id_unidade_de_armazenamento INTEGER NOT NULL,
+    id_um INTEGER NOT NULL,
+    id_ua INTEGER NOT NULL,
     FOREIGN KEY (id_marca) REFERENCES marca(id),
     FOREIGN KEY (id_tipo_produto) REFERENCES tipo_produto(id),
-    FOREIGN KEY (id_unidade_de_medida) REFERENCES unidade_de_medida(id),
-    FOREIGN KEY (id_unidade_de_armazenamento) REFERENCES unidade_de_armazenamento(id)
+    FOREIGN KEY (id_um) REFERENCES um(id),
+    FOREIGN KEY (id_ua) REFERENCES ua(id)
 );
 
 -- Índices nas chaves estrangeiras da tabela produto
 CREATE INDEX idx_produto_id_marca ON produto(id_marca);
 CREATE INDEX idx_produto_id_tipo_produto ON produto(id_tipo_produto);
-CREATE INDEX idx_produto_id_unidade_de_medida ON produto(id_unidade_de_medida);
-CREATE INDEX idx_produto_id_unidade_de_armazenamento ON produto(id_unidade_de_armazenamento);
+CREATE INDEX idx_produto_id_um ON produto(id_um);
+CREATE INDEX idx_produto_id_ua ON produto(id_ua);
 
 -- Tabela venda
 CREATE TABLE venda (

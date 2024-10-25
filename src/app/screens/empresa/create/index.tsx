@@ -109,6 +109,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
   const [isNewPerson, setIsNewPerson] = React.useState(false);
   const [isNewRamo, setIsNewRamo] = React.useState(false);
   const db = useSQLiteContext();
+  const isfocused = useIsFocused();
 
   async function start() {
     try {
@@ -127,8 +128,10 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
     }
   }
   React.useEffect(() => {
-    start();
-  }, []);
+    if (isfocused) {
+      start();
+    }
+  }, [isfocused]);
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -194,9 +197,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                 values,
                 errors,
               }) => {
-                if (route?.params?.pessoa) {
                   React.useEffect(() => {
-                    console.log('modify pessoa');
                     if (route && route.params && route.params.pessoa) {
                       const { data_nascimento, ...person } =
                         route.params.pessoa;
@@ -206,16 +207,14 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                       });
                     }
                   }, [route?.params?.pessoa]);
-                }
-                if (route?.params?.ramo) {
+
                   React.useEffect(() => {
-                    console.log('modify ramo');
                     if (route && route.params && route.params.ramo) {
                       const rm = route.params.ramo;
                       setFieldValue('ramo', rm);
                     }
                   }, [route?.params?.ramo]);
-                }
+                
 
                 return (
                   <Box gap="$8">

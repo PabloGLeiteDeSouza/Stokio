@@ -63,6 +63,7 @@ import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
 import { CadastrarCompraScreen } from '@/interfaces/compra';
 const Create: React.FC<CadastrarCompraScreen> = ({ navigation }) => {
   const [haveProducts, setHaveProducts] = React.useState(false);
+
   return (
     <Box w="$full" h="$full">
       <ScrollView w="$full">
@@ -74,28 +75,30 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation }) => {
             <Formik
               initialValues={{
                 data: new Date(),
-                data_pagamento: new Date(),
-                valor_pago: '',
                 status: '',
+                empresa: {
+                  id: Number(null),
+                  nome: '',
+                },
                 itens_compra: [
                   {
-                    quantidade: '',
+                    quantidade: Number(null),
                     preco_unitario: '',
-                    subtotal: '',
                     produto: {
-                      id: '',
+                      id: Number(null),
                       nome: '',
                       marca: '',
                       tipo: '',
                       preco: '',
-                      data_validade: '',
+                      data_validade: new Date(),
+                      quantidade: Number(null),
                     },
                   },
                 ],
               }}
               onSubmit={() => {}}
             >
-              {({ values, errors, handleChange, handleSubmit }) => {
+              {({ values, errors, handleChange, setFieldValue, handleSubmit }) => {
                 return (
                   <>
                     <Button
@@ -106,76 +109,16 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation }) => {
                       <ButtonText>Cadastrar produto</ButtonText>
                     </Button>
                     <InputDatePicker
-                      onChangeDate={handleChange('data')}
+                      onChangeDate={(data) => setFieldValue('data', data)}
                       value={values.data}
                       title="Data da Compra"
                       error={errors.data}
                     />
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>Valor Total</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <InputField
-                          type="text"
-                          defaultValue="12345"
-                          placeholder="password"
-                        />
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          Atleast 6 characters are required.
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>Valor Pago</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <InputField
-                          type="text"
-                          value={values.valor_pago}
-                          placeholder="R$ 100,00"
-                        />
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          Atleast 6 characters are required.
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
-                    <InputDatePicker
-                      value={values.data_pagamento}
-                      title="Data do Pagamento"
-                      onChangeDate={handleChange('data_pagamento')}
-                    />
+                    <Box>
+                      <Heading>Valor Total</Heading>
+                      <Text>{values.itens_compra.map((vld) => Number(vld.preco_unitario) * Number(vld.quantidade)).reduce((acumulador, valorAtual) => acumulador + valorAtual)}</Text>
+                    </Box>
+                    {}
                     <FormControl
                       isInvalid={errors.status ? true : false}
                       size={'md'}

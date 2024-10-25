@@ -102,29 +102,29 @@ const Details: React.FC<DetalhesEmpresaScreen> = ({ navigation, route }) => {
               </Heading>
               <Box gap="$1.5">
                 <Heading>Logradouro:</Heading>
-                <Text>{empresa.endereco.logradouro}</Text>
+                <Text>{empresa.logradouro}</Text>
               </Box>
               <Box gap="$1.5">
                 <Heading>Número:</Heading>
-                <Text>{empresa.endereco.numero}</Text>
+                <Text>{empresa.numero}</Text>
               </Box>
-              {empresa.endereco.complemento && (
+              {empresa.complemento && (
                 <Box gap="$1.5">
                   <Heading>Complemento:</Heading>
-                  <Text>{empresa.endereco.complemento}</Text>
+                  <Text>{empresa.complemento}</Text>
                 </Box>
               )}
               <Box gap="$1.5">
                 <Heading>Bairro:</Heading>
-                <Text>{empresa.endereco.bairro}</Text>
+                <Text>{empresa.bairro}</Text>
               </Box>
               <Box gap="$1.5">
                 <Heading>Cidade:</Heading>
-                <Text size="xl">{empresa.endereco.cidade}</Text>
+                <Text size="xl">{empresa.cidade}</Text>
               </Box>
               <Box gap="$1.5">
                 <Heading>UF:</Heading>
-                <Text size="xl">{empresa.endereco.uf}</Text>
+                <Text size="xl">{empresa.uf}</Text>
               </Box>
             </Box>
             <Box gap="$1.5">

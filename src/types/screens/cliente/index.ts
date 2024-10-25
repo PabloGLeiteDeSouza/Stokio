@@ -31,7 +31,7 @@ export type AtualizarClienteScreenNavigationProp = StackNavigationProp<
 >;
 
 export type AtualizarClienteScreenRouterProp = RouteProp<
-  RootStackParamList,
+  ClientesStackParamList,
   'atualizar-cliente'
 >;
 
@@ -73,10 +73,10 @@ export type ClienteObject = {
 };
 
 export type Pessoa = {
-  id: string;
+  id: number;
   nome: string;
   cpf: string;
-  data_nascimento: string;
+  data_nascimento: Date;
 };
 
 export type PessoaFlatList = React.ForwardRefExoticComponent<

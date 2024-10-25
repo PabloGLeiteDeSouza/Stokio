@@ -60,12 +60,12 @@ import {
   CalendarDaysIcon,
   AddIcon,
   TrashIcon,
+  Card,
 } from '@gluestack-ui/themed';
 
 import { Box, ScrollView } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import { RemoveIcon } from '@gluestack-ui/themed';
-import { Pessoa } from '@/types/screens/cliente';
 import LoadingScreen from '@/components/LoadingScreen';
 import { Alert, GestureResponderEvent } from 'react-native';
 import * as Yup from 'yup';
@@ -107,7 +107,7 @@ const validationSchema = Yup.object().shape({
       endereco: Yup.string().required('Endereço de email é obrigatório'),
     }),
   ),
-  limite: Yup.string().required('Limite é obrigatório'),
+  saldo: Yup.string().required('Saldo é obrigatório'),
 });
 
 const Update: React.FC<AtualizarClienteScreen> = ({ navigation, route }) => {
@@ -116,22 +116,42 @@ const Update: React.FC<AtualizarClienteScreen> = ({ navigation, route }) => {
     return null;
   }
   const id = route.params.id;
-  const [pessoas, setPessoas] = React.useState<Array<IPessoaUpdate>>([]);
   const db = useSQLiteContext();
-  const [isNewPerson, setIsNewPerson] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
-  const [cliente, setCliente] = React.useState<IClienteUpdate>({});
+  const [cliente, setCliente] = React.useState<IClienteUpdate>({
+    id: Number(null),
+    pessoa: {
+      id: Number(null),
+      nome: '',
+      data_nascimento: new Date(),
+      cpf: '',
+    },
+    cep: '',
+    logradouro: '',
+    numero: '',
+    complemento: '',
+    bairro: '',
+    cidade: '',
+    uf: '',
+    emails: [
+      {
+        id: Number(null),
+        endereco: '',
+      },
+    ],
+    telefones: [
+      {
+        id: Number(null),
+        numero: '',
+      },
+    ],
+    saldo: '',
+  });
 
   React.useEffect(() => {
     async function startScreen() {
       try {
-        const pss = await new ClienteService(db).findAllPessoas();
-        if (pss.length < 1) {
-          setIsNewPerson(true);
-        }
-        setPessoas([...pss]);
         const cli = await new ClienteService(db).findClienteById(String(id));
-        console.log(cli);
         setCliente(cli);
         setIsLoading(false);
       } catch (error) {
@@ -176,460 +196,8 @@ const Update: React.FC<AtualizarClienteScreen> = ({ navigation, route }) => {
                 values,
                 errors,
               }) => {
-                React.useEffect(() => {
-                  if (route?.params?.pessoa) {
-                    const pessoa = route.params.pessoa;
-                    setFieldValue('pessoa.id', pessoa.id);
-                    setFieldValue('pessoa.nome', pessoa.nome);
-                    setFieldValue(
-                      'pessoa.data_nascimento',
-                      new Date(pessoa.data_nascimento),
-                    );
-                    setFieldValue('pessoa.cpf', pessoa.cpf);
-                  }
-                }, [route?.params?.pessoa]);
-
                 return (
                   <Box gap="$5">
-                    {values.pessoa.id == '' &&
-                    !isNewPerson &&
-                    pessoas.length > 0 ? (
-                      <Box gap="$5" mt="$5">
-                        <Button
-                          onPress={() =>
-                            navigation?.navigate('selecionar-pessoa', {
-                              screen: 'atualizar-cliente',
-                              pessoas,
-                            })
-                          }
-                        >
-                          <ButtonText>Selecionar Pessoa</ButtonText>
-                        </Button>
-                        <Button onPress={() => setIsNewPerson(true)}>
-                          <ButtonText>Cadastrar Pessoa</ButtonText>
-                        </Button>
-                      </Box>
-                    ) : values.pessoa.id != '' && !isNewPerson ? (
-                      <Box gap="$2.5" mt="$5">
-                        <Heading textAlign="center" size="xl">
-                          Pessoa selecionada:{' '}
-                        </Heading>
-                        <Card my="$5">
-                          <HStack>
-                            <Box gap="$2.5">
-                              <Box>
-                                <Heading>{values.pessoa.nome}</Heading>
-                              </Box>
-                              <Box>
-                                <Text>{values.pessoa.cpf}</Text>
-                              </Box>
-                              <Box>
-                                <Text>
-                                  {new Date(
-                                    values.pessoa.data_nascimento,
-                                  ).toLocaleDateString('PT-BR')}
-                                </Text>
-                              </Box>
-                            </Box>
-                          </HStack>
-                        </Card>
-                        <Button
-                          onPress={() => {
-                            const pessoaSelecionada = {
-                              id: values.pessoa.id,
-                              nome: values.pessoa.nome,
-                              cpf: values.pessoa.cpf,
-                              data_nascimento: String(
-                                values.pessoa.data_nascimento,
-                              ),
-                            };
-                            navigation?.navigate('selecionar-pessoa', {
-                              screen: 'atualizae-cliente',
-                              pessoas,
-                              pessoaSelecionada,
-                            });
-                          }}
-                        >
-                          <ButtonText>Alterar Pessoa</ButtonText>
-                        </Button>
-                        <Button
-                          onPress={() => {
-                            setFieldValue('pessoa', {
-                              id: '',
-                              nome: '',
-                              cpf: '',
-                              data_nascimento: new Date(),
-                            });
-                            setIsNewPerson(true);
-                          }}
-                        >
-                          <ButtonText>Cadastrar Nova Pessoa</ButtonText>
-                        </Button>
-                      </Box>
-                    ) : (
-                      <>
-                        <FormControl
-                          isInvalid={false}
-                          size={'md'}
-                          isDisabled={false}
-                          isRequired={true}
-                        >
-                          <FormControlLabel>
-                            <FormControlLabelText>Nome</FormControlLabelText>
-                          </FormControlLabel>
-                          <Input>
-                            <InputField
-                              type="text"
-                              placeholder="Nome Completo do Clinente"
-                              onChangeText={handleChange('pessoa.nome')}
-                              value={values.pessoa.nome}
-                            />
-                          </Input>
-
-                          <FormControlHelper>
-                            <FormControlHelperText>
-                              Must be atleast 6 characters.
-                            </FormControlHelperText>
-                          </FormControlHelper>
-
-                          <FormControlError>
-                            <FormControlErrorIcon as={AlertCircleIcon} />
-                            <FormControlErrorText>
-                              {errors.pessoa?.nome}
-                            </FormControlErrorText>
-                          </FormControlError>
-                        </FormControl>
-                        <InputDatePicker
-                          value={new Date(values.pessoa.data_nascimento)}
-                          onChangeDate={(date) => {
-                            setFieldValue('pessoa.data_nascimento', date);
-                          }}
-                          title="Data de Nascimento"
-                          isInvalid={
-                            errors.pessoa?.data_nascimento ? true : false
-                          }
-                          isRequired={true}
-                          error={errors.pessoa?.data_nascimento}
-                        />
-                        <InputText
-                          inputType="cpf"
-                          value={values.pessoa.cpf}
-                          onChangeValue={handleChange('pessoa.cpf')}
-                          error={errors.pessoa?.cpf}
-                          isInvalid={errors.pessoa?.cpf ? true : false}
-                          isRequired={true}
-                        />
-                        <InputText
-                          inputType="cep"
-                          error={errors.cep}
-                          onChangeValue={handleChange('cep')}
-                          value={values.cep}
-                          isRequired={true}
-                          isDisabled={false}
-                          isInvalid={errors.cep ? true : false}
-                        />
-                        <FormControl
-                          isInvalid={false}
-                          size={'md'}
-                          isDisabled={false}
-                          isRequired={true}
-                        >
-                          <FormControlLabel>
-                            <FormControlLabelText>Rua</FormControlLabelText>
-                          </FormControlLabel>
-                          <Input>
-                            <InputField
-                              onChangeText={handleChange('logradouro')}
-                              type="text"
-                              placeholder="adadasdasdas"
-                              value={values.logradouro}
-                            />
-                          </Input>
-
-                          <FormControlHelper>
-                            <FormControlHelperText>
-                              Must be atleast 6 characters.
-                            </FormControlHelperText>
-                          </FormControlHelper>
-
-                          <FormControlError>
-                            <FormControlErrorIcon as={AlertCircleIcon} />
-                            <FormControlErrorText>
-                              Atleast 6 characters are required.
-                            </FormControlErrorText>
-                          </FormControlError>
-                        </FormControl>
-                        <FormControl
-                          isInvalid={errors.numero ? true : false}
-                          size={'md'}
-                          isDisabled={false}
-                          isRequired={true}
-                        >
-                          <FormControlLabel>
-                            <FormControlLabelText>Numero</FormControlLabelText>
-                          </FormControlLabel>
-                          <Input>
-                            <InputField
-                              onChangeText={handleChange('numero')}
-                              type="text"
-                              placeholder="dasdasdasdasdasd"
-                              keyboardType="number-pad"
-                              value={values.numero.toString()}
-                            />
-                          </Input>
-
-                          <FormControlHelper>
-                            <FormControlHelperText>
-                              Informe o numero do endereco.
-                            </FormControlHelperText>
-                          </FormControlHelper>
-
-                          <FormControlError>
-                            <FormControlErrorIcon as={AlertCircleIcon} />
-                            <FormControlErrorText>
-                              {errors.numero}
-                            </FormControlErrorText>
-                          </FormControlError>
-                        </FormControl>
-                        <FormControl
-                          isInvalid={errors.complemento ? true : false}
-                          size={'md'}
-                          isDisabled={false}
-                          isRequired={true}
-                        >
-                          <FormControlLabel>
-                            <FormControlLabelText>
-                              Complemento
-                            </FormControlLabelText>
-                          </FormControlLabel>
-                          <Textarea>
-                            <TextareaInput
-                              onChangeText={handleChange('complemento')}
-                              type="text"
-                              placeholder="asdsadasdas"
-                              value={values.complemento}
-                              value={values.complemento}
-                            />
-                          </Textarea>
-
-                          <FormControlHelper>
-                            <FormControlHelperText>
-                              Informe o complemento.
-                            </FormControlHelperText>
-                          </FormControlHelper>
-
-                          <FormControlError>
-                            <FormControlErrorIcon as={AlertCircleIcon} />
-                            <FormControlErrorText>
-                              {errors.complemento}
-                            </FormControlErrorText>
-                          </FormControlError>
-                        </FormControl>
-                        <FormControl
-                          isInvalid={errors.bairro ? true : false}
-                          size={'md'}
-                          isDisabled={false}
-                          isRequired={true}
-                        >
-                          <FormControlLabel>
-                            <FormControlLabelText>Bairro</FormControlLabelText>
-                          </FormControlLabel>
-                          <Input>
-                            <InputField
-                              onChangeText={handleChange('bairro')}
-                              type="text"
-                              placeholder="asdasdasdas"
-                              value={values.bairro}
-                            />
-                          </Input>
-
-                          <FormControlHelper>
-                            <FormControlHelperText>
-                              Informe o nome do bairro.
-                            </FormControlHelperText>
-                          </FormControlHelper>
-
-                          <FormControlError>
-                            <FormControlErrorIcon as={AlertCircleIcon} />
-                            <FormControlErrorText>
-                              {errors.bairro}
-                            </FormControlErrorText>
-                          </FormControlError>
-                        </FormControl>
-                        <FormControl
-                          isInvalid={errors.cidade ? true : false}
-                          size={'md'}
-                          isDisabled={false}
-                          isRequired={true}
-                        >
-                          <FormControlLabel>
-                            <FormControlLabelText>Cidade</FormControlLabelText>
-                          </FormControlLabel>
-                          <Input>
-                            <InputField
-                              onChangeText={handleChange('cidade')}
-                              type="text"
-                              placeholder="adasdasdasdas"
-                              value={values.cidade}
-                            />
-                          </Input>
-
-                          <FormControlHelper>
-                            <FormControlHelperText>
-                              Informe a cidade
-                            </FormControlHelperText>
-                          </FormControlHelper>
-
-                          <FormControlError>
-                            <FormControlErrorIcon as={AlertCircleIcon} />
-                            <FormControlErrorText>
-                              {errors.cidade}
-                            </FormControlErrorText>
-                          </FormControlError>
-                        </FormControl>
-                        <SelectEstados
-                          isInvalid={errors.uf ? true : false}
-                          error={errors.uf}
-                          onChangeValue={handleChange('uf')}
-                          value={values.uf}
-                        />
-                        <Box gap="$2.5">
-                          {values.telefones.map((telefone, i) => {
-                            return (
-                              <Box key={`telefone-${i}`}>
-                                <InputText
-                                  inputType="telefone"
-                                  value={telefone.numero}
-                                  onChangeValue={handleChange(
-                                    `telefones[${i}].numero`,
-                                  )}
-                                  isRequired={true}
-                                  isInvalid={
-                                    typeof errors.telefones !== 'undefined' &&
-                                    typeof errors.telefones[i] === 'object'
-                                      ? true
-                                      : false
-                                  }
-                                  error={
-                                    typeof errors.telefones !== 'undefined' &&
-                                    typeof errors.telefones[i] === 'object'
-                                      ? errors.telefones[i].numero
-                                      : ''
-                                  }
-                                />
-                              </Box>
-                            );
-                          })}
-                          <Button
-                            onPress={() => {
-                              setFieldValue('telefones', [
-                                ...values.telefones,
-                                { numero: '' },
-                              ]);
-                            }}
-                            action="positive"
-                          >
-                            <ButtonIcon as={AddIcon} />
-                          </Button>
-                          <Button
-                            onPress={() => {
-                              if (values.telefones.length > 1) {
-                                setFieldValue('telefones', [
-                                  ...values.telefones.slice(0, -1),
-                                ]);
-                              } else {
-                                Alert.alert(
-                                  'Aviso',
-                                  'Nao existem mais telefones a serem removidos',
-                                );
-                              }
-                            }}
-                            action="negative"
-                          >
-                            <ButtonIcon as={RemoveIcon} />
-                          </Button>
-                        </Box>
-
-                        <Box gap="$2.5">
-                          {values.emails.map((mail, i) => {
-                            return (
-                              <Box key={`email-${mail.id}`}>
-                                <FormControl
-                                  isInvalid={false}
-                                  size={'md'}
-                                  isDisabled={false}
-                                  isRequired={true}
-                                >
-                                  <FormControlLabel>
-                                    <FormControlLabelText>
-                                      Email
-                                    </FormControlLabelText>
-                                  </FormControlLabel>
-                                  <Input>
-                                    <InputField
-                                      type="text"
-                                      placeholder="teste@teste.com"
-                                      value={mail.endereco}
-                                      onChangeText={handleChange(
-                                        `emails[${i}].endereco`,
-                                      )}
-                                      keyboardType="email-address"
-                                    />
-                                  </Input>
-
-                                  <FormControlHelper>
-                                    <FormControlHelperText>
-                                      Informe o email do cliente.
-                                    </FormControlHelperText>
-                                  </FormControlHelper>
-
-                                  <FormControlError>
-                                    <FormControlErrorIcon
-                                      as={AlertCircleIcon}
-                                    />
-                                    <FormControlErrorText>
-                                      {typeof errors.emails !== 'undefined' &&
-                                      typeof errors.emails[i] === 'object'
-                                        ? errors.emails[i].endereco
-                                        : ''}
-                                    </FormControlErrorText>
-                                  </FormControlError>
-                                </FormControl>
-                              </Box>
-                            );
-                          })}
-
-                          <Button
-                            onPress={() => {
-                              setFieldValue('email', [
-                                ...values.emails,
-                                { endereco: '' },
-                              ]);
-                            }}
-                            action="positive"
-                          >
-                            <ButtonIcon as={AddIcon} />
-                          </Button>
-                          <Button
-                            onPress={() => {
-                              if (values.emails.length > 1) {
-                                setFieldValue('emails', [
-                                  ...values.emails.slice(0, -1),
-                                ]);
-                              } else {
-                                Alert.alert(
-                                  'Aviso',
-                                  'Nao ha mais emails a serem removidos',
-                                );
-                              }
-                            }}
-                            action="negative"
-                          >
-                            <ButtonIcon as={RemoveIcon} />
-                          </Button>
-                        </Box>
-                      </>
-                    )}
                     <FormControl
                       isInvalid={false}
                       size={'md'}
@@ -637,31 +205,362 @@ const Update: React.FC<AtualizarClienteScreen> = ({ navigation, route }) => {
                       isRequired={true}
                     >
                       <FormControlLabel>
-                        <FormControlLabelText>Limite</FormControlLabelText>
+                        <FormControlLabelText>Nome</FormControlLabelText>
                       </FormControlLabel>
                       <Input>
                         <InputField
-                          onChangeText={handleChange('limite')}
                           type="text"
-                          placeholder="1000"
-                          value={values.limite.toString()}
-                          keyboardType="number-pad"
+                          placeholder="Nome Completo do Clinente"
+                          onChangeText={handleChange('pessoa.nome')}
+                          value={values.pessoa.nome}
                         />
                       </Input>
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Informe o Limite do Cliente.
+                          Must be atleast 6 characters.
                         </FormControlHelperText>
                       </FormControlHelper>
 
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          {errors.limite}
+                          {errors.pessoa?.nome}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
+                    <InputDatePicker
+                      value={new Date(values.pessoa.data_nascimento)}
+                      onChangeDate={(date) => {
+                        setFieldValue('pessoa.data_nascimento', date);
+                      }}
+                      title="Data de Nascimento"
+                      isInvalid={errors.pessoa?.data_nascimento ? true : false}
+                      isRequired={true}
+                      error={errors.pessoa?.data_nascimento}
+                    />
+                    <InputText
+                      inputType="cpf"
+                      value={values.pessoa.cpf}
+                      onChangeValue={handleChange('pessoa.cpf')}
+                      error={errors.pessoa?.cpf}
+                      isInvalid={errors.pessoa?.cpf ? true : false}
+                      isRequired={true}
+                    />
+                    <InputText
+                      inputType="cep"
+                      error={errors.cep}
+                      onChangeValue={handleChange('cep')}
+                      value={values.cep}
+                      isRequired={true}
+                      isDisabled={false}
+                      isInvalid={errors.cep ? true : false}
+                    />
+                    <FormControl
+                      isInvalid={false}
+                      size={'md'}
+                      isDisabled={false}
+                      isRequired={true}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>Rua</FormControlLabelText>
+                      </FormControlLabel>
+                      <Input>
+                        <InputField
+                          onChangeText={handleChange('logradouro')}
+                          type="text"
+                          placeholder="adadasdasdas"
+                          value={values.logradouro}
+                        />
+                      </Input>
+
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          Must be atleast 6 characters.
+                        </FormControlHelperText>
+                      </FormControlHelper>
+
+                      <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
+                          Atleast 6 characters are required.
+                        </FormControlErrorText>
+                      </FormControlError>
+                    </FormControl>
+                    <FormControl
+                      isInvalid={errors.numero ? true : false}
+                      size={'md'}
+                      isDisabled={false}
+                      isRequired={true}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>Numero</FormControlLabelText>
+                      </FormControlLabel>
+                      <Input>
+                        <InputField
+                          onChangeText={handleChange('numero')}
+                          type="text"
+                          placeholder="dasdasdasdasdasd"
+                          keyboardType="number-pad"
+                          value={values.numero.toString()}
+                        />
+                      </Input>
+
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          Informe o numero do endereco.
+                        </FormControlHelperText>
+                      </FormControlHelper>
+
+                      <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
+                          {errors.numero}
+                        </FormControlErrorText>
+                      </FormControlError>
+                    </FormControl>
+                    <FormControl
+                      isInvalid={errors.complemento ? true : false}
+                      size={'md'}
+                      isDisabled={false}
+                      isRequired={true}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>Complemento</FormControlLabelText>
+                      </FormControlLabel>
+                      <Textarea>
+                        <TextareaInput
+                          onChangeText={handleChange('complemento')}
+                          type="text"
+                          placeholder="asdsadasdas"
+                          value={String(values.complemento)}
+                        />
+                      </Textarea>
+
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          Informe o complemento.
+                        </FormControlHelperText>
+                      </FormControlHelper>
+
+                      <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
+                          {errors.complemento}
+                        </FormControlErrorText>
+                      </FormControlError>
+                    </FormControl>
+                    <FormControl
+                      isInvalid={errors.bairro ? true : false}
+                      size={'md'}
+                      isDisabled={false}
+                      isRequired={true}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>Bairro</FormControlLabelText>
+                      </FormControlLabel>
+                      <Input>
+                        <InputField
+                          onChangeText={handleChange('bairro')}
+                          type="text"
+                          placeholder="asdasdasdas"
+                          value={values.bairro}
+                        />
+                      </Input>
+
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          Informe o nome do bairro.
+                        </FormControlHelperText>
+                      </FormControlHelper>
+
+                      <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
+                          {errors.bairro}
+                        </FormControlErrorText>
+                      </FormControlError>
+                    </FormControl>
+                    <FormControl
+                      isInvalid={errors.cidade ? true : false}
+                      size={'md'}
+                      isDisabled={false}
+                      isRequired={true}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>Cidade</FormControlLabelText>
+                      </FormControlLabel>
+                      <Input>
+                        <InputField
+                          onChangeText={handleChange('cidade')}
+                          type="text"
+                          placeholder="adasdasdasdas"
+                          value={values.cidade}
+                        />
+                      </Input>
+
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          Informe a cidade
+                        </FormControlHelperText>
+                      </FormControlHelper>
+
+                      <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
+                          {errors.cidade}
+                        </FormControlErrorText>
+                      </FormControlError>
+                    </FormControl>
+                    <SelectEstados
+                      isInvalid={errors.uf ? true : false}
+                      error={errors.uf}
+                      onChangeValue={handleChange('uf')}
+                      value={values.uf}
+                    />
+                    <Box gap="$2.5">
+                      {values.telefones.map((telefone, i) => {
+                        return (
+                          <Box key={`telefone-${i}`}>
+                            <InputText
+                              inputType="telefone"
+                              value={telefone.numero}
+                              onChangeValue={handleChange(
+                                `telefones[${i}].numero`,
+                              )}
+                              isRequired={true}
+                              isInvalid={
+                                typeof errors.telefones !== 'undefined' &&
+                                typeof errors.telefones[i] === 'object'
+                                  ? true
+                                  : false
+                              }
+                              error={
+                                typeof errors.telefones !== 'undefined' &&
+                                typeof errors.telefones[i] === 'object'
+                                  ? errors.telefones[i].numero
+                                  : ''
+                              }
+                            />
+                          </Box>
+                        );
+                      })}
+                      <Button
+                        onPress={() => {
+                          setFieldValue('telefones', [
+                            ...values.telefones,
+                            { numero: '' },
+                          ]);
+                        }}
+                        action="positive"
+                      >
+                        <ButtonIcon as={AddIcon} />
+                      </Button>
+                      <Button
+                        onPress={() => {
+                          if (values.telefones.length > 1) {
+                            setFieldValue('telefones', [
+                              ...values.telefones.slice(0, -1),
+                            ]);
+                          } else {
+                            Alert.alert(
+                              'Aviso',
+                              'Nao existem mais telefones a serem removidos',
+                            );
+                          }
+                        }}
+                        action="negative"
+                      >
+                        <ButtonIcon as={RemoveIcon} />
+                      </Button>
+                    </Box>
+
+                    <Box gap="$2.5">
+                      {values.emails.map((mail, i) => {
+                        return (
+                          <Box key={`email-${mail.id}`}>
+                            <FormControl
+                              isInvalid={false}
+                              size={'md'}
+                              isDisabled={false}
+                              isRequired={true}
+                            >
+                              <FormControlLabel>
+                                <FormControlLabelText>
+                                  Email
+                                </FormControlLabelText>
+                              </FormControlLabel>
+                              <Input>
+                                <InputField
+                                  type="text"
+                                  placeholder="teste@teste.com"
+                                  value={mail.endereco}
+                                  onChangeText={handleChange(
+                                    `emails[${i}].endereco`,
+                                  )}
+                                  keyboardType="email-address"
+                                />
+                              </Input>
+
+                              <FormControlHelper>
+                                <FormControlHelperText>
+                                  Informe o email do cliente.
+                                </FormControlHelperText>
+                              </FormControlHelper>
+
+                              <FormControlError>
+                                <FormControlErrorIcon as={AlertCircleIcon} />
+                                <FormControlErrorText>
+                                  {typeof errors.emails !== 'undefined' &&
+                                  typeof errors.emails[i] === 'object'
+                                    ? errors.emails[i].endereco
+                                    : ''}
+                                </FormControlErrorText>
+                              </FormControlError>
+                            </FormControl>
+                          </Box>
+                        );
+                      })}
+
+                      <Button
+                        onPress={() => {
+                          setFieldValue('email', [
+                            ...values.emails,
+                            { endereco: '' },
+                          ]);
+                        }}
+                        action="positive"
+                      >
+                        <ButtonIcon as={AddIcon} />
+                      </Button>
+                      <Button
+                        onPress={() => {
+                          if (values.emails.length > 1) {
+                            setFieldValue('emails', [
+                              ...values.emails.slice(0, -1),
+                            ]);
+                          } else {
+                            Alert.alert(
+                              'Aviso',
+                              'Nao ha mais emails a serem removidos',
+                            );
+                          }
+                        }}
+                        action="negative"
+                      >
+                        <ButtonIcon as={RemoveIcon} />
+                      </Button>
+                    </Box>
+                    <InputText
+                      inputType='money'
+                      value={values.saldo}
+                      onChangeValue={handleChange('saldo')}
+                      error={errors.saldo}
+                      isInvalid={errors.saldo ? true : false}
+                      isRequired={true}
+                      size="md"
+                      title='Saldo do cliente'
+                    />
 
                     <Box>
                       <Button

@@ -1,7 +1,8 @@
 import { AndroidNativeProps } from '@react-native-community/datetimepicker';
 import { FormikErrors } from 'formik';
 
-export interface IInputDatePicker extends Omit<AndroidNativeProps, 'onChange'> {
+export interface IInputDatePicker
+  extends Omit<AndroidNativeProps, 'onChange' | 'value'> {
   title: string;
   error?: FormikErrors<Date>;
   value?: Date;
@@ -11,4 +12,5 @@ export interface IInputDatePicker extends Omit<AndroidNativeProps, 'onChange'> {
   isRequired?: boolean;
   isReadOnly?: boolean;
   size?: 'sm' | 'md' | 'lg' | undefined;
+  placeholder?: string;
 }

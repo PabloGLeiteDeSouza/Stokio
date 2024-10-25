@@ -85,6 +85,10 @@ const Details: React.FC<DetalhesClienteScreen> = ({ navigation, route }) => {
               <Heading>CPF:</Heading>
               <Text>{mask(cliente.pessoa.cpf, 'cpf')}</Text>
             </Box>
+            <Box>
+              <Heading>Saldo:</Heading>
+              <Text>{new Intl.NumberFormat('pt-BR', { currency: 'BRL', style: 'currency' }).format(Number(cliente.saldo))}</Text>
+            </Box>
             <Box gap="$1.5">
               <Heading>Endereço:</Heading>
               <Box gap="$1.5">

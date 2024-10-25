@@ -14,6 +14,7 @@ import {
 import React from 'react';
 import { ListRenderItem } from 'react-native';
 import { ISlectPessoaProps } from './interfaces';
+import { getStringFromDate } from '@/utils';
 
 const SelectPessoa: React.FC<ISlectPessoaProps> = ({ navigation, route }) => {
   if (!route || !route.params || !route.params.screen) {
@@ -61,7 +62,11 @@ const SelectPessoa: React.FC<ISlectPessoaProps> = ({ navigation, route }) => {
               </Box>
               <Box>
                 <Text>
-                  {new Date(item.data_nascimento).toLocaleDateString()}
+                  {new Intl.DateTimeFormat('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                  }).format(new Date(item.data_nascimento))}
                 </Text>
               </Box>
               <Box>
@@ -102,7 +107,13 @@ const SelectPessoa: React.FC<ISlectPessoaProps> = ({ navigation, route }) => {
         keyExtractor={(item) => String(item.id)}
       />
       <Box my="$5" mx="$5">
-        <Button onPress={() => navigation?.navigate(screen, { pessoa })}>
+        <Button
+          onPress={() =>
+            navigation?.navigate(screen, {
+              pessoa,
+            })
+          }
+        >
           <ButtonText>Selecionar Pessoa</ButtonText>
         </Button>
       </Box>

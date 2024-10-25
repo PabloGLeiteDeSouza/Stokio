@@ -88,9 +88,21 @@ const View: React.FC<VisualizarEmpresaScreen> = ({ navigation }) => {
       <Card size="md" variant="elevated" m="$3">
         <HStack justifyContent="space-between">
           <Box w="$2/3">
-            <Heading mb="$1" size="md">
-              {item.nome_fantasia}
-            </Heading>
+            {item.cnpj ? (
+              <>
+                <Heading mb="$1" size="md">
+                  {item.nome_fantasia}
+                </Heading>
+                <Heading mb="$1" size="md">
+                  {item.razao_social}
+                </Heading>
+              </>
+            ) : (
+              <Heading mb="$1" size="md">
+                {item.nome_fantasia}
+              </Heading>
+            )}
+
             {item.cnpj ? (
               <Text mb="$1" size="sm">
                 {mask(item.cnpj, 'cnpj')}

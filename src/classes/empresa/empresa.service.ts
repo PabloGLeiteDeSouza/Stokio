@@ -55,7 +55,7 @@ export class EmpresaService implements IEmpresaService {
         if (!res) throw new Error('Ramo não encontrado');
       }
       const id_pessoa =
-        typeof dados.pessoa.id !== 'undefined'
+        dados.pessoa.id !== 0
           ? dados.pessoa.id
           : (
               await this.db.runAsync(
@@ -71,7 +71,7 @@ export class EmpresaService implements IEmpresaService {
             ).lastInsertRowId;
 
       const id_ramo =
-        typeof dados.ramo.id !== 'undefined'
+        dados.ramo.id !== 0
           ? dados.ramo.id
           : (
               await this.db.runAsync(
@@ -83,9 +83,8 @@ export class EmpresaService implements IEmpresaService {
             ).lastInsertRowId;
 
       const res_emp = await this.db.runAsync(
-        'INSERT INTO empresa ( nome, nome_fantasia, razao_social, cnpj, cep, logradouro, numero, complemento, bairro, cidade, uf, id_ramo, id_pessoa ) VALUES ( $nome, $nome_fantasia, $razao_social, $cnpj, $cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf, $id_ramo, $id_pessoa )',
+        'INSERT INTO empresa ( nome_fantasia, razao_social, cnpj, cep, logradouro, numero, complemento, bairro, cidade, uf, id_ramo, id_pessoa ) VALUES ( $nome_fantasia, $razao_social, $cnpj, $cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf, $id_ramo, $id_pessoa )',
         {
-          $nome: dados.nome_fantasia,
           $nome_fantasia: dados.nome_fantasia,
           $razao_social: dados.razao_social,
           $cnpj: dados.cnpj || '',
@@ -112,7 +111,7 @@ export class EmpresaService implements IEmpresaService {
   async update(dados: EmpresaUpdate) {
     try {
       const res_emp = await this.db.runAsync(
-        'UPDATE empresa SET nome_fantasia = $nome_fantasia, razao_social = $razao_social, cnpj = $cnpj, cep = $cep, logradouro = $logradouro, numero = $numero, complemento = $complemento, bairro = $bairro, cidade $cidade, uf = $uf, limite = $limite, id_ramo = $id_ramo WHERE id = $id',
+        'UPDATE empresa SET nome_fantasia = $nome_fantasia, razao_social = $razao_social, cnpj = $cnpj, cep = $cep, logradouro = $logradouro, numero = $numero, complemento = $complemento, bairro = $bairro, cidade = $cidade, uf = $uf WHERE id = $id',
         {
           $nome_fantasia: dados.nome_fantasia,
           $razao_social: dados.razao_social,
@@ -139,7 +138,7 @@ export class EmpresaService implements IEmpresaService {
         );
       }
       const res_pss = await this.db.runAsync(
-        'UPDATE pessoa SET nome = $nome, $cpf = cpf, data_nascimento = $data_nascimento WHERE id = $id',
+        'UPDATE pessoa SET nome = $nome, cpf = $cpf, data_nascimento = $data_nascimento WHERE id = $id',
         {
           $nome: dados.pessoa.nome,
           $cpf: dados.pessoa.cpf,
@@ -277,13 +276,8 @@ export class EmpresaService implements IEmpresaService {
     await Promise.all(
       emails.map(async (email) => {
         const res = await this.db.runAsync(
-          'INSERT INTO email (endereco) VALUES ($endereco)',
-          { $endereco: email.endereco },
-        );
-        const id_email = res.lastInsertRowId;
-        await this.db.runAsync(
-          'INSERT INTO empresa_email (id_empresa, id_email) VALUES ($id_empresa, $id_email)',
-          { $id_empresa: id_empresa, $id_email: id_email },
+          'INSERT INTO email (endereco, id_empresa) VALUES ($endereco, $id_empresa)',
+          { $endereco: email.endereco, $id_empresa: id_empresa },
         );
       }),
     );
@@ -334,17 +328,8 @@ export class EmpresaService implements IEmpresaService {
       );
       if (!pessoa) throw new Error('Nao foi possivel encontrar a pessoa!');
 
-      const endereco = await this.db.getFirstAsync<EnderecoDataUpdate>(
-        'SELECT * FROM endereco WHERE id == $id',
-        {
-          $id: empresa.id_endereco,
-        },
-      );
-
-      if (!endereco) throw new Error('Nao foi possivel encontrar o endereco!');
-
       const telefones = await this.db.getAllAsync<TelefoneDataUpdate>(
-        'SELECT tel.* FROM telefone as tel INNER JOIN empresa_telefone as et ON et.id_telefone == tel.id WHERE et.id_empresa == $id',
+        'SELECT id, numero FROM telefone WHERE id_empresa == $id',
         {
           $id: id,
         },
@@ -352,7 +337,7 @@ export class EmpresaService implements IEmpresaService {
       if (telefones.length < 1)
         throw new Error('Nao foi possivel encontrar nenhum telefone!');
       const emails = await this.db.getAllAsync<EmailDataUpdate>(
-        'SELECT mail.* FROM email as mail INNER JOIN empresa_email as ee ON mail.id == ee.id_email WHERE ee.id_empresa == $id',
+        'SELECT id, endereco FROM email WHERE id_empresa == $id',
         { $id: id },
       );
       if (emails.length < 1)

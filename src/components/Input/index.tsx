@@ -340,14 +340,14 @@ const InputText: React.FC<IInputTextProps> = ({
 
             <FormControlHelper>
               <FormControlHelperText>
-                Must be atleast 6 characters.
+                Informe um valor valido.
               </FormControlHelperText>
             </FormControlHelper>
 
             <FormControlError>
               <FormControlErrorIcon as={AlertCircleIcon} />
               <FormControlErrorText>
-                Atleast 6 characters are required.
+                {error}
               </FormControlErrorText>
             </FormControlError>
           </FormControl>
