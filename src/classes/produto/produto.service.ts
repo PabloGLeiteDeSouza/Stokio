@@ -1,7 +1,7 @@
 import { SQLiteDatabase } from 'expo-sqlite';
 import { Produto, Marca, TipoProduto, UnidadeDeMedida } from './interfaces';
 
-export class ProductService {
+export class ProdutoService {
   constructor(private db: SQLiteDatabase) {}
 
   // CRUD de Produtos
@@ -94,7 +94,7 @@ export class ProductService {
       return produto;
     } catch (error) {
       throw new Error(
-        `Erro ao buscar produto pelo ID: ${(error as Error).message}`,
+        `Erro ao buscar produtos: ${(error as Error).message}`,
       );
     }
   }

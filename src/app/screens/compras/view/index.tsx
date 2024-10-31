@@ -54,6 +54,7 @@ import {
   ChevronDownIcon,
   ButtonIcon,
   SearchIcon,
+  Card,
 } from '@gluestack-ui/themed';
 import LoadingScreen from '@/components/LoadingScreen';
 import { VisualizarCompraScreen } from '@/interfaces/compra';
@@ -62,30 +63,60 @@ import { Button } from '@gluestack-ui/themed';
 import { Box, ButtonText, Heading } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import React from 'react';
-import { Alert } from 'react-native';
+import { Alert, ListRenderItem } from 'react-native';
 const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
-  let selectIconSize = '';
-  const [compras, setCompras] = React.useState<unknown[]>([]);
+  const [compras, setCompras] = React.useState<unknown[]>([{
+    id: 1,
+    
+  }]);
   const [isLoading, setIsLoading] = React.useState(true);
-  async function start() {
-    try {
-      if (!isLoading) {
-        setIsLoading(true);
-      }
-      setCompras([]);
-      setIsLoading(false);
-    } catch (error) {
-      Alert.alert('Error', (error as Error).message);
-      setIsLoading(false);
-      throw error;
-    }
-  }
-  React.useEffect(() => {
-    start();
-  }, []);
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
+  // async function start() {
+  //   try {
+  //     if (!isLoading) {
+  //       setIsLoading(true);
+  //     }
+  //     setCompras([]);
+  //     setIsLoading(false);
+  //   } catch (error) {
+  //     Alert.alert('Error', (error as Error).message);
+  //     setIsLoading(false);
+  //     throw error;
+  //   }
+  // }
+  // React.useEffect(() => {
+  //   start();
+  // }, []);
+  // if (isLoading) {
+  //   return <LoadingScreen />;
+  // }
+
+  const ListRenderCompra: ListRenderItem<Compra> = ({ item }) => {
+    return (
+      <Card size="md" variant="elevated" m="$3">
+        <HStack justifyContent="space-between">
+          <Box gap="$2.5" w="$2/3">
+            <Heading size="lg">{item.nome}</Heading>
+            <Text size="md">{item.valor}</Text>
+            <Text color={item.status === 'devendo' ? '$red600' : ''} size="md">
+              {item.status}
+            </Text>
+          </Box>
+          <Box gap="$5">
+            <Button
+              onPress={() =>
+                navigation?.navigate('detalhes-venda', { id: String(item.id) })
+              }
+            >
+              <ButtonIcon as={EyeIcon} />
+            </Button>
+          </Box>
+        </HStack>
+      </Card>
+    );
+  };
+
+
+
   return compras.length < 1 ? (
     <Box h="$full" w="$full" alignItems="center" justifyContent="center">
       <Box gap="$5">
