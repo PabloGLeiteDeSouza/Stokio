@@ -67,7 +67,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { ClienteService } from '@/classes/cliente/cliente.service';
 import { EmpresaService } from '@/classes/empresa/empresa.service';
 import LoadingScreen from '@/components/LoadingScreen';
-const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route }) => {
+const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
   const [haveProducts, setHaveProducts] = React.useState(false);
   const [temEmpresas, setTemEmpresas] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -90,22 +90,23 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route }) => {
       Alert.alert('Erro', (error as Error).message);
       navigation?.goBack();
       setIsLoading(false);
-      if ((error as Error).cause === 'ERR_EMPRESA_FINDALL_NOT_FOUND') {
+      if ((error as Error).cause === "ERR_EMPRESA_FINDALL_NOT_FOUND") {
         navigation?.navigate('screens-empresas');
-      } else if ((error as Error).cause === 'ERR_PRODUTO_FINDALL_NOT_FOUND') {
+      } else if ((error as Error).cause === "ERR_PRODUTO_FINDALL_NOT_FOUND") {
         navigation?.navigate('screens-produtos');
       } else {
         navigation?.navigate('visualizar-compras');
       }
     }
-  };
+  }
+
 
   React.useEffect(() => {
     StartScreen();
   }, []);
 
   if (isLoading) {
-    return <LoadingScreen />;
+    return <LoadingScreen/>;
   }
 
   return (
@@ -155,10 +156,10 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route }) => {
                 handleSubmit,
               }) => {
                 React.useEffect(() => {
-                  if (route && route.params && route.params.cliente) {
-                    setFieldValue('cliente', { ...route.params.cliente });
+                  if (route && route.params && route.params.empresa) {
+                    setFieldValue('empresa', { ...route.params.empresa });
                   }
-                }, [route?.params?.cliente]);
+                }, [route?.params?.empresa]);
 
                 React.useEffect(() => {
                   if (
