@@ -406,22 +406,22 @@ export type ComprasStackParamList = {
   'screens-clientes'?: object;
   'cadastrar-compra'?: {
     empresa?: {
-      id: string;
+      id: number;
       nome_fantasia: string;
       razao_social: string;
       cpf: string;
       cnpj?: string;
     };
     produto?: {
-      id: string;
+      id: number;
       codigo_de_barras: string;
       nome: string;
       data_validade: string;
       tipo: string;
       marca: string;
       empresa: string;
-      quantidade: string;
-      valor: string;
+      quantidade: number;
+      valor: number;
     };
     type?: 'update' | 'create';
     indexUpdated?: number;

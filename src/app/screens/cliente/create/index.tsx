@@ -336,10 +336,17 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                                 : 'Atualizar Pessoa'}
                             </ButtonText>
                           </Button>
-                          <Button onPress={() => {
-                            setFieldValue('pessoa', { id: Number(null), nome: '', data_nascimento: getMinDateFor18YearsOld(), cpf: '' });
-                            setIsNewPerson(true);
-                          }}>
+                          <Button
+                            onPress={() => {
+                              setFieldValue('pessoa', {
+                                id: Number(null),
+                                nome: '',
+                                data_nascimento: getMinDateFor18YearsOld(),
+                                cpf: '',
+                              });
+                              setIsNewPerson(true);
+                            }}
+                          >
                             <ButtonText>Cadastrar Pessoa</ButtonText>
                           </Button>
                         </Box>
@@ -638,14 +645,14 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                       </Box>
                     </>
                     <InputText
-                      inputType='money'
+                      inputType="money"
                       value={values.saldo}
                       onChangeValue={handleChange('saldo')}
                       error={errors.saldo}
                       isInvalid={errors.saldo ? true : false}
                       isRequired={true}
                       size="md"
-                      title='Saldo do cliente'
+                      title="Saldo do cliente"
                     />
 
                     <Box gap="$5">

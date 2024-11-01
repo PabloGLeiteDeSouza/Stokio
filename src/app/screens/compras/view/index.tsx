@@ -63,12 +63,13 @@ import { Button } from '@gluestack-ui/themed';
 import { Box, ButtonText, Heading } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import React from 'react';
-import { Alert, ListRenderItem } from 'react-native';
+import { Alert, GestureResponderEvent, ListRenderItem } from 'react-native';
 const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
-  const [compras, setCompras] = React.useState<unknown[]>([{
-    id: 1,
-    
-  }]);
+  const [compras, setCompras] = React.useState<unknown[]>([
+    {
+      id: 1,
+    },
+  ]);
   const [isLoading, setIsLoading] = React.useState(true);
   // async function start() {
   //   try {
@@ -115,8 +116,6 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
     );
   };
 
-
-
   return compras.length < 1 ? (
     <Box h="$full" w="$full" alignItems="center" justifyContent="center">
       <Box gap="$5">
@@ -128,9 +127,8 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
     </Box>
   ) : (
     <Box w="$full" h="$full">
-      <Box>
-        <Heading>Compras</Heading>
-        <Box>
+      <Box mx="$5" mt="$8">
+        <Box gap="$5">
           <Formik
             initialValues={{
               busca: '',
@@ -160,11 +158,7 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
                     >
                       <SelectTrigger size={'lg'} variant={'rounded'}>
                         <SelectInput placeholder="Select option" />
-                        <SelectIcon
-                          mr={'$3'}
-                          ml={0}
-                          as={ChevronDownIcon}
-                        />
+                        <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
                       </SelectTrigger>
                       <SelectPortal>
                         <SelectBackdrop />
@@ -202,9 +196,7 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
 
                     <FormControlError>
                       <FormControlErrorIcon as={AlertCircleIcon} />
-                      <FormControlErrorText>
-                        {errors.tipo}
-                      </FormControlErrorText>
+                      <FormControlErrorText>{errors.tipo}</FormControlErrorText>
                     </FormControlError>
                   </FormControl>
                   <FormControl
@@ -223,7 +215,7 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
                         placeholder="Busca...."
                         onChangeText={handleChange('busca')}
                       />
-                      <Button onPress={() => {}}>
+                      <Button onPress={handleSubmit as unknown as (event: GestureResponderEvent) => void}>
                         <ButtonIcon as={SearchIcon} />
                       </Button>
                     </Input>
@@ -248,7 +240,9 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
         </Box>
       </Box>
       <ScrollView>
-        <Box gap="$5"></Box>
+        <Box gap="$5">
+          
+        </Box>
       </ScrollView>
     </Box>
   );

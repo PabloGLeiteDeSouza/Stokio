@@ -1,8 +1,3 @@
-export interface CompraObjectBase {
-    
-}
+export interface CompraObjectBase {}
 
-export interface ItemDeCompraObjectBase {
-
-}
-
+export interface ItemDeCompraObjectBase {}

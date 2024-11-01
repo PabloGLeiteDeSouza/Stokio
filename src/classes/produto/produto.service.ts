@@ -93,9 +93,7 @@ export class ProdutoService {
       );
       return produto;
     } catch (error) {
-      throw new Error(
-        `Erro ao buscar produtos: ${(error as Error).message}`,
-      );
+      throw new Error(`Erro ao buscar produtos: ${(error as Error).message}`);
     }
   }
 

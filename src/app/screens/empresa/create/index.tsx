@@ -197,24 +197,22 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                 values,
                 errors,
               }) => {
-                  React.useEffect(() => {
-                    if (route && route.params && route.params.pessoa) {
-                      const { data_nascimento, ...person } =
-                        route.params.pessoa;
-                      setFieldValue('pessoa', {
-                        ...person,
-                        data_nascimento: new Date(data_nascimento),
-                      });
-                    }
-                  }, [route?.params?.pessoa]);
+                React.useEffect(() => {
+                  if (route && route.params && route.params.pessoa) {
+                    const { data_nascimento, ...person } = route.params.pessoa;
+                    setFieldValue('pessoa', {
+                      ...person,
+                      data_nascimento: new Date(data_nascimento),
+                    });
+                  }
+                }, [route?.params?.pessoa]);
 
-                  React.useEffect(() => {
-                    if (route && route.params && route.params.ramo) {
-                      const rm = route.params.ramo;
-                      setFieldValue('ramo', rm);
-                    }
-                  }, [route?.params?.ramo]);
-                
+                React.useEffect(() => {
+                  if (route && route.params && route.params.ramo) {
+                    const rm = route.params.ramo;
+                    setFieldValue('ramo', rm);
+                  }
+                }, [route?.params?.ramo]);
 
                 return (
                   <Box gap="$8">

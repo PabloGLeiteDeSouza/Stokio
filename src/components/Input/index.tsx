@@ -346,9 +346,7 @@ const InputText: React.FC<IInputTextProps> = ({
 
             <FormControlError>
               <FormControlErrorIcon as={AlertCircleIcon} />
-              <FormControlErrorText>
-                {error}
-              </FormControlErrorText>
+              <FormControlErrorText>{error}</FormControlErrorText>
             </FormControlError>
           </FormControl>
         </>

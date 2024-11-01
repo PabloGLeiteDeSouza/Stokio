@@ -1,26 +1,15 @@
-import { SQLiteDatabase } from "expo-sqlite";
-
+import { SQLiteDatabase } from 'expo-sqlite';
 
 export default class CompraService {
-    constructor(private db: SQLiteDatabase) {}
+  constructor(private db: SQLiteDatabase) {}
 
-    async create(){
+  async create() {}
 
-    }
+  async update() {}
 
-    async update(){
+  async delete() {}
 
-    }
+  async findAll() {}
 
-    async delete(){
-
-    }
-
-    async findAll(){
-
-    }
-
-    async findById(){
-
-    }
+  async findById() {}
 }
