@@ -55,6 +55,8 @@ import {
   ButtonIcon,
   SearchIcon,
   Card,
+  EyeIcon,
+  FlatList,
 } from '@gluestack-ui/themed';
 import LoadingScreen from '@/components/LoadingScreen';
 import { VisualizarCompraScreen } from '@/interfaces/compra';
@@ -64,8 +66,10 @@ import { Box, ButtonText, Heading } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import React from 'react';
 import { Alert, GestureResponderEvent, ListRenderItem } from 'react-native';
+import { CompraFlatList } from '@/types/screens/compra';
+import { CompraViewObject } from '@/classes/compra/interfaces';
 const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
-  const [compras, setCompras] = React.useState<unknown[]>([
+  const [compras, setCompras] = React.useState<CompraViewObject[]>([
     {
       id: 1,
     },
@@ -91,13 +95,13 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
   //   return <LoadingScreen />;
   // }
 
-  const ListRenderCompra: ListRenderItem<Compra> = ({ item }) => {
+  const ListRenderCompra: ListRenderItem<CompraViewObject> = ({ item }) => {
     return (
       <Card size="md" variant="elevated" m="$3">
         <HStack justifyContent="space-between">
           <Box gap="$2.5" w="$2/3">
-            <Heading size="lg">{item.nome}</Heading>
-            <Text size="md">{item.valor}</Text>
+            <Heading size="lg">{item.}</Heading>
+            <Text size="md">{item.}</Text>
             <Text color={item.status === 'devendo' ? '$red600' : ''} size="md">
               {item.status}
             </Text>
@@ -105,7 +109,7 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
           <Box gap="$5">
             <Button
               onPress={() =>
-                navigation?.navigate('detalhes-venda', { id: String(item.id) })
+                navigation?.navigate('detalhes-compra', { id: String(item.id) })
               }
             >
               <ButtonIcon as={EyeIcon} />
@@ -115,6 +119,8 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
       </Card>
     );
   };
+
+  const FlatListCompra = FlatList as CompraFlatList;
 
   return compras.length < 1 ? (
     <Box h="$full" w="$full" alignItems="center" justifyContent="center">
@@ -237,13 +243,17 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
               );
             }}
           </Formik>
+          <Box>
+            <Button>
+              <ButtonText>Cadastrar Compra</ButtonText>
+            </Button>
+          </Box>
         </Box>
       </Box>
-      <ScrollView>
-        <Box gap="$5">
-          
-        </Box>
-      </ScrollView>
+      <FlatListCompra
+        data={compras}
+        keyExtractor={(c) => String(c.id)}
+      />
     </Box>
   );
 };

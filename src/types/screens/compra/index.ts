@@ -4,6 +4,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { ViewStyle } from '@expo/html-elements/build/primitives/View';
 import { StyledComponentProps } from '@gluestack-style/react/lib/typescript/types';
 import { FlatList, FlatListProps, StyleProp } from 'react-native';
+import { CompraViewObject } from '@/classes/compra/interfaces';
 
 export type VisualisarCompraScreenNavigationProp = StackNavigationProp<
   ComprasStackParamList,
@@ -43,4 +44,15 @@ export type DetalhesCompraScreenNavigationProp = StackNavigationProp<
 export type DetalhesCompraScreenRouterProp = RouteProp<
   ComprasStackParamList,
   'detalhes-compra'
+>;
+
+
+export type CompraFlatList = React.ForwardRefExoticComponent<
+  StyledComponentProps<
+    StyleProp<ViewStyle>,
+    CompraViewObject,
+    FlatListProps<CompraViewObject>,
+    'FlatList',
+    typeof FlatList
+  >
 >;
