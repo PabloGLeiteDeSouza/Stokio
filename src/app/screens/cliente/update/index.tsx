@@ -172,7 +172,7 @@ const Update: React.FC<AtualizarClienteScreen> = ({ navigation, route }) => {
       <ScrollView w="$full">
         <Box px="$8" py="$5">
           <Box w="$full" alignItems="center">
-            <Text size="3xl">Cadastrar Cliente</Text>
+            <Text size="3xl">Atualizar Cliente</Text>
           </Box>
           <Box>
             <Formik
