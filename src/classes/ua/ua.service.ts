@@ -89,6 +89,11 @@ export default class UaService {
     }
   }
 
+  async findAll() {
+    const data = await this.db.getAllAsync('SELECT * FROM ua');
+    return data;
+  }
+
   // Busca todos os tipos de unidades de armazenamento
   async findAllStorageUnitTypes(): Promise<TipoDeUnidadeDeArmazenamento[]> {
     try {

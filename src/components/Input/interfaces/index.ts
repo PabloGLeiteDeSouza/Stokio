@@ -1,9 +1,11 @@
 import {} from '@gluestack-ui/input/src/types';
 
 export interface IInputTextProps {
+  
   error?: string;
   value?: string;
   size?: 'sm' | 'md' | 'lg' | undefined;
+  isReadOnly?: boolean | undefined;
   isInvalid?: boolean | undefined;
   isDisabled?: boolean | undefined;
   isRequired?: boolean | undefined;

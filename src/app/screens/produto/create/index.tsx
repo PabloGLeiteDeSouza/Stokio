@@ -115,30 +115,30 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
   React.useEffect(() => {
     async function start() {
       try {
-        const ums = await new UmService(db).haveUms();
-        if (ums) {
+        const ums = (await new UmService(db).getAll()).length > 0;
+        if (!ums) {
           setHaveUnidadeDeMedida(true);
         } else {
-          setIsNewUnidadeDeMedida(true);
+          throw new Error('Nao empresas cadastradas', { cause: 'NO' });
         }
-        const tipo_prod = await new TipoProdutoService(db).haveTipoProduto();
-        if (tipo_prod) {
+        const tipo_prod = (await new TipoProdutoService(db).getAll()).length > 0;
+        if (!tipo_prod) {
           setHaveTipoProduto(true);
         } else {
           setIsNewTipoProduto(true);
         }
-        const marca = await new MarcaService(db).haveMarca();
-        if (marca) {
+        const marca = (await new MarcaService(db).getAll()).length > 0;
+        if (!marca) {
           setHaveMarca(true);
         } else {
           setIsNewMarca(true);
         }
-        const ua = await new UaService(db).haveUas();
-        if (ua) {
+        const ua = (await new UaService(db).findAll()).length > 0;
+        if (!ua) {
           setHaveUnidadeDeArmazenamento(true);
         }
-        const empresa = await new EmpresaService(db).haveEmpresa();
-        if (empresa) {
+        const empresa = (await new EmpresaService(db).findAll()).length > 0;
+        if (!empresa) {
           setIsHaveEmpresa(true);
         }
         setIsLoading(false);
@@ -393,20 +393,25 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                     <Box>
                       <Heading textAlign="center">Tipo do Produto</Heading>
                     </Box>
-                    {values.tipo_produto.id !== '' && haveTipoProduto && (
+                    
+                    {haveTipoProduto && (
                       <Box>
-                        <Card>
-                          <HStack>
-                            <VStack gap="$5">
-                              <Box>
-                                <Heading>Tipo do Produto Selecionado:</Heading>
-                              </Box>
-                              <Box>
-                                <Text>{values.tipo_produto.nome}</Text>
-                              </Box>
-                            </VStack>
-                          </HStack>
-                        </Card>
+                        {values.tipo_produto.id !== '' && (
+                          <>
+                            <Card>
+                              <HStack>
+                                <VStack gap="$5">
+                                  <Box>
+                                    <Heading>Tipo do Produto Selecionado:</Heading>
+                                  </Box>
+                                  <Box>
+                                    <Text>{values.tipo_produto.nome}</Text>
+                                  </Box>
+                                </VStack>
+                              </HStack>
+                            </Card>
+                          </>
+                        )}
                         <Box>
                           <Button
                             onPress={() => {
@@ -485,7 +490,7 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                                 </Box>
                                 <Box>
                                   <Text>{values.unidade_de_medida.nome}</Text>
-                                  <Text>{values.unidade_de_medida.value}</Text>
+                                  <Text>{values.unidade_de_medida.valor}</Text>
                                 </Box>
                               </VStack>
                             </HStack>
@@ -569,7 +574,7 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                           <Input>
                             <InputField
                               type="text"
-                              value={values.unidade_de_medida.calor}
+                              value={values.unidade_de_medida.valor}
                               placeholder="cm"
                               onChangeText={handleChange(
                                 'unidade_de_medida.valor',
@@ -655,7 +660,7 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                     <InputDatePicker
                       value={values.data_de_validade}
                       title="Data de Válidade"
-                      onChangeDate={handleChange('data_de_validade')}
+                      onChangeDate={(data) => setFieldValue('data_validade', data)}
                     />
                     <FormControl
                       isInvalid={false}
@@ -718,6 +723,7 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                           type="text"
                           onChangeText={handleChange('nome')}
                           placeholder="Nome do produto"
+                          value={values.nome}
                         />
                       </Input>
 
@@ -786,7 +792,7 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
                       <Input>
                         <InputField
                           type="text"
-                          value={values.tamanho}
+                          value={values.tamanho.toString()}
                           placeholder="100"
                           onChangeText={handleChange('tamanho')}
                           keyboardType="number-pad"

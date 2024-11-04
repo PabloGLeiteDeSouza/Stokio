@@ -41,19 +41,10 @@ export default class TipoProdutoService {
   }
 
   async getAll() {
-    try {
-      const data = await this.db.getAllAsync<TipoProdutoUpdate>(
-        'SELECT * FROM tipo_produto',
-      );
-      if (data.length < 1) {
-        throw new Error('Não foi possível encontrar nenhum tipo de produto', {
-          cause: 'ERR_TIPO_PROD_GETALL',
-        });
-      }
-      return data;
-    } catch (error) {
-      throw error;
-    }
+    const data = await this.db.getAllAsync<TipoProdutoUpdate>(
+      'SELECT * FROM tipo_produto',
+    );
+    return data;
   }
 
   async getById(id: number) {

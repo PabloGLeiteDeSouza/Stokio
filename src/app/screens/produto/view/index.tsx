@@ -80,7 +80,7 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
     label: string;
     value: string;
   }> = BuscasTipos;
-  const [produtos, setProdutos] = React.useState<Array<Produto>>(Produtos);
+  const [produtos, setProdutos] = React.useState<Array<Produto>>([...Produtos]);
   const FlatListProduto = FlatList as ProdutoFlatList;
   const ListRenderProduto: ListRenderItem<Produto> = ({ item }) => {
     return (

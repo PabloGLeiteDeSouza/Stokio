@@ -74,7 +74,10 @@ import { Marca, MarcaFlatList } from '@/types/screens/marca';
 import { ListRenderItem } from 'react-native';
 
 const View: React.FC<VisualizarMarcaScreen> = ({ navigation }) => {
-  const [marcas, setMarcas] = React.useState<Array<Marca>>([]);
+  const [marcas, setMarcas] = React.useState<Array<Marca>>([{
+    id: 1,
+    nome: 'Teste',
+  }]);
   const FlatListMarca = FlatList as MarcaFlatList;
   const ListRenderMarca: ListRenderItem<Marca> = ({ item }) => {
     return (

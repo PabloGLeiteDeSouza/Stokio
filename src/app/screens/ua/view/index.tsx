@@ -77,7 +77,7 @@ import { VisualizarUaScreen } from '@/interfaces/ua';
 const View: React.FC<VisualizarUaScreen> = ({ navigation }) => {
   const FlatListUa = FlatList as UaFlatList;
 
-  const [uas, setUas] = React.useState<Array<Ua>>(Uas);
+  const [uas, setUas] = React.useState<Array<Ua>>([]);
 
   const ListRenderUa: ListRenderItem<Ua> = ({ item }) => {
     return (

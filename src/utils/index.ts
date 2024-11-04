@@ -21,11 +21,8 @@ export function getStringFromDate(data: Date) {
 }
 
 export function getDateFromString(data: string) {
-  return new Date(
-    Number(data.split('-')[0]),
-    Number(data.split('-')[1]),
-    Number(data.split('-')[2]),
-  );
+  const values = data.split('-');
+  return new Date(`${values[0]}-${values[1]}-${values[2]+1}`);
 }
 
 export function verificarAtributosObjeto(obj: object) {

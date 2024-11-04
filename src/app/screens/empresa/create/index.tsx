@@ -576,7 +576,7 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
                       isInvalid={errors.complemento ? true : false}
                       size={'md'}
                       isDisabled={false}
-                      isRequired={true}
+                      isRequired={false}
                     >
                       <FormControlLabel>
                         <FormControlLabelText>Complemento</FormControlLabelText>

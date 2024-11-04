@@ -69,11 +69,19 @@ import { Alert, GestureResponderEvent, ListRenderItem } from 'react-native';
 import { CompraFlatList } from '@/types/screens/compra';
 import { CompraViewObject } from '@/classes/compra/interfaces';
 const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
-  const [compras, setCompras] = React.useState<CompraViewObject[]>([
-    {
-      id: 1,
-    },
-  ]);
+  const [compras, setCompras] = React.useState<CompraViewObject[]>([{
+    id: 1,
+    data: new Date(),
+    valor_venda: 100.0,
+    status: 'pendente',
+    nome_empresa: 'teste'
+  }, {
+    id: 2,
+    data: new Date(),
+    valor_venda: 100.0,
+    status: 'pendente',
+    nome_empresa: 'teste'
+  }]);
   const [isLoading, setIsLoading] = React.useState(true);
   // async function start() {
   //   try {
@@ -95,14 +103,14 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
   //   return <LoadingScreen />;
   // }
 
-  const ListRenderCompra: ListRenderItem<CompraViewObject> = ({ item }) => {
+  const ListRenderCompra: ListRenderItem<CompraViewObject> = ({ item, index }) => {
     return (
-      <Card size="md" variant="elevated" m="$3">
+      <Card size="md" variant="elevated" mx="$8" mt={index === 1 ? "$5" : "$0"} mb={"$5"}>
         <HStack justifyContent="space-between">
           <Box gap="$2.5" w="$2/3">
-            <Heading size="lg">{item.}</Heading>
-            <Text size="md">{item.}</Text>
-            <Text color={item.status === 'devendo' ? '$red600' : ''} size="md">
+            <Heading size="lg">{item.nome_empresa}</Heading>
+            <Text size="md">{new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(item.data)}</Text>
+            <Text color={item.status === 'pendente' ? '$red600' : ''} size="md">
               {item.status}
             </Text>
           </Box>
@@ -133,7 +141,7 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
     </Box>
   ) : (
     <Box w="$full" h="$full">
-      <Box mx="$5" mt="$8">
+      <Box mx="$5" my="$8">
         <Box gap="$5">
           <Formik
             initialValues={{
@@ -244,7 +252,7 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
             }}
           </Formik>
           <Box>
-            <Button>
+            <Button onPress={() => navigation?.navigate('cadastrar-compra')}>
               <ButtonText>Cadastrar Compra</ButtonText>
             </Button>
           </Box>
@@ -252,6 +260,7 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
       </Box>
       <FlatListCompra
         data={compras}
+        renderItem={ListRenderCompra}
         keyExtractor={(c) => String(c.id)}
       />
     </Box>

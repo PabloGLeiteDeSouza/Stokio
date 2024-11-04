@@ -63,20 +63,8 @@ export default class UmService {
   }
 
   async getAll() {
-    try {
-      const data = await this.db.getAllAsync<UmUpdate>('SELECT * FROM um');
-      if (data.length < 1) {
-        throw new Error('Nao foram encontradas unidades de medida!');
-      }
-      return data;
-    } catch (error) {
-      throw new Error(
-        'Erro ao buscar unidades de medida: ' + (error as Error).message,
-        {
-          cause: 'ERR_UM_GETALL',
-        },
-      );
-    }
+    const data = await this.db.getAllAsync<UmUpdate>('SELECT * FROM um');
+    return data;
   }
 
   async getByNome(nome: string) {
@@ -111,13 +99,5 @@ export default class UmService {
         `Erro ao deletar unidade de medida: ${(error as Error).message}`,
       );
     }
-  }
-
-  async haveUms() {
-    const data = await this.db.getAllAsync('SELECT * from um');
-    if (data.length < 1) {
-      return false;
-    }
-    return true;
   }
 }

@@ -27,8 +27,8 @@ const Update: React.FC = () => {
           </Box>
           <Formik
             initialValues={{
-              id: '',
-              nome: '',
+              id: 1,
+              nome: 'Teste',
             }}
             onSubmit={() => {}}
           >

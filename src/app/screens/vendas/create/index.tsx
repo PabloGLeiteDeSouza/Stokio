@@ -90,8 +90,7 @@ const Create: React.FC<CadastrarVendaScreen> = ({ navigation, route }) => {
                   cpf: '',
                 },
                 valor: '',
-                data_venda: new Date(),
-                data_atualizacao: new Date(),
+                data: new Date(),
                 status: '' as 'pago' | 'devendo',
               }}
               onSubmit={() => {}}
@@ -450,15 +449,9 @@ const Create: React.FC<CadastrarVendaScreen> = ({ navigation, route }) => {
                     </Box>
 
                     <InputDatePicker
-                      onChangeDate={handleChange('data_venda')}
+                      onChangeDate={(dt) => setFieldValue('data', dt)}
                       title="Data da Venda"
-                      value={values.data_venda}
-                    />
-
-                    <InputDatePicker
-                      onChangeDate={handleChange('data_atualizacao')}
-                      title="Data da Atualizacao"
-                      value={values.data_venda}
+                      value={values.data}
                     />
 
                     <FormControl

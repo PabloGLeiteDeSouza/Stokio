@@ -47,19 +47,19 @@ export type DetalhesProdutoScreenRouterProp = RouteProp<
 >;
 
 export type Produto = {
-  id: string;
+  id: number;
   codigo_de_barras: string;
   nome: string;
   data_validade: string;
   tipo: string;
   marca: string;
   empresa: string;
-  quantidade: string;
-  valor: string;
+  quantidade: number;
+  valor: number;
 };
 
 export type ProdutoObject = {
-  id: string;
+  id: number;
   nome: string;
   codigo_de_barras: string;
   data_validade: string;
@@ -67,22 +67,22 @@ export type ProdutoObject = {
   quantidate: string;
   empresa: Empresa;
   tipo_produto: {
-    id: string;
+    id: number;
     nome: string;
   };
   marca: {
-    id: string;
+    id: number;
     nome: string;
   };
   um: {
-    id: string;
+    id: number;
     nome: string;
   };
   ua: {
-    id: string;
+    id: number;
     nome: string;
     tipo_ua: {
-      id: string;
+      id: number;
       nome: string;
     };
   };

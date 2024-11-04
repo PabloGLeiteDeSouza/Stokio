@@ -41,6 +41,8 @@ import onAddProduct from './functions/onAddProduct';
 import onRemoveProduct from './functions/onRemoveProduct';
 import { formatValue } from '@/utils/calc';
 import LoadingScreen from '@/components/LoadingScreen';
+import { mask } from '@/utils/mask';
+import InputText from '@/components/Input';
 
 const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
   if (!route || !route.params || !route.params.id) {
@@ -76,7 +78,7 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
         <Box p="$8">
           <Box mb="$8">
             <Heading textAlign="center" size="2xl">
-              Cadastrar Venda
+              Atualizar Venda
             </Heading>
           </Box>
           <Box gap="$8">
@@ -84,28 +86,26 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
               initialValues={{
                 produtos: [
                   {
-                    id: '',
-                    codigo_de_barras: '',
-                    nome: '',
-                    data_validade: '',
-                    marca: '',
-                    tipo: '',
-                    valor_total: '',
-                    valor: '',
-                    empresa: '',
-                    quantidade: '',
-                    qtd: '',
+                    id: 1,
+                    codigo_de_barras: '2343243432432432',
+                    nome: 'asdasdsadsadasd',
+                    data_validade: new Date('2026-10-27'),
+                    marca: 'asdasdsadas',
+                    tipo: 'asdsadsadsada',
+                    valor: 10.00,
+                    empresa: 'asdsadsadsaasdsa',
+                    quantidade_disponivel: 50,
+                    quantidade: 5,
                   },
                 ],
                 cliente: {
-                  id: '',
-                  nome: '',
-                  cpf: '',
+                  id: 1,
+                  nome: 'sdasddsadassdas',
+                  cpf: '12323154387',
                 },
-                valor: '',
-                data_venda: new Date(),
-                data_atualizacao: new Date(),
-                status: '' as 'pago' | 'devendo',
+                valor: 50.00,
+                data: new Date(),
+                status: 'devendo' as 'pago' | 'devendo',
               }}
               onSubmit={() => {}}
             >
@@ -175,13 +175,13 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                 return (
                   <>
                     <Box gap="$5">
-                      {values.cliente.id !== '' && (
+                      {values.cliente.id !== 0 && (
                         <Card>
                           <HStack>
                             <VStack>
                               <Heading size="lg">Cliente</Heading>
                               <Text size="lg">{values.cliente.nome}</Text>
-                              <Text size="lg">{values.cliente.cpf}</Text>
+                              <Text size="lg">{mask(values.cliente.cpf, 'cpf')}</Text>
                             </VStack>
                           </HStack>
                         </Card>
@@ -215,7 +215,7 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                             Produtos
                           </Heading>
                           {values.produtos.map(
-                            ({ qtd, valor_total, ...produto }, i) => {
+                            ({ quantidade, quantidade_disponivel, valor, ...produto }, i) => {
                               if (produto.id !== '') {
                                 return (
                                   <Box key={`produto-${i}`} gap="$5">
@@ -227,8 +227,8 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                                           </Heading>
                                           <Text size="lg">{produto.marca}</Text>
                                           <Text size="lg">{produto.tipo}</Text>
-                                          <Text>{qtd} unidades</Text>
-                                          <Text>{valor_total} reais</Text>
+                                          <Text>{quantidade} unidades</Text>
+                                          <Text>{valor * quantidade} reais</Text>
                                         </VStack>
                                       </HStack>
                                     </Card>
@@ -247,17 +247,17 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                                         <Button
                                           onPress={() => {
                                             const result = onAddProduct(
-                                              qtd,
-                                              values.valor,
+                                              quantidade.toString(),
+                                              valor.toString(),
                                               produto,
                                             );
                                             if (typeof result != 'undefined') {
                                               setFieldValue(
-                                                `produtos[${i}].qtd`,
+                                                `produtos[${i}].quantidade`,
                                                 result.quantidade,
                                               );
                                               setFieldValue(
-                                                `produtos[${i}].valor_total`,
+                                                `produtos[${i}].valor`,
                                                 result.valor_produto,
                                               );
                                               setFieldValue(
@@ -516,48 +516,18 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                     </Box>
 
                     <InputDatePicker
-                      onChangeDate={handleChange('data_venda')}
+                      onChangeDate={(dt) => setFieldValue('data', dt)}
                       title="Data da Venda"
-                      value={values.data_venda}
+                      value={values.data}
                     />
 
-                    <InputDatePicker
-                      onChangeDate={handleChange('data_atualizacao')}
-                      title="Data da Atualizacao"
-                      value={values.data_venda}
+                    <InputText
+                      isReadOnly={true}
+                      inputType='money'
+                      title="Valor da Venda"
+                      value={values.valor}
+                      errors={errors.valor}
                     />
-
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>Valor</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <InputField
-                          editable={false}
-                          type="text"
-                          value={values.valor}
-                          placeholder="120,00"
-                        />
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Valor da compra.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          {errors.valor}
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
 
                     <FormControl
                       isInvalid={false}
@@ -579,6 +549,7 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                               ? 'Devendo'
                               : ''
                         }
+                        defaultValue={values.status}
                         isInvalid={false}
                         isDisabled={false}
                       >

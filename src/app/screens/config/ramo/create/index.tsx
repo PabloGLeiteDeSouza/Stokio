@@ -1,3 +1,47 @@
+import {
+  Radio,
+  RadioGroup,
+  RadioIcon,
+  RadioIndicator,
+  RadioLabel,
+  Checkbox,
+  CheckboxGroup,
+  CheckboxIndicator,
+  CheckboxIcon,
+  CheckboxLabel,
+  Textarea,
+  TextareaInput,
+  Select,
+  SelectTrigger,
+  SelectInput,
+  SelectIcon,
+  SelectPortal,
+  SelectBackdrop,
+  SelectContent,
+  SelectDragIndicatorWrapper,
+  SelectDragIndicator,
+  SelectItem,
+  Slider,
+  SliderTrack,
+  SliderFilledTrack,
+  SliderThumb,
+  Switch,
+  Modal,
+  ModalBackdrop,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  HStack,
+  Text,
+  Center,
+  Icon,
+  CircleIcon,
+  CheckIcon,
+  ChevronDownIcon,
+} from '@gluestack-ui/themed';
+
 import React from 'react';
 import {
   FormControl,
@@ -32,6 +76,7 @@ const Create: React.FC<CadastrarRamoScreen> = ({ navigation }) => {
           <Formik
             initialValues={{
               nome: '',
+              descricao: '',
             }}
             onSubmit={async (value) => {
               try {
@@ -74,6 +119,35 @@ const Create: React.FC<CadastrarRamoScreen> = ({ navigation }) => {
                     <FormControlError>
                       <FormControlErrorIcon as={AlertCircleIcon} />
                       <FormControlErrorText>{errors.nome}</FormControlErrorText>
+                    </FormControlError>
+                  </FormControl>
+                  <FormControl
+                    isInvalid={false}
+                    size={'md'}
+                    isDisabled={false}
+                    isRequired={false}
+                  >
+                    <FormControlLabel>
+                      <FormControlLabelText>Descricao</FormControlLabelText>
+                    </FormControlLabel>
+                    <Textarea>
+                      <TextareaInput
+                        value={values.descricao}
+                        onChangeText={handleChange('descricao')}
+                      />
+                    </Textarea>
+
+                    <FormControlHelper>
+                      <FormControlHelperText>
+                        Informe uma descicao.
+                      </FormControlHelperText>
+                    </FormControlHelper>
+
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        Atleast 6 characters are required.
+                      </FormControlErrorText>
                     </FormControlError>
                   </FormControl>
                   <Box>

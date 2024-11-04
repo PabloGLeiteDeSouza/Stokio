@@ -196,6 +196,11 @@ export class EmpresaService implements IEmpresaService {
     }
   }
 
+  async findAll() {
+    const data = this.db.getAllAsync("SELECT * FROM empresa");
+    return data;
+  }
+
   async search(criteria: EmpresaSearchCriteria): Promise<EmpresaObject[]> {
     let query =
       'SELECT * FROM empresa INNER JOIN pessoa_empresa ON empresa.id = pessoa_empresa.id_empresa INNER JOIN pessoa ON pessoa_empresa.id_pessoa = pessoa.id WHERE 1=1';

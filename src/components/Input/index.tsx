@@ -36,6 +36,7 @@ const InputText: React.FC<IInputTextProps> = ({
   customType,
   value,
   error,
+  isReadOnly,
   isDisabled,
   isInvalid,
   isRequired,
@@ -105,6 +106,7 @@ const InputText: React.FC<IInputTextProps> = ({
             isInvalid={isInvalid}
             isDisabled={isDisabled}
             isRequired={isRequired}
+            isReadOnly={isReadOnly}
             size={'md'}
           >
             <FormControlLabel>
@@ -156,6 +158,7 @@ const InputText: React.FC<IInputTextProps> = ({
             isInvalid={isInvalid}
             isDisabled={isDisabled}
             isRequired={isRequired}
+            isReadOnly={isReadOnly}
             size={'md'}
           >
             <FormControlLabel>
@@ -208,6 +211,7 @@ const InputText: React.FC<IInputTextProps> = ({
             isInvalid={isInvalid}
             isDisabled={isDisabled}
             isRequired={isRequired}
+            isReadOnly={isReadOnly}
             size={'md'}
           >
             <FormControlLabel>
@@ -263,6 +267,7 @@ const InputText: React.FC<IInputTextProps> = ({
             isInvalid={isInvalid}
             isDisabled={isDisabled}
             isRequired={isRequired}
+            isReadOnly={isReadOnly}
             size={'md'}
           >
             <FormControlLabel>
@@ -314,6 +319,7 @@ const InputText: React.FC<IInputTextProps> = ({
             isInvalid={isInvalid}
             isDisabled={isDisabled}
             isRequired={isRequired}
+            isReadOnly={isReadOnly}
             size={'md'}
           >
             <FormControlLabel>
@@ -322,13 +328,10 @@ const InputText: React.FC<IInputTextProps> = ({
             <Input>
               <InputField
                 type="text"
-                value={mask(data, 'money')}
+                value={mask(value, 'money')}
                 placeholder="R$10,00"
                 keyboardType="number-pad"
                 onChangeText={(text) => {
-                  setData(
-                    unmask(mask(unmask(text, 'money'), 'money'), 'money'),
-                  );
                   if (onChangeValue) {
                     onChangeValue(
                       unmask(mask(unmask(text, 'money'), 'money'), 'money'),
@@ -358,6 +361,7 @@ const InputText: React.FC<IInputTextProps> = ({
             isInvalid={isInvalid}
             isDisabled={isDisabled}
             isRequired={isRequired}
+            isReadOnly={isReadOnly}
             size={'md'}
           >
             <FormControlLabel>

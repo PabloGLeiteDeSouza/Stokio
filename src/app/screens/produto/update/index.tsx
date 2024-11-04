@@ -28,6 +28,8 @@ import { AtualizarProdutoScreen } from '@/interfaces/produto';
 import * as Yup from 'yup';
 import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
 import LoadingScreen from '@/components/LoadingScreen';
+import { mask } from '@/utils/mask';
+import InputText from '@/components/Input';
 const validationSchema = Yup.object().shape({
   codigo_de_barras: Yup.string().required('O código de barras é obrigatório'),
   nome: Yup.string().required('O nome é obrigatório'),
@@ -65,36 +67,36 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
   const [isNewUnidadeDeMedida, setIsNewUnidadeDeMedida] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const [produto, setProduto] = React.useState({
-    codigo_de_barras: '',
-    nome: '',
-    descricao: '',
+    codigo_de_barras: '12321332543534',
+    nome: 'asdsadsadsa',
+    descricao: 'asdasdsadasdsadsadasdsa',
     data_de_validade: new Date(),
-    valor: '',
-    quantidade: '',
-    tamanho: '',
+    valor: 200.00,
+    quantidade: 20,
+    tamanho: 50,
     marca: {
-      id: '',
-      nome: '',
+      id: 1,
+      nome: 'KASKDAS',
     },
     tipo_produto: {
-      id: '',
-      nome: '',
+      id: 1,
+      nome: 'asdasdsadsa',
     },
     unidade_de_medida: {
-      id: '',
-      nome: '',
-      value: '',
+      id: 1,
+      nome: 'mililitros',
+      value: 'ml',
     },
     unidade_de_armazenamento: {
-      id: '',
-      nome: '',
+      id: 1,
+      nome: 'caixa-01',
     },
     empresa: {
-      id: '',
-      nome_fantaisa: '',
-      razao_social: '',
-      cnpj: '',
-      cpf: '',
+      id: 1,
+      nome_fantaisa: 'asdasdsadas',
+      razao_social: 'asdasdasdsadsa',
+      cnpj: '12312323000112',
+      cpf: '12312312312',
     },
   });
   React.useEffect(() => {
@@ -116,7 +118,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
         <Box mt="$5" mx="$8">
           <Box mb="$8">
             <Heading textAlign="center" size="xl">
-              Cadastre o Produto abaixo
+              Atualizar o Produto abaixo
             </Heading>
           </Box>
           <Box gap="$8" mb="$10">
@@ -167,7 +169,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
 
                 return (
                   <>
-                    {values.empresa.id != '' && (
+                    {values.empresa.id != 0 && (
                       <>
                         <Card>
                           <Box gap="$5">
@@ -178,18 +180,18 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                             </Box>
                             <Box>
                               <Text>Razao Social</Text>
-                              <Text></Text>
+                              <Text>{values.empresa.razao_social}</Text>
                             </Box>
                             {values.empresa.cnpj !== '' && (
                               <Box>
                                 <Text>CNPJ</Text>
-                                <Text>{values.empresa.cnpj}</Text>
+                                <Text>{mask(values.empresa.cnpj, 'cnpj')}</Text>
                               </Box>
                             )}
                             {values.empresa.cnpj === '' && (
                               <Box>
                                 <Text>CPF</Text>
-                                <Text>{values.empresa.cpf}</Text>
+                                <Text>{mask(values.empresa.cpf, 'cpf')}</Text>
                               </Box>
                             )}
                           </Box>
@@ -210,7 +212,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                             })
                           }
                         >
-                          <ButtonText>Selecionar empresa</ButtonText>
+                          <ButtonText>{values.empresa.id != 0 ? "Atualizar Empresa" : "Selecionar Empresa"}</ButtonText>
                         </Button>
                       </Box>
                       <FormControlHelper>
@@ -235,7 +237,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                         <ButtonText>Cadastrar Empresa</ButtonText>
                       </Button>
                     </Box>
-                    {values.marca.id == '' && isNewMarca && (
+                    {isNewMarca && (
                       <>
                         <FormControl
                           isInvalid={false}
@@ -273,7 +275,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                     <Box>
                       <Heading textAlign="center">Marca do Produto</Heading>
                     </Box>
-                    {values.marca.id !== '' && !isNewMarca && (
+                    {!isNewMarca && (
                       <Box>
                         <Card>
                           <HStack>
@@ -588,6 +590,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                           type="text"
                           onChangeText={handleChange('nome')}
                           placeholder="Nome do produto"
+                          value={values.nome}
                         />
                       </Input>
 
@@ -635,50 +638,13 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>Valor</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <Box
-                          h="$full"
-                          justifyContent="center"
-                          alignItems="center"
-                          px="$5"
-                          $dark-bgColor="$blueGray400"
-                          $light-bgColor="$blueGray600"
-                        >
-                          <Text $light-color="$white" $dark-color="$black">
-                            R$
-                          </Text>
-                        </Box>
-                        <InputField
-                          type="text"
-                          value={values.valor}
-                          placeholder="25.99"
-                          onChangeText={handleChange('valor')}
-                          keyboardType="number-pad"
-                        />
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          Atleast 6 characters are required.
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
+                   <InputText
+                    title='Valor'
+                    inputType="money"
+                    value={values.valor.toString()}
+                    onChangeValue={handleChange('valor')}
+                    error={errors.valor}
+                   />
                     <FormControl
                       isInvalid={false}
                       size={'md'}
@@ -691,7 +657,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                       <Input>
                         <InputField
                           type="text"
-                          value={values.quantidade}
+                          value={values.quantidade.toString()}
                           placeholder="500"
                           onChangeText={handleChange('quantidade')}
                           keyboardType="number-pad"
@@ -723,7 +689,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                       <Input>
                         <InputField
                           type="text"
-                          value={values.tamanho}
+                          value={values.tamanho.toString()}
                           placeholder="100"
                           onChangeText={handleChange('tamanho')}
                           keyboardType="number-pad"

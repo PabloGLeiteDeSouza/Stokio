@@ -55,19 +55,10 @@ export default class MarcaService {
   }
 
   async getAll() {
-    try {
-      const data = await this.db.getAllAsync<MarcaUpdate>(
-        'SELECT * FROM marca',
-      );
-      if (data.length < 1) {
-        throw new Error('Não foi possível encontrar nenhuma marca', {
-          cause: 'ERR_MARCA_GETALL',
-        });
-      }
-      return data;
-    } catch (error) {
-      throw error;
-    }
+    const data = await this.db.getAllAsync<MarcaUpdate>(
+      'SELECT * FROM marca',
+    );
+    return data;
   }
 
   async haveMarca() {

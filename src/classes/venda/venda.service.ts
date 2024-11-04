@@ -1,6 +1,6 @@
 import { SQLiteDatabase } from 'expo-sqlite';
 
-export class VendaService {
+export default class VendaService {
   constructor(private db: SQLiteDatabase) {}
 
   async create() {}
@@ -9,7 +9,9 @@ export class VendaService {
 
   async delete() {}
 
-  async getById() {}
+  async findById(id: number ) {}
+
+  async findAll() {}
 
   async getByCliente() {}
 

@@ -26,16 +26,22 @@ const SelectEmpresa: React.FC<ISelectEmpresaProps> = ({
   const screen = route.params.screen;
   const [empresas, setEmpresas] = React.useState<Array<Empresa>>([
     {
-      id: '1',
+      id: 1,
       nome_fantasia: 'João',
       razao_social: 'Joao',
       cpf: '21347298146327',
     },
     {
-      id: '2',
+      id: 2,
       nome_fantasia: 'Maria',
       razao_social: 'Maria',
       cpf: '21382194763289',
+    },
+    {
+      id: 3,
+      nome_fantasia: 'Comercio de Eletronicos ATA e CIA',
+      razao_social: 'Comercio de Eletronicos ATA e CIA',
+      cpf: '21347298146327',
     },
   ]);
   const [empresa, setEmpresa] = React.useState<Empresa>(empresas[0]);
@@ -46,12 +52,6 @@ const SelectEmpresa: React.FC<ISelectEmpresaProps> = ({
       try {
         setEmpresas([
           ...empresas,
-          {
-            id: '3',
-            nome_fantasia: 'Comercio de Eletronicos ATA e CIA',
-            razao_social: 'Comercio de Eletronicos ATA e CIA',
-            cpf: '21347298146327',
-          },
         ]);
         setIsLoading(false);
       } catch (error) {

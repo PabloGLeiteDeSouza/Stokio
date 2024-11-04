@@ -13,6 +13,7 @@ import {
   Button,
   ButtonText,
   AlertCircleIcon,
+  Textarea,
 } from '@gluestack-ui/themed';
 import { Box, Heading, ScrollView, VStack } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
@@ -20,6 +21,7 @@ import { Alert, GestureResponderEvent } from 'react-native';
 import { AtualizarRamoScreen } from '@/interfaces/ramo';
 import { useSQLiteContext } from 'expo-sqlite';
 import { RamoService } from '@/classes/ramo/ramo.service';
+import { TextareaInput } from '@gluestack-ui/themed';
 const Update: React.FC<AtualizarRamoScreen> = ({ navigation, route }) => {
   const db = useSQLiteContext();
   if (!route || !route.params || !route.params.ramo) {
@@ -79,6 +81,35 @@ const Update: React.FC<AtualizarRamoScreen> = ({ navigation, route }) => {
                     <FormControlError>
                       <FormControlErrorIcon as={AlertCircleIcon} />
                       <FormControlErrorText>{errors.nome}</FormControlErrorText>
+                    </FormControlError>
+                  </FormControl>
+                  <FormControl
+                    isInvalid={false}
+                    size={'md'}
+                    isDisabled={false}
+                    isRequired={false}
+                  >
+                    <FormControlLabel>
+                      <FormControlLabelText>Descricao</FormControlLabelText>
+                    </FormControlLabel>
+                    <Textarea>
+                      <TextareaInput
+                        value={values.descricao}
+                        onChangeText={handleChange('descricao')}
+                      />
+                    </Textarea>
+
+                    <FormControlHelper>
+                      <FormControlHelperText>
+                        Informe uma descicao.
+                      </FormControlHelperText>
+                    </FormControlHelper>
+
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        Atleast 6 characters are required.
+                      </FormControlErrorText>
                     </FormControlError>
                   </FormControl>
                   <Box>

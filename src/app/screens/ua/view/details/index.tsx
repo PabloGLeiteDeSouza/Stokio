@@ -36,18 +36,29 @@ const Details: React.FC<DetalhesClienteScreen> = ({ navigation, route }) => {
           <Box w="$full" alignItems="center">
             <Text size="3xl">Detalhes da Ua</Text>
           </Box>
-          <Box gap="$5">
+          <Box gap="$8">
             <Box gap="$1.5">
               <Heading>Nome:</Heading>
-              <Text>João</Text>
+              <Text>Caixa-01</Text>
             </Box>
             <Box gap="$1.5">
-              <Heading>Tipo</Heading>
-              <Text>01/01/1990</Text>
+              <Heading>Descricao</Heading>
+              <Text>Uma caixa identificada como 01</Text>
+            </Box>
+            <Box gap="$3">
+              <Heading>Tipo de unidade de armazenamento</Heading>
+              <Box gap="$1.5">
+                <Heading>Nome</Heading>
+                <Text>Caixa</Text>
+              </Box>
+              <Box gap="$1.5">
+                <Heading>Descricao</Heading>
+                <Text>Uma caixa qualquer</Text>
+              </Box>
             </Box>
             <Box gap="$5">
               <Button
-                onPress={() => navigation?.navigate('atualizar-ua')}
+                onPress={() => navigation?.navigate('atualizar-ua', { id: 1 })}
                 gap="$5"
               >
                 <ButtonText>Editar</ButtonText>

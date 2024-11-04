@@ -22,6 +22,8 @@ import TipoUaService from '@/classes/tipo_ua/tipo_ua.service';
 import { useSQLiteContext } from 'expo-sqlite';
 import { TipoUaUpdate } from '@/classes/tipo_ua/interfaces';
 import LoadingScreen from '@/components/LoadingScreen';
+import { Textarea } from '@gluestack-ui/themed';
+import { TextareaInput } from '@gluestack-ui/themed';
 const Update: React.FC<AtualizarTipoUaScreen> = ({ navigation, route }) => {
   if (!route || !route.params || !route.params.id) {
     navigation?.goBack();
@@ -113,6 +115,35 @@ const Update: React.FC<AtualizarTipoUaScreen> = ({ navigation, route }) => {
                     <FormControlError>
                       <FormControlErrorIcon as={AlertCircleIcon} />
                       <FormControlErrorText>{errors.nome}</FormControlErrorText>
+                    </FormControlError>
+                  </FormControl>
+                  <FormControl
+                    isInvalid={false}
+                    size={'md'}
+                    isDisabled={false}
+                    isRequired={false}
+                  >
+                    <FormControlLabel>
+                      <FormControlLabelText>Descricao</FormControlLabelText>
+                    </FormControlLabel>
+                    <Textarea>
+                      <TextareaInput
+                        onChangeText={handleChange('descricao')}
+                        values={values.descricao}
+                      />
+                    </Textarea>
+
+                    <FormControlHelper>
+                      <FormControlHelperText>
+                        Descricao do aplicativo.
+                      </FormControlHelperText>
+                    </FormControlHelper>
+
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        {errors.descricao}
+                      </FormControlErrorText>
                     </FormControlError>
                   </FormControl>
                   <Box>

@@ -14,6 +14,7 @@ import { ListRenderItem } from 'react-native';
 import { ISelectProdutoProps } from './interfaces';
 import { Produto, ProdutoFlatList } from '@/types/screens/produto';
 import { Text } from '@gluestack-ui/themed';
+import { getDateFromString, getStringFromDate } from '@/utils';
 
 const SelectProduto: React.FC<ISelectProdutoProps> = ({
   navigation,
@@ -28,7 +29,7 @@ const SelectProduto: React.FC<ISelectProdutoProps> = ({
     ? route.params.selectedsProdutos
     : [
         {
-          id: '',
+          id: 0,
         },
       ];
   const screen = route.params.screen;
@@ -38,49 +39,49 @@ const SelectProduto: React.FC<ISelectProdutoProps> = ({
   const type = route.params.type;
   const [produtos, setProdutos] = React.useState<Array<Produto>>([
     {
-      id: '1',
+      id: 1,
       codigo_de_barras: '7324623784632324',
       nome: 'KAIAK AVENTURA DESODORANTE COLONIA',
-      data_validade: '10-25-2026',
+      data_validade: '2026-11-26',
       marca: 'KAIAK',
       tipo: 'DESODORANTE COLONIA',
       empresa: 'NATURA',
-      valor: '5.00',
-      quantidade: '15',
+      valor: 5.00,
+      quantidade: 15,
     },
     {
-      id: '2',
+      id: 2,
       codigo_de_barras: '3459765398563487',
       nome: 'MEU PRIMEIRO HUMOR DESODORANTE COLONIA',
-      data_validade: '08-17-2025',
+      data_validade: '2025-08-18',
       marca: 'HUMOR',
       tipo: 'DESODORANTE COLONIA',
       empresa: 'NATURA',
-      valor: '10.00',
-      quantidade: '25',
+      valor: 10.00,
+      quantidade: 25,
     },
     {
-      id: '3',
+      id: 3,
       codigo_de_barras: '2345320958347982456',
       nome: `KAIAK DESODORANTE ROLL'ON`,
-      data_validade: '11-09-2026',
+      data_validade: '2026-11-10',
       empresa: 'NATURA',
       marca: 'KAIAK',
       tipo: `DESODORANTE ROLL'ON`,
-      valor: '12.99',
-      quantidade: '50',
+      valor: 12.99,
+      quantidade: 50,
     },
   ]);
   const [produto, setProduto] = React.useState<Produto>({
-    id: '',
+    id: 0,
     codigo_de_barras: '',
     nome: '',
     data_validade: '',
     marca: '',
     tipo: '',
     empresa: '',
-    valor: '',
-    quantidade: '',
+    valor: 0,
+    quantidade: 0,
   });
   const [isLoading, setIsLoading] = React.useState(true);
 

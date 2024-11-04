@@ -18,5 +18,11 @@ export default class CompraService {
 
   async findAll() {}
 
-  async findById() {}
+  async findById(id: number) {
+    try {
+      
+    } catch (error) {
+      
+    }
+  }
 }

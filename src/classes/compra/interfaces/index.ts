@@ -23,6 +23,7 @@ export interface CompraUpdate extends CompraObjectBase {
     item_compra: Array<ItemDeCompraObjectBase>;
 }
 
-export interface CompraViewObject extends CompraObjectBase {
+export interface CompraViewObject extends Omit<CompraObjectBase, 'id_empresa'> {
+    nome_empresa: string;
     valor_venda: number;
 }

@@ -33,7 +33,7 @@ const Details: React.FC<DetalhesVendaScreen> = ({ navigation }) => {
             </Box>
             <Box>
               <Text>Data de nascimento:</Text>
-              <Text>12-10-1995</Text>
+              <Text>12/10/1998</Text>
             </Box>
             <Box gap="$5">
               <Heading>Produtos</Heading>
@@ -130,7 +130,7 @@ const Details: React.FC<DetalhesVendaScreen> = ({ navigation }) => {
             </Box>
             <Box>
               <Text>Data da Venda:</Text>
-              <Text>2022-01-01</Text>
+              <Text>01/01/2022</Text>
             </Box>
             <Box>
               <Text>Status</Text>
@@ -139,7 +139,7 @@ const Details: React.FC<DetalhesVendaScreen> = ({ navigation }) => {
             <Box gap="$5">
               <Button
                 onPress={() =>
-                  navigation?.navigate('atualizar-venda', { id: '1' })
+                  navigation?.navigate('atualizar-venda', { id: 1 })
                 }
               >
                 <ButtonText>Editar</ButtonText>

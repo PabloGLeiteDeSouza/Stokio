@@ -36,8 +36,9 @@ export type AtualizarRamoScreenRouterProp = RouteProp<
 >;
 
 export type Ramo = {
-  id: string;
+  id: number;
   nome: string;
+  descricao: string;
 };
 
 export type RamoFlatList = React.ForwardRefExoticComponent<

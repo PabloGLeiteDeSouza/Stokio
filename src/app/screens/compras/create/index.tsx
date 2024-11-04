@@ -56,6 +56,9 @@ import {
   AlertCircleIcon,
   ChevronDownIcon,
   Card,
+  ButtonIcon,
+  RemoveIcon,
+  AddIcon,
 } from '@gluestack-ui/themed';
 import { Box, Heading, ScrollView } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
@@ -63,10 +66,15 @@ import { Alert, GestureResponderEvent } from 'react-native';
 import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
 import { CadastrarCompraScreen } from '@/interfaces/compra';
 import { ProdutoService } from '@/classes/produto/produto.service';
-import { useSQLiteContext } from 'expo-sqlite';
 import { ClienteService } from '@/classes/cliente/cliente.service';
 import { EmpresaService } from '@/classes/empresa/empresa.service';
+import { useSQLiteContext } from 'expo-sqlite';
 import LoadingScreen from '@/components/LoadingScreen';
+import InputText from '@/components/Input';
+import { onAddProduct, onRemoveProduct, onUpdateProduct } from '../functions';
+import { Empresa } from '@/types/screens/empresa';
+import { getStringFromDate } from '@/utils';
+import produtos from '../../../../../components/forms/produtos';
 const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
   const [haveProducts, setHaveProducts] = React.useState(false);
   const [temEmpresas, setTemEmpresas] = React.useState(false);
@@ -123,30 +131,36 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
               initialValues={{
                 produtos: [
                   {
-                    id: '',
+                    id: 0,
                     codigo_de_barras: '',
                     nome: '',
-                    data_validade: '',
-                    marca: '',
                     tipo: '',
-                    valor_total: '',
-                    valor: '',
+                    marca: '',
                     empresa: '',
-                    quantidade: '',
-                    qtd: '',
+                    data_validade: new Date(),
+                    valor: 0,
+                    quantidade: 0,
+                    quantidade_disponivel: 0,
                   },
                 ],
-                cliente: {
-                  id: '',
-                  nome: '',
+                empresa: {
+                  id: 0,
+                  nome_fantasia: '',
+                  razao_social: '',
                   cpf: '',
-                },
-                valor: '',
-                data_venda: new Date(),
-                data_atualizacao: new Date(),
-                status: '' as 'pago' | 'devendo',
+                  cnpj: '',
+                } as Empresa,
+                valor: 0,
+                data: new Date(),
+                status: '' as 'pago' | 'pendente',
               }}
-              onSubmit={() => {}}
+              onSubmit={async (value) => {
+                try {
+                  
+                } catch (error) {
+                  
+                }
+              }}
             >
               {({
                 values,
@@ -171,42 +185,38 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
                   ) {
                     const prod = route.params.produto;
                     const prods = values.produtos;
-                    if (
-                      route.params.type === 'create' &&
-                      values.produtos.length === 1 &&
-                      values.produtos[0].id === ''
-                    ) {
-                      prods[0] = {
-                        ...prod,
-                        valor_total: prod.valor,
-                        qtd: '1',
-                      };
-                      setFieldValue('produtos', [...prods]);
-                    } else if (route.params.type === 'create') {
-                      setFieldValue('produtos', [
-                        ...prods,
-                        { ...prod, valor_total: prod.valor, qtd: '1' },
-                      ]);
+                    if (route.params.type === 'create') {
+                      if (values.produtos.length === 1 && values.produtos[0].id === 0) {
+                        setFieldValue('produtos', [{
+                          ...prod,
+                          data_validade: new Date(prod.data_validade),
+                          quantidade: 1,
+                          quantidade_disponivel: prod.quantidade,
+                        }]);
+                        setFieldValue('valor', prod.valor);
+                      } else {
+                        setFieldValue('produtos', [
+                          ...prods,
+                          { ...prod, data_validade: new Date(prod.data_validade), quantidade: 1, quantidade_disponivel: prod.quantidade, },
+                        ]);
+                        setFieldValue('valor', values.valor + prod.valor);
+                      }
                     } else if (route.params.type === 'update') {
+                      let i = route.params.indexUpdated;
+                      const produto = prods[i];
+                      setFieldValue('valor', (values.valor - (produto.valor * produto.quantidade)) + (prod.valor * 1));
                       prods[route.params.indexUpdated] = {
                         ...prod,
-                        valor_total: prod.valor,
-                        qtd: '1',
-                      };
-                      setFieldValue('produtos', [...prods]);
+                        data_validade: new Date(prod.data_validade),
+                        quantidade: 1,
+                        quantidade_disponivel: prod.quantidade,
+                      }; 
+                      setFieldValue(`produtos[${i}]`, {...prod, data_validade: new Date(prod.data_validade),
+                        quantidade: 1,
+                        quantidade_disponivel: prod.quantidade,}
+                      );  
                     } else {
                       Alert.alert('Aviso', 'Erro ao selecionar o clinente!');
-                    }
-                    if (values.valor === '') {
-                      setFieldValue('valor', prod.valor);
-                    } else {
-                      setFieldValue(
-                        'valor',
-                        formatValue(
-                          Number(values.valor.replace(',', '.')) +
-                            Number(prod.valor.replace(',', '.')),
-                        ),
-                      );
                     }
                   }
                 }, [route?.params?.produto]);
@@ -214,13 +224,13 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
                 return (
                   <>
                     <Box gap="$5">
-                      {values.cliente.id !== '' && (
+                      {values.empresa.id !== 0 && (
                         <Card>
                           <HStack>
                             <VStack>
-                              <Heading size="lg">Cliente</Heading>
-                              <Text size="lg">{values.cliente.nome}</Text>
-                              <Text size="lg">{values.cliente.cpf}</Text>
+                              <Heading size="lg">Empresa</Heading>
+                              <Text size="lg">{values.empresa.nome_fantasia}</Text>
+                              <Text size="lg">{values.empresa.cpf}</Text>
                             </VStack>
                           </HStack>
                         </Card>
@@ -234,7 +244,7 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
                           }
                         >
                           <ButtonText>
-                            {values.cliente.id === ''
+                            {values.empresa.id === 0
                               ? 'Selecionar Empresa'
                               : 'Atualizar Empresa'}
                           </ButtonText>
@@ -253,8 +263,8 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
                       </Heading>
 
                       {values.produtos.map(
-                        ({ qtd, valor_total, ...produto }, i) => {
-                          if (produto.id !== '') {
+                        ({ quantidade, quantidade_disponivel, ...produto }, i) => {
+                          if (produto.id !== 0) {
                             return (
                               <Box key={`produto-${i}`} gap="$5">
                                 <Card>
@@ -265,8 +275,8 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
                                       </Heading>
                                       <Text size="lg">{produto.marca}</Text>
                                       <Text size="lg">{produto.tipo}</Text>
-                                      <Text>{qtd} unidades</Text>
-                                      <Text>{valor_total} reais</Text>
+                                      <Text>{quantidade} unidades</Text>
+                                      <Text>{(quantidade * produto.valor)} reais</Text>
                                     </VStack>
                                   </HStack>
                                 </Card>
@@ -284,21 +294,17 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
                                   <Input>
                                     <Button
                                       onPress={() => {
-                                        const result = onAddProduct(
-                                          qtd,
-                                          values.valor,
-                                          produto,
-                                        );
-                                        if (typeof result != 'undefined') {
-                                          setFieldValue(
-                                            `produtos[${i}].qtd`,
-                                            result.quantidade,
+                                        try {
+                                          const result = onAddProduct(
+                                            quantidade_disponivel,
+                                            quantidade,
+                                            produto.valor,
+                                            values.valor,
                                           );
-                                          setFieldValue(
-                                            `produtos[${i}].valor_total`,
-                                            result.valor_produto,
-                                          );
+                                          setFieldValue(`produtos[${i}].quantidade`, result.quantidade);
                                           setFieldValue('valor', result.valor);
+                                        } catch (error) {
+                                          Alert.alert("Erro", (error as Error).message);
                                         }
                                       }}
                                       action="positive"
@@ -308,134 +314,129 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
                                     <InputField
                                       textAlign="center"
                                       type="text"
-                                      value={values.produtos[i].qtd}
+                                      value={values.produtos[i].quantidade.toString()}
                                       placeholder="12"
                                       onChangeText={(text) => {
-                                        const result = onUpdateProduct(
-                                          text,
-                                          produto,
-                                          values.valor,
-                                          valor_total,
-                                        );
-                                        if (result.erro) {
-                                          Alert.alert(
-                                            'Aviso',
-                                            'Limite do produto atingido',
+                                        try {
+                                          const result = onUpdateProduct(
+                                            text,
+                                            quantidade,
+                                            produto.valor,
+                                            values.valor,
                                           );
-                                        } else if (result.remove) {
-                                          Alert.alert(
-                                            'Aviso',
-                                            'Deseja remover esse produto?',
-                                            [
-                                              {
-                                                text: 'Sim',
-                                                onPress: () => {
-                                                  setFieldValue(
-                                                    'produtos',
-                                                    values.produtos.splice(
-                                                      i,
-                                                      1,
-                                                    ),
-                                                  );
-                                                },
-                                              },
-                                              {
-                                                text: 'Não',
-                                                onPress: () =>
-                                                  Alert.alert(
-                                                    'Aviso',
-                                                    'Operação cancelada!',
-                                                  ),
-                                              },
-                                            ],
-                                          );
-                                        } else {
                                           setFieldValue(
-                                            `produtos[${i}].qtd`,
+                                            `produtos[${i}].quantidade`,
                                             result.quantidade,
                                           );
                                           setFieldValue(
                                             'valor',
-                                            result.valor_total,
+                                            result.valor,
                                           );
-                                          setFieldValue(
-                                            `produtos[${i}].valor_total`,
-                                            result.valor_total,
-                                          );
+                                        } catch (error) {
+                                          const e = error as Error
+                                          if (e.cause === "ERR_REMOVE_PRODUCT") {
+                                            Alert.alert("Aviso", e.message, [
+                                              {
+                                                text: "Sim",
+                                                onPress: async () => {
+                                                  if (values.produtos.length === 1) {
+                                                    await setFieldValue('produtos', [
+                                                      {
+                                                        id: 0,
+                                                        codigo_de_barras: '',
+                                                        nome: '',
+                                                        tipo: '',
+                                                        marca: '',
+                                                        empresa: '',
+                                                        data_validade: new Date(),
+                                                        valor: 0,
+                                                        quantidade: 0,
+                                                        quantidade_disponivel: 0,
+                                                      },
+                                                    ])
+                                                  } else {
+                                                    await setFieldValue(
+                                                      'produtos',
+                                                      values.produtos.splice(
+                                                        i,
+                                                        1,
+                                                      ),
+                                                    );
+                                                  }
+                                                }
+                                              }, 
+                                              {
+                                                text: "Não",
+                                                onPress: () => {
+                                                  Alert.alert(
+                                                    'Aviso',
+                                                    'Operação cancelada!',
+                                                  );
+                                                }
+                                              }
+                                            ])
+                                          }
                                         }
                                       }}
                                       keyboardType="number-pad"
                                     />
                                     <Button
                                       onPress={() => {
-                                        const result = onRemoveProduct(
-                                          qtd,
-                                          produto,
-                                          valor_total,
-                                          values.valor,
-                                        );
-                                        if (result.remove) {
-                                          Alert.alert(
-                                            'Aviso',
-                                            'Deseja remover esse produto?',
-                                            [
+                                        try {
+                                          const result = onRemoveProduct(
+                                            quantidade,
+                                            produto.valor,
+                                            values.valor,
+                                          );
+                                          setFieldValue(
+                                            `produtos[${i}].quantidade`,
+                                            result.quantidade,
+                                          );
+                                          setFieldValue('valor', result.valor);
+                                        } catch (error) {
+                                          const e = error as Error;
+                                          if(e.cause === "ERR_REMOVE_PRODUCT") {
+                                            Alert.alert("Aviso", e.message, [
                                               {
-                                                text: 'Sim',
-                                                onPress: () => {
-                                                  if (
-                                                    values.produtos.splice(i, 1)
-                                                      .length < 1
-                                                  ) {
-                                                    setFieldValue('produtos', [
+                                                text: "Sim",
+                                                onPress: async () => {
+                                                  if (values.produtos.length === 1) {
+                                                    await setFieldValue('produtos', [
                                                       {
-                                                        id: '',
+                                                        id: 0,
                                                         codigo_de_barras: '',
                                                         nome: '',
-                                                        data_validade: '',
-                                                        marca: '',
                                                         tipo: '',
-                                                        valor_total: '',
-                                                        valor: '',
+                                                        marca: '',
                                                         empresa: '',
-                                                        quantidade: '',
-                                                        qtd: '',
+                                                        data_validade: new Date(),
+                                                        valor: 0,
+                                                        quantidade: 0,
+                                                        quantidade_disponivel: 0,
                                                       },
-                                                    ]);
-                                                    setFieldValue('valor', '');
+                                                    ])
                                                   } else {
-                                                    setFieldValue(
-                                                      'valor',
-                                                      `${Number(values.valor.replace(',', '.')) - Number(valor_total.replace(',', '.'))}`,
-                                                    );
-                                                    setFieldValue('produtos', [
-                                                      ...values.produtos.splice(
+                                                    await setFieldValue(
+                                                      'produtos',
+                                                      values.produtos.splice(
                                                         i,
                                                         1,
                                                       ),
-                                                    ]);
+                                                    );
                                                   }
-                                                },
-                                              },
+                                                }
+                                              }, 
                                               {
-                                                text: 'Não',
-                                                onPress: () =>
+                                                text: "Não",
+                                                onPress: () => {
                                                   Alert.alert(
                                                     'Aviso',
                                                     'Operação cancelada!',
-                                                  ),
-                                              },
-                                            ],
-                                          );
-                                        } else {
-                                          setFieldValue(
-                                            `produtos[${i}].qtd`,
-                                            result.quantidade,
-                                          );
-                                          setFieldValue(
-                                            `produtos[${i}].valor_total`,
-                                            result.valor_total,
-                                          );
-                                          setFieldValue('valor', result.valor);
+                                                  );
+                                                }
+                                              }
+                                            ])
+                                          }
                                         }
                                       }}
                                       action="negative"
@@ -462,13 +463,13 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
                                 <Button
                                   onPress={() => {
                                     navigation?.navigate('selecionar-produto', {
-                                      screen: 'cadastrar-venda',
+                                      screen: 'cadastrar-compra',
                                       type: 'update',
                                       indexUpdated: i,
                                       selectedsProdutos:
-                                        values.produtos[0].id === ''
+                                        values.produtos[0].id === 0
                                           ? undefined
-                                          : values.produtos,
+                                          : values.produtos.map((data) => { return {...data, data_validade: getStringFromDate(data.data_validade) }; }),
                                     });
                                   }}
                                 >
@@ -483,12 +484,12 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
                       <Button
                         onPress={() => {
                           navigation?.navigate('selecionar-produto', {
-                            screen: 'cadastrar-venda',
+                            screen: 'cadastrar-compra',
                             type: 'create',
                             selectedsProdutos:
-                              values.produtos[0].id === ''
-                                ? undefined
-                                : values.produtos,
+                              values.produtos[0].id === 0
+                              ? undefined
+                              : values.produtos.map((data) => { return {...data, data_validade: getStringFromDate(data.data_validade) }; }),
                           });
                         }}
                       >
@@ -502,48 +503,18 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
                     </Box>
 
                     <InputDatePicker
-                      onChangeDate={handleChange('data_venda')}
-                      title="Data da Venda"
-                      value={values.data_venda}
+                      onChangeDate={(dt) => setFieldValue('data', dt)}
+                      title="Data da Compra"
+                      value={values.data}
                     />
 
-                    <InputDatePicker
-                      onChangeDate={handleChange('data_atualizacao')}
-                      title="Data da Atualizacao"
-                      value={values.data_venda}
+                    <InputText
+                      isReadOnly={true}
+                      title="Valor da compra"
+                      inputType='money'
+                      value={values.valor.toString()}
+                      onChangeValue={handleChange('valor')}
                     />
-
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>Valor</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <InputField
-                          editable={false}
-                          type="text"
-                          value={values.valor}
-                          placeholder="120,00"
-                        />
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Valor da compra.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          {errors.valor}
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
 
                     <FormControl
                       isInvalid={false}
@@ -553,7 +524,7 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
                     >
                       <FormControlLabel>
                         <FormControlLabelText>
-                          Selecione o status da venda
+                          Selecione o status da compra
                         </FormControlLabelText>
                       </FormControlLabel>
                       <Select
@@ -561,8 +532,8 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
                         selectedValue={
                           values.status === 'pago'
                             ? 'Pago'
-                            : values.status === 'devendo'
-                              ? 'Devendo'
+                            : values.status === 'pendente'
+                              ? 'Pendente'
                               : ''
                         }
                         isInvalid={false}
@@ -579,9 +550,9 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
                               <SelectDragIndicator />
                             </SelectDragIndicatorWrapper>
                             <SelectItem
-                              label="Devendo"
-                              value="devendo"
-                              isPressed={values.status === 'devendo'}
+                              label="Pendente"
+                              value="pendente"
+                              isPressed={values.status === 'pendente'}
                             />
                             <SelectItem
                               label="Pago"
@@ -613,7 +584,7 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
                           ) => void
                         }
                       >
-                        <ButtonText>Cadastrar Venda</ButtonText>
+                        <ButtonText>Cadastrar</ButtonText>
                       </Button>
                     </Box>
                   </>

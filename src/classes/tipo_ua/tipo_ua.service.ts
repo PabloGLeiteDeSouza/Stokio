@@ -66,22 +66,10 @@ export default class TipoUaService {
   }
 
   async getAll() {
-    try {
-      const data = await this.db.getAllAsync<TipoUaUpdate>(
-        'SELECT * FROM tipo_ua',
-      );
-      if (data.length < 1) {
-        throw new Error(
-          'Não foi possível encontrar nenhum tipo de unidade de armazenamento',
-          {
-            cause: 'ERR_TipoUa_GETALL',
-          },
-        );
-      }
-      return data;
-    } catch (error) {
-      throw error;
-    }
+    const data = await this.db.getAllAsync<TipoUaUpdate>(
+      'SELECT * FROM tipo_ua',
+    );
+    return data;
   }
 
   async getId(id: number) {
