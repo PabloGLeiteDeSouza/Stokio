@@ -129,7 +129,9 @@ const Update: React.FC<AtualizarTipoUaScreen> = ({ navigation, route }) => {
                     <Textarea>
                       <TextareaInput
                         onChangeText={handleChange('descricao')}
-                        values={values.descricao}
+                        value={values.descricao}
+                        placeholder="Descricao"
+                        
                       />
                     </Textarea>
 
