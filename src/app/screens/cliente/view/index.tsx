@@ -141,7 +141,12 @@ const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
   };
 
   return clientes.length < 1 ? (
-    <Box h="$full" w="$full" alignItems="center" justifyContent="center">
+    <Box 
+      h="$full" 
+      w="$full" 
+      alignItems="center" 
+      justifyContent="center"
+    >
       <Box gap="$5">
         <Heading textAlign="center">Clientes não encontrados</Heading>
         <Box>
@@ -153,8 +158,15 @@ const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
       </Box>
     </Box>
   ) : (
-    <Box w="$full" h="$full" px="$8" py="$8">
-      <Box gap="$5">
+    <Box 
+      w="$full" 
+      h="$full" 
+      px="$8" 
+      py="$8"
+    >
+      <Box 
+        gap="$5"
+      >
         <Formik
           initialValues={{
             busca: '',

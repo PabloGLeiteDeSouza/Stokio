@@ -57,6 +57,7 @@ import {
   getStringFromDate,
 } from '@/utils';
 import { IPessoaUpdate } from '@/classes/cliente/interfaces';
+import Validator from './validatior';
 
 const validationSchema = Yup.object().shape({
   pessoa: Yup.object().shape({
@@ -69,7 +70,9 @@ const validationSchema = Yup.object().shape({
       then: (yup) => yup.required('Data de nascimento e obrigatorio'),
     }),
     cpf: Yup.string().when('pessoa.id', (id_pessoa, schema) =>
-      id_pessoa ? schema.required('CPF é obrigatório') : schema,
+      id_pessoa ? schema.required('CPF é obrigatório').test('cpf-cnpj', 'Documento inválido', function (value) {
+        return Validator.validate(value);
+      }) : schema,
     ),
   }),
   cep: Yup.string().required('CEP é obrigatório'),
