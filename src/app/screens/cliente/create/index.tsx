@@ -70,8 +70,8 @@ const validationSchema = Yup.object().shape({
       then: (yup) => yup.required('Data de nascimento e obrigatorio'),
     }),
     cpf: Yup.string().when('pessoa.id', (id_pessoa, schema) =>
-      id_pessoa ? schema.required('CPF é obrigatório').test('cpf-cnpj', 'Documento inválido', function (value) {
-        return Validator.validate(value);
+      id_pessoa ? schema.required('CPF é obrigatório').test('cpf', 'CPF esta invalido', async (value) => {
+        return Validator.validateCPF(value);
       }) : schema,
     ),
   }),
@@ -109,6 +109,8 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
   const [isNewPerson, setIsNewPerson] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const db = useSQLiteContext();
+  const [isDisabledAll, setIsDisabledAll] = React.useState(false);
+  const [isDisabledAddress, setIsDisabledAddress] = React.useState(false);
 
   async function startScreen() {
     try {
@@ -231,7 +233,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                         <FormControl
                           isInvalid={errors.pessoa?.nome ? true : false}
                           size={'md'}
-                          isDisabled={false}
+                          isDisabled={isDisabledAll}
                           isRequired={true}
                         >
                           <FormControlLabel>
@@ -260,6 +262,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                           </FormControlError>
                         </FormControl>
                         <InputDatePicker
+                          isDisabled={isDisabledAll}
                           title="Data de Nascimento"
                           error={errors.pessoa?.data_nascimento}
                           onChangeDate={(date) =>
@@ -269,6 +272,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                           maximumDate={getMinDateFor18YearsOld()}
                         />
                         <InputText
+                          isDisabled={isDisabledAll}
                           isRequired={true}
                           isInvalid={errors.pessoa?.cpf ? true : false}
                           inputType="cpf"
@@ -357,6 +361,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                     )}
                     <>
                       <InputText
+                        isDisabled={isDisabledAll ? isDisabledAll : isDisabledAddress}
                         isRequired={true}
                         isInvalid={errors.cep ? true : false}
                         inputType="cep"
@@ -367,7 +372,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                       <FormControl
                         isInvalid={errors.logradouro ? true : false}
                         size={'md'}
-                        isDisabled={false}
+                        isDisabled={isDisabledAll ? isDisabledAll : isDisabledAddress}
                         isRequired={true}
                       >
                         <FormControlLabel>
@@ -399,7 +404,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                       <FormControl
                         isInvalid={errors.numero ? true : false}
                         size={'md'}
-                        isDisabled={false}
+                        isDisabled={isDisabledAll ? isDisabledAll : isDisabledAddress}
                         isRequired={true}
                       >
                         <FormControlLabel>
