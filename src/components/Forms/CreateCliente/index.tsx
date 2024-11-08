@@ -58,6 +58,7 @@ import {
   AlertCircleIcon,
   ChevronDownIcon,
   ButtonIcon,
+  Card,
 } from '@gluestack-ui/themed';
 
 import { Formik } from 'formik';
@@ -66,15 +67,15 @@ import { getMinDateFor18YearsOld, getStringFromDate } from '@/utils';
 import { IFormCreateCliente } from './interfaces';
 import { Alert, GestureResponderEvent } from 'react-native';
 import { ClienteService } from '@/classes/cliente/cliente.service';
-import { useSQLiteContext } from 'expo-sqlite';
 import InputText from '@/components/Input';
 import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
 import { RemoveIcon } from '@gluestack-ui/themed';
 import SelectEstados from '@/components/Custom/Selects/SelectEstados';
-const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db }) => {
+
+const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db, pessoas }) => {
     const [isDisabledAll, setIsDisabledAll] = React.useState(false);
     const [isDisabledAddress, setIsDisabledAddress] = React.useState(false);
-  
+    const [isNewPerson, setIsNewPerson] = React.useState(pessoas.length < 1);
   return (
     <>
       <Formik
@@ -120,13 +121,13 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db 
         {({ handleChange, setFieldValue, handleSubmit, values, errors }) => {
           React.useEffect(() => {
             if (pessoa) {
-              const pessoa = {
+              const pss = {
                 ...pessoa,
                 data_nascimento: getDateFromString(
                   pessoa.data_nascimento,
                 ),
               };
-              setFieldValue('pessoa', pessoa);
+              setFieldValue('pessoa', pss);
             }
           }, [pessoa]);
           const ErrorsReturn = (i: number) => {
