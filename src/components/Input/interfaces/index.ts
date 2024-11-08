@@ -9,7 +9,8 @@ export interface IInputTextProps {
   isInvalid?: boolean | undefined;
   isDisabled?: boolean | undefined;
   isRequired?: boolean | undefined;
-  onChangeValue?: (text: string) => void;
+  onChangeValue?: (text: string) => Promise<void> | void;
+  onBlur?: () => Promise<void> | void;
   onSubmitedValues?: (text: string) => Promise<void> | void;
   inputType?: 'cpf' | 'cnpj' | 'cep' | 'telefone' | 'money' | 'default';
   customType?: 'search_input' | 'default';

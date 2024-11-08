@@ -22,7 +22,7 @@ export function getStringFromDate(data: Date) {
 
 export function getDateFromString(data: string) {
   const values = data.split('-');
-  return new Date(`${values[0]}-${values[1]}-${values[2]+1}`);
+  return new Date(`${values[0]}-${values[1]}-${Number(values[2])+1}`);
 }
 
 export function verificarAtributosObjeto(obj: object) {

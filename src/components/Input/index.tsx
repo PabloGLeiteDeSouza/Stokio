@@ -33,6 +33,7 @@ const InputText: React.FC<IInputTextProps> = ({
   inputType,
   onChangeValue,
   onSubmitedValues,
+  onBlur,
   customType,
   value,
   error,
@@ -72,6 +73,7 @@ const InputText: React.FC<IInputTextProps> = ({
                     onChangeValue(unmask(mask(text, 'cep')));
                   }
                 }}
+                onBlur={onBlur}
               />
               {customType === 'search_input' && (
                 <Box>
@@ -124,6 +126,7 @@ const InputText: React.FC<IInputTextProps> = ({
                     onChangeValue(unmask(mask(text, 'cnpj')));
                   }
                 }}
+                onBlur={onBlur}
               />
               {customType === 'search_input' && (
                 <Box>
@@ -176,6 +179,7 @@ const InputText: React.FC<IInputTextProps> = ({
                     onChangeValue(unmask(mask(text, 'cpf')));
                   }
                 }}
+                onBlur={onBlur}
               />
               {customType === 'search_input' && (
                 <Box>
@@ -328,7 +332,7 @@ const InputText: React.FC<IInputTextProps> = ({
             <Input>
               <InputField
                 type="text"
-                value={mask(value, 'money')}
+                value={mask(String(value), 'money')}
                 placeholder="R$10,00"
                 keyboardType="number-pad"
                 onChangeText={(text) => {
@@ -338,6 +342,7 @@ const InputText: React.FC<IInputTextProps> = ({
                     );
                   }
                 }}
+                onBlur={onBlur}
               />
             </Input>
 
@@ -372,6 +377,7 @@ const InputText: React.FC<IInputTextProps> = ({
                 type="password"
                 defaultValue="12345"
                 placeholder="password"
+                onBlur={onBlur}
               />
             </Input>
 

@@ -59,11 +59,12 @@ import {
   ChevronDownIcon,
   ButtonIcon,
   Card,
+  AddIcon,
 } from '@gluestack-ui/themed';
 
 import { Formik } from 'formik';
 import { validationSchema } from './validation';
-import { getMinDateFor18YearsOld, getStringFromDate } from '@/utils';
+import { getDateFromString, getMinDateFor18YearsOld, getStringFromDate } from '@/utils';
 import { IFormCreateCliente } from './interfaces';
 import { Alert, GestureResponderEvent } from 'react-native';
 import { ClienteService } from '@/classes/cliente/cliente.service';
@@ -72,7 +73,7 @@ import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
 import { RemoveIcon } from '@gluestack-ui/themed';
 import SelectEstados from '@/components/Custom/Selects/SelectEstados';
 
-const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db, pessoas }) => {
+const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db, pessoas, onSelectPerson }) => {
     const [isDisabledAll, setIsDisabledAll] = React.useState(false);
     const [isDisabledAddress, setIsDisabledAddress] = React.useState(false);
     const [isNewPerson, setIsNewPerson] = React.useState(pessoas.length < 1);
@@ -243,25 +244,14 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db,
                   )}
                   <Box>
                     <Button
-                      onPress={() =>
-                        navigation?.navigate('selecionar-pessoa', {
-                          pessoas: pessoas.map((pes) => {
-                            return {
-                              ...pes,
-                              data_nascimento: getStringFromDate(
-                                pes.data_nascimento,
-                              ),
-                            };
-                          }),
-                          screen: 'cadastrar-cliente',
-                          pessoaSelecionada: {
-                            ...values.pessoa,
-                            data_nascimento: getStringFromDate(
-                              values.pessoa.data_nascimento,
-                            ),
-                          },
-                        })
-                      }
+                      onPress={() => {
+                        onSelectPerson(pessoas, {
+                          ...values.pessoa,
+                          data_nascimento: getStringFromDate(
+                            values.pessoa.data_nascimento,
+                          )
+                        });
+                      }}
                     >
                       <ButtonText>
                         {values.pessoa.id === 0
