@@ -1,4 +1,4 @@
-import { getMinDateFor18YearsOld } from '@/utils';
+import { getMinDateFor18YearsOld, getStringFromDate } from '@/utils';
 import {
   FormControl,
   FormControlLabel,
@@ -184,15 +184,12 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                   </Card>
                   <Box gap="$5">
                     <Button
-                      onPress={() => {
-                        navigation?.navigate('selecionar-pessoa', {
-                          pessoas,
-                          screen: 'cadastrar-empresa',
-                          pessoaSelecionada: {
-                            ...values.pessoa,
-                          },
-                        });
-                      }}
+                      onPress={() => onChangePessoa(pessoas, {
+                        id: values.pessoa.id,
+                        nome: values.pessoa.nome,
+                        cpf: values.pessoa.cpf,
+                        data_nascimento: getStringFromDate(values.pessoa.data_nascimento)
+                      })}
                     >
                       <ButtonText>Alterar Pessoa</ButtonText>
                     </Button>
@@ -272,12 +269,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                   </Box>
                   <Box gap="$5">
                     <Button
-                      onPress={() =>
-                        navigation?.navigate('selecionar-ramo', {
-                          screen: 'cadastrar-empresa',
-                          ramoSelecionado: values.ramo,
-                        })
-                      }
+                      onPress={() => onChangeRamo(values.ramo)}
                     >
                       <ButtonText>Selecionar Ramo</ButtonText>
                     </Button>
@@ -298,12 +290,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                   </Card>
                   <Box gap="$5">
                     <Button
-                      onPress={() =>
-                        navigation?.navigate('selecionar-ramo', {
-                          screen: 'cadastrar-empresa',
-                          ramoSelecionado: values.ramo,
-                        })
-                      }
+                      onPress={() => onChangeRamo(values.ramo)}
                     >
                       <ButtonText>Alterar Ramo</ButtonText>
                     </Button>

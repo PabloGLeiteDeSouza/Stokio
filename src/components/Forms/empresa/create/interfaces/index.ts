@@ -8,7 +8,7 @@ export interface IFormCreateEmpresa {
     db: SQLiteDatabase;
     onSubmited: () => Promise<void> | void;
     onChangePessoa: (pessoas: Array<pessoa>, selectedPessoa: pessoa) => Promise<void> | void;
-    onChangeRamo: (ramos: Array<Ramo>, selectedRamo: Ramo) => Promise<void> | void;
+    onChangeRamo: (selectedRamo: Ramo) => Promise<void> | void;
     pessoas: Array<pessoa>;
     ramos: Array<Ramo>;
     pessoa: pessoa;
