@@ -17,6 +17,8 @@ import {
 } from '@gluestack-ui/themed';
 import { IInputDatePicker } from './interfaces';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+import { Alert } from 'react-native';
+import { getDateFromString, getMinDateFor18YearsOld } from '@/utils';
 
 const InputDatePicker: React.FC<IInputDatePicker> = ({
   title,
@@ -34,6 +36,8 @@ const InputDatePicker: React.FC<IInputDatePicker> = ({
   placeholder,
   ...props
 }) => {
+  const [ajustDate, setAjustDate] = React.useState(false);
+  const [data, setData] = React.useState(value ? `${value.getDate()+1}/${value.getMonth()}/${value.getFullYear()}` : '');
   const startPicker = () => {
     DateTimePickerAndroid.open({
       minuteInterval,
@@ -65,15 +69,40 @@ const InputDatePicker: React.FC<IInputDatePicker> = ({
         </FormControlLabel>
         <Input>
           <InputField
-            readOnly={true}
-            editable={false}
             type="text"
             placeholder={'01/01/1999' + ` ${placeholder}`}
-            value={new Intl.DateTimeFormat('pt-BR', {
+            value={ajustDate ? data : new Intl.DateTimeFormat('pt-BR', {
               day: '2-digit',
               month: '2-digit',
               year: 'numeric',
-            }).format(value)}
+            }).format(value ? value : maximumDate ? maximumDate : new Date())}
+            onChangeText={(text) => {
+              try {
+                setAjustDate(true);
+                if (text.length === 2) {
+                  return setData(text+"/");
+                } else if (text.length === 5) {
+                  return setData(text+"/");
+                }
+                setData(text);
+              } catch (error) {
+                const err = error as Error;
+                Alert.alert('Erro', err.message);
+              }
+            }}
+            keyboardType='number-pad'
+            onBlur={() => {
+              try{
+                if (!data.includes('/')) {
+                  throw new Error("Data invalida!");
+                }
+                setAjustDate(false);
+                onChangeDate(getDateFromString(data));
+              } catch (error) {
+                const err = error as Error;
+                Alert.alert("Erro", err.message);
+              }
+            }}
           />
           <Button onPress={startPicker}>
             <ButtonIcon as={CalendarDaysIcon} />
@@ -82,7 +111,7 @@ const InputDatePicker: React.FC<IInputDatePicker> = ({
 
         <FormControlHelper>
           <FormControlHelperText>
-            Selecione uma data válida.
+            Selecione uma data válida, a data deve ser informada por completo caso nao seja a ultima data correta inserida sera considerada.
           </FormControlHelperText>
         </FormControlHelper>
 

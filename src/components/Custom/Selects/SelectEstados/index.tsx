@@ -26,6 +26,7 @@ import {
 } from '@gluestack-ui/themed';
 
 import { ISelectEstados } from './interfaces';
+import { formatValue } from '@/utils/calc';
 const SelectEstados: React.FC<ISelectEstados> = ({
   value,
   onChangeValue,
@@ -34,15 +35,17 @@ const SelectEstados: React.FC<ISelectEstados> = ({
   isDisabled,
   isInvalid,
   isRequired,
+  isReadOnly,
 }) => {
-  const [valor, setValor] = React.useState(value ? value : '');
+  const [valor, setValor] = React.useState(value);
   return (
     <>
       <FormControl
-        isInvalid={isInvalid}
         size={'md'}
+        isInvalid={isInvalid}
         isDisabled={isDisabled}
         isRequired={isRequired}
+        isReadOnly={isReadOnly}
       >
         <FormControlLabel>
           <FormControlLabelText>{label ? label : 'UF'}</FormControlLabelText>
@@ -54,7 +57,7 @@ const SelectEstados: React.FC<ISelectEstados> = ({
               onChangeValue(text);
             }
           }}
-          selectedValue={Estados.find((e) => e.sigla === valor)?.nome}
+          selectedValue={Estados.find((e) => e.sigla === value)?.nome}
           isInvalid={false}
           isDisabled={false}
         >

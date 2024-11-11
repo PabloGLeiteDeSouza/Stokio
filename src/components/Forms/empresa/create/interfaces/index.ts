@@ -1,0 +1,16 @@
+import { Ramo } from "@/classes/empresa/types";
+import { Pessoa } from "@/types/screens/cliente";
+import { SQLiteDatabase } from "expo-sqlite";
+
+type pessoa = Omit<Pessoa, 'data_nascimento'> & { data_nascimento: string }
+
+export interface IFormCreateEmpresa {
+    db: SQLiteDatabase;
+    onSubmited: () => Promise<void> | void;
+    onChangePessoa: (pessoas: Array<pessoa>, selectedPessoa: pessoa) => Promise<void> | void;
+    onChangeRamo: (ramos: Array<Ramo>, selectedRamo: Ramo) => Promise<void> | void;
+    pessoas: Array<pessoa>;
+    ramos: Array<Ramo>;
+    pessoa: pessoa;
+    ramo: Ramo;
+}

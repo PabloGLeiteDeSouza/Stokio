@@ -57,46 +57,47 @@ class Validator {
     }
 }
 
-
 export const validationSchema = Yup.object().shape({
     pessoa: Yup.object().shape({
-      id: Yup.number(),
+      id: Yup.string(),
       nome: Yup.string().when('pessoa.id', (id_pessoa, schema) =>
         id_pessoa ? schema.required('Nome é obrigatório') : schema,
       ),
-      data_nascimento: Yup.date().when('pessoa.id', {
-        is: (id_pessoa: string) => id_pessoa !== '',
-        then: (yup) => yup.required('Data de nascimento e obrigatorio'),
-      }),
-      cpf: Yup.string().required('CPF é obrigatório').test('cpf', 'CPF esta invalido', async (value) => {
-        return Validator.validateCPF(value);
-      })
+      data_nascimento: Yup.date().when('pessoa.id', (id_pessoa, schema) =>
+        id_pessoa ? schema.required('Data de nascimento é obrigatória') : schema,
+      ),
+      cpf: Yup.string().when('pessoa.id', (id_pessoa, schema) =>
+        id_pessoa ? schema.required('CPF é obrigatório').test('cpf', 'CPF esta invalido', async (value) => {
+            return Validator.validateCPF(value);
+        }) : schema,
+      ),
     }),
-    cep: Yup.string().required('CEP é obrigatório'),
+    cnpj: Yup.string().when('cnpj', (cnpj, schema) => cnpj ? schema.test('cpf', 'CPF esta invalido', async (value) => {
+        return Validator.validateCNPJ(String(value));
+    }) : schema),
+    nome_fantasia: Yup.string().required('Nome fantasia e obrigatorio'),
+    razao_social: Yup.string().required('Razao social e obrigatoria'),
+    ramo: Yup.object().shape({
+      id: Yup.string(),
+      nome: Yup.string().when('ramo.id', (id_ramo, schema) =>
+        id_ramo ? schema.required('Nome é obrigatório') : schema,
+      ),
+    }),
+    telefones: Yup.array().of(
+      Yup.object().shape({
+        numero: Yup.string().required('Número de telefone é obrigatório'),
+      }),
+    ),
+    cep: Yup.string().required('CEP é obrigatório').min(8, 'CEP invalido!'),
     logradouro: Yup.string().required('Logradouro é obrigatório'),
     numero: Yup.string().required('Número é obrigatório'),
     complemento: Yup.string(),
     bairro: Yup.string().required('Bairro é obrigatório'),
     cidade: Yup.string().required('Cidade é obrigatória'),
-    uf: Yup.string().required('UF é obrigatório'),
-    telefones: Yup.array()
-      .of(
-        Yup.object().shape({
-          numero: Yup.string()
-            .required('Número de telefone é obrigatório')
-            .min(12, 'Número de telefone deve ter no mínimo 12 caracteres'),
-        }),
-      )
-      .min(1, 'É necessário informar ao menos um telefone'), // Adiciona uma validação para garantir ao menos um telefone
-  
-    emails: Yup.array()
-      .of(
-        Yup.object().shape({
-          endereco: Yup.string()
-            .required('Endereço de email é obrigatório')
-            .email('Endereço de email inválido'),
-        }),
-      )
-      .min(1, 'É necessário informar ao menos um email'),
-    saldo: Yup.string().required('Saldo é obrigatório'),
+    uf: Yup.string().required('UF e obrigatorio!'),
+    emails: Yup.array().of(
+      Yup.object().shape({
+        endereco: Yup.string().required('Endereço de email é obrigatório'),
+      }),
+    ),
 });

@@ -62,46 +62,7 @@ import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
 import { getMinDateFor18YearsOld } from '@/utils';
 import { Pessoa } from '@/classes/empresa/types';
 
-const validationSchema = Yup.object().shape({
-  pessoa: Yup.object().shape({
-    id: Yup.string(),
-    nome: Yup.string().when('pessoa.id', (id_pessoa, schema) =>
-      id_pessoa ? schema.required('Nome é obrigatório') : schema,
-    ),
-    data_nascimento: Yup.date().when('pessoa.id', (id_pessoa, schema) =>
-      id_pessoa ? schema.required('Data de nascimento é obrigatória') : schema,
-    ),
-    cpf: Yup.string().when('pessoa.id', (id_pessoa, schema) =>
-      id_pessoa ? schema.required('CPF é obrigatório') : schema,
-    ),
-  }),
-  cnpj: Yup.string(),
-  nome_fantasia: Yup.string().required('Nome fantasia e obrigatorio'),
-  razao_social: Yup.string().required('Razao social e obrigatoria'),
-  ramo: Yup.object().shape({
-    id: Yup.string(),
-    nome: Yup.string().when('ramo.id', (id_ramo, schema) =>
-      id_ramo ? schema.required('Nome é obrigatório') : schema,
-    ),
-  }),
-  telefones: Yup.array().of(
-    Yup.object().shape({
-      numero: Yup.string().required('Número de telefone é obrigatório'),
-    }),
-  ),
-  cep: Yup.string().required('CEP é obrigatório'),
-  logradouro: Yup.string().required('Logradouro é obrigatório'),
-  numero: Yup.string().required('Número é obrigatório'),
-  complemento: Yup.string(),
-  bairro: Yup.string().required('Bairro é obrigatório'),
-  cidade: Yup.string().required('Cidade é obrigatória'),
-  uf: Yup.string().required('UF e obrigatorio!'),
-  emails: Yup.array().of(
-    Yup.object().shape({
-      endereco: Yup.string().required('Endereço de email é obrigatório'),
-    }),
-  ),
-});
+
 
 const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = React.useState(true);

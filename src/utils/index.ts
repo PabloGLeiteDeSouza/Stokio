@@ -21,8 +21,13 @@ export function getStringFromDate(data: Date) {
 }
 
 export function getDateFromString(data: string) {
-  const values = data.split('-');
-  return new Date(`${values[0]}-${values[1]}-${Number(values[2])+1}`);
+  if(data.includes('/')) {
+    const [dia, mes, ano] = data.split('/');
+    return new Date(`${ano}-${mes}-${Number(dia)+1}`);
+  } else {
+    const [dia, mes, ano] = data.split('-');
+    return new Date(`${ano}-${mes}-${Number(dia)+1}`);
+  }
 }
 
 export function verificarAtributosObjeto(obj: object) {

@@ -72,10 +72,11 @@ import InputText from '@/components/Input';
 import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
 import { RemoveIcon } from '@gluestack-ui/themed';
 import SelectEstados from '@/components/Custom/Selects/SelectEstados';
+import buscaCep from '@/utils/buscaCep/buscaCep';
 
 const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db, pessoas, onSelectPerson }) => {
-    const [isDisabledAll, setIsDisabledAll] = React.useState(false);
-    const [isDisabledAddress, setIsDisabledAddress] = React.useState(false);
+    const [isReadOnlyAll, setIsReadOnlyAll] = React.useState(false);
+    const [isReadOnlyAddress, setIsReadOnlyAddress] = React.useState(false);
     const [isNewPerson, setIsNewPerson] = React.useState(pessoas.length < 1);
   return (
     <>
@@ -160,8 +161,9 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db,
                   <FormControl
                     isInvalid={errors.pessoa?.nome ? true : false}
                     size={'md'}
-                    isDisabled={isDisabledAll}
+                    isDisabled={false}
                     isRequired={true}
+                    isReadOnly={isReadOnlyAll}
                   >
                     <FormControlLabel>
                       <FormControlLabelText>Nome</FormControlLabelText>
@@ -189,7 +191,7 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db,
                     </FormControlError>
                   </FormControl>
                   <InputDatePicker
-                    isDisabled={isDisabledAll}
+                    isReadOnly={isReadOnlyAll}
                     title="Data de Nascimento"
                     error={errors.pessoa?.data_nascimento}
                     onChangeDate={(date) =>
@@ -199,7 +201,7 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db,
                     maximumDate={getMinDateFor18YearsOld()}
                   />
                   <InputText
-                    isDisabled={isDisabledAll}
+                    isReadOnly={isReadOnlyAll}
                     isRequired={true}
                     isInvalid={errors.pessoa?.cpf ? true : false}
                     inputType="cpf"
@@ -277,18 +279,31 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db,
               )}
               <>
                 <InputText
-                  isDisabled={isDisabledAll ? isDisabledAll : isDisabledAddress}
+                  isReadOnly={isReadOnlyAll ? isReadOnlyAll : isReadOnlyAddress}
                   isRequired={true}
                   isInvalid={errors.cep ? true : false}
                   inputType="cep"
                   onChangeValue={handleChange('cep')}
                   value={values.cep}
                   error={errors.cep}
+                  onBlur={async () => {
+                    try {
+                      setIsReadOnlyAddress(true);
+                      const data = await buscaCep(values.cep);
+                      setFieldValue('logradouro', data.logradouro);
+                      setFieldValue('bairro', data.bairro);
+                      setFieldValue('cidade', data.localidade);
+                      setFieldValue('complemento', data.complemento);
+                      setFieldValue('uf', data.uf);
+                    } catch (error) {
+                      setIsReadOnlyAddress(false);
+                    }
+                  }}
                 />
                 <FormControl
                   isInvalid={errors.logradouro ? true : false}
                   size={'md'}
-                  isDisabled={isDisabledAll ? isDisabledAll : isDisabledAddress}
+                  isReadOnly={isReadOnlyAll ? isReadOnlyAll : isReadOnlyAddress}
                   isRequired={true}
                 >
                   <FormControlLabel>
@@ -296,6 +311,7 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db,
                   </FormControlLabel>
                   <Input>
                     <InputField
+                      value={values.logradouro}
                       onChangeText={handleChange('logradouro')}
                       type="text"
                       placeholder="adadasdasdas"
@@ -318,7 +334,7 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db,
                 <FormControl
                   isInvalid={errors.numero ? true : false}
                   size={'md'}
-                  isDisabled={isDisabledAll ? isDisabledAll : isDisabledAddress}
+                  isReadOnly={isReadOnlyAll}
                   isRequired={true}
                 >
                   <FormControlLabel>
@@ -326,6 +342,7 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db,
                   </FormControlLabel>
                   <Input>
                     <InputField
+                      value={values.numero.toString()}
                       onChangeText={handleChange('numero')}
                       type="text"
                       placeholder="dasdasdasdasdasd"
@@ -347,7 +364,7 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db,
                 <FormControl
                   isInvalid={errors.complemento ? true : false}
                   size={'md'}
-                  isDisabled={false}
+                  isReadOnly={isReadOnlyAll}
                   isRequired={false}
                 >
                   <FormControlLabel>
@@ -380,12 +397,14 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db,
                   size={'md'}
                   isDisabled={false}
                   isRequired={true}
+                  
                 >
                   <FormControlLabel>
                     <FormControlLabelText>Bairro</FormControlLabelText>
                   </FormControlLabel>
                   <Input>
                     <InputField
+                      value={values.bairro}
                       onChangeText={handleChange('bairro')}
                       type="text"
                       placeholder="asdasdasdas"
@@ -414,6 +433,7 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db,
                   </FormControlLabel>
                   <Input>
                     <InputField
+                      value={values.cidade}
                       onChangeText={handleChange('cidade')}
                       type="text"
                       placeholder="adasdasdasdas"
@@ -434,6 +454,7 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db,
                 <SelectEstados
                   isRequired={true}
                   isDisabled={false}
+                  isReadOnly={isReadOnlyAll ? isReadOnlyAll : isReadOnlyAddress}
                   isInvalid={errors.uf ? true : false}
                   onChangeValue={handleChange('uf')}
                   value={values.uf}

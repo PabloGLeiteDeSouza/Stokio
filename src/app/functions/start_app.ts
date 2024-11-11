@@ -18,7 +18,7 @@ export default async function StartApp(
     setIsLoading(false);
   } catch (error) {
     Alert.alert('Erro', (error as Error).message);
-    setPageStarting('auth-screen');
+    setPageStarting('app-screens');
     setIsLoading(false);
     throw error;
   }
