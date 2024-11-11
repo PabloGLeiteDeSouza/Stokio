@@ -244,7 +244,7 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db,
                       </Card>
                     </Box>
                   )}
-                  <Box>
+                  <Box gap="$5">
                     <Button
                       onPress={() => {
                         onSelectPerson(pessoas, {

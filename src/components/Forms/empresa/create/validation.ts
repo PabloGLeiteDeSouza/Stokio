@@ -72,11 +72,15 @@ export const validationSchema = Yup.object().shape({
         }) : schema,
       ),
     }),
-    cnpj: Yup.string().when('cnpj', (cnpj, schema) => cnpj ? schema.test('cpf', 'CPF esta invalido', async (value) => {
+    cnpj: Yup.string().test('cnpj', 'CNPJ esta inválido', async (value) => {
+      if (value) {
         return Validator.validateCNPJ(String(value));
-    }) : schema),
-    nome_fantasia: Yup.string().required('Nome fantasia e obrigatorio'),
-    razao_social: Yup.string().required('Razao social e obrigatoria'),
+      } else {
+        return true;
+      }
+    }),
+    nome_fantasia: Yup.string().required('Nome fantasia e obrigatório'),
+    razao_social: Yup.string().required('Razão social e obrigatória'),
     ramo: Yup.object().shape({
       id: Yup.string(),
       nome: Yup.string().when('ramo.id', (id_ramo, schema) =>
@@ -88,7 +92,7 @@ export const validationSchema = Yup.object().shape({
         numero: Yup.string().required('Número de telefone é obrigatório'),
       }),
     ),
-    cep: Yup.string().required('CEP é obrigatório').min(8, 'CEP invalido!'),
+    cep: Yup.string().required('CEP é obrigatório').min(8, 'CEP inválido!'),
     logradouro: Yup.string().required('Logradouro é obrigatório'),
     numero: Yup.string().required('Número é obrigatório'),
     complemento: Yup.string(),

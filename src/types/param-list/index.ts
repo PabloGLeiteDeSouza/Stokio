@@ -211,13 +211,13 @@ export type EmpresasStackParamList = {
   'screens-ramos'?: object;
   'screens-itens-venda'?: object;
   'visualizar-empresas'?: object;
-  'cadastrar-empresa'?: { pessoa?: pessoa; ramo?: Ramo };
+  'cadastrar-empresa'?: { pessoa?: Omit<pessoa, 'data_nascimento'> & { data_nascimento: string }; ramo?: Ramo };
   'detalhes-empresa'?: { id: number };
   'atualizar-empresa'?: { id: number; pessoa?: pessoa; ramo?: Ramo };
   'selecionar-pessoa'?: {
     screen: 'cadastrar-empresa';
-    pessoas: Array<pessoa>;
-    pessoaSelecionada?: pessoa;
+    pessoas: Array<Omit<pessoa, 'data_nascimento'> & { data_nascimento: string }>;
+    pessoaSelecionada?: Omit<pessoa, 'data_nascimento'> & { data_nascimento: string };
   };
   'selecionar-ramo'?: {
     screen: 'cadastrar-empresa' | 'atualizar-empresa';

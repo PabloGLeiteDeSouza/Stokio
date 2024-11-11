@@ -563,45 +563,6 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                               }
                               isRequired={true}
                             />
-                            <FormControl
-                              isInvalid={false}
-                              size={'md'}
-                              isDisabled={false}
-                              isRequired={true}
-                            >
-                              <FormControlLabel>
-                                <FormControlLabelText>
-                                  Telefone
-                                </FormControlLabelText>
-                              </FormControlLabel>
-                              <Input>
-                                <InputField
-                                  value={telefone.numero}
-                                  onChangeText={handleChange(
-                                    `telefones[${i}].numero`,
-                                  )}
-                                  type="text"
-                                  keyboardType="number-pad"
-                                  placeholder="password"
-                                />
-                              </Input>
-
-                              <FormControlHelper>
-                                <FormControlHelperText>
-                                  Atualize o número do telefone.
-                                </FormControlHelperText>
-                              </FormControlHelper>
-
-                              <FormControlError>
-                                <FormControlErrorIcon as={AlertCircleIcon} />
-                                <FormControlErrorText>
-                                  {typeof errors.telefones !== 'undefined' &&
-                                  typeof errors.telefones[i] === 'object'
-                                    ? errors.telefones[i].numero
-                                    : ''}
-                                </FormControlErrorText>
-                              </FormControlError>
-                            </FormControl>
                           </Box>
                         );
                       })}

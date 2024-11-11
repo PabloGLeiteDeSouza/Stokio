@@ -104,10 +104,12 @@ const Details: React.FC<DetalhesClienteScreen> = ({ navigation, route }) => {
                 <Heading>Número:</Heading>
                 <Text>{cliente.numero}</Text>
               </Box>
-              <Box gap="$1.5">
-                <Heading>Complemento:</Heading>
-                <Text>{cliente.complemento}</Text>
-              </Box>
+              {cliente.complemento != "" && (
+                <Box gap="$1.5">
+                  <Heading>Complemento:</Heading>
+                  <Text>{cliente.complemento}</Text>
+                </Box>
+              )}
               <Box gap="$1.5">
                 <Heading>Bairro:</Heading>
                 <Text>{cliente.bairro}</Text>
@@ -125,7 +127,7 @@ const Details: React.FC<DetalhesClienteScreen> = ({ navigation, route }) => {
               <Heading>Telefones:</Heading>
               {cliente.telefones.map((tel) => (
                 <Box key={`telefone-${tel.id}`}>
-                  <Text size="lg">{mask(tel.numero, 'telefone')}</Text>
+                  <Text size="lg">{mask(tel.numero, 'telefone', tel.numero.length > 12 ? 'movel' : 'fixo')}</Text>
                 </Box>
               ))}
             </Box>

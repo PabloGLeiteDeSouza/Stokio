@@ -10,7 +10,7 @@ export interface IFormCreateEmpresa {
     onChangePessoa: (pessoas: Array<pessoa>, selectedPessoa: pessoa) => Promise<void> | void;
     onChangeRamo: (selectedRamo: Ramo) => Promise<void> | void;
     pessoas: Array<pessoa>;
-    ramos: Array<Ramo>;
-    pessoa: pessoa;
-    ramo: Ramo;
+    pessoa?: pessoa | undefined;
+    ramo?: Ramo | undefined;
+    haveRamos: boolean;
 }

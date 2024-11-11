@@ -56,7 +56,7 @@ const SelectPessoa: React.FC<ISlectPessoaProps> = ({ navigation, route }) => {
       <Box>
         <Card my="$5">
           <HStack justifyContent="space-between">
-            <VStack>
+            <VStack w="$2/3">
               <Box>
                 <Heading>{item.nome}</Heading>
               </Box>

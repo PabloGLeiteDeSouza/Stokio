@@ -19,7 +19,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
     try {
       const pss = await new ClienteService(db).findAllPessoas();
       console.log('Pessoas', pss);
-      if (pss.length > 1) {
+      if (pss.length > 0) {
         setPessoas([...pss]);
       }
       setIsLoading(false);
@@ -57,7 +57,7 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
                   pessoaSelecionada,
                 });
               }}
-              pessoas={pessoas.length > 1 ? pessoas.map((item) => { return { ...item, data_nascimento: getStringFromDate(item.data_nascimento) };}) : []}
+              pessoas={pessoas.length > 0 ? pessoas.map((item) => { return { ...item, data_nascimento: getStringFromDate(item.data_nascimento) };}) : []}
               pessoa={route?.params?.pessoa}
             />
           </Box>

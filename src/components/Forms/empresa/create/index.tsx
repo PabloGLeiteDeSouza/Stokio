@@ -73,10 +73,12 @@ import SelectEstados from '@/components/Custom/Selects/SelectEstados';
 import { ButtonIcon } from '@gluestack-ui/themed';
 import { AddIcon } from '@gluestack-ui/themed';
 import { RemoveIcon } from '@gluestack-ui/themed';
-const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onChangePessoa, onChangeRamo, pessoas, pessoa, ramos, ramo,  }) => {
+import buscaCep from '@/utils/buscaCep/buscaCep';
+const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onChangePessoa, onChangeRamo, pessoas, pessoa, haveRamos, ramo,  }) => {
   const [isNewPerson, setIsNewPerson] = React.useState(pessoas.length < 1);
-  const [isNewRamo, setIsNewRamo] = React.useState(ramos.length < 1);
-  
+  const [isNewRamo, setIsNewRamo] = React.useState(!haveRamos);
+  const [isReadOnlyAll, setIsReadOnlyAll] = React.useState(false);
+  const [isReadOnlyAddress, setIsReadOnlyAddress] = React.useState(false);
   
     return (
     <>
@@ -149,7 +151,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                   <Box gap="$5">
                     <Button
                       onPress={() => {
-                        onChangePessoa(pessoas, pessoa)
+                        onChangePessoa(pessoas, { ...values.pessoa, data_nascimento: getStringFromDate(values.pessoa.data_nascimento) })
                       }}
                     >
                       <ButtonText>Selecionar Pessoa</ButtonText>
@@ -214,6 +216,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                   <FormControl
                     isInvalid={errors.pessoa?.nome ? true : false}
                     size={'md'}
+                    isReadOnly={isReadOnlyAll}
                     isDisabled={false}
                     isRequired={true}
                   >
@@ -244,6 +247,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                   </FormControl>
 
                   <InputDatePicker
+                    isReadOnly={isReadOnlyAll}
                     title="Data de nascimento"
                     maximumDate={getMinDateFor18YearsOld()}
                     value={values.pessoa.data_nascimento}
@@ -253,6 +257,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                     error={errors.pessoa?.data_nascimento}
                   />
                   <InputText
+                    isReadOnly={isReadOnlyAll}
                     isInvalid={errors.pessoa?.cpf ? true : false}
                     error={errors.pessoa?.cpf}
                     value={values.pessoa.cpf}
@@ -302,6 +307,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
               ) : (
                 <Box>
                   <FormControl
+                    isReadOnly={isReadOnlyAll}
                     isInvalid={errors.ramo?.nome ? true : false}
                     size={'md'}
                     isDisabled={false}
@@ -336,6 +342,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
               )}
 
               <FormControl
+                isReadOnly={isReadOnlyAll}
                 isInvalid={errors.nome_fantasia ? true : false}
                 size={'md'}
                 isDisabled={false}
@@ -368,6 +375,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                 </FormControlError>
               </FormControl>
               <FormControl
+                isReadOnly={isReadOnlyAll}
                 isInvalid={errors.razao_social ? true : false}
                 size={'md'}
                 isDisabled={false}
@@ -398,6 +406,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                 </FormControlError>
               </FormControl>
               <InputText
+                isReadOnly={isReadOnlyAll}
                 title="CNPJ"
                 inputType="cnpj"
                 value={values.cnpj}
@@ -408,15 +417,30 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                 isRequired={false}
               />
               <InputText
+                isReadOnly={isReadOnlyAll ? isReadOnlyAll : isReadOnlyAddress}
                 size="md"
                 isInvalid={errors.cep ? true : false}
                 inputType="cep"
                 value={values.cep}
                 error={errors.cep}
                 onChangeValue={handleChange('cep')}
+                onBlur={async () => {
+                  try {
+                    setIsReadOnlyAddress(true);
+                    const data = await buscaCep(values.cep);
+                    setFieldValue('logradouro', data.logradouro);
+                    setFieldValue('bairro', data.bairro);
+                    setFieldValue('cidade', data.localidade);
+                    setFieldValue('complemento', data.complemento);
+                    setFieldValue('uf', data.uf);
+                  } catch (error) {
+                    setIsReadOnlyAddress(false);
+                  }
+                }}
               />
 
               <FormControl
+                isReadOnly={isReadOnlyAll ? isReadOnlyAll : isReadOnlyAddress}
                 isInvalid={errors.logradouro ? true : false}
                 size={'md'}
                 isDisabled={false}
@@ -449,6 +473,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
               </FormControl>
 
               <FormControl
+                isReadOnly={isReadOnlyAll}
                 isInvalid={errors.numero ? true : false}
                 size={'md'}
                 isDisabled={false}
@@ -479,6 +504,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                 </FormControlError>
               </FormControl>
               <FormControl
+                isReadOnly={isReadOnlyAll}
                 isInvalid={errors.complemento ? true : false}
                 size={'md'}
                 isDisabled={false}
@@ -510,6 +536,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                 </FormControlError>
               </FormControl>
               <FormControl
+                isReadOnly={isReadOnlyAll ? isReadOnlyAll : isReadOnlyAddress}
                 isInvalid={errors.bairro ? true : false}
                 size={'md'}
                 isDisabled={false}
@@ -539,6 +566,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                 </FormControlError>
               </FormControl>
               <FormControl
+                isReadOnly={isReadOnlyAll ? isReadOnlyAll : isReadOnlyAddress}
                 isInvalid={errors.cidade ? true : false}
                 size={'md'}
                 isDisabled={false}
@@ -568,6 +596,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                 </FormControlError>
               </FormControl>
               <SelectEstados
+                isReadOnly={isReadOnlyAll ? isReadOnlyAll : isReadOnlyAddress}
                 error={errors.uf}
                 value={values.uf}
                 isInvalid={errors.uf ? true : false}
@@ -578,6 +607,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                   return (
                     <Box key={`telefone-${i}`}>
                       <InputText
+                        isReadOnly={isReadOnlyAll}
                         isInvalid={
                           errors.telefones &&
                           typeof errors?.telefones[i] === 'object'
@@ -601,10 +631,21 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                   );
                 })}
 
-                <Button action="positive">
-                  <ButtonIcon as={AddIcon} />
+                <Button action="positive" onPress={() => {
+                  setFieldValue("telefones",[...values.telefones, { numero: '' }]);
+                }}>
+                  <ButtonIcon as={AddIcon}/>
                 </Button>
-                <Button action="negative">
+                <Button 
+                  action="negative" 
+                  onPress={() => {
+                    if (values.telefones.length > 1) {
+                      setFieldValue("telefones",[...values.telefones.slice(-1)]);
+                    } else {
+                      Alert.alert('Aviso', 'Não há mais telefones a serem removidos')
+                    }
+                  }}
+                >
                   <ButtonIcon as={RemoveIcon} />
                 </Button>
               </Box>
@@ -614,6 +655,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                   return (
                     <Box key={`email-${i}`}>
                       <FormControl
+                        isReadOnly={isReadOnlyAll}
                         isInvalid={false}
                         size={'md'}
                         isDisabled={false}
@@ -634,7 +676,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
 
                         <FormControlHelper>
                           <FormControlHelperText>
-                            Must be atleast 6 characters.
+                            Informe o email válido.
                           </FormControlHelperText>
                         </FormControlHelper>
 
@@ -654,10 +696,24 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                   );
                 })}
 
-                <Button action="positive">
+                <Button 
+                  action="positive"
+                  onPress={() => {
+                    setFieldValue("emails",[...values.emails, { endereco: '' }]);
+                  }}
+                >
                   <ButtonIcon as={AddIcon} />
                 </Button>
-                <Button action="negative">
+                <Button
+                  action="negative"
+                  onPress={() => {
+                    if (values.emails.length > 1) {
+                      setFieldValue("emails",[...values.emails.slice(-1)]);
+                    } else {
+                      Alert.alert('Aviso', 'Não há mais emails a serem removidos')
+                    }
+                  }}
+                >
                   <ButtonIcon as={RemoveIcon} />
                 </Button>
               </Box>
