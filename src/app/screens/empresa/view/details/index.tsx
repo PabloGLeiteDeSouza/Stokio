@@ -6,10 +6,13 @@ import { mask } from '@/utils/mask';
 import {
   Box,
   Button,
+  ButtonIcon,
   ButtonText,
+  EditIcon,
   Heading,
   ScrollView,
   Text,
+  TrashIcon,
 } from '@gluestack-ui/themed';
 import { useSQLiteContext } from 'expo-sqlite';
 import React from 'react';
@@ -157,13 +160,19 @@ const Details: React.FC<DetalhesEmpresaScreen> = ({ navigation, route }) => {
             </Box>
             <Box gap="$5">
               <Button
+                gap="$5"
                 onPress={() =>
                   navigation?.navigate('atualizar-empresa', { id: empresa.id })
                 }
               >
+                <ButtonIcon as={EditIcon} />
                 <ButtonText>Editar</ButtonText>
               </Button>
-              <Button action="negative">
+              <Button 
+                gap="$5"
+                action="negative"
+              >
+                <ButtonIcon as={TrashIcon} />
                 <ButtonText>Excluir</ButtonText>
               </Button>
             </Box>

@@ -1,6 +1,8 @@
+import { Ua } from '@/types/screens/ua';
 import {
   UnidadeDeArmazenamento,
   TipoDeUnidadeDeArmazenamento,
+  UnidadeDeArmazenamentoCreate,
 } from './interfaces';
 import { SQLiteDatabase } from 'expo-sqlite';
 
@@ -19,6 +21,30 @@ export default class UaService {
       throw new Error(
         `Erro ao verificar existência da unidade de armazenamento: ${(error as Error).message}`,
       );
+    }
+  }
+
+  async create(data: UnidadeDeArmazenamentoCreate): Promise<void> {
+    try {
+      if (data.tipo_ua.id === 0) {
+        const tipoRes = await this.db.runAsync(
+          'INSERT INTO tipo_ua (nome, descricao) VALUES ($nome, $descricao)',
+          { $nome: data.tipo_ua.nome, $descricao: String(data.tipo_ua.descricao)},
+        );
+        data.tipo_ua.id = tipoRes.lastInsertRowId;
+      }
+
+      await this.db.runAsync(
+        'INSERT INTO ua (nome, descricao, id_tipo_ua) VALUES ($nome, $descricao, $id_tipo_ua)',
+        {
+          $nome: data.nome,
+          $descricao: String(data.descricao),
+          $id_tipo_ua: data.tipo_ua.id,
+        },
+      );
+
+    } catch (err) {
+      throw new Error(`Erro ao criar unidade de armazenamento: ${(err as Error).message}`);
     }
   }
 
@@ -90,7 +116,7 @@ export default class UaService {
   }
 
   async findAll() {
-    const data = await this.db.getAllAsync('SELECT * FROM ua');
+    const data = await this.db.getAllAsync<Ua>('SELECT * FROM ua');
     return data;
   }
 

@@ -46,7 +46,7 @@ export type DetalhesUaScreenRouterProp = RouteProp<
 >;
 
 export type Ua = {
-  id: string;
+  id: number;
   nome: string;
   tipo: string;
 };

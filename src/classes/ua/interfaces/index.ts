@@ -10,3 +10,15 @@ export interface TipoDeUnidadeDeArmazenamento {
   nome: string;
   descricao?: string;
 }
+
+export interface UnidadeDeArmazenamentoCreate {
+  nome: string;
+  descricao?: string;
+  tipo_ua: {
+    id: number;
+    nome: string;
+    descricao?: string;
+  }
+}
+
+

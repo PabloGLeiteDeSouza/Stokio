@@ -73,11 +73,18 @@ import { SearchIcon } from '@gluestack-ui/themed';
 import { Ua, UaFlatList } from '@/types/screens/ua';
 import { ListRenderItem } from 'react-native';
 import { VisualizarUaScreen } from '@/interfaces/ua';
+import { useSQLiteContext } from 'expo-sqlite';
+import UaService from '@/classes/ua/ua.service';
+import { useIsFocused } from '@react-navigation/native';
 
 const View: React.FC<VisualizarUaScreen> = ({ navigation }) => {
+
   const FlatListUa = FlatList as UaFlatList;
 
   const [uas, setUas] = React.useState<Array<Ua>>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const db = useSQLiteContext();
+  const isFocused = useIsFocused();
 
   const ListRenderUa: ListRenderItem<Ua> = ({ item }) => {
     return (
@@ -102,6 +109,22 @@ const View: React.FC<VisualizarUaScreen> = ({ navigation }) => {
       </Card>
     );
   };
+
+  async function start() {
+    try {
+      const data = await new UaService(db).findAll();
+      if (data.length < 1) {
+        throw new Error("Não há dados para exibir");
+      }
+      setUas([...data]);
+    } catch (error) {
+      
+    }
+  }
+
+  React.useEffect(() => {
+    start();
+  }, [isFocused])
 
   return uas.length < 1 ? (
     <Box h="$full" w="$full" alignItems="center" justifyContent="center">
