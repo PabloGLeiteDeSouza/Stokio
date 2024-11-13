@@ -41,9 +41,11 @@ export default class MarcaService {
     }
   }
 
-  async delete() {
+  async delete(id: number) {
     try {
-      const res = await this.db.runAsync('DELETE FROM marca');
+      const res = await this.db.runAsync('DELETE FROM marca WHERE id = $id', {
+        $id: id,
+      });
       if (res.changes < 1) {
         throw new Error('Não foi possível deletar a marca', {
           cause: 'ERR_MARCA_DELETE',
@@ -59,6 +61,18 @@ export default class MarcaService {
       'SELECT * FROM marca',
     );
     return data;
+  }
+
+  async getId(id: number) {
+    try {
+      const data = await this.db.getFirstAsync<MarcaUpdate>('SELECT * FROM marca WHERE id = $id', { $id: id });
+      if (!data) {
+        throw new Error("Nao foi possivel encontrar uma marca!");
+      }
+      return data;
+    } catch (err) {
+      throw err;
+    }
   }
 
   async haveMarca() {

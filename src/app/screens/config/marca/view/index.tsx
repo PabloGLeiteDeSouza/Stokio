@@ -71,13 +71,17 @@ import Marcas from './marcas.json';
 import { SearchIcon } from '@gluestack-ui/themed';
 import { VisualizarMarcaScreen } from '@/interfaces/marca';
 import { Marca, MarcaFlatList } from '@/types/screens/marca';
-import { ListRenderItem } from 'react-native';
+import { Alert, ListRenderItem } from 'react-native';
+import LoadingScreen from '@/components/LoadingScreen';
+import MarcaService from '@/classes/marca/marca.service';
+import { useSQLiteContext } from 'expo-sqlite';
+import { useIsFocused } from '@react-navigation/native';
 
 const View: React.FC<VisualizarMarcaScreen> = ({ navigation }) => {
-  const [marcas, setMarcas] = React.useState<Array<Marca>>([{
-    id: 1,
-    nome: 'Teste',
-  }]);
+  const [marcas, setMarcas] = React.useState<Array<Marca>>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const isFocused = useIsFocused();
+  const db = useSQLiteContext();
   const FlatListMarca = FlatList as MarcaFlatList;
   const ListRenderMarca: ListRenderItem<Marca> = ({ item }) => {
     return (
@@ -89,7 +93,29 @@ const View: React.FC<VisualizarMarcaScreen> = ({ navigation }) => {
             </Heading>
           </Box>
           <Box gap="$5">
-            <Button action="negative">
+            <Button 
+              action="negative"
+              onPress={() => {
+                Alert.alert("Aviso", `Deseja remover a marca ${item.nome} ?`, [
+                  {
+                    text: 'Sim',
+                    onPress: async () => {
+                      await new MarcaService(db).delete(item.id);
+                      Alert.alert('Sucesso', 'Marca deletada com sucesso!');
+                      start();
+                    },
+                    style: 'default',
+                  },
+                  {
+                    text: 'Nao',
+                    onPress: () => {
+                      Alert.alert('Aviso', 'Operacao cancelada com sucesso');
+                    },
+                    style: 'cancel',
+                  }
+                ]);
+              }}
+            >
               <ButtonIcon as={TrashIcon} />
             </Button>
             <Button
@@ -104,6 +130,29 @@ const View: React.FC<VisualizarMarcaScreen> = ({ navigation }) => {
       </Card>
     );
   };
+
+  const start = async () => {
+    try {
+      const dados = await new MarcaService(db).getAll();
+      setMarcas([...dados]);
+      setIsLoading(false);
+    } catch (error) {
+      Alert.alert('Erro', (error as Error).message);
+      setIsLoading(false);
+      throw error;
+    }
+  }
+
+  React.useEffect(() => {
+    start();
+  }, [isFocused])
+
+
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
   return marcas.length < 1 ? (
     <Box h="$full" w="$full" alignItems="center" justifyContent="center">
       <Box gap="$5">

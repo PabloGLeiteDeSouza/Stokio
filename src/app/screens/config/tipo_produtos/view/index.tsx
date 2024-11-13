@@ -78,7 +78,26 @@ const View: React.FC<VisualizarTipoProdutoScreen> = ({ navigation }) => {
             </Heading>
           </Box>
           <Box gap="$5">
-            <Button action="negative">
+            <Button 
+              onPress={async () => {
+                Alert.alert('Aviso', `Voce deseja mesmo alterar o tipo de produto: ${item.nome}?`, [{
+                  text: 'Sim',
+                  onPress: async () => {
+                    const data = await new TipoProdutoService(db).delete(item.id);
+                    Alert.alert('Aviso', 'Dados deletados com sucesso!');
+                    start();
+                  },
+                  style: 'default'
+                },
+                {
+                  text: 'Nao',
+                  onPress: async () => {
+                    Alert.alert('Aviso', 'Operacao cancelada com sucesso!');
+                  },
+                  style: 'cancel' 
+                }])
+              }}
+              action="negative">
               <ButtonIcon as={TrashIcon} />
             </Button>
             <Button
@@ -199,6 +218,7 @@ const View: React.FC<VisualizarTipoProdutoScreen> = ({ navigation }) => {
           } catch (error) {
             Alert.alert('Error', (error as Error).message);
             if (isLoading) {
+              start();
               setIsLoading(false);
             }
             throw error;

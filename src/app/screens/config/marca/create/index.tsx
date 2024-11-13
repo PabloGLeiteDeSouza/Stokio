@@ -16,8 +16,12 @@ import {
 } from '@gluestack-ui/themed';
 import { Box, Heading, ScrollView, VStack } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
-import { GestureResponderEvent } from 'react-native';
-const Create: React.FC = () => {
+import { Alert, GestureResponderEvent } from 'react-native';
+import { useSQLiteContext } from 'expo-sqlite';
+import MarcaService from '@/classes/marca/marca.service';
+import { CadastrarMarcaScreen } from '@/interfaces/marca';
+const Create: React.FC<CadastrarMarcaScreen> = ({ navigation }) => {
+  const db = useSQLiteContext();
   return (
     <Box h="$full" w="$full" px="$8" py="$8">
       <ScrollView w="$full">
@@ -29,7 +33,15 @@ const Create: React.FC = () => {
             initialValues={{
               nome: '',
             }}
-            onSubmit={() => {}}
+            onSubmit={async (values) => {
+              try {
+                await new MarcaService(db).create(values);
+                Alert.alert('Sucesso', 'Marca cadastrada com sucesso!');
+                navigation?.goBack();
+              } catch (error) {
+                Alert.alert('Error', (error as Error).message);
+              }
+            }}
           >
             {({ handleChange, handleSubmit, values, errors }) => {
               return (

@@ -90,4 +90,12 @@ export default class TipoProdutoService {
     }
     return true;
   }
+
+  async delete(id: number) {
+    try {
+      await this.db.runAsync('DELETE FROM tipo_produto WHERE id = $id', { $id: id });
+    } catch (err) {
+      throw err;
+    }
+  }
 }

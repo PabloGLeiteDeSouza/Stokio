@@ -16,8 +16,48 @@ import {
 } from '@gluestack-ui/themed';
 import { Box, Heading, ScrollView, VStack } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
-import { GestureResponderEvent } from 'react-native';
-const Update: React.FC = () => {
+import { Alert, GestureResponderEvent } from 'react-native';
+import { AtualizarMarcaScreen } from '@/interfaces/marca';
+import LoadingScreen from '@/components/LoadingScreen';
+import { useSQLiteContext } from 'expo-sqlite';
+import MarcaService from '@/classes/marca/marca.service';
+import { MarcaUpdate } from '@/classes/marca/interfaces';
+const Update: React.FC<AtualizarMarcaScreen> = ({ navigation, route }) => {
+
+  if (!route || !route.params || !route.params.id ) {
+    Alert.alert('Erro', 'Infrome uma marca correta');
+    navigation?.goBack();
+    return null;
+  }
+
+  const id = route.params.id;
+  const [marca, setMarca] = React.useState<MarcaUpdate>({
+    id,
+    nome: '',
+  });
+  const [isLoading, setIsLoading] = React.useState(true);
+  const db = useSQLiteContext();
+
+  const start = async () => {
+    try {
+      const marca = await new MarcaService(db).getId(id);
+      setMarca(marca);
+      setIsLoading(false);
+    } catch (error) {
+      Alert.alert('Error', (error as Error).message);
+      setIsLoading(false);
+      throw error;
+    }
+  }
+
+  React.useEffect(() => {
+    start();
+  }, []);
+
+  if (isLoading) {
+    return <LoadingScreen />
+  }
+
   return (
     <Box h="$full" w="$full" px="$8" py="$8">
       <ScrollView w="$full">
@@ -26,11 +66,16 @@ const Update: React.FC = () => {
             <Heading size="xl">Atualizar Marca:</Heading>
           </Box>
           <Formik
-            initialValues={{
-              id: 1,
-              nome: 'Teste',
+            initialValues={marca}
+            onSubmit={async (values) => {
+              try {
+                await new MarcaService(db).update(values);
+                Alert.alert("Sucesso", "Atualizacao realizada com sucesso!")
+                navigation?.goBack();
+              } catch (error) {
+                Alert.alert("Error", (error as Error).message);
+              }
             }}
-            onSubmit={() => {}}
           >
             {({ handleChange, handleSubmit, values, errors }) => {
               return (
