@@ -7,9 +7,10 @@ export default class TipoUaService {
   async create(data: TipoUaCreate) {
     try {
       const res = await this.db.runAsync(
-        'INSERT into tipo_ua ( nome ) VALUES ( $nome )',
+        'INSERT into tipo_ua ( nome, descricao ) VALUES ( $nome, $descricao )',
         {
           $nome: data.nome,
+          $descricao: data.descricao,
         },
       );
       if (res.changes < 1) {
@@ -28,9 +29,10 @@ export default class TipoUaService {
   async update(data: TipoUaUpdate) {
     try {
       const res = await this.db.runAsync(
-        'UPDATE tipo_ua SET nome = $nome WHERE id = $id',
+        'UPDATE tipo_ua SET nome = $nome, descricao = $descricao WHERE id = $id',
         {
           $nome: data.nome,
+          $descricao: data.descricao,
           $id: data.id,
         },
       );

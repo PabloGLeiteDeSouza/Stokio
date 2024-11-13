@@ -3,6 +3,6 @@ export interface MarcaCreate {
 }
 
 export interface MarcaUpdate {
-  id: string;
+  id: number;
   nome: string;
 }

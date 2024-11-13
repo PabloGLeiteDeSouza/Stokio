@@ -22,9 +22,10 @@ export class RamoService implements IRamoService {
       }
 
       const result = await this.db.runAsync(
-        'INSERT INTO ramo ( nome ) VALUES ( $nome )',
+        'INSERT INTO ramo ( nome, descricao ) VALUES ( $nome, $descricao )',
         {
           $nome: data.nome,
+          $descricao: data.descricao,
         },
       );
 
@@ -38,10 +39,11 @@ export class RamoService implements IRamoService {
   async update(data: RamoUpdateData): Promise<void> {
     try {
       const result = await this.db.runAsync(
-        'UPDATE ramo SET nome = $nome WHERE id = $id',
+        'UPDATE ramo SET nome = $nome, descricao = $descricao WHERE id = $id',
         {
           $id: data.id,
           $nome: data.nome,
+          $descricao: data.descricao,
         },
       );
 

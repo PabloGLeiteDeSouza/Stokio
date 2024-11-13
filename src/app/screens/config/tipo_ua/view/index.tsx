@@ -34,11 +34,13 @@ import { useSQLiteContext } from 'expo-sqlite';
 import TipoUaService from '@/classes/tipo_ua/tipo_ua.service';
 import { TipoUaUpdate } from '@/classes/tipo_ua/interfaces';
 import { useIsFocused } from '@react-navigation/native';
+import LoadingScreen from '@/components/LoadingScreen';
 
 const View: React.FC<VisualizarTipoUaScreen> = ({ navigation }) => {
   const db = useSQLiteContext();
   const [tipos_Uas, setTipos_Uas] = React.useState<Array<TipoUaUpdate>>([]);
   const [isRefreshing, setIsRefreshing] = React.useState<boolean>(true);
+  const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const FlatListTipoUa = FlatList as TipoUaFlatList;
 
   const isFocused = useIsFocused();
@@ -48,9 +50,12 @@ const View: React.FC<VisualizarTipoUaScreen> = ({ navigation }) => {
       const tipos = await new TipoUaService(db).getAll();
       setTipos_Uas([...tipos]);
       setIsRefreshing(false);
+      setIsLoading(false);
     } catch (error) {
       Alert.alert('Error', (error as Error).message);
       setTipos_Uas([]);
+      setIsRefreshing(false);
+      setIsLoading(false);
     }
   }
 
@@ -120,6 +125,10 @@ const View: React.FC<VisualizarTipoUaScreen> = ({ navigation }) => {
       </Card>
     );
   };
+
+  if (isLoading) {
+    return <LoadingScreen />
+  }
 
   return tipos_Uas.length < 1 ? (
     <Box h="$full" w="$full" alignItems="center" justifyContent="center">

@@ -36,7 +36,7 @@ export type AtualizarMarcaScreenRouterProp = RouteProp<
 >;
 
 export type Marca = {
-  id: string;
+  id: number;
   nome: string;
 };
 

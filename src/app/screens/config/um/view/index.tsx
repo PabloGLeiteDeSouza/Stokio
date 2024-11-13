@@ -78,8 +78,25 @@ const View: React.FC<VisualizarUmScreen> = ({ navigation }) => {
             <Button
               onPress={async () => {
                 try {
-                  await new UmService(db).delete(item.id);
-                  Alert.alert('Sucesso', 'Um deletado com sucesso!');
+                  Alert.alert('Aviso', `Voce deseja mesmo deletar a unidade de medida: ${item.nome} ?`, [
+                    {
+                      text: 'Sim',
+                      onPress: async () => {
+                        await new UmService(db).delete(item.id);
+                        Alert.alert('Sucesso', 'Unidade de medida ' + item.nome + ' deletada com sucesso!')
+                        start();
+                      },
+                      style: 'default'
+                    },
+                    {
+                      text: 'Não',
+                      onPress: async () => {
+                        Alert.alert('Aviso', 'Operacao cancelada com sucesso!');
+                      },
+                      style: 'cancel',
+                    },
+                  ])
+                  
                   start();
                 } catch (error) {
                   Alert.alert('Erro', (error as Error).message);

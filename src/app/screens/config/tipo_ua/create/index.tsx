@@ -137,7 +137,7 @@ const Create: React.FC<CadastrarTipoUaScreen> = ({ navigation }) => {
                     <Textarea>
                       <TextareaInput
                         onChangeText={handleChange('descricao')}
-                        values={values.descricao}
+                        value={values.descricao}
                       />
                     </Textarea>
 
