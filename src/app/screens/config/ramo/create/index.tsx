@@ -78,9 +78,9 @@ const Create: React.FC<CadastrarRamoScreen> = ({ navigation }) => {
               nome: '',
               descricao: '',
             }}
-            onSubmit={async (value) => {
+            onSubmit={async (values) => {
               try {
-                await new RamoService(db).create(value);
+                await new RamoService(db).create(values);
                 Alert.alert('Sucesso', 'Ramo criado com sucesso!');
                 navigation?.goBack();
               } catch (error) {

@@ -71,7 +71,7 @@ import { EditIcon } from '@gluestack-ui/themed';
 import Ramos from './ramos.json';
 import { SearchIcon } from '@gluestack-ui/themed';
 import { Ramo, RamoFlatList } from '@/types/screens/ramo';
-import { Alert, ListRenderItem } from 'react-native';
+import { Alert, GestureResponderEvent, ListRenderItem } from 'react-native';
 import { VisualizarRamoScreen } from '@/interfaces/ramo';
 import { useIsFocused } from '@react-navigation/native';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -100,6 +100,16 @@ const View: React.FC<VisualizarRamoScreen> = ({ navigation }) => {
     start();
   }, [focused]);
 
+  const buscar = async (nome: string) => {
+    try {
+      const data = await new RamoService(db).findByName(nome);
+      setRamos([...data]);
+    } catch (err) {
+      Alert.alert('Error', (err as Error).message);
+    }
+  }
+
+
   const FlatListRamo = FlatList as RamoFlatList;
   const ListRenderRamo: ListRenderItem<Ramo> = ({ item }) => {
     return (
@@ -118,7 +128,28 @@ const View: React.FC<VisualizarRamoScreen> = ({ navigation }) => {
             >
               <ButtonIcon as={EditIcon} />
             </Button>
-            <Button action="negative">
+            <Button onPress={async () =>{
+              Alert.alert('Aviso', `Deseja mesmo deletar o ramo: ${item.nome}?`, [
+                {
+                  text: 'Sim',
+                  onPress: async () => {
+                    try {
+                      await new RamoService(db).delete(item.id);
+                      Alert.alert('Sucesso', `Ramo deletado com sucesso!`);
+                      start();
+                      } catch (error) {
+                        Alert.alert('Error', (error as Error).message);
+                      }
+                  },
+                },
+                {
+                  text: 'Não',
+                  onPress: () => {
+                    Alert.alert('Aviso', 'Operação cancelada com sucesso!');
+                  }
+                }
+              ])
+            }} action="negative">
               <ButtonIcon as={TrashIcon} />
             </Button>
           </Box>
@@ -150,9 +181,11 @@ const View: React.FC<VisualizarRamoScreen> = ({ navigation }) => {
           initialValues={{
             busca: '',
           }}
-          onSubmit={() => {}}
+          onSubmit={async (value) => {
+            await buscar(value.busca);
+          }}
         >
-          {({ values, handleChange, errors }) => {
+          {({ values, handleChange, handleSubmit, errors }) => {
             return (
               <>
                 <FormControl
@@ -169,9 +202,9 @@ const View: React.FC<VisualizarRamoScreen> = ({ navigation }) => {
                       type="text"
                       value={values.busca}
                       placeholder="Buscar"
-                      onChangeText={handleChange('buscar')}
+                      onChangeText={handleChange('busca')}
                     />
-                    <Button>
+                    <Button onPress={handleSubmit as unknown as (event: GestureResponderEvent) => void}>
                       <ButtonIcon as={SearchIcon} />
                     </Button>
                   </Input>

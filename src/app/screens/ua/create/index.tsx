@@ -64,12 +64,15 @@ import { CadastrarUaScreen } from '@/interfaces/ua';
 import UaService from '@/classes/ua/ua.service';
 import { useSQLiteContext } from 'expo-sqlite';
 import FormCreateUa from '@/components/Forms/ua/create';
+import TipoUaService from '@/classes/tipo_ua/tipo_ua.service';
 const Create: React.FC<CadastrarUaScreen> = ({ navigation }) => {
   const [isLoadingScreen, setisLoadingScreen] = React.useState(true);
+  const [haveTipoUa, setHaveTipoUa] = React.useState(false);
   const db = useSQLiteContext();
   React.useEffect(() => {
     async function Start() {
       try {
+        setHaveTipoUa((await new TipoUaService(db).getAll()).length > 0)
         setisLoadingScreen(false);
       } catch (error) {
         throw error;
@@ -91,6 +94,7 @@ const Create: React.FC<CadastrarUaScreen> = ({ navigation }) => {
           <Box w="$full" px="$8">
             <FormCreateUa
               db={db}
+              haveTipoUa={haveTipoUa}
               onSubimited={() => {
                 navigation?.goBack();
               }}

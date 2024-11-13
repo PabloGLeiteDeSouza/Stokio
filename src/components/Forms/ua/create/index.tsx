@@ -57,13 +57,15 @@ import {
   CheckIcon,
   AlertCircleIcon,
   ChevronDownIcon,
+  Card,
 } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
 import { Alert, GestureResponderEvent } from 'react-native';
 import UaService from '@/classes/ua/ua.service';
 import { IFormCreateUa } from './interface';
 
-const FormCreateUa: React.FC<IFormCreateUa> = ({ db, onSubimited }) => {
+const FormCreateUa: React.FC<IFormCreateUa> = ({ db, onSubimited, haveTipoUa }) => {
+  const [isNewTipoUa, setIsNewTipoUa] = React.useState(!haveTipoUa);
   return (
     <>
       <Formik
@@ -146,69 +148,106 @@ const FormCreateUa: React.FC<IFormCreateUa> = ({ db, onSubimited }) => {
                   <FormControlErrorText>{errors.descricao}</FormControlErrorText>
                 </FormControlError>
               </FormControl>
-              <FormControl
-                isInvalid={false}
-                size={'md'}
-                isDisabled={false}
-                isRequired={true}
-              >
-                <FormControlLabel>
-                  <FormControlLabelText>
-                    Tipo de unidade de medida
-                  </FormControlLabelText>
-                </FormControlLabel>
-                <Input>
-                  <InputField
-                    type="text"
-                    value={values.tipo_ua.nome}
-                    placeholder="Tipo de ua nome"
-                    onChangeText={handleChange('tipo_ua.nome')}
-                  />
-                </Input>
+              {isNewTipoUa ? (
+                <>
+                  <FormControl
+                    isInvalid={false}
+                    size={'md'}
+                    isDisabled={false}
+                    isRequired={true}
+                  >
+                    <FormControlLabel>
+                      <FormControlLabelText>
+                        Tipo de unidade de armazenamento
+                      </FormControlLabelText>
+                    </FormControlLabel>
+                    <Input>
+                      <InputField
+                        type="text"
+                        value={values.tipo_ua.nome}
+                        placeholder="Tipo de ua nome"
+                        onChangeText={handleChange('tipo_ua.nome')}
+                      />
+                    </Input>
 
-                <FormControlHelper>
-                  <FormControlHelperText>
-                    Informe a nome do tipo de unidade de medida.
-                  </FormControlHelperText>
-                </FormControlHelper>
+                    <FormControlHelper>
+                      <FormControlHelperText>
+                        Informe a nome do tipo de unidade de armazenamento.
+                      </FormControlHelperText>
+                    </FormControlHelper>
 
-                <FormControlError>
-                  <FormControlErrorIcon as={AlertCircleIcon} />
-                  <FormControlErrorText>
-                    {errors.tipo_ua?.nome}
-                  </FormControlErrorText>
-                </FormControlError>
-              </FormControl>
-              <FormControl
-                isInvalid={false}
-                size={'md'}
-                isDisabled={false}
-                isRequired={false}
-              >
-                <FormControlLabel>
-                  <FormControlLabelText>
-                    Descricao Tipo de Ua
-                  </FormControlLabelText>
-                </FormControlLabel>
-                <Textarea>
-                  <TextareaInput
-                    value={values.tipo_ua.descricao}
-                    onChangeText={handleChange('tipo_ua.descricao')}
-                  />
-                </Textarea>
-                <FormControlHelper>
-                  <FormControlHelperText>
-                    Must be atleast 6 characters.
-                  </FormControlHelperText>
-                </FormControlHelper>
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        {errors.tipo_ua?.nome}
+                      </FormControlErrorText>
+                    </FormControlError>
+                  </FormControl>
 
-                <FormControlError>
-                  <FormControlErrorIcon as={AlertCircleIcon} />
-                  <FormControlErrorText>
-                    Atleast 6 characters are required.
-                  </FormControlErrorText>
-                </FormControlError>
-              </FormControl>
+                  <FormControl
+                    isInvalid={false}
+                    size={'md'}
+                    isDisabled={false}
+                    isRequired={false}
+                  >
+                    <FormControlLabel>
+                      <FormControlLabelText>
+                        Descricao Tipo de Unidade de Armazenamento
+                      </FormControlLabelText>
+                    </FormControlLabel>
+                    <Textarea>
+                      <TextareaInput
+                        value={values.tipo_ua.descricao}
+                        onChangeText={handleChange('tipo_ua.descricao')}
+                      />
+                    </Textarea>
+                    <FormControlHelper>
+                      <FormControlHelperText>
+                        Informe uma descrição.
+                      </FormControlHelperText>
+                    </FormControlHelper>
+
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        {errors.tipo_ua?.descricao}
+                      </FormControlErrorText>
+                    </FormControlError>
+                  </FormControl>
+                </>
+              ) : (
+                <>
+                  {values.tipo_ua.id !== 0 && (
+                    <>
+                      <Box>
+                        <Card>
+                          <Heading>Tipo de unidade de armazenamento</Heading>
+                          <HStack>
+                            <Text>Nome:</Text>
+                            <Text>{values.tipo_ua.nome}</Text>
+                          </HStack>
+                          <VStack>
+                            <Text>Descrição:</Text>
+                            <Text>{values.tipo_ua.nome}</Text>
+                          </VStack>
+                        </Card>
+                      </Box>
+                    </>
+                  )}
+                  <Box gap="$5">
+                    <Button onPress={() => {
+                      onSelectTipoUa()
+                    }}>
+                      <ButtonText>{values.tipo_ua.id === 0 ? "Selecionar Tipo de UA" : "Atualizar Tipo de UA"}</ButtonText>
+                    </Button>
+                    <Button onPress={() => setIsNewTipoUa(true)}>
+                      <ButtonText>
+                        Cadastrar Tipo UA
+                      </ButtonText>
+                    </Button>
+                  </Box>
+                </>
+              )}
               <Box>
                 <Button
                   onPress={
