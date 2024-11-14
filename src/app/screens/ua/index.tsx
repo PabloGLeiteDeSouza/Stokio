@@ -3,6 +3,7 @@ import Create from './create';
 import View from './view';
 import Update from './update';
 import Details from './view/details';
+import SelectTipoUA from '@/components/Custom/Screens/SelectTipoUa';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +29,11 @@ const UaScreens: React.FC = () => {
         name="detalhes-ua"
         component={Details}
         options={{ title: 'Detalhes da Unidade de Armazenamento' }}
+      />
+      <Stack.Screen
+        name="selecionar-tipo-ua"
+        component={SelectTipoUA}
+        options={{ title: 'Selecionar Tipo de Unidade de Armazenamento' }}
       />
     </Stack.Navigator>
   );

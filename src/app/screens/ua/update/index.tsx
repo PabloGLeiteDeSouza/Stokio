@@ -18,13 +18,26 @@ import {
 } from '@gluestack-ui/themed';
 import { Box, Heading, ScrollView, VStack } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
-import { GestureResponderEvent } from 'react-native';
+import { Alert, GestureResponderEvent } from 'react-native';
+import LoadingScreen from '@/components/LoadingScreen';
+import { useSQLiteContext } from 'expo-sqlite';
+import UaService from '@/classes/ua/ua.service';
+import { AtualizarUaScreen } from '@/interfaces/ua';
+import { UnidadeDeArmazenamentoObject } from '@/classes/ua/interfaces';
 
-const Update: React.FC = () => {
+const Update: React.FC<AtualizarUaScreen> = ({ navigation, route }) => {
+  if (!route || !route.params || !route.params.id) {
+    navigation?.goBack();
+    return null;
+  }
+  const id = route.params.id;
   const [isLoadingScreen, setisLoadingScreen] = React.useState(true);
+  const [ua, setUa] = React.useState<UnidadeDeArmazenamentoObject>({})
+  const db = useSQLiteContext();
   React.useEffect(() => {
     async function Start() {
       try {
+        const data = new UaService(db).findStorageUnitById(id);
         setisLoadingScreen(false);
       } catch (error) {
         throw error;
@@ -34,6 +47,12 @@ const Update: React.FC = () => {
       Start();
     }
   }, [isLoadingScreen]);
+
+
+  if (isLoadingScreen) {
+    return <LoadingScreen />
+  }
+
 
   return (
     <Box h="$full" w="$full" px="$1.5">
@@ -46,16 +65,16 @@ const Update: React.FC = () => {
           </Box>
           <Box w="$full" px="$8">
             <Formik
-              initialValues={{
-                nome: '',
-                decricao: '',
-                tipo_ua: {
-                  id: 0,
-                  nome: '',
-                  descricao: '',
-                },
+              initialValues={ua}
+              onSubmit={async (values) => {
+                try {
+                  await new UaService(db).update(values);
+                  Alert.alert("Sucesso", "Atualizacao realizada com sucesso");
+                  navigation?.navigate('visualizar-uas');
+                } catch (error) {
+                  Alert.alert("Erro", (error as Error).message);
+                }
               }}
-              onSubmit={() => {}}
             >
               {({ handleChange, handleSubmit, values, errors }) => {
                 return (

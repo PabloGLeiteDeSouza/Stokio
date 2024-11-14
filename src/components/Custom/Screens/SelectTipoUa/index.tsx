@@ -11,9 +11,13 @@ import {
   Text,
 } from '@gluestack-ui/themed';
 import React from 'react';
-import { ListRenderItem } from 'react-native';
+import { Alert, ListRenderItem } from 'react-native';
 import { ISelectTipoUaProps } from './interfaces';
-import { Ua, UaFlatList } from '@/types/screens/ua';
+import { UaFlatList } from '@/types/screens/ua';
+import { TipoUaUpdate } from '@/classes/tipo_ua/interfaces';
+import { useSQLiteContext } from 'expo-sqlite';
+import TipoUaService from '@/classes/tipo_ua/tipo_ua.service';
+import { TipoUaFlatList } from '@/types/screens/tipo-ua';
 
 const SelectTipoUA: React.FC<ISelectTipoUaProps> = ({ navigation, route }) => {
   if (!route || !route.params || !route.params.screen) {
@@ -21,59 +25,49 @@ const SelectTipoUA: React.FC<ISelectTipoUaProps> = ({ navigation, route }) => {
     return null;
   }
   const screen = route.params.screen;
-  const [uas, setUas] = React.useState<Array<Ua>>([
-    {
-      id: 1,
-      nome: 'João',
-      tipo: 'teste',
-    },
-    {
-      id: 2,
-      nome: 'Maria',
-      tipo: 'teste1',
-    },
-  ]);
-  const [ua, setUa] = React.useState<Ua>(uas[0]);
+  const tipoUa = route.params.tipo_ua;
+  const [tiposUas, setTiposUas] = React.useState<TipoUaUpdate[]>([]);
+  const [tipo_ua, set_tipo_ua] = React.useState<TipoUaUpdate>(tipoUa);
   const [isLoading, setIsLoading] = React.useState(true);
+  const db = useSQLiteContext();
 
-  React.useEffect(() => {
-    async function startScreen() {
-      try {
-        setUas([
-          ...uas,
-          {
-            id: 3,
-            nome: 'Pedro',
-            tipo: 'teste2',
-          },
-        ]);
-        setIsLoading(false);
-      } catch (error) {
-        setIsLoading(false);
-        throw error;
-      }
+  async function startScreen() {
+    try {
+      const tiposUas = await new TipoUaService(db).getAll();
+      setTiposUas([...tiposUas]);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      Alert.alert('Error', (error as Error).message);
+      navigation?.goBack();
+      throw error;
     }
+  }
+  React.useEffect(() => {
     startScreen();
   }, []);
 
-  const FlatListUas = FlatList as UaFlatList;
+  const FlatListTiposUas = FlatList as TipoUaFlatList;
 
-  const ListRenderUas: ListRenderItem<Ua> = ({ item }) => {
+  const ListRenderUas: ListRenderItem<TipoUaUpdate> = ({ item, index }) => {
     return (
-      <Card>
-        <HStack>
-          <VStack>
+      <Card mt={index === 0 ? "$5" : "$2.5"} mb={index === (tiposUas.length - 1) ? "$5" : "$2.5"}>
+        <HStack justifyContent='space-between'>
+          <VStack w="$2/3">
             <Box>
               <Heading>{item.nome}</Heading>
             </Box>
             <Box>
-              <Text>{item.tipo}</Text>
+              <Text>{item.descricao}</Text>
             </Box>
           </VStack>
-          <VStack>
-            <Button isDisabled={item.id === ua.id} onPress={() => setUa(item)}>
+          <VStack w="$1/3">
+            <Button 
+              isDisabled={item.id === tipo_ua.id} 
+              onPress={() => set_tipo_ua(item)}
+            >
               <ButtonText>
-                {item.id === ua.id ? 'selcionado' : 'selecionar'}
+                {item.id === tipo_ua.id ? 'selcionado' : 'selecionar'}
               </ButtonText>
             </Button>
           </VStack>
@@ -88,20 +82,20 @@ const SelectTipoUA: React.FC<ISelectTipoUaProps> = ({ navigation, route }) => {
 
   return (
     <Box h="$full" w="$full">
-      <Box>
+      <Box mt="$5">
         <Heading size="2xl" textAlign="center">
-          Selecionar Unidade de Armazenamento:
+          Selecionar Tipo de Unidade de Armazenamento:
         </Heading>
       </Box>
-      <Box>
-        <FlatListUas
-          data={uas}
+      <Box mx="$5" gap="$5">
+        <FlatListTiposUas
+          data={tiposUas}
           renderItem={ListRenderUas}
           keyExtractor={(item) => String(item.id)}
         />
         <Box>
-          <Button onPress={() => navigation?.navigate(screen, { ua })}>
-            <ButtonText>Selecionar Ua</ButtonText>
+          <Button onPress={() => navigation?.navigate(screen, { tipo_ua })}>
+            <ButtonText>Selecionar Tipo de Ua</ButtonText>
           </Button>
         </Box>
       </Box>
@@ -109,4 +103,4 @@ const SelectTipoUA: React.FC<ISelectTipoUaProps> = ({ navigation, route }) => {
   );
 };
 
-export default SelectUa;
+export default SelectTipoUA;

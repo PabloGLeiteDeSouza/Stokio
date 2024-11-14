@@ -11,7 +11,7 @@ export class UnidadesDeArmazenamento {
   async checkStorageUnitExists(id: number): Promise<boolean> {
     try {
       const unidade = await this.db.getFirstAsync(
-        `SELECT id FROM unidade_de_armazenamento WHERE id = $id`,
+        `SELECT id FROM ua WHERE id = $id`,
         { $id: id },
       );
       return !!unidade;
@@ -26,7 +26,7 @@ export class UnidadesDeArmazenamento {
   async checkStorageUnitTypeExists(id: number): Promise<boolean> {
     try {
       const tipo = await this.db.getFirstAsync(
-        `SELECT id FROM tipo_de_unidade_de_armazenamento WHERE id = $id`,
+        `SELECT id FROM tipo_de_ua WHERE id = $id`,
         { $id: id },
       );
       return !!tipo;
@@ -41,7 +41,7 @@ export class UnidadesDeArmazenamento {
   async findAllStorageUnits(): Promise<UnidadeDeArmazenamento[]> {
     try {
       const unidades = await this.db.getAllAsync<UnidadeDeArmazenamento>(
-        `SELECT id, nome, descricao, id_tipo_de_unidade_de_armazenamento FROM unidade_de_armazenamento`,
+        `SELECT id, nome, descricao, id_tipo_de_ua FROM ua`,
       );
       return unidades;
     } catch (error) {
@@ -57,8 +57,8 @@ export class UnidadesDeArmazenamento {
   ): Promise<UnidadeDeArmazenamento[]> {
     try {
       const unidades = await this.db.getAllAsync<UnidadeDeArmazenamento>(
-        `SELECT id, nome, descricao, id_tipo_de_unidade_de_armazenamento 
-         FROM unidade_de_armazenamento
+        `SELECT id, nome, descricao, id_tipo_de_ua 
+         FROM ua
          WHERE nome LIKE $nome`,
         { $nome: `%${nome}%` },
       );
@@ -76,8 +76,8 @@ export class UnidadesDeArmazenamento {
   ): Promise<UnidadeDeArmazenamento | null> {
     try {
       const unidade = await this.db.getFirstAsync<UnidadeDeArmazenamento>(
-        `SELECT id, nome, descricao, id_tipo_de_unidade_de_armazenamento 
-         FROM unidade_de_armazenamento 
+        `SELECT id, nome, descricao, id_tipo_de_ua 
+         FROM ua 
          WHERE id = $id`,
         { $id: id },
       );
@@ -93,7 +93,7 @@ export class UnidadesDeArmazenamento {
   async findAllStorageUnitTypes(): Promise<TipoDeUnidadeDeArmazenamento[]> {
     try {
       const tipos = await this.db.getAllAsync<TipoDeUnidadeDeArmazenamento>(
-        `SELECT id, nome, descricao FROM tipo_de_unidade_de_armazenamento`,
+        `SELECT id, nome, descricao FROM tipo_de_ua`,
       );
       return tipos;
     } catch (error) {
@@ -110,7 +110,7 @@ export class UnidadesDeArmazenamento {
     try {
       const tipos = await this.db.getAllAsync<TipoDeUnidadeDeArmazenamento>(
         `SELECT id, nome, descricao 
-         FROM tipo_de_unidade_de_armazenamento
+         FROM tipo_de_ua
          WHERE nome LIKE $nome`,
         { $nome: `%${nome}%` },
       );
@@ -129,7 +129,7 @@ export class UnidadesDeArmazenamento {
     try {
       const tipo = await this.db.getFirstAsync<TipoDeUnidadeDeArmazenamento>(
         `SELECT id, nome, descricao 
-         FROM tipo_de_unidade_de_armazenamento 
+         FROM tipo_de_ua 
          WHERE id = $id`,
         { $id: id },
       );

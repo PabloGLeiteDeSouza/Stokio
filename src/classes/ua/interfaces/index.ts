@@ -2,7 +2,11 @@ export interface UnidadeDeArmazenamento {
   id: number;
   nome: string;
   descricao?: string;
-  idTipoDeUnidadeDeArmazenamento: number;
+  id_tipo_ua: number;
+}
+
+export interface UnidadeDeArmazenamentoObject extends Omit<UnidadeDeArmazenamento, 'id_tipo_ua'> {
+  tipo_ua: TipoDeUnidadeDeArmazenamento;
 }
 
 export interface TipoDeUnidadeDeArmazenamento {

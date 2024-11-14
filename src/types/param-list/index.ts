@@ -9,6 +9,7 @@ import { TipoProduto } from '../screens/tipo-produto';
 import { TipoUa } from '../screens/tipo-ua';
 import { Ua } from '../screens/ua';
 import { Um } from '../screens/um';
+import { TipoUaUpdate } from '@/classes/tipo_ua/interfaces';
 
 export type RootStackParamList = {
   'code-scanner'?: { screen: ParamListCodeScanner };
@@ -304,7 +305,7 @@ export type SelecionarUaStackParamList = {
 };
 
 export type SelecionarTipoUaStackParamList = {
-  'selecionar-tipo-ua'?: { screen: 'cadastrar-ua'; tipoUaSelecionada?: TipoUa };
+  'selecionar-tipo-ua'?: { screen: 'cadastrar-ua'; tipo_ua?: TipoUaUpdate };
   'cadastrar-ua'?: { tipo_ua: { id: number; nome: string } };
 };
 
@@ -457,4 +458,5 @@ export type UasStackParamList = {
   'visualizar-uas'?: object;
   'detalhes-ua'?: { id: number };
   'atualizar-ua'?: { id: number };
+  'selecionar-tipo-ua'?: { tipo_ua: TipoUaUpdate, screen: 'cadastrar-ua' | 'atualizar-ua' }
 };

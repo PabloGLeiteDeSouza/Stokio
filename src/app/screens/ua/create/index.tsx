@@ -59,29 +59,38 @@ import {
 } from '@gluestack-ui/themed';
 import { Box, Heading, ScrollView, VStack } from '@gluestack-ui/themed';
 import { Formik } from 'formik';
-import { GestureResponderEvent } from 'react-native';
+import { Alert, GestureResponderEvent } from 'react-native';
 import { CadastrarUaScreen } from '@/interfaces/ua';
 import UaService from '@/classes/ua/ua.service';
 import { useSQLiteContext } from 'expo-sqlite';
 import FormCreateUa from '@/components/Forms/ua/create';
 import TipoUaService from '@/classes/tipo_ua/tipo_ua.service';
-const Create: React.FC<CadastrarUaScreen> = ({ navigation }) => {
+import { useIsFocused } from '@react-navigation/native';
+import LoadingScreen from '@/components/LoadingScreen';
+const Create: React.FC<CadastrarUaScreen> = ({ navigation, route }) => {
   const [isLoadingScreen, setisLoadingScreen] = React.useState(true);
   const [haveTipoUa, setHaveTipoUa] = React.useState(false);
   const db = useSQLiteContext();
+  const isFocused = useIsFocused();
+  async function Start() {
+    try {
+      setHaveTipoUa((await new TipoUaService(db).getAll()).length > 0)
+      setisLoadingScreen(false);
+    } catch (error) {
+      Alert.alert('Error', (error as Error).message);
+      navigation?.goBack();
+      throw error;
+    }
+  }
   React.useEffect(() => {
-    async function Start() {
-      try {
-        setHaveTipoUa((await new TipoUaService(db).getAll()).length > 0)
-        setisLoadingScreen(false);
-      } catch (error) {
-        throw error;
-      }
-    }
-    if (isLoadingScreen) {
-      Start();
-    }
-  }, [isLoadingScreen]);
+    setisLoadingScreen(true);
+    Start();
+  }, [isFocused]);
+
+  if(isLoadingScreen){
+    return <LoadingScreen />
+  }
+
   return (
     <Box h="$full" w="$full" px="$1.5">
       <ScrollView w="$full">
@@ -98,6 +107,10 @@ const Create: React.FC<CadastrarUaScreen> = ({ navigation }) => {
               onSubimited={() => {
                 navigation?.goBack();
               }}
+              onChangeTipoUa={(tipo_ua) => {
+                navigation?.navigate('selecionar-tipo-ua', { tipo_ua, screen: 'cadastrar-ua'});
+              }}
+              tipo_ua={route?.params?.tipo_ua}
             />
           </Box>
         </VStack>

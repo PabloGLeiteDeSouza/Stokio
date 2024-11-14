@@ -3,6 +3,7 @@ import {
   UnidadeDeArmazenamento,
   TipoDeUnidadeDeArmazenamento,
   UnidadeDeArmazenamentoCreate,
+  UnidadeDeArmazenamentoObject,
 } from './interfaces';
 import { SQLiteDatabase } from 'expo-sqlite';
 
@@ -99,19 +100,26 @@ export default class UaService {
   // Busca uma unidade de armazenamento pelo ID
   async findStorageUnitById(
     id: number,
-  ): Promise<UnidadeDeArmazenamento | null> {
+  ): Promise<UnidadeDeArmazenamentoObject> {
     try {
       const unidade = await this.db.getFirstAsync<UnidadeDeArmazenamento>(
-        `SELECT id, nome, descricao, id_tipo_de_unidade_de_armazenamento 
-         FROM unidade_de_armazenamento 
+        `SELECT id, nome, descricao 
+         FROM ua 
          WHERE id = $id`,
         { $id: id },
       );
-      return unidade || null;
+      if (!unidade) {
+        throw new Error("Nao foi possivel encontrar a unidade de armazenamento!");
+      }
+      const tipo_ua = await this.db.getFirstAsync<TipoDeUnidadeDeArmazenamento>('SELECT * FROM tipo_ua WHERE id = $id', {
+        $id: unidade.id_tipo_ua,
+      })
+      if (!tipo_ua) {
+        throw new Error("Nao foi possivel encontrar o tipo de unidade de armazenamento!")
+      }
+      return {...unidade, tipo_ua };
     } catch (error) {
-      throw new Error(
-        `Erro ao buscar unidade de armazenamento pelo ID: ${(error as Error).message}`,
-      );
+      throw error;
     }
   }
 

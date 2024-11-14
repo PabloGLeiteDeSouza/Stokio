@@ -64,7 +64,7 @@ import { Alert, GestureResponderEvent } from 'react-native';
 import UaService from '@/classes/ua/ua.service';
 import { IFormCreateUa } from './interface';
 
-const FormCreateUa: React.FC<IFormCreateUa> = ({ db, onSubimited, haveTipoUa }) => {
+const FormCreateUa: React.FC<IFormCreateUa> = ({ db, onSubimited, haveTipoUa, onChangeTipoUa, tipo_ua }) => {
   const [isNewTipoUa, setIsNewTipoUa] = React.useState(!haveTipoUa);
   return (
     <>
@@ -88,7 +88,12 @@ const FormCreateUa: React.FC<IFormCreateUa> = ({ db, onSubimited, haveTipoUa }) 
           }
         }}
       >
-        {({ handleChange, handleSubmit, values, errors }) => {
+        {({ handleChange, handleSubmit, setFieldValue, values, errors }) => {
+          React.useEffect(() => {
+            if (tipo_ua) {
+              setFieldValue('tipo_ua', tipo_ua);
+            }
+          }, [tipo_ua])
           return (
             <Box gap="$5">
               <FormControl
@@ -236,7 +241,7 @@ const FormCreateUa: React.FC<IFormCreateUa> = ({ db, onSubimited, haveTipoUa }) 
                   )}
                   <Box gap="$5">
                     <Button onPress={() => {
-                      onSelectTipoUa()
+                      onChangeTipoUa(values.tipo_ua)
                     }}>
                       <ButtonText>{values.tipo_ua.id === 0 ? "Selecionar Tipo de UA" : "Atualizar Tipo de UA"}</ButtonText>
                     </Button>

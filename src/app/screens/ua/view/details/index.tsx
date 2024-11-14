@@ -1,6 +1,8 @@
+import { UnidadeDeArmazenamentoObject } from '@/classes/ua/interfaces';
+import UaService from '@/classes/ua/ua.service';
 import ButtonDelete from '@/components/Custom/Buttons/Delete';
 import LoadingScreen from '@/components/LoadingScreen';
-import { DetalhesClienteScreen } from '@/interfaces/cliente';
+import { DetalhesUaScreen } from '@/interfaces/ua';
 import {
   Box,
   Button,
@@ -11,18 +13,48 @@ import {
   ScrollView,
   Text,
 } from '@gluestack-ui/themed';
+import { useSQLiteContext } from 'expo-sqlite';
 import React from 'react';
+import { Alert } from 'react-native';
 
-const Details: React.FC<DetalhesClienteScreen> = ({ navigation, route }) => {
+const Details: React.FC<DetalhesUaScreen> = ({ navigation, route }) => {
   if (!route || !route.params || !route.params.id) {
     navigation?.navigate('visualizar-uas');
+    return null;
   }
 
+  const { id } = route.params;
+  const db = useSQLiteContext();
   const [isLoading, setIsLoading] = React.useState(true);
-  const [ua, setUa] = React.useState({});
+  const [ua, setUa] = React.useState<UnidadeDeArmazenamentoObject>({
+    id: 0,
+    nome: '',
+    descricao: '',
+    tipo_ua: {
+      id: 0,
+      nome: '',
+      descricao: '',
+    },
+    id_tipo_ua: 0,
+  });
+
+
+  const start = async () => {
+    try {
+      const data = await new UaService(db).findStorageUnitById(id);
+      console.log(data);
+      setUa(data);
+      setIsLoading(false);
+    } catch (err) {
+      Alert.alert('Erro', (err as Error).message);
+      navigation?.navigate('visualizar-uas');
+    }
+  }
+
+
 
   React.useEffect(() => {
-    setIsLoading(false);
+    start()
   }, []);
 
   if (isLoading) {
@@ -39,26 +71,30 @@ const Details: React.FC<DetalhesClienteScreen> = ({ navigation, route }) => {
           <Box gap="$8">
             <Box gap="$1.5">
               <Heading>Nome:</Heading>
-              <Text>Caixa-01</Text>
+              <Text>{ua.nome}</Text>
             </Box>
-            <Box gap="$1.5">
-              <Heading>Descricao</Heading>
-              <Text>Uma caixa identificada como 01</Text>
-            </Box>
+            {ua.descricao !== "" && (
+              <Box gap="$1.5">
+                <Heading>Descricao</Heading>
+                <Text>{ua.descricao}</Text>
+              </Box>
+            )}
             <Box gap="$3">
               <Heading>Tipo de unidade de armazenamento</Heading>
               <Box gap="$1.5">
                 <Heading>Nome</Heading>
-                <Text>Caixa</Text>
+                <Text>{ua.tipo_ua.nome}</Text>
               </Box>
-              <Box gap="$1.5">
-                <Heading>Descricao</Heading>
-                <Text>Uma caixa qualquer</Text>
-              </Box>
+              {ua.tipo_ua.descricao !== "" && (
+                <Box gap="$1.5">
+                  <Heading>Descricao</Heading>
+                  <Text>{ua.tipo_ua.descricao}</Text>
+                </Box>
+              )}
             </Box>
             <Box gap="$5">
               <Button
-                onPress={() => navigation?.navigate('atualizar-ua', { id: 1 })}
+                onPress={() => navigation?.navigate('atualizar-ua', { id: ua.id })}
                 gap="$5"
               >
                 <ButtonText>Editar</ButtonText>
