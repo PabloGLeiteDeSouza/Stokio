@@ -226,7 +226,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                     <Input>
                       <InputField
                         type="text"
-                        placeholder="Nome Completo do Clinente"
+                        placeholder="Nome Completo da Pessoa"
                         onChangeText={handleChange('pessoa.nome')}
                         value={values.pessoa.nome}
                       />
@@ -656,7 +656,14 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                     <Box key={`email-${i}`}>
                       <FormControl
                         isReadOnly={isReadOnlyAll}
-                        isInvalid={false}
+                        isInvalid={
+                        errors.emails &&
+                          typeof errors?.emails[i] === 'object'
+                            ? errors.emails[i].endereco
+                              ? true
+                              : false
+                            : false
+                        }
                         size={'md'}
                         isDisabled={false}
                         isRequired={true}
