@@ -1,3 +1,4 @@
+import { ProdutoService } from '@/classes/produto/produto.service';
 import LoadingScreen from '@/components/LoadingScreen';
 import {
   DetalhesEmpresaScreen,
@@ -11,18 +12,35 @@ import {
   ScrollView,
   Text,
 } from '@gluestack-ui/themed';
+import { useSQLiteContext } from 'expo-sqlite';
 import React from 'react';
+import { Alert } from 'react-native';
 
 const Details: React.FC<DetalhesProdutoScreen> = ({ navigation, route }) => {
   if (!route || !route.params || !route.params.id) {
     navigation?.navigate('visualizar-produtos');
+    return null;
   }
-
+  const id = route.params.id;
   const [isLoading, setIsLoading] = React.useState(true);
   const [produto, setProduto] = React.useState({});
+  const db = useSQLiteContext();
+
+  const StartScreen = async () => {
+    try {
+      const data = await new ProdutoService(db).getProdutoById(id);
+      setProduto(data);
+      setIsLoading(false);
+    } catch (error) {
+      Alert.alert("Erro", (error as Error).message);
+      navigation?.goBack();
+      setIsLoading(false);
+    }
+  }
+
 
   React.useEffect(() => {
-    setIsLoading(false);
+    StartScreen()
   }, []);
 
   if (isLoading) {
@@ -39,7 +57,7 @@ const Details: React.FC<DetalhesProdutoScreen> = ({ navigation, route }) => {
           <Box gap="$5">
             <Box gap="$1.5">
               <Heading>Nome:</Heading>
-              <Text>João</Text>
+              <Text>{produto.nome}</Text>
             </Box>
             <Box gap="$1.5">
               <Heading>Empresa:</Heading>

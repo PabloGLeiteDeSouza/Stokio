@@ -4,6 +4,8 @@ import {
   TipoDeUnidadeDeArmazenamento,
   UnidadeDeArmazenamentoCreate,
   UnidadeDeArmazenamentoObject,
+  UnidadeDeArmazenamentoUpdate,
+  UnidadeDeArmazenamentoListView,
 } from './interfaces';
 import { SQLiteDatabase } from 'expo-sqlite';
 
@@ -49,11 +51,31 @@ export default class UaService {
     }
   }
 
+  async update(data: UnidadeDeArmazenamentoUpdate): Promise<void> {
+    try {
+      await this.db.runAsync(
+        'UPDATE ua SET nome = $nome, descricao = $descrocao, id_tipo_ua = $id_tipo_ua WHERE id = $id',
+        {
+          $id: data.id,
+          $nome: data.nome,
+          $descricao: String(data.descricao),
+          $id_tipo_ua: data.tipo_ua.id,
+        },
+      );
+      await this.db.runAsync(
+        'UPDATE tipo_ua SET nome = $nome, descricao = $descricao WHERE id = $id',
+        { $nome: data.tipo_ua.nome, $descricao: String(data.tipo_ua.descricao), $id: data.tipo_ua.id },
+      );
+    } catch (err) {
+      throw new Error(`Erro ao criar unidade de armazenamento: ${(err as Error).message}`);
+    }
+  }
+
   // Verifica se o tipo de unidade de armazenamento existe pelo ID
   async checkStorageUnitTypeExists(id: number): Promise<boolean> {
     try {
       const tipo = await this.db.getFirstAsync(
-        `SELECT id FROM tipo_de_unidade_de_armazenamento WHERE id = $id`,
+        `SELECT id FROM tipo_ua WHERE id = $id`,
         { $id: id },
       );
       return !!tipo;
@@ -85,7 +107,7 @@ export default class UaService {
     try {
       const unidades = await this.db.getAllAsync<UnidadeDeArmazenamento>(
         `SELECT id, nome, descricao, id_tipo_de_unidade_de_armazenamento 
-         FROM unidade_de_armazenamento
+         FROM ua
          WHERE nome LIKE $nome`,
         { $nome: `%${nome}%` },
       );
@@ -103,7 +125,7 @@ export default class UaService {
   ): Promise<UnidadeDeArmazenamentoObject> {
     try {
       const unidade = await this.db.getFirstAsync<UnidadeDeArmazenamento>(
-        `SELECT id, nome, descricao 
+        `SELECT id, nome, descricao, id_tipo_ua
          FROM ua 
          WHERE id = $id`,
         { $id: id },
@@ -111,20 +133,21 @@ export default class UaService {
       if (!unidade) {
         throw new Error("Nao foi possivel encontrar a unidade de armazenamento!");
       }
+      const { id_tipo_ua, ...ua} = unidade;
       const tipo_ua = await this.db.getFirstAsync<TipoDeUnidadeDeArmazenamento>('SELECT * FROM tipo_ua WHERE id = $id', {
-        $id: unidade.id_tipo_ua,
+        $id: id_tipo_ua,
       })
       if (!tipo_ua) {
         throw new Error("Nao foi possivel encontrar o tipo de unidade de armazenamento!")
       }
-      return {...unidade, tipo_ua };
+      return {...ua, tipo_ua };
     } catch (error) {
       throw error;
     }
   }
 
   async findAll() {
-    const data = await this.db.getAllAsync<Ua>('SELECT * FROM ua');
+    const data = await this.db.getAllAsync<Ua>('SELECT ua.id, ua.nome, tipo_ua.nome as tipo FROM ua INNER JOIN tipo_ua ON ua.id_tipo_ua == tipo_ua.id');
     return data;
   }
 
@@ -180,10 +203,51 @@ export default class UaService {
     }
   }
 
+  async findUaByTipo(id: number): Promise<UnidadeDeArmazenamentoListView[]> {
+    try {
+      const data = await this.db.getAllAsync<UnidadeDeArmazenamentoListView>('SELECT ua.id, ua.nome, tipo_ua.nome as tipo FROM ua INNER JOIN tipo_ua ON tipo_ua.id == ua.id_tipo_ua WHERE id_tipo_ua = $id', {
+        $id: id
+      });
+
+      if(data.length < 1){
+        throw new Error("Nao foram encontradas Unidades de Armazenamento com esse Tipo!");
+      }
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findUaByNome(nome: string): Promise<UnidadeDeArmazenamentoListView[]> {
+    try {
+      const data = await this.db.getAllAsync<UnidadeDeArmazenamentoListView>(`SELECT ua.id, ua.nome, tipo_ua.nome as tipo FROM ua INNER JOIN tipo_ua ON tipo_ua.id == ua.id_tipo_ua WHERE ua.nome LIKE $nome`, {
+        $nome: `%${nome}%`,
+      });
+
+      if(data.length < 1){
+        throw new Error("Nao foram encontradas Unidades de Armazenamento com esse nome!");
+      }
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async haveUas() {
     const data = await this.db.getAllAsync(
       'SELECT * FROM unidade_de_armazenamento',
     );
     return data.length > 0;
+  }
+
+  async delete(id: number) {
+    try {
+      const res = await this.db.runAsync('DELETE FROM ua WHERE id = $id', { $id: id });
+      if (res.changes < 1) {
+        throw new Error("Não foi possível deletar a unidade de armazenamento");
+      }
+    } catch (error) {
+      throw error;
+    }
   }
 }

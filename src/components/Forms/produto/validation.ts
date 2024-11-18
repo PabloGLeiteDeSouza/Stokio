@@ -4,7 +4,7 @@ export const validationSchema = Yup.object().shape({
     codigo_de_barras: Yup.string().required('O código de barras é obrigatório'),
     nome: Yup.string().required('O nome é obrigatório'),
     descricao: Yup.string().required('A descrição é obrigatória'),
-    preco: Yup.number().required('O preço é obrigatório'),
+    valor: Yup.number().required('O valor é obrigatório'),
     data_de_validade: Yup.date().required('A data de válidade é obrigatória'),
     tipo_produto: Yup.object().shape({
       id: Yup.number().required('O tipo de produto é obrigatório'),

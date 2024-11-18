@@ -80,7 +80,7 @@ const CodeScanner: React.FC<CodeScannerProps> = ({ navigation, route }) => {
             ]);
             return;
           }
-          navigation?.navigate(screen, { code: result.data, result: true });
+          navigation?.navigate(screen, { code: result.data });
         }}
         {...props}
       />

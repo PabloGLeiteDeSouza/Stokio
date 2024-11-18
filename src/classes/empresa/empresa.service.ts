@@ -201,6 +201,11 @@ export class EmpresaService implements IEmpresaService {
     return data;
   }
 
+  async findAllMin() {
+    const data = await this.db.getAllAsync("SELECT e.id, e.nome_fantasia, e.razao_social, p.cpf, e.cnpj FROM empresa as e INNER JOIN pessoa as p ON p.id == e.id_pessoa");
+    return data;
+  }
+
   async search(criteria: EmpresaSearchCriteria): Promise<EmpresaObject[]> {
     let query =
       'SELECT * FROM empresa INNER JOIN pessoa_empresa ON empresa.id = pessoa_empresa.id_empresa INNER JOIN pessoa ON pessoa_empresa.id_pessoa = pessoa.id WHERE 1=1';

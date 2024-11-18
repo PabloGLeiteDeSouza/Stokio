@@ -25,7 +25,7 @@ export type RootStackParamList = {
   'screens-tipos-uas'?: object;
   'screens-ramos'?: object;
   'screens-itens-venda'?: object;
-  'visualizar-produtos'?: { code?: string; result?: boolean };
+  'visualizar-produtos'?: { code?: string; };
   'visualizar-empresas'?: object;
   'visualizar-uas'?: object;
   'visualizar-tipo-uas'?: object;
@@ -42,7 +42,7 @@ export type RootStackParamList = {
   'detalhes-produto'?: { id: number };
   'detalhes-venda'?: { id: number };
   'detalhes-ua'?: { id: number };
-  'cadastrar-produto'?: { code?: string; result?: boolean };
+  'cadastrar-produto'?: { code?: string; };
   'cadastrar-cliente'?: { pessoa: Pessoa };
   'cadastrar-empresa'?: object;
   'cadastrar-categoria'?: object;
@@ -52,9 +52,9 @@ export type RootStackParamList = {
   'cadastrar-tipo-ua'?: object;
   'cadastrar-um'?: object;
   'cadastrar-ramo'?: object;
-  'cadastrar-venda'?: { cliente?: Cliente; produto?: Produto };
+  'cadastrar-venda'?: { cliente?: Cliente; produto?: Produto; code?: string };
   'cadastrar-item-venda'?: object;
-  'cadastrar-compra'?: object;
+  'cadastrar-compra'?: { code?: string; };
   'atualizar-produto'?: { id: number };
   'atualizar-empresa'?: { id: number };
   'atualizar-ua'?: { id: number };
@@ -86,7 +86,7 @@ export type ParamList =
   | 'screens-tipos-uas'
   | 'screens-ramos'
   | 'item-venda-screens'
-  | 'cadastrar-produtos'
+  | 'cadastrar-produto'
   | 'code-scanner'
   | 'visualizar-produtos'
   | 'visualizar-empresas'
@@ -106,8 +106,8 @@ export type ParamList =
   | 'detalhes-produto'
   | 'detalhes-venda'
   | 'detalhes-ua'
-  | 'cadastrar-clientes'
-  | 'cadastrar-empresas'
+  | 'cadastrar-cliente'
+  | 'cadastrar-empresa'
   | 'cadastrar-categoria'
   | 'cadastrar-marca'
   | 'cadastrar-tipo-produto'
@@ -137,7 +137,8 @@ export type ParamList =
 export type ParamListCodeScanner =
   | 'cadastrar-produto'
   | 'visualizar-produtos'
-  | 'cadastrar-venda';
+  | 'cadastrar-venda'
+  | 'cadastrar-compra';
 
 export type ProdutosStackParamList = {
   'code-scanner'?: { screen: ParamListCodeScanner };
@@ -147,29 +148,27 @@ export type ProdutosStackParamList = {
   'screens-config'?: object;
   'screens-empresas'?: object;
   'screens-marcas'?: object;
-  'cadastrar-marcas'?: object;
+  'cadastrar-marca'?: object;
   'screens-uas'?: object;
   'screens-ums'?: object;
-  'cadastrar-ums'?: object;
+  'cadastrar-um'?: object;
   'screens-vendas'?: object;
   'screens-tipos-uas'?: object;
   'screens-ramos'?: object;
   'screens-itens-venda'?: object;
-  'visualizar-produtos'?: { code?: string; result?: boolean };
+  'visualizar-produtos'?: { code?: string; };
   'cadastrar-produto'?: {
     code?: string;
-    result?: boolean;
     marca?: { id: number; nome: string };
     tipo_produto?: { id: number; nome: string };
-    ua?: { id: number; nome: string };
-    um?: { id: number; nome: string };
+    ua?: Ua;
+    um?: Um;
     empresa?: Empresa;
   };
   'detalhes-produto'?: { id: number };
   'atualizar-produto'?: {
     id: number;
     code?: string;
-    result?: boolean;
     marca?: { id: number; nome: string };
     tipo_produto?: { id: number; nome: string };
     ua?: { id: number; nome: string };
@@ -267,7 +266,7 @@ export type SelecionarPessoaStackParamList = {
 export type SelecionarMarcaStackParamList = {
   'selecionar-marca'?: {
     screen: 'cadastrar-produto';
-    marcaSelecionado?: Marca;
+    marcaSelecionada?: Marca;
   };
   'cadastrar-produto'?: { marca: Marca };
 };
@@ -423,6 +422,7 @@ export type ComprasStackParamList = {
       quantidade: number;
       valor: number;
     };
+    code?: string;
     type?: 'update' | 'create';
     indexUpdated?: number;
   };
@@ -458,5 +458,5 @@ export type UasStackParamList = {
   'visualizar-uas'?: object;
   'detalhes-ua'?: { id: number };
   'atualizar-ua'?: { id: number };
-  'selecionar-tipo-ua'?: { tipo_ua: TipoUaUpdate, screen: 'cadastrar-ua' | 'atualizar-ua' }
+  'selecionar-tipo-ua'?: { tipo_ua: TipoUaUpdate; screen: 'cadastrar-ua' | 'atualizar-ua' };
 };

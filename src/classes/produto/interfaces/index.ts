@@ -17,15 +17,16 @@ export interface Marca {
 
 export interface Produto {
   id: number;
-  codigoDeBarras: string;
-  dataDeValidade: string;
+  codigo_de_barras: string;
+  data_de_validade: string;
   nome: string;
-  descricao?: string;
+  descricao: string | null;
   valor: number;
   quantidade: number;
-  idMarca: number;
-  idTipoProduto: number;
-  idUnidadeDeMedida: number;
+  id_empresa: number;
+  id_marca: number;
+  id_tipo_produto: number;
+  id_um: number;
   tamanho: number;
-  idUnidadeDeArmazenamento: number;
+  id_ua: number;
 }

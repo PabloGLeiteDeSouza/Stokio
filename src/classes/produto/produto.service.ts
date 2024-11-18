@@ -7,25 +7,29 @@ export class ProdutoService {
   // CRUD de Produtos
 
   // Criação de Produto
-  async createProduto(produto: Produto): Promise<number> {
+  async createProduto(produto: Omit<Produto, 'id'>): Promise<number> {
     try {
       const result = await this.db.runAsync(
-        `INSERT INTO produto (codigo_de_barras, data_de_validade, nome, descricao, valor, quantidade, id_marca, id_tipo_produto, id_unidade_de_medida, tamanho, id_unidade_de_armazenamento) 
-         VALUES ($codigoDeBarras, $dataDeValidade, $nome, $descricao, $valor, $quantidade, $idMarca, $idTipoProduto, $idUnidadeDeMedida, $tamanho, $idUnidadeDeArmazenamento)`,
+        `INSERT INTO produto (codigo_de_barras, data_de_validade, nome, descricao, valor, quantidade, id_empresa, id_marca, id_tipo_produto, id_um, tamanho, id_ua) 
+         VALUES ($codigoDeBarras, $dataDeValidade, $nome, $descricao, $valor, $quantidade, $id_empresa, $idMarca, $idTipoProduto, $idUnidadeDeMedida, $tamanho, $idUnidadeDeArmazenamento)`,
         {
-          $codigoDeBarras: produto.codigoDeBarras,
-          $dataDeValidade: produto.dataDeValidade,
+          $codigoDeBarras: produto.codigo_de_barras,
+          $dataDeValidade: produto.data_de_validade,
           $nome: produto.nome,
           $descricao: String(produto.descricao),
           $valor: produto.valor,
           $quantidade: produto.quantidade,
-          $idMarca: produto.idMarca,
-          $idTipoProduto: produto.idTipoProduto,
-          $idUnidadeDeMedida: produto.idUnidadeDeMedida,
+          $id_empresa: produto.id_empresa,
+          $idMarca: produto.id_marca,
+          $idTipoProduto: produto.id_tipo_produto,
+          $idUnidadeDeMedida: produto.id_um,
           $tamanho: produto.tamanho,
-          $idUnidadeDeArmazenamento: produto.idUnidadeDeArmazenamento,
+          $idUnidadeDeArmazenamento: produto.id_ua,
         },
       );
+      if (result.changes < 1) {
+        throw new Error("Nao foi possivel cadasatrar o produto!");
+      }
       return result.lastInsertRowId;
     } catch (error) {
       throw new Error(`Erro ao criar produto: ${(error as Error).message}`);
@@ -39,6 +43,15 @@ export class ProdutoService {
         `SELECT * FROM produto WHERE id = $id`,
         { $id: id },
       );
+      if(!produto){
+        throw new Error("Nao foi possivel encontrar o produto!");
+      }
+      const empresa = this.db.getFirstAsync('SELECT * FROM empresa WHERE id == $id', {
+        $id: produto.id_empresa,
+      });
+      const marca = this.db.getFirstAsync('SELECT * FROM marca WHERE id == $id', {
+        $id: produto.id_marca,
+      })
       return produto || null;
     } catch (error) {
       throw new Error(
@@ -53,13 +66,13 @@ export class ProdutoService {
   ): Promise<Produto | null> {
     try {
       const produto = await this.db.getFirstAsync<Produto>(
-        `SELECT * FROM produto WHERE codigoDeBarras = $codigoDeBarras`,
+        `SELECT * FROM produto WHERE codigo_de_barras = $codigoDeBarras`,
         { $codigoDeBarras: codigoDeBarras },
       );
       return produto || null;
     } catch (error) {
       throw new Error(
-        `Erro ao buscar produto pelo ID: ${(error as Error).message}`,
+        `Erro ao buscar produto pelo codigo de barras: ${(error as Error).message}`,
       );
     }
   }
@@ -87,10 +100,7 @@ export class ProdutoService {
   async getAllProdutos(orderBy?: 'ASC' | 'DESC'): Promise<Produto[]> {
     try {
       const $ord = orderBy ? orderBy : 'ASC';
-      const produto = await this.db.getAllAsync<Produto>(
-        `SELECT * FROM produto WHERE 1 = 1 ORDER BY nome $ord`,
-        { $ord },
-      );
+      const produto = await this.db.getAllAsync<Produto>(`SELECT * FROM produto ${orderBy ? `ORDER BY ${orderBy}` : ''}`);
       return produto;
     } catch (error) {
       throw new Error(`Erro ao buscar produtos: ${(error as Error).message}`);
@@ -105,17 +115,17 @@ export class ProdutoService {
          SET codigo_de_barras = $codigoDeBarras, data_de_validade = $dataDeValidade, nome = $nome, descricao = $descricao, valor = $valor, quantidade = $quantidade, id_marca = $idMarca, id_tipo_produto = $idTipoProduto, id_unidade_de_medida = $idUnidadeDeMedida, tamanho = $tamanho, id_unidade_de_armazenamento = $idUnidadeDeArmazenamento 
          WHERE id = $id`,
         {
-          $codigoDeBarras: produto.codigoDeBarras,
-          $dataDeValidade: produto.dataDeValidade,
+          $codigoDeBarras: produto.codigo_de_barras,
+          $dataDeValidade: produto.data_de_validade,
           $nome: produto.nome,
           $descricao: String(produto.descricao),
           $valor: produto.valor,
           $quantidade: produto.quantidade,
           $idMarca: produto.idMarca,
-          $idTipoProduto: produto.idTipoProduto,
-          $idUnidadeDeMedida: produto.idUnidadeDeMedida,
+          $idTipoProduto: produto.id_tipo_produto,
+          $idUnidadeDeMedida: produto.id_um,
           $tamanho: produto.tamanho,
-          $idUnidadeDeArmazenamento: produto.idUnidadeDeArmazenamento,
+          $idUnidadeDeArmazenamento: produto.id_ua,
           $id: id,
         },
       );

@@ -56,14 +56,33 @@ import {
   CheckIcon,
   AlertCircleIcon,
   ChevronDownIcon,
+  ButtonIcon,
 } from '@gluestack-ui/themed';
 
 import { Formik } from 'formik';
 import React from 'react';
 import { validationSchema } from './validation';
 import { Card } from '@gluestack-ui/themed';
-const FormCreateProduto: React.FC = () => {
-    const [is] = React.useState();
+import { IFormCreateProduto } from './interfaces';
+import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
+import { FontAwesome6 } from '@expo/vector-icons';
+import InputText from '@/components/Input';
+import { mask } from '@/utils/mask';
+import { ProdutoService } from '@/classes/produto/produto.service';
+import { Alert, GestureResponderEvent } from 'react-native';
+import { useSQLiteContext } from 'expo-sqlite';
+import MarcaService from '@/classes/marca/marca.service';
+import TipoProdutoService from '@/classes/tipo_produto/tipo_produto.service';
+import { getStringFromDate } from '@/utils';
+import { string } from 'yup';
+import UmService from '@/classes/um/um.service';
+
+const FormCreateProduto: React.FC<IFormCreateProduto> = ({ onCreatedProduto, db, onRedirectProductExists, onCodeScanner, code, haveEmpresas, haveMarcas, haveTiposProdutos, 
+  haveUas, haveUms, onCreateEmpresa, onCreateUa, onSelectEmpresa, onSelectMarca, onSelectTipoProduto, onSelectUa, onSelectUm, empresa, ua, tipo_produto, um, marca }) => {
+  const [newTipoProduto, setNewTipoProduto] = React.useState(!haveTiposProdutos);
+  const [newUm, setNewUm] = React.useState(!haveUms);
+  const [newMarca, setNewMarca] = React.useState(!haveMarcas);
+
   return (
     <>
       <Formik
@@ -74,7 +93,7 @@ const FormCreateProduto: React.FC = () => {
           descricao: '',
           data_de_validade: new Date(),
           valor: '',
-          quantidade: '0',
+          quantidade: '',
           tamanho: '',
           marca: {
             id: Number(null),
@@ -92,21 +111,53 @@ const FormCreateProduto: React.FC = () => {
           unidade_de_armazenamento: {
             id: Number(null),
             nome: '',
+            tipo: '',
           },
           empresa: {
             id: Number(null),
-            nome_fantaisa: '',
+            nome_fantasia: '',
             razao_social: '',
             cnpj: '',
             cpf: '',
           },
         }}
-        onSubmit={() => {}}
+        onSubmit={async (values) => {
+          try {
+            const {marca, tipo_produto, unidade_de_medida, unidade_de_armazenamento, empresa, descricao, nome, quantidade, tamanho, valor, codigo_de_barras, data_de_validade} = values;
+            if (marca.id === 0) {
+              marca.id = await new MarcaService(db).create(values.marca);
+            }
+            if (tipo_produto.id === 0) {
+              tipo_produto.id = await new TipoProdutoService(db).create(values.tipo_produto);
+            }
+            if (unidade_de_medida.id === 0) {
+              unidade_de_medida.id = await new UmService(db).create(values.unidade_de_medida);
+            }
+            await new ProdutoService(db).createProduto({idMarca: marca.id, id_tipo_produto: tipo_produto.id, codigo_de_barras, data_de_validade: getStringFromDate(data_de_validade), id_ua: unidade_de_armazenamento.id, id_um: unidade_de_medida.id, nome: nome, quantidade: Number(quantidade), tamanho: Number(tamanho), valor: Number(valor), descricao });
+            Alert.alert('Sucesso', 'Produto cadastrado com sucesso!');
+            onCreatedProduto();
+          } catch (error) {
+            Alert.alert('Erro', (error as Error).message);
+          }
+        }}
       >
-        {({ values, errors, handleChange, setFieldValue }) => {
+        {({ values, errors, handleSubmit, handleChange, setFieldValue }) => {
           React.useEffect(() => {
+            async function start(code: string) {
+              try {
+                const res = await new ProdutoService(db).getProdutoByCodigoDeBarras(code);
+                if (res) {
+                  Alert.alert('Aviso', 'O produto ja existe')
+                  onRedirectProductExists();
+                }
+                setFieldValue('codigo_de_barras', code);
+              } catch (err) {
+                Alert.alert('Erro', (err as Error).message);
+              }
+            }
+            console.log(code)
             if (code) {
-              setFieldValue('codigo_de_barras', code);
+              start(code)
             }
           }, [code]);
           React.useEffect(() => {
@@ -135,68 +186,75 @@ const FormCreateProduto: React.FC = () => {
               setFieldValue('unidade_de_armazenamento', ua);
             }
           }, [ua]);
+
+
           return (
             <>
               <Box>
-                <Heading textAlign="center">Empresa Responsável</Heading>
+                <Heading size="xl" textAlign="center">Empresa Responsável</Heading>
               </Box>
               {values.empresa.id != 0 && (
                 <>
                   <Card>
                     <Box gap="$5">
-                      <Heading size="lg">Dados da Empresa</Heading>
+                      <Heading size="xl">Dados da Empresa</Heading>
                       <Box>
-                        <Text>Nome da Fantasia</Text>
-                        <Text>{values.empresa.nome_fantaisa}</Text>
+                        <Heading>Nome da Fantasia</Heading>
+                        <Text>{values.empresa.nome_fantasia}</Text>
                       </Box>
                       <Box>
-                        <Text>Razao Social</Text>
-                        <Text></Text>
+                        <Heading>Razao Social</Heading>
+                        <Text>{values.empresa.razao_social}</Text>
                       </Box>
-                      {values.empresa.cnpj !== '' && (
+                      {values.empresa.cpf !== '' && (
                         <Box>
-                          <Text>CNPJ</Text>
-                          <Text>{values.empresa.cnpj}</Text>
+                          <Heading>CPF</Heading>
+                          <Text>{mask(values.empresa.cpf, 'cpf')}</Text>
                         </Box>
                       )}
-                      {values.empresa.cnpj === '' && (
+                      {values.empresa.cnpj !== '' && (
                         <Box>
-                          <Text>CPF</Text>
-                          <Text>{values.empresa.cpf}</Text>
+                          <Heading>CNPJ</Heading>
+                          <Text>{mask(values.empresa.cnpj, 'cnpj')}</Text>
                         </Box>
                       )}
                     </Box>
                   </Card>
                 </>
               )}
-              <FormControl
-                isInvalid={false}
-                size={'md'}
-                isDisabled={false}
-                isRequired={true}
-              >
-                <Box>
-                  <Button
-                    onPress={() => {
-                        onSelectEmpresa(values.empresa);
-                    }}
+              {haveEmpresas && (
+                <>
+                  <FormControl
+                    isInvalid={false}
+                    size={'md'}
+                    isDisabled={false}
+                    isRequired={true}
                   >
-                    <ButtonText>Selecionar empresa</ButtonText>
-                  </Button>
-                </Box>
-                <FormControlHelper>
-                  <FormControlHelperText>
-                    Você deve selecionar a empresa.
-                  </FormControlHelperText>
-                </FormControlHelper>
+                    <Box>
+                      <Button
+                        onPress={() => {
+                            onSelectEmpresa(values.empresa);
+                        }}
+                      >
+                        <ButtonText>{values.empresa.id != 0 ? "Atualizar empresa" : "Selecionar empresa"}</ButtonText>
+                      </Button>
+                    </Box>
+                    <FormControlHelper>
+                      <FormControlHelperText>
+                        Você deve selecionar a empresa.
+                      </FormControlHelperText>
+                    </FormControlHelper>
 
-                <FormControlError>
-                  <FormControlErrorIcon as={AlertCircleIcon} />
-                  <FormControlErrorText>
-                    {errors.empresa?.id}
-                  </FormControlErrorText>
-                </FormControlError>
-              </FormControl>
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        {errors.empresa?.id}
+                      </FormControlErrorText>
+                    </FormControlError>
+                  </FormControl>
+                </>
+              )}
+
               <Box>
                 <Button
                   onPress={() => {
@@ -206,16 +264,18 @@ const FormCreateProduto: React.FC = () => {
                   <ButtonText>Cadastrar Empresa</ButtonText>
                 </Button>
               </Box>
+
               <Box>
-                <Heading textAlign="center">Marca do Produto</Heading>
+                <Heading size="xl" textAlign="center">Marca do Produto</Heading>
               </Box>
+
               {values.marca.id !== 0 && (
                 <Box>
                   <Card>
                     <HStack>
                       <VStack gap="$5">
                         <Box>
-                          <Heading>Maarca Selecionada:</Heading>
+                          <Heading>Marca Selecionada:</Heading>
                         </Box>
                         <Box>
                           <Text>{values.marca.nome}</Text>
@@ -225,29 +285,40 @@ const FormCreateProduto: React.FC = () => {
                   </Card>
                 </Box>
               )}
-              <Box gap="$5">
-                <Button
-                  onPress={() => {
-                    onSelectMarca(values.marca);
-                  }}
-                >
-                  <ButtonText>
-                    {values.marca.id !== 0
-                      ? 'Atualizar Marca'
-                      : 'Selecionar Marca'}
-                  </ButtonText>
-                </Button>
-                <Box>
-                    {!isNewMarca && (
-                        <>
-                            <Button onPress={() => setIsNewMarca(true)}>
-                            <ButtonText>Cadastrar Marca</ButtonText>
-                            </Button>
-                        </>
-                    )}
-                </Box>
 
-              {isNewMarca || values.marca.id === 0 && (
+              {haveMarcas && (
+                <>
+                  <Button
+                    onPress={() => {
+                      setNewMarca(false);
+                      onSelectMarca(values.marca);
+                    }}
+                  >
+                    <ButtonText>
+                      {values.marca.id !== 0
+                        ? 'Atualizar Marca'
+                        : 'Selecionar Marca'}
+                    </ButtonText>
+                  </Button>
+                  
+                </>
+              )}
+
+              {!newMarca && (
+                <Box>
+                  <Button onPress={() => {
+                    setFieldValue('marca', {
+                      id: 0,
+                      nome: '',
+                    });
+                    setNewMarca(true)
+                  }}>
+                    <ButtonText>Cadastrar Marca</ButtonText>
+                  </Button>
+                </Box>
+              )}
+
+              {newMarca && (
                 <FormControl
                   isInvalid={errors.marca?.nome ? true : false}
                   size={'md'}
@@ -280,54 +351,59 @@ const FormCreateProduto: React.FC = () => {
                   </FormControlError>
                 </FormControl>
               )}
+                
               <Box>
-                <Heading textAlign="center">Tipo do Produto</Heading>
+                <Heading size="xl" textAlign="center">Tipo do Produto</Heading>
               </Box>
 
-              {haveTipoProduto && (
+              {values.tipo_produto.id !== 0 && (
                 <Box>
-                  {values.tipo_produto.id !== 0 && (
-                    <>
-                      <Card>
-                        <HStack>
-                          <VStack gap="$5">
-                            <Box>
-                              <Heading>Tipo do Produto Selecionado:</Heading>
-                            </Box>
-                            <Box>
-                              <Text>{values.tipo_produto.nome}</Text>
-                            </Box>
-                          </VStack>
-                        </HStack>
-                      </Card>
-                    </>
-                  )}
-                  <Box>
-                    <Button
-                      onPress={() => {
-                        navigation?.navigate('selecionar-tipo-produto', {
-                          screen: 'cadastrar-produto',
-                          tipoProdutoSelecionado: values.tipo_produto,
-                        });
-                      }}
-                    >
-                      <ButtonText>
-                        {values.tipo_produto.id !== 0
-                          ? 'Atualizar Tipo do Produto'
-                          : 'Selecionar Tipo do Produto'}
-                      </ButtonText>
-                    </Button>
-                  </Box>
+                  <Card>
+                    <HStack>
+                      <VStack gap="$5">
+                        <Box>
+                          <Heading>Tipo do Produto Selecionado:</Heading>
+                        </Box>
+                        <Box>
+                          <Text>{values.tipo_produto.nome}</Text>
+                        </Box>
+                      </VStack>
+                    </HStack>
+                  </Card>
                 </Box>
               )}
-              {!isNewTipoProduto && (
+
+              {haveTiposProdutos && (
+                <Box>
+                  <Button
+                    onPress={() => {
+                      setNewTipoProduto(false);
+                      onSelectTipoProduto(values.tipo_produto);
+                    }}
+                  >
+                    <ButtonText>
+                      {values.tipo_produto.id !== 0
+                        ? 'Atualizar Tipo do Produto'
+                        : 'Selecionar Tipo do Produto'}
+                    </ButtonText>
+                  </Button>
+                </Box>
+              )}
+
+              {!newTipoProduto && (
                 <Box gap="$5">
-                  <Button onPress={() => setIsNewTipoProduto(true)}>
+                  <Button onPress={() => {
+                    setFieldValue('tipo_produto', {
+                      id: Number(null),
+                      nome: '',
+                    });
+                    setNewTipoProduto(true)
+                  }}>
                     <ButtonText>Cadastrar Tipo de Produto</ButtonText>
                   </Button>
                 </Box>
               )}
-              {isNewTipoProduto && (
+              {newTipoProduto && (
                 <Box>
                   <FormControl
                     isInvalid={errors.tipo_produto?.nome ? true : false}
@@ -365,9 +441,9 @@ const FormCreateProduto: React.FC = () => {
                 </Box>
               )}
               <Box>
-                <Heading textAlign="center">Unidade de Medida</Heading>
+                <Heading size="xl" textAlign="center">Unidade de Medida</Heading>
               </Box>
-              {values.unidade_de_medida.id !== 0 && isHaveUnidadeDeMedida && (
+              {values.unidade_de_medida.id !== 0 && ( 
                 <Box>
                   <Card>
                     <HStack>
@@ -384,14 +460,12 @@ const FormCreateProduto: React.FC = () => {
                   </Card>
                 </Box>
               )}
-              {isHaveUnidadeDeMedida && (
+              {haveUms && (
                 <Box gap="$5">
                   <Button
                     onPress={() => {
-                      navigation?.navigate('selecionar-um', {
-                        screen: 'cadastrar-produto',
-                        umSelecionado: values.unidade_de_medida,
-                      });
+                      setNewUm(false);
+                      onSelectUm(values.unidade_de_medida)
                     }}
                   >
                     <ButtonText>
@@ -400,13 +474,24 @@ const FormCreateProduto: React.FC = () => {
                         : 'Selecionar Unidade de Medida'}
                     </ButtonText>
                   </Button>
-                  <Button onPress={() => setIsNewUnidadeDeMedida(true)}>
+                </Box>
+                
+              )}
+              {!newUm && (
+                <Box>
+                  <Button onPress={() => {
+                    setFieldValue('unidade_de_medida', {
+                      id: 0,
+                      nome: '',
+                      valor: '',
+                    })
+                    setNewUm(true);
+                  }}>
                     <ButtonText>Cadastrar Unidade de Medida</ButtonText>
                   </Button>
                 </Box>
               )}
-
-              {isNewUnidadeDeMedida && (
+              {newUm && (
                 <Box gap="$5">
                   <FormControl
                     isInvalid={errors.unidade_de_medida?.nome ? true : false}
@@ -479,7 +564,7 @@ const FormCreateProduto: React.FC = () => {
               )}
 
               <Box>
-                <Heading textAlign="center">Unidade de Armazenamento</Heading>
+                <Heading size="xl" textAlign="center">Unidade de Armazenamento</Heading>
               </Box>
               {values.unidade_de_armazenamento.id !== 0 && (
                 <Box>
@@ -499,28 +584,27 @@ const FormCreateProduto: React.FC = () => {
                   </Card>
                 </Box>
               )}
-
+              {haveUas && (
+                <>
+                  <Box gap="$5">
+                    <Button
+                      onPress={() => {
+                        onSelectUa(values.unidade_de_armazenamento);
+                      }}
+                    >
+                      <ButtonText>
+                        {values.unidade_de_armazenamento.id !== 0
+                          ? 'Atualizar Unidade de Armazenamento'
+                          : 'Selecionar Unidade de Armazenamento'}
+                      </ButtonText>
+                    </Button>
+                  </Box>
+                </>
+              )}
               <Box gap="$5">
                 <Button
                   onPress={() => {
-                    navigation?.navigate('selecionar-ua', {
-                      screen: 'cadastrar-produto',
-                      uaSelecionada: values.unidade_de_armazenamento,
-                    });
-                  }}
-                >
-                  <ButtonText>
-                    {values.marca.id !== 0
-                      ? 'Atualizar Unidade de Armazenamento'
-                      : 'Selecionar Unidade de Armazenamento'}
-                  </ButtonText>
-                </Button>
-              </Box>
-
-              <Box gap="$5">
-                <Button
-                  onPress={() => {
-                    navigation?.navigate('screens-uas');
+                    onCreateUa();
                   }}
                 >
                   <ButtonText>Cadastrar Unidade de Armazenamento</ButtonText>
@@ -528,9 +612,10 @@ const FormCreateProduto: React.FC = () => {
               </Box>
 
               <InputDatePicker
+                minimumDate={new Date()}
                 value={values.data_de_validade}
                 title="Data de Válidade"
-                onChangeDate={(data) => setFieldValue('data_validade', data)}
+                onChangeDate={(data) => setFieldValue('data_de_validade', data)}
               />
               <FormControl
                 isInvalid={false}
@@ -550,11 +635,7 @@ const FormCreateProduto: React.FC = () => {
                     onChangeText={handleChange('codigo_de_barras')}
                   />
                   <Button
-                    onPress={() =>
-                      navigation?.navigate('code-scanner', {
-                        screen: 'cadastrar-produto',
-                      })
-                    }
+                    onPress={() => onCodeScanner()}
                   >
                     <ButtonIcon
                       as={(props: object) => (
@@ -655,6 +736,38 @@ const FormCreateProduto: React.FC = () => {
                 isRequired={true}
               >
                 <FormControlLabel>
+                  <FormControlLabelText>Quantidade</FormControlLabelText>
+                </FormControlLabel>
+                <Input>
+                  <InputField
+                    type="text"
+                    value={values.quantidade.toString()}
+                    placeholder="100"
+                    onChangeText={handleChange('quantidade')}
+                    keyboardType="number-pad"
+                  />
+                </Input>
+
+                <FormControlHelper>
+                  <FormControlHelperText>
+                    Infrome uma quantidade.
+                  </FormControlHelperText>
+                </FormControlHelper>
+
+                <FormControlError>
+                  <FormControlErrorIcon as={AlertCircleIcon} />
+                  <FormControlErrorText>
+                    {errors.quantidade}
+                  </FormControlErrorText>
+                </FormControlError>
+              </FormControl>
+              <FormControl
+                isInvalid={false}
+                size={'md'}
+                isDisabled={false}
+                isRequired={true}
+              >
+                <FormControlLabel>
                   <FormControlLabelText>Tamanho</FormControlLabelText>
                 </FormControlLabel>
                 <Input>
@@ -682,19 +795,19 @@ const FormCreateProduto: React.FC = () => {
 
                 <FormControlHelper>
                   <FormControlHelperText>
-                    Must be atleast 6 characters.
+                    Infrome o tamanho do produto.
                   </FormControlHelperText>
                 </FormControlHelper>
 
                 <FormControlError>
                   <FormControlErrorIcon as={AlertCircleIcon} />
                   <FormControlErrorText>
-                    Atleast 6 characters are required.
+                    {errors.tamanho}
                   </FormControlErrorText>
                 </FormControlError>
               </FormControl>
               <Box>
-                <Button>
+                <Button onPress={handleSubmit as unknown as (event: GestureResponderEvent) => void}>
                   <ButtonText>Cadastrar Produto</ButtonText>
                 </Button>
               </Box>
@@ -705,3 +818,5 @@ const FormCreateProduto: React.FC = () => {
     </>
   );
 };
+
+export default FormCreateProduto;

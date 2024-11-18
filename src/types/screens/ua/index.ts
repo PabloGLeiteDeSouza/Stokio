@@ -55,8 +55,8 @@ export type Ua = {
 export type UaFlatList = React.ForwardRefExoticComponent<
   StyledComponentProps<
     StyleProp<ViewStyle>,
-    TipoUaUpdate,
-    FlatListProps<TipoUaUpdate>,
+    Ua,
+    FlatListProps<Ua>,
     'FlatList',
     typeof FlatList
   >

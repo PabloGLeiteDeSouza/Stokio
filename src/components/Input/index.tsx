@@ -229,7 +229,7 @@ const InputText: React.FC<IInputTextProps> = ({
               isDisabled={isDisabled}
               isRequired={isRequired}
               selectedValue={
-                telefoneType === 'fixo' ? 'Residencial' : 'Celular'
+                telefoneType === 'fixo' ? 'Fixo' : 'Movel'
               }
             >
               <SelectTrigger size={'lg'} variant={'rounded'}>
@@ -243,12 +243,12 @@ const InputText: React.FC<IInputTextProps> = ({
                     <SelectDragIndicator />
                   </SelectDragIndicatorWrapper>
                   <SelectItem
-                    label="Residencial"
+                    label="Fixo"
                     value="fixo"
                     isPressed={telefoneType === 'fixo'}
                   />
                   <SelectItem
-                    label="Celular"
+                    label="Movel"
                     value="movel"
                     isPressed={telefoneType === 'movel'}
                   />

@@ -23,7 +23,7 @@ import LoadingScreen from '@/components/LoadingScreen';
 import { useSQLiteContext } from 'expo-sqlite';
 import UaService from '@/classes/ua/ua.service';
 import { AtualizarUaScreen } from '@/interfaces/ua';
-import { UnidadeDeArmazenamentoObject } from '@/classes/ua/interfaces';
+import { UnidadeDeArmazenamentoObject, UnidadeDeArmazenamentoUpdate } from '@/classes/ua/interfaces';
 
 const Update: React.FC<AtualizarUaScreen> = ({ navigation, route }) => {
   if (!route || !route.params || !route.params.id) {
@@ -32,17 +32,29 @@ const Update: React.FC<AtualizarUaScreen> = ({ navigation, route }) => {
   }
   const id = route.params.id;
   const [isLoadingScreen, setisLoadingScreen] = React.useState(true);
-  const [ua, setUa] = React.useState<UnidadeDeArmazenamentoObject>({})
-  const db = useSQLiteContext();
-  React.useEffect(() => {
-    async function Start() {
-      try {
-        const data = new UaService(db).findStorageUnitById(id);
-        setisLoadingScreen(false);
-      } catch (error) {
-        throw error;
-      }
+  const [ua, setUa] = React.useState<UnidadeDeArmazenamentoUpdate>({
+    id: 0,
+    nome: '',
+    descricao: '',
+    tipo_ua: {
+      id: 0,
+      nome: '',
+      descricao: '',
     }
+  })
+  const db = useSQLiteContext();
+  async function Start() {
+    try {
+      const data = await new UaService(db).findStorageUnitById(id);
+      setUa(data);
+      setisLoadingScreen(false);
+    } catch (error) {
+      Alert.alert('Erro', (error as Error).message);
+      navigation?.goBack();
+      throw error;
+    }
+  }
+  React.useEffect(() => {
     if (isLoadingScreen) {
       Start();
     }
@@ -60,7 +72,7 @@ const Update: React.FC<AtualizarUaScreen> = ({ navigation, route }) => {
         <VStack space="xl" py="$10">
           <Box w="$full" px="$8" alignItems="center">
             <Heading textAlign="center" size="xl">
-              Cadastrar Unidade de Armazenamento:
+              Atualizar Unidade de Armazenamento:
             </Heading>
           </Box>
           <Box w="$full" px="$8">
@@ -119,7 +131,7 @@ const Update: React.FC<AtualizarUaScreen> = ({ navigation, route }) => {
                       </FormControlLabel>
                       <Textarea>
                         <TextareaInput
-                          value={values.decricao}
+                          value={values.descricao ? values.descricao : ''}
                           placeholder="descricao"
                           onChangeText={handleChange('descricao')}
                         />
@@ -134,10 +146,22 @@ const Update: React.FC<AtualizarUaScreen> = ({ navigation, route }) => {
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          {errors.decricao}
+                          {errors.descricao}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
+                    <Box>
+                      <Button onPress={() => {
+                        navigation?.navigate('selecionar-tipo-ua', {
+                          screen: 'atualizar-ua',
+                          tipo_ua: values.tipo_ua,
+                        })
+                      }}>
+                        <ButtonText>
+                          Selecionar Tipo de Ua
+                        </ButtonText>
+                      </Button>
+                    </Box>
                     <FormControl
                       isInvalid={false}
                       size={'md'}
@@ -184,7 +208,7 @@ const Update: React.FC<AtualizarUaScreen> = ({ navigation, route }) => {
                       </FormControlLabel>
                       <Textarea>
                         <TextareaInput
-                          value={values.tipo_ua.descricao}
+                          value={values.tipo_ua.descricao ? values.tipo_ua.descricao : ''}
                           onChangeText={handleChange('tipo_ua.descricao')}
                         />
                       </Textarea>
@@ -209,7 +233,7 @@ const Update: React.FC<AtualizarUaScreen> = ({ navigation, route }) => {
                           ) => void
                         }
                       >
-                        <ButtonText>Cadastrar</ButtonText>
+                        <ButtonText>Atualizar</ButtonText>
                       </Button>
                     </Box>
                   </Box>

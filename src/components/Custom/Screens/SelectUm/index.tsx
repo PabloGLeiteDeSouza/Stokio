@@ -19,14 +19,15 @@ import UmService from '@/classes/um/um.service';
 import { useSQLiteContext } from 'expo-sqlite';
 
 const SelectUm: React.FC<ISelectUmProps> = ({ navigation, route }) => {
-  if (!route || !route.params || !route.params.screen) {
+  if (!route || !route.params || !route.params.screen || !route.params.umSelecionada) {
     navigation?.goBack();
     return null;
   }
   const screen = route.params.screen;
+  const um_selecionada = oute.params.umSelecionada;
   const db = useSQLiteContext();
   const [ums, setUms] = React.useState<Array<UmUpdate>>([]);
-  const [um, setUm] = React.useState<UmUpdate>(ums[0]);
+  const [um, setUm] = React.useState<UmUpdate>(um_selecionada);
   const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {

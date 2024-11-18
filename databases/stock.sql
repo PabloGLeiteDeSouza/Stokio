@@ -128,10 +128,12 @@ CREATE TABLE produto (
     valor REAL NOT NULL,
     quantidade INTEGER,
     tamanho INTEGER NOT NULL,
+    id_empresa INTEGER NOT NULL,
     id_marca INTEGER NOT NULL,
     id_tipo_produto INTEGER NOT NULL,
     id_um INTEGER NOT NULL,
     id_ua INTEGER NOT NULL,
+    FOREIGN KEY (id_empresa) REFERENCES empresa(id),
     FOREIGN KEY (id_marca) REFERENCES marca(id),
     FOREIGN KEY (id_tipo_produto) REFERENCES tipo_produto(id),
     FOREIGN KEY (id_um) REFERENCES um(id),
@@ -139,6 +141,7 @@ CREATE TABLE produto (
 );
 
 -- Índices nas chaves estrangeiras da tabela produto
+CREATE INDEX idx_produto_id_empresa ON produto(id_empresa);
 CREATE INDEX idx_produto_id_marca ON produto(id_marca);
 CREATE INDEX idx_produto_id_tipo_produto ON produto(id_tipo_produto);
 CREATE INDEX idx_produto_id_um ON produto(id_um);

@@ -3,7 +3,7 @@ import { TipoProdutoCreate, TipoProdutoUpdate } from './interfaces';
 export default class TipoProdutoService {
   constructor(private db: SQLiteDatabase) {}
 
-  async create(data: TipoProdutoCreate) {
+  async create(data: TipoProdutoCreate): Promise<number> {
     try {
       const res = await this.db.runAsync(
         'INSERT into tipo_produto ( nome ) VALUES ( $nome )',
@@ -16,6 +16,7 @@ export default class TipoProdutoService {
           cause: 'ERR_TIPOPRODUTO_INSERT',
         });
       }
+      return res.lastInsertRowId;
     } catch (error) {
       throw error;
     }

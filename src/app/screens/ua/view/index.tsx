@@ -71,17 +71,23 @@ import { EditIcon } from '@gluestack-ui/themed';
 import Uas from './uas.json';
 import { SearchIcon } from '@gluestack-ui/themed';
 import { Ua, UaFlatList } from '@/types/screens/ua';
-import { ListRenderItem } from 'react-native';
+import { Alert, GestureResponderEvent, ListRenderItem } from 'react-native';
 import { VisualizarUaScreen } from '@/interfaces/ua';
 import { useSQLiteContext } from 'expo-sqlite';
 import UaService from '@/classes/ua/ua.service';
 import { useIsFocused } from '@react-navigation/native';
+import { TipoUaUpdate } from '@/classes/tipo_ua/interfaces';
+import TipoUaService from '@/classes/tipo_ua/tipo_ua.service';
+import { TipoUaFlatList } from '@/types/screens/tipo-ua';
 
 const View: React.FC<VisualizarUaScreen> = ({ navigation }) => {
 
   const FlatListUa = FlatList as UaFlatList;
 
-  const [uas, setUas] = React.useState<Array<Ua>>([]);
+  const FlatListTipoUa = FlatList as TipoUaFlatList;
+
+  const [uas, setUas] = React.useState<Ua[]>([]);
+  const [tiposUas, setTiposUas] = React.useState<TipoUaUpdate[]>([])
   const [isLoading, setIsLoading] = React.useState(true);
   const db = useSQLiteContext();
   const isFocused = useIsFocused();
@@ -110,16 +116,17 @@ const View: React.FC<VisualizarUaScreen> = ({ navigation }) => {
     );
   };
 
+  const ListRenderSelectTipoUa: ListRenderItem<TipoUaUpdate> = ({ item }) => {
+    return (
+      <SelectItem label={item.nome} value={item.id.toString()} />
+    )
+  }
+
   async function start() {
-    try {
-      const data = await new UaService(db).findAll();
-      if (data.length < 1) {
-        throw new Error("Não há dados para exibir");
-      }
-      setUas([...data]);
-    } catch (error) {
-      
-    }
+    const data = await new UaService(db).findAll();
+    const tipoUas = await new TipoUaService(db).getAll();
+    setUas([...data]);
+    setTiposUas([...tipoUas]);
   }
 
   React.useEffect(() => {
@@ -146,11 +153,25 @@ const View: React.FC<VisualizarUaScreen> = ({ navigation }) => {
         <Formik
           initialValues={{
             busca: '',
-            tipo: '',
+            tipo: 'nome' as 'nome' | 'tipo',
+            id_tipo_ua: 0,
           }}
-          onSubmit={() => {}}
+          onSubmit={async (values) => {
+            try {
+              if(values.tipo === "nome"){
+                const data = await new UaService(db).findUaByNome(values.busca);
+                setUas([...data]);
+              } else {
+                const data = await new UaService(db).findUaByTipo(values.id_tipo_ua);
+                setUas([...data]);
+              }
+            } catch (error) {
+              Alert.alert('Erro', (error as Error).message);
+            }
+            
+          }}
         >
-          {({ values, handleChange, setFieldValue, errors }) => {
+          {({ values, handleChange, setFieldValue, handleSubmit, errors }) => {
             return (
               <>
                 <FormControl
@@ -168,6 +189,9 @@ const View: React.FC<VisualizarUaScreen> = ({ navigation }) => {
                     onValueChange={(text) => {
                       setFieldValue('tipo', text);
                     }}
+                    defaultValue={values.tipo}
+                    initialLabel={values.tipo === "nome" ? "Nome" : "Tipo"}
+                    selectedValue={values.tipo === "nome" ? "Nome" : "Tipo"}
                     isInvalid={false}
                     isDisabled={false}
                   >
@@ -222,16 +246,16 @@ const View: React.FC<VisualizarUaScreen> = ({ navigation }) => {
                           type="text"
                           value={values.busca}
                           placeholder="Buscar"
-                          onChangeText={handleChange('buscar')}
+                          onChangeText={handleChange('busca')}
                         />
-                        <Button>
+                        <Button onPress={handleSubmit as unknown as (event: GestureResponderEvent) => void}>
                           <ButtonIcon as={SearchIcon} />
                         </Button>
                       </Input>
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Infrome o nome da unidade de armazenamento.
                         </FormControlHelperText>
                       </FormControlHelper>
 
@@ -253,59 +277,44 @@ const View: React.FC<VisualizarUaScreen> = ({ navigation }) => {
                       isRequired={true}
                     >
                       <FormControlLabel>
-                        <FormControlLabelText>Password</FormControlLabelText>
+                        <FormControlLabelText>Selecione o tipo</FormControlLabelText>
                       </FormControlLabel>
-                      <Select isInvalid={false} isDisabled={false}>
+                      <Select onValueChange={(vl) => setFieldValue('id_tipo_ua', Number(vl))} isInvalid={false} isDisabled={false}>
                         <SelectTrigger size={'lg'} variant={'rounded'}>
                           <SelectInput placeholder="Select option" />
                           <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
                         </SelectTrigger>
-                        <SelectPortal>
-                          <SelectBackdrop />
-                          <SelectContent>
-                            <SelectDragIndicatorWrapper>
-                              <SelectDragIndicator />
-                            </SelectDragIndicatorWrapper>
-                            <SelectItem
-                              label="UX Research"
-                              value="UX Research"
-                            />
-                            <SelectItem
-                              label="Web Development"
-                              value="Web Development"
-                            />
-                            <SelectItem
-                              label="Cross Platform Development Process"
-                              value="Cross Platform Development Process"
-                            />
-                            <SelectItem
-                              label="UI Designing"
-                              value="UI Designing"
-                              isDisabled={true}
-                            />
-                            <SelectItem
-                              label="Backend Development"
-                              value="Backend Development"
-                            />
-                          </SelectContent>
-                        </SelectPortal>
+                          <SelectPortal>
+                            <SelectBackdrop />
+                            <SelectContent>
+                              <SelectDragIndicatorWrapper>
+                                <SelectDragIndicator />
+                              </SelectDragIndicatorWrapper>
+                              <FlatListTipoUa
+                                w="$full"
+                                data={tiposUas}
+                                renderItem={ListRenderSelectTipoUa}
+                                keyExtractor={(item) => item.id.toString()}
+                              />
+                            </SelectContent>
+                          </SelectPortal>
                       </Select>
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Selecione um tipo.
                         </FormControlHelperText>
                       </FormControlHelper>
 
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          Atleast 6 characters are required.
+                          {errors.id_tipo_ua}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
                     <Box>
-                      <Button>
+                      <Button onPress={handleSubmit as unknown as (event: GestureResponderEvent) => void}>
                         <ButtonText>Buscar</ButtonText>
                       </Button>
                     </Box>

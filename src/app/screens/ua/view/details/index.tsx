@@ -1,8 +1,8 @@
 import { UnidadeDeArmazenamentoObject } from '@/classes/ua/interfaces';
 import UaService from '@/classes/ua/ua.service';
-import ButtonDelete from '@/components/Custom/Buttons/Delete';
 import LoadingScreen from '@/components/LoadingScreen';
 import { DetalhesUaScreen } from '@/interfaces/ua';
+import { TrashIcon } from '@gluestack-ui/themed';
 import {
   Box,
   Button,
@@ -34,15 +34,38 @@ const Details: React.FC<DetalhesUaScreen> = ({ navigation, route }) => {
       id: 0,
       nome: '',
       descricao: '',
-    },
-    id_tipo_ua: 0,
+    }
   });
 
+
+  const onDelete = async () => {
+    Alert.alert('Aviso',`Voce deseja mesmo deletar a unidade de armazenamento: ${ua.nome} ?`, [
+      {
+        text: 'Sim',
+        onPress: async () => {
+          try {
+            await new UaService(db).delete(ua.id);
+            Alert.alert('Sucesso', 'Unidade de armazenamento deletada com sucesso!');
+            navigation?.navigate('visualizar-uas');
+          } catch (error) {
+            Alert.alert('Erro', (error as Error).message);
+          }
+        }
+      },
+      {
+        text: 'Não',
+        style: 'cancel',
+        onPress: () => {
+          Alert.alert('Aviso', 'Operacao cancelada com sucesso!');
+        }
+      }
+    ])
+    
+  }
 
   const start = async () => {
     try {
       const data = await new UaService(db).findStorageUnitById(id);
-      console.log(data);
       setUa(data);
       setIsLoading(false);
     } catch (err) {
@@ -97,12 +120,13 @@ const Details: React.FC<DetalhesUaScreen> = ({ navigation, route }) => {
                 onPress={() => navigation?.navigate('atualizar-ua', { id: ua.id })}
                 gap="$5"
               >
-                <ButtonText>Editar</ButtonText>
                 <ButtonIcon as={EditIcon} />
+                <ButtonText>Editar</ButtonText>
               </Button>
-              <ButtonDelete
-                delete_message={`Tem certeza que deseja deletar?`}
-              />
+              <Button onPress={onDelete} action="negative" gap="$5">
+                <ButtonIcon as={TrashIcon} />
+                <ButtonText>Excluir</ButtonText>
+              </Button>
             </Box>
           </Box>
         </Box>

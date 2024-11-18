@@ -1,70 +1,9 @@
-import {
-  Radio,
-  RadioGroup,
-  RadioIcon,
-  RadioIndicator,
-  RadioLabel,
-  Checkbox,
-  CheckboxGroup,
-  CheckboxIndicator,
-  CheckboxIcon,
-  CheckboxLabel,
-  Select,
-  SelectTrigger,
-  SelectInput,
-  SelectIcon,
-  SelectPortal,
-  SelectBackdrop,
-  SelectContent,
-  SelectDragIndicatorWrapper,
-  SelectDragIndicator,
-  SelectItem,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  Switch,
-  Modal,
-  ModalBackdrop,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  Center,
-  Icon,
-  CircleIcon,
-  CheckIcon,
-  ChevronDownIcon,
-} from '@gluestack-ui/themed';
 import React from 'react';
 import {
-  FormControl,
-  FormControlLabel,
-  FormControlLabelText,
-  FormControlHelper,
-  FormControlHelperText,
-  FormControlError,
-  FormControlErrorIcon,
-  FormControlErrorText,
-  Input,
-  InputField,
-  Button,
-  ButtonText,
-  Textarea,
-  TextareaInput,
-  HStack,
-  VStack,
   Heading,
-  AlertCircleIcon,
-  Card,
-  ButtonIcon,
 } from '@gluestack-ui/themed';
-import { Box, ScrollView, Text } from '@gluestack-ui/themed';
-import { Formik } from 'formik';
-import { FontAwesome6 } from '@expo/vector-icons';
+import { Box, ScrollView } from '@gluestack-ui/themed';
 import { CadastrarProdutoScreen } from '@/interfaces/produto';
-import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
 import LoadingScreen from '@/components/LoadingScreen';
 import UmService from '@/classes/um/um.service';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -72,8 +11,8 @@ import MarcaService from '@/classes/marca/marca.service';
 import TipoProdutoService from '@/classes/tipo_produto/tipo_produto.service';
 import UaService from '@/classes/ua/ua.service';
 import { EmpresaService } from '@/classes/empresa/empresa.service';
-import InputText from '@/components/Input';
 import { Alert } from 'react-native';
+import FormCreateProduto from '@/components/Forms/produto';
 
 const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
   const [haveMarca, setHaveMarca] = React.useState(true);
@@ -81,32 +20,28 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
   const [haveUnidadeDeMedida, setHaveUnidadeDeMedida] = React.useState(false);
   const [haveUnidadeDeArmazenamento, setHaveUnidadeDeArmazenamento] =
     React.useState(false);
-  const [isHaveEmpresa, setIsHaveEmpresa] = React.useState(false);
+  const [HaveEmpresa, setHaveEmpresa] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const db = useSQLiteContext();
   React.useEffect(() => {
     async function start() {
       try {
-        if ((await new UmService(db).getAll()).length <= 0) {
-          throw new Error('Não há empresas cadastradas', { cause: 'ERR_EXISTS_EMPRESAS' });
-        }
-        if ((await new TipoProdutoService(db).getAll()).length <= 0) {
-          throw new Error('Não há tipos de produtos cadastrados', { cause: 'ERR_EXISTS_TIPO_PRODUTOS' });
-        }
-        if ((await new MarcaService(db).getAll()).length <= 0) {
-          throw new Error('Não há marcas cadastradas', { cause: 'ERR_EXISTS_MARCA' });
-        };
+        setHaveMarca((await new MarcaService(db).haveMarca()));
+        setHaveTipoProduto((await new TipoProdutoService(db).haveTipoProduto()));
+        setHaveUnidadeDeMedida((await new UmService(db).getAll()).length > 0);
         if ((await new UaService(db).findAll()).length <= 0) {
           throw new Error('Não há unidades de armazenamento cadastrados', { cause: 'ERR_EXISTS_UA' });
         }
+        setHaveUnidadeDeArmazenamento(true);
         if ((await new EmpresaService(db).findAll()).length <= 0) {
           throw new Error('Não há empresas cadastradas', { cause: 'ERR_EXISTS_EMPRESAS' });
         }
+        setHaveEmpresa(true);
         setIsLoading(false);
       } catch (error) {
         const err = error as Error;
         Alert.alert('Error', err.message);
-        const cause = err.cause as 'ERR_EXISTS_EMPRESAS' | 'ERR_EXISTS_TIPO_PRODUTOS' | 'ERR_EXISTS_MARCA' | 'ERR_EXISTS_UA' | 'ERR_EXISTS_EMPRESAS';
+        const cause = err.cause as 'ERR_EXISTS_EMPRESAS' | 'ERR_EXISTS_UA';
         if(cause === 'ERR_EXISTS_EMPRESAS'){
           navigation?.goBack();
           navigation?.navigate('screens-empresas');
@@ -134,7 +69,50 @@ const Create: React.FC<CadastrarProdutoScreen> = ({ navigation, route }) => {
             </Heading>
           </Box>
           <Box gap="$8" mb="$10">
-            
+            <FormCreateProduto
+              onCreatedProduto={() => {
+                navigation?.goBack();
+              }}
+              db={db}
+              onRedirectProductExists={() => {
+                navigation?.goBack();
+              }}
+              haveEmpresas={HaveEmpresa}
+              haveMarcas={haveMarca}
+              haveTiposProdutos={haveTipoProduto}
+              haveUas={haveUnidadeDeArmazenamento}
+              haveUms={haveUnidadeDeMedida}
+              onCodeScanner={() => {
+                navigation?.navigate('code-scanner', { screen: 'cadastrar-produto' })
+              }}
+              onCreateEmpresa={() => {
+                navigation?.navigate('screens-empresas');
+              }}
+              onCreateUa={() => {
+                navigation?.navigate('screens-uas');
+              }}
+              onSelectEmpresa={(empresaSelecionada) => {
+                navigation?.navigate('selecionar-empresa', { screen: 'cadastrar-produto', empresaSelecionada });
+              }}
+              onSelectMarca={(marcaSelecionada) => {
+                navigation?.navigate('selecionar-marca', { screen: 'cadastrar-produto', marcaSelecionada });
+              }}
+              onSelectTipoProduto={(tipoProdutoSelecionado) => {
+                navigation?.navigate('selecionar-tipo-produto', { screen: 'cadastrar-produto', tipoProdutoSelecionado });
+              }}
+              onSelectUa={(uaSelecionada) => {
+                navigation?.navigate('selecionar-ua', { screen: 'cadastrar-produto', uaSelecionada });
+              }}
+              onSelectUm={(umSelecionado) => {
+                navigation?.navigate('selecionar-um', { screen: 'cadastrar-produto', umSelecionado });
+              }}
+              code={route?.params?.code}
+              empresa={route?.params?.empresa}
+              marca={route?.params?.marca}
+              tipo_produto={route?.params?.tipo_produto}
+              um={route?.params?.um}
+              ua={route?.params?.ua}
+            />
           </Box>
         </Box>
       </ScrollView>

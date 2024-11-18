@@ -13,35 +13,27 @@ import React from 'react';
 import { ListRenderItem } from 'react-native';
 import { ISelectMarcaProps } from './interfaces';
 import { Marca, MarcaFlatList } from '@/types/screens/marca';
+import { useSQLiteContext } from 'expo-sqlite';
+import MarcaService from '@/classes/marca/marca.service';
 
 const SelectMarca: React.FC<ISelectMarcaProps> = ({ navigation, route }) => {
-  if (!route || !route.params || !route.params.screen) {
+  if (!route || !route.params || !route.params.screen || !route.params.marcaSelecionada) {
     navigation?.goBack();
     return null;
   }
   const screen = route.params.screen;
-  const [ramos, setMarcas] = React.useState<Array<Marca>>([
-    {
-      id: '1',
-      nome: 'João',
-    },
-    {
-      id: '2',
-      nome: 'Maria',
-    },
-  ]);
-  const [marca, setMarca] = React.useState<Marca>(ramos[0]);
+  const mrc = route.params.marcaSelecionada;
+  const [ramos, setMarcas] = React.useState<Array<Marca>>([]);
+  const [marca, setMarca] = React.useState<Marca>(mrc);
   const [isLoading, setIsLoading] = React.useState(true);
+  const db = useSQLiteContext();
 
   React.useEffect(() => {
     async function startScreen() {
       try {
+        const marcas = await new MarcaService(db).getAll();
         setMarcas([
-          ...ramos,
-          {
-            id: '3',
-            nome: 'Pedro',
-          },
+          ...marcas,
         ]);
         setIsLoading(false);
       } catch (error) {
@@ -57,13 +49,13 @@ const SelectMarca: React.FC<ISelectMarcaProps> = ({ navigation, route }) => {
   const ListRenderMarcas: ListRenderItem<Marca> = ({ item }) => {
     return (
       <Card>
-        <HStack>
-          <VStack>
+        <HStack w="$full" justifyContent='space-between'>
+          <VStack w="$3/5">
             <Box>
               <Heading>{item.nome}</Heading>
             </Box>
           </VStack>
-          <VStack>
+          <VStack w="$1/3">
             <Button
               isDisabled={item.id === marca.id}
               onPress={() => setMarca(item)}

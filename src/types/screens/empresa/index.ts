@@ -51,21 +51,21 @@ export type Empresa = {
   nome_fantasia: string;
   razao_social: string;
   cpf: string;
-  cnpj?: string;
+  cnpj: string | null;
 };
 
 export type EmpresaObject = {
   id: number;
   nome_fantasia: string;
   razao_social: string;
-  cnpj?: string;
+  cnpj: string | null;
   saldo: string;
   endereco: {
     id: number;
     cep: string;
     rua: string;
     numero: string;
-    complemento: string;
+    complemento: string | null;
     bairro: string;
     cidade: string;
     uf: string;
@@ -77,8 +77,8 @@ export type EmpresaObject = {
 export type EmpresaFlatList = React.ForwardRefExoticComponent<
   StyledComponentProps<
     StyleProp<ViewStyle>,
-    EmpresaSearchRelatinalPessoa,
-    FlatListProps<EmpresaSearchRelatinalPessoa>,
+    Empresa,
+    FlatListProps<Empresa>,
     'FlatList',
     typeof FlatList
   >

@@ -17,6 +17,7 @@ export default class MarcaService {
           cause: 'ERR_MARCA_INSERT',
         });
       }
+      return res.lastInsertRowId;
     } catch (error) {
       throw error;
     }

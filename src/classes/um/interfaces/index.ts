@@ -1,5 +1,5 @@
 export interface UmUpdate {
-  id: string;
+  id: number;
   nome: string;
   valor: string;
 }

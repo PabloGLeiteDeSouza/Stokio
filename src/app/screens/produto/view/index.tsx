@@ -75,12 +75,18 @@ import { VisualizarProdutoScreen } from '@/interfaces/produto';
 import { Produto, ProdutoFlatList } from '@/types/screens/produto';
 import { Alert, ListRenderItem } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useSQLiteContext } from 'expo-sqlite';
+import { ProdutoService } from '@/classes/produto/produto.service';
+import LoadingScreen from '@/components/LoadingScreen';
+import { useIsFocused } from '@react-navigation/native';
 const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
   const tipos_busca: Array<{
     label: string;
     value: string;
   }> = BuscasTipos;
-  const [produtos, setProdutos] = React.useState<Array<Produto>>([...Produtos]);
+  const [produtos, setProdutos] = React.useState<Array<Produto>>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const isFocused = useIsFocused();
   const FlatListProduto = FlatList as ProdutoFlatList;
   const ListRenderProduto: ListRenderItem<Produto> = ({ item }) => {
     return (
@@ -110,21 +116,35 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
       </Card>
     );
   };
+
+  const db = useSQLiteContext();
+
+  const StartScreen = async () => {
+    try {
+      const PRODUTOS = await new ProdutoService(db).getAllProdutos();
+      setProdutos(PRODUTOS);
+      setIsLoading(false);
+    } catch (err) {
+      setProdutos([]);
+      setIsLoading(false);
+    }
+  }
+
+  React.useEffect(() => {
+    if (isFocused) {
+      StartScreen();
+    }
+  }, [isFocused])
+
   const onCadastrarProduto = () => {
-    // if (true) {
-    //   Alert.alert('Erro', 'Não existem empresas cadastradas!');
-    //   navigation?.navigate('screens-empresas');
-    // } else if (true) {
-    //   Alert.alert('Erro', 'Não existem marcas cadastradas!');
-    //   navigation?.navigate('screens-empresas');
-    // } else if (true) {
-    //   Alert.alert('Erro', 'Não existem tipos de produtos cadastrados!');
-    //   navigation?.navigate('screens-empresas');
-    // } else {
-    //   navigation?.navigate('cadastrar-produto');
-    // }
     navigation?.navigate('cadastrar-produto');
   };
+
+  if (isLoading) {
+    return <LoadingScreen />
+  }
+
+
   return produtos.length < 1 ? (
     <Box h="$full" w="$full" alignItems="center" justifyContent="center">
       <Box gap="$5">

@@ -4,7 +4,7 @@ import { UmCreate, UmUpdate } from './interfaces';
 export default class UmService {
   constructor(private db: SQLiteDatabase) {}
 
-  async create(um: UmCreate) {
+  async create(um: UmCreate): Promise<number> {
     try {
       const data = await this.db.runAsync(
         'INSERT into um ( nome, valor ) VALUES ( $nome, $valor )',

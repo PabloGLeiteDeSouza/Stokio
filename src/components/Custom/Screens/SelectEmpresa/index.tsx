@@ -14,45 +14,30 @@ import { ListRenderItem } from 'react-native';
 import { ISelectEmpresaProps } from './interfaces';
 import { Empresa, EmpresaFlatList } from '@/types/screens/empresa';
 import { Text } from '@gluestack-ui/themed';
+import { useSQLiteContext } from 'expo-sqlite';
+import { EmpresaService } from '@/classes/empresa/empresa.service';
 
 const SelectEmpresa: React.FC<ISelectEmpresaProps> = ({
   navigation,
   route,
 }) => {
-  if (!route || !route.params || !route.params.screen) {
+  if (!route || !route.params || !route.params.screen || !route.params.empresaSelecionada ) {
     navigation?.goBack();
     return null;
   }
   const screen = route.params.screen;
-  const [empresas, setEmpresas] = React.useState<Array<Empresa>>([
-    {
-      id: 1,
-      nome_fantasia: 'João',
-      razao_social: 'Joao',
-      cpf: '21347298146327',
-    },
-    {
-      id: 2,
-      nome_fantasia: 'Maria',
-      razao_social: 'Maria',
-      cpf: '21382194763289',
-    },
-    {
-      id: 3,
-      nome_fantasia: 'Comercio de Eletronicos ATA e CIA',
-      razao_social: 'Comercio de Eletronicos ATA e CIA',
-      cpf: '21347298146327',
-    },
-  ]);
-  const [empresa, setEmpresa] = React.useState<Empresa>(empresas[0]);
+  const emp = route.params.empresaSelecionada;
+  const [empresas, setEmpresas] = React.useState<Array<Empresa>>([]);
+  const [empresa, setEmpresa] = React.useState<Empresa>(emp);
   const [isLoading, setIsLoading] = React.useState(true);
+  const db = useSQLiteContext();
+
 
   React.useEffect(() => {
     async function startScreen() {
       try {
-        setEmpresas([
-          ...empresas,
-        ]);
+        const empresas = (await new EmpresaService(db).findAllMin()) as Empresa[];
+        setEmpresas(empresas);
         setIsLoading(false);
       } catch (error) {
         setIsLoading(false);
@@ -79,7 +64,7 @@ const SelectEmpresa: React.FC<ISelectEmpresaProps> = ({
               <Text>{item.razao_social}</Text>
             </Box>
           </VStack>
-          <VStack w="$24">
+          <VStack w="$1/3">
             <Button
               h="$10"
               size="xs"

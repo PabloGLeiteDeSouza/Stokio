@@ -12,7 +12,10 @@ import {
 import React from 'react';
 import { ListRenderItem } from 'react-native';
 import { ISelectTipoProdutoProps } from './interfaces';
-import { TipoProduto, TipoProdutoFlatList } from '@/types/screens/tipo-produto';
+import { TipoProdutoFlatList } from '@/types/screens/tipo-produto';
+import { useSQLiteContext } from 'expo-sqlite';
+import TipoProdutoService from '@/classes/tipo_produto/tipo_produto.service';
+import { TipoProduto } from '@/classes/produto/interfaces';
 
 const SelectTipoProduto: React.FC<ISelectTipoProdutoProps> = ({
   navigation,
@@ -23,39 +26,23 @@ const SelectTipoProduto: React.FC<ISelectTipoProdutoProps> = ({
     return null;
   }
 
-  if (!route || !route.params || !route.params.tipoProdutoSelecionado) {
+  if (!route || !route.params || !route.params.screen || !route.params.tipoProdutoSelecionado) {
     navigation?.goBack();
     return null;
   }
 
   const screen = route.params.screen;
-  const [tipoProdutos, setTipoProdutos] = React.useState<Array<TipoProduto>>([
-    {
-      id: '1',
-      nome: 'João',
-    },
-    {
-      id: '2',
-      nome: 'Maria',
-    },
-  ]);
-  const TipoProdutos = route.params.tipoProdutoSelecionado
-    ? route.params.tipoProdutoSelecionado
-    : tipoProdutos[0];
-  const [tipo_produto, setTipoProduto] =
-    React.useState<TipoProduto>(TipoProdutos);
+  const tp_prod = route.params.tipoProdutoSelecionado;
+  const [tipoProdutos, setTipoProdutos] = React.useState<Array<TipoProduto>>([]);
+  const [tipo_produto, setTipoProduto] = React.useState<TipoProduto>(tp_prod);
   const [isLoading, setIsLoading] = React.useState(true);
+  const db = useSQLiteContext();
 
   React.useEffect(() => {
     async function startScreen() {
       try {
-        setTipoProdutos([
-          ...tipoProdutos,
-          {
-            id: '3',
-            nome: 'Pedro',
-          },
-        ]);
+        const data = await new TipoProdutoService(db).getAll();
+        setTipoProdutos(data);
         setIsLoading(false);
       } catch (error) {
         setIsLoading(false);
@@ -70,13 +57,13 @@ const SelectTipoProduto: React.FC<ISelectTipoProdutoProps> = ({
   const ListRenderTipoProdutos: ListRenderItem<TipoProduto> = ({ item }) => {
     return (
       <Card>
-        <HStack justifyContent="space-between">
-          <VStack>
+        <HStack w="$full" justifyContent="space-between">
+          <VStack w="$3/5">
             <Box>
               <Heading>{item.nome}</Heading>
             </Box>
           </VStack>
-          <VStack>
+          <VStack w="$1/3">
             <Button
               isDisabled={item.id === tipo_produto.id}
               onPress={() => setTipoProduto(item)}
@@ -97,17 +84,18 @@ const SelectTipoProduto: React.FC<ISelectTipoProdutoProps> = ({
 
   return (
     <Box h="$full" w="$full">
-      <Box>
+      <Box py="$5">
         <Heading size="2xl" textAlign="center">
           Selecionar Tipo de Produto:
         </Heading>
       </Box>
       <FlatListTipoProdutos
+        px="$5"
         data={tipoProdutos}
         renderItem={ListRenderTipoProdutos}
         keyExtractor={(item) => String(item.id)}
       />
-      <Box>
+      <Box px="$5" py="$5">
         <Button onPress={() => navigation?.navigate(screen, { tipo_produto })}>
           <ButtonText>Selecionar Tipo de Produto</ButtonText>
         </Button>

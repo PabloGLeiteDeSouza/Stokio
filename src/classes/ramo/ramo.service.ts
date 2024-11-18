@@ -28,7 +28,9 @@ export class RamoService implements IRamoService {
           $descricao: data.descricao,
         },
       );
-
+      if (result.changes < 1) {
+        throw new Error('Nao foi possivel cadastrar!');
+      }
       return result.lastInsertRowId;
     } catch (error) {
       throw new Error(`Erro ao criar ramo: ${(error as Error).message}`);
