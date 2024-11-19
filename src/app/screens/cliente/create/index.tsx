@@ -18,7 +18,6 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
   async function startScreen() {
     try {
       const pss = await new ClienteService(db).findAllPessoas();
-      console.log('Pessoas', pss);
       if (pss.length > 0) {
         setPessoas([...pss]);
       }

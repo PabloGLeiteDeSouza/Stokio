@@ -71,6 +71,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = React.useState(true);
   const db = useSQLiteContext();
   const [produto, setProduto] = React.useState({
+    id: 0,
     codigo_de_barras: '12321332543534',
     nome: 'asdsadsadsa',
     descricao: 'asdasdsadasdsadsadasdsa' as string | null,
@@ -79,25 +80,25 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
     quantidade: 20,
     tamanho: 50,
     marca: {
-      id: 1,
+      id: 0,
       nome: 'KASKDAS',
     },
     tipo_produto: {
-      id: 1,
+      id: 0,
       nome: 'asdasdsadsa',
     },
     unidade_de_medida: {
-      id: 1,
+      id: 0,
       nome: 'mililitros',
       valor: 'ml',
     },
     unidade_de_armazenamento: {
-      id: 1,
+      id: 0,
       nome: 'caixa-01',
     },
     empresa: {
       id: 1,
-      nome_fantaisa: 'asdasdsadas',
+      nome_fantasia: 'asdasdsadas',
       razao_social: 'asdasdasdsadsa',
       cnpj: '12312323000112',
       cpf: '12312312312',
@@ -131,7 +132,14 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
             <Formik
               validationSchema={validationSchema}
               initialValues={produto}
-              onSubmit={() => {}}
+              onSubmit={async (values) => {
+                try {
+                  const { empresa, marca, tipo_produto, unidade_de_armazenamento, unidade_de_medida, ...prod } = values;
+                  const data = await new ProdutoService(db).updateProduto(prod.id, prod);
+                } catch (err) {
+
+                }
+              }}
             >
               {({ values, errors, handleChange, setFieldValue }) => {
                 React.useEffect(() => {
@@ -182,7 +190,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                             <Heading size="lg">Dados da Empresa</Heading>
                             <Box>
                               <Text>Nome da Fantasia</Text>
-                              <Text>{values.empresa.nome_fantaisa}</Text>
+                              <Text>{values.empresa.nome_fantasia}</Text>
                             </Box>
                             <Box>
                               <Text>Razao Social</Text>
@@ -307,7 +315,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                         }}
                       >
                         <ButtonText>
-                          {values.marca.id !== ''
+                          {values.marca.id !== 0
                             ? 'Atualizar Marca'
                             : 'Selecionar Marca'}
                         </ButtonText>
@@ -315,7 +323,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                       {!isNewMarca && (
                         <>
                           <Button onPress={() => setIsNewMarca(true)}>
-                            <ButtonText>Cadastrar Marca</ButtonText>
+                            <ButtonText>atualizar dados da marca Marca</ButtonText>
                           </Button>
                         </>
                       )}
@@ -323,7 +331,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                     <Box>
                       <Heading textAlign="center">Tipo do Produto</Heading>
                     </Box>
-                    {values.tipo_produto.id !== '' && !isNewTipoProduto && (
+                    {values.tipo_produto.id !== 0 && !isNewTipoProduto && (
                       <Box>
                         <Card>
                           <HStack>
@@ -349,7 +357,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                         }}
                       >
                         <ButtonText>
-                          {values.marca.id !== ''
+                          {values.marca.id !== 0
                             ? 'Atualizar Tipo do Produto'
                             : 'Selecionar Tipo do Produto'}
                         </ButtonText>
@@ -357,7 +365,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                       {!isNewMarca && (
                         <>
                           <Button onPress={() => setIsNewTipoProduto(true)}>
-                            <ButtonText>Cadastrar Tipo de Produto</ButtonText>
+                            <ButtonText>Atualizar dados do Tipo de Produto</ButtonText>
                           </Button>
                         </>
                       )}
@@ -366,7 +374,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                     <Box>
                       <Heading textAlign="center">Unidade de Medida</Heading>
                     </Box>
-                    {values.unidade_de_medida.id !== '' &&
+                    {values.unidade_de_medida.id !== 0 &&
                       !isNewUnidadeDeMedida && (
                         <Box>
                           <Card>
@@ -423,7 +431,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                           </FormControlError>
                         </FormControl>
                         <FormControl
-                          isInvalid={false}
+                          isInvalid={errors.unidade_de_medida?.valor ? true : false}
                           size={'md'}
                           isDisabled={false}
                           isRequired={true}
@@ -436,7 +444,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                           <Input>
                             <InputField
                               type="text"
-                              value={values.unidade_de_medida.value}
+                              value={values.unidade_de_medida.valor}
                               placeholder="cm"
                             />
                           </Input>
@@ -451,7 +459,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                           <FormControlError>
                             <FormControlErrorIcon as={AlertCircleIcon} />
                             <FormControlErrorText>
-                              Atleast 6 characters are required.
+                              {errors.unidade_de_medida?.valor}
                             </FormControlErrorText>
                           </FormControlError>
                         </FormControl>
@@ -468,7 +476,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                         }}
                       >
                         <ButtonText>
-                          {values.marca.id !== ''
+                          {values.marca.id !== 0
                             ? 'Atualizar Unidade de Medida'
                             : 'Selecionar Unidade de Medida'}
                         </ButtonText>
@@ -483,7 +491,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                         Unidade de Armazenamento
                       </Heading>
                     </Box>
-                    {values.unidade_de_medida.id !== '' && (
+                    {values.unidade_de_medida.id !== 0 && (
                       <Box>
                         <Card>
                           <HStack>
@@ -514,7 +522,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                         }}
                       >
                         <ButtonText>
-                          {values.marca.id !== ''
+                          {values.marca.id !== 0
                             ? 'Atualizar Unidade de Armazenamento'
                             : 'Selecionar Unidade de Armazenamento'}
                         </ButtonText>
@@ -533,8 +541,9 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                     <InputDatePicker
                       value={values.data_de_validade}
                       title="Data de Válidade"
-                      onChangeDate={handleChange('data_de_validade')}
+                      onChangeDate={(date) => setFieldValue('data_de_validade', date)}
                     />
+
                     <FormControl
                       isInvalid={false}
                       size={'md'}
@@ -583,7 +592,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                       </FormControlError>
                     </FormControl>
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={errors.nome ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
@@ -602,14 +611,14 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Informe o nome do produto
                         </FormControlHelperText>
                       </FormControlHelper>
 
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          Atleast 6 characters are required.
+                          {errors.nome}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
@@ -625,7 +634,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                       <Textarea>
                         <TextareaInput
                           type="text"
-                          value={values.descricao}
+                          value={String(values.descricao)}
                           placeholder="Descrição"
                           onChangeText={handleChange('descricao')}
                         />
@@ -652,7 +661,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                     error={errors.valor}
                    />
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={errors.quantidade ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
@@ -672,19 +681,19 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Informe a quantidade.
                         </FormControlHelperText>
                       </FormControlHelper>
 
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          Atleast 6 characters are required.
+                          {errors.quantidade}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={errors.tamanho ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
@@ -704,14 +713,14 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Informe o tamanho.
                         </FormControlHelperText>
                       </FormControlHelper>
 
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          Atleast 6 characters are required.
+                          {errors.tamanho}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>

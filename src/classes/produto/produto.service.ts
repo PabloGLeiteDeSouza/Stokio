@@ -49,7 +49,7 @@ export class ProdutoService {
         throw new Error("Nao foi possivel encontrar o produto!");
       }
       const { id_empresa, id_marca, id_tipo_produto, id_ua, id_um, ...prod } = produto;
-      const empresa = await this.db.getFirstAsync<EmpresaCustomSimpleRequest>('SELECT e.id, e.nome_fantasia, e.razao_social, e.cnpj, p.cpf  FROM empresa AS e INNER JOIN pessoa AS p ON p.id == e.id_pessoa WHERE id == $id', {
+      const empresa = await this.db.getFirstAsync<EmpresaCustomSimpleRequest>('SELECT e.id, e.nome_fantasia, e.razao_social, e.cnpj, p.cpf FROM empresa AS e INNER JOIN pessoa AS p ON p.id == e.id_pessoa WHERE e.id == $id', {
         $id: produto.id_empresa,
       });
       if(!empresa){

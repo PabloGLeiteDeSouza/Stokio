@@ -102,7 +102,7 @@ const Details: React.FC<DetalhesProdutoScreen> = ({ navigation, route }) => {
             </Box>
             <Box gap="$1.5">
               <Heading>Tamanho:</Heading>
-              <Text>{`${produto.tamanho}${produto.unidade_de_medida.valor}`}</Text>
+              <Text>{`${produto.tamanho} ${produto.unidade_de_medida.valor}`}</Text>
             </Box>
             <Box>
               <Heading>Qauntidade:</Heading>
