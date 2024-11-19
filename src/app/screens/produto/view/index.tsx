@@ -72,23 +72,25 @@ import Produtos from './produtos.json';
 import { SearchIcon } from '@gluestack-ui/themed';
 import BuscasTipos from './busca_tipos_vendas.json';
 import { VisualizarProdutoScreen } from '@/interfaces/produto';
-import { Produto, ProdutoFlatList } from '@/types/screens/produto';
+import { ProdutoFlatList } from '@/types/screens/produto';
 import { Alert, ListRenderItem } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useSQLiteContext } from 'expo-sqlite';
 import { ProdutoService } from '@/classes/produto/produto.service';
+import { Produto, ProdutoObjectRequestAll } from '@/classes/produto/interfaces';
 import LoadingScreen from '@/components/LoadingScreen';
 import { useIsFocused } from '@react-navigation/native';
+import { getDateFromString } from '@/utils';
 const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
   const tipos_busca: Array<{
     label: string;
     value: string;
   }> = BuscasTipos;
-  const [produtos, setProdutos] = React.useState<Array<Produto>>([]);
+  const [produtos, setProdutos] = React.useState<Array<ProdutoObjectRequestAll>>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const isFocused = useIsFocused();
   const FlatListProduto = FlatList as ProdutoFlatList;
-  const ListRenderProduto: ListRenderItem<Produto> = ({ item }) => {
+  const ListRenderProduto: ListRenderItem<ProdutoObjectRequestAll> = ({ item }) => {
     return (
       <Card size="md" variant="elevated" m="$3">
         <HStack justifyContent="space-between">
@@ -96,7 +98,7 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
             <Heading mb="$1" size="md">
               {item.nome}
             </Heading>
-            <Text size="md">{item.data_validade}</Text>
+            <Text size="md">{new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(getDateFromString(item.data_de_validade))}</Text>
             <Text size="md">{item.tipo}</Text>
             <Text size="md">{item.marca}</Text>
           </Box>
@@ -121,8 +123,9 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
 
   const StartScreen = async () => {
     try {
-      const PRODUTOS = await new ProdutoService(db).getAllProdutos();
-      setProdutos(PRODUTOS);
+      const prodts = await new ProdutoService(db).getAllProdutos();
+      console.log(prodts);
+      setProdutos(prodts);
       setIsLoading(false);
     } catch (err) {
       setProdutos([]);

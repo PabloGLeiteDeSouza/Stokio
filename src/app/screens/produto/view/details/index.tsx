@@ -1,9 +1,11 @@
+import { ProdutoObjectComplete } from '@/classes/produto/interfaces';
 import { ProdutoService } from '@/classes/produto/produto.service';
 import LoadingScreen from '@/components/LoadingScreen';
 import {
-  DetalhesEmpresaScreen,
   DetalhesProdutoScreen,
 } from '@/interfaces/produto';
+import { getDateFromString } from '@/utils';
+import { mask } from '@/utils/mask';
 import {
   Box,
   Button,
@@ -23,7 +25,7 @@ const Details: React.FC<DetalhesProdutoScreen> = ({ navigation, route }) => {
   }
   const id = route.params.id;
   const [isLoading, setIsLoading] = React.useState(true);
-  const [produto, setProduto] = React.useState({});
+  const [produto, setProduto] = React.useState<ProdutoObjectComplete>({});
   const db = useSQLiteContext();
 
   const StartScreen = async () => {
@@ -61,52 +63,59 @@ const Details: React.FC<DetalhesProdutoScreen> = ({ navigation, route }) => {
             </Box>
             <Box gap="$1.5">
               <Heading>Empresa:</Heading>
-              <Text>Velho</Text>
+              <Box>
+                <Heading>Nome fantasia</Heading>
+                <Text>{produto.empresa.nome_fantasia}</Text>
+              </Box>
+              <Box>
+                <Heading>Razão Social</Heading>
+                <Text>{produto.empresa.razao_social}</Text>
+              </Box>
             </Box>
-            <Box gap="$1.5">
-              <Heading>cnpj:</Heading>
-              <Text>123456789</Text>
-            </Box>
+            {produto.empresa.cnpj && (
+                <>
+                  <Box gap="$1.5">
+                    <Heading>CNPJ:</Heading>
+                    <Text>{mask(produto.empresa.cnpj, 'cnpj')}</Text>
+                  </Box>
+                </>
+              )}
             <Box>
               <Heading>Codigo de barras:</Heading>
-              <Text>12345678901234</Text>
+              <Text>{produto.codigo_de_barras}</Text>
             </Box>
             <Box>
               <Heading>Data de Validade:</Heading>
-              <Text>12/02/2026</Text>
+              <Text>{new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(getDateFromString(produto.data_de_validade))}</Text>
             </Box>
             <Box>
               <Heading>Tipo:</Heading>
-              <Text>João</Text>
+              <Text>{produto.tipo_produto.nome}</Text>
             </Box>
             <Box>
               <Heading>Marca:</Heading>
-              <Text>João</Text>
+              <Text>{produto.marca.nome}</Text>
             </Box>
             <Box gap="$1.5">
               <Heading>Valor:</Heading>
-              <Text>22,50</Text>
+              <Text>{mask(`${produto.valor}`, 'money')}</Text>
             </Box>
             <Box gap="$1.5">
               <Heading>Tamanho:</Heading>
-              <Text>20g</Text>
+              <Text>{`${produto.tamanho}${produto.unidade_de_medida.valor}`}</Text>
             </Box>
             <Box>
               <Heading>Qauntidade:</Heading>
-              <Text>50</Text>
+              <Text>{produto.quantidade}</Text>
             </Box>
             <Box>
               <Heading>Unidade de armazenamento</Heading>
-              <Text>Caixa 05</Text>
-            </Box>
-            <Box>
-              <Heading>Tipo de Unidade de armazenamento:</Heading>
-              <Text>Caixa</Text>
+              <Text>{produto.unidade_de_armazenamento.nome}</Text>
             </Box>
             <Box gap="$5">
               <Button
                 onPress={() =>
-                  navigation?.navigate('atualizar-produto', { id: '1' })
+                  navigation?.navigate('atualizar-produto', { id: produto.id })
                 }
               >
                 <ButtonText>Editar</ButtonText>

@@ -30,6 +30,9 @@ import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
 import LoadingScreen from '@/components/LoadingScreen';
 import { mask } from '@/utils/mask';
 import InputText from '@/components/Input';
+import { useSQLiteContext } from 'expo-sqlite';
+import { ProdutoService } from '@/classes/produto/produto.service';
+import { getDateFromString } from '@/utils';
 const validationSchema = Yup.object().shape({
   codigo_de_barras: Yup.string().required('O código de barras é obrigatório'),
   nome: Yup.string().required('O nome é obrigatório'),
@@ -66,10 +69,11 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
   const [isNewTipoProduto, setIsNewTipoProduto] = React.useState(false);
   const [isNewUnidadeDeMedida, setIsNewUnidadeDeMedida] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
+  const db = useSQLiteContext();
   const [produto, setProduto] = React.useState({
     codigo_de_barras: '12321332543534',
     nome: 'asdsadsadsa',
-    descricao: 'asdasdsadasdsadsadasdsa',
+    descricao: 'asdasdsadasdsadsadasdsa' as string | null,
     data_de_validade: new Date(),
     valor: 200.00,
     quantidade: 20,
@@ -85,7 +89,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
     unidade_de_medida: {
       id: 1,
       nome: 'mililitros',
-      value: 'ml',
+      valor: 'ml',
     },
     unidade_de_armazenamento: {
       id: 1,
@@ -102,6 +106,8 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
   React.useEffect(() => {
     async function start() {
       try {
+        const prod = await new ProdutoService(db).getProdutoById(id_produto);
+        setProduto({...prod, data_de_validade: getDateFromString(prod.data_de_validade)});
         setIsLoading(false);
       } catch (error) {
         setIsLoading(false);

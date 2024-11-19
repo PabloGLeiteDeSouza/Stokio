@@ -1,3 +1,6 @@
+import { Empresa, EmpresaCustomSimpleRequest } from "@/classes/empresa/types";
+import { UnidadeDeArmazenamento } from "@/classes/ua/interfaces";
+
 export interface UnidadeDeMedida {
   id: number;
   nome: string;
@@ -29,4 +32,20 @@ export interface Produto {
   id_um: number;
   tamanho: number;
   id_ua: number;
+}
+
+export interface ProdutoObjectRequestAll { 
+  id: number; 
+  nome: string; 
+  data_de_validade: string; 
+  tipo: string; 
+  marca: string 
+}
+
+export interface ProdutoObjectComplete extends Omit<Produto, 'id_empresa' | 'id_marca' | 'id_tipo_produto' | 'id_um' | 'id_ua'> {
+  empresa: EmpresaCustomSimpleRequest;
+  marca: Marca;
+  tipo_produto: TipoProduto;
+  unidade_de_medida: UnidadeDeMedida;
+  unidade_de_armazenamento: UnidadeDeArmazenamento;
 }

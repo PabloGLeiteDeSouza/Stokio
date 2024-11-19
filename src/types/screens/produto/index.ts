@@ -5,6 +5,7 @@ import { ViewStyle } from '@expo/html-elements/build/primitives/View';
 import { StyledComponentProps } from '@gluestack-style/react/lib/typescript/types';
 import { FlatList, FlatListProps, StyleProp } from 'react-native';
 import { Empresa } from '../empresa';
+import { ProdutoObjectRequestAll } from '@/classes/produto/interfaces';
 
 export type VisualisarProdutoScreenNavigationProp = StackNavigationProp<
   ProdutosStackParamList,
@@ -91,8 +92,8 @@ export type ProdutoObject = {
 export type ProdutoFlatList = React.ForwardRefExoticComponent<
   StyledComponentProps<
     StyleProp<ViewStyle>,
-    Produto,
-    FlatListProps<Produto>,
+    ProdutoObjectRequestAll,
+    FlatListProps<ProdutoObjectRequestAll>,
     'FlatList',
     typeof FlatList
   >

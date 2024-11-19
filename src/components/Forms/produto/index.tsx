@@ -92,9 +92,9 @@ const FormCreateProduto: React.FC<IFormCreateProduto> = ({ onCreatedProduto, db,
           nome: '',
           descricao: '',
           data_de_validade: new Date(),
-          valor: '',
-          quantidade: '',
-          tamanho: '',
+          valor: Number(null),
+          quantidade: Number(null),
+          tamanho: Number(null),
           marca: {
             id: Number(null),
             nome: '',
@@ -133,7 +133,7 @@ const FormCreateProduto: React.FC<IFormCreateProduto> = ({ onCreatedProduto, db,
             if (unidade_de_medida.id === 0) {
               unidade_de_medida.id = await new UmService(db).create(values.unidade_de_medida);
             }
-            await new ProdutoService(db).createProduto({idMarca: marca.id, id_tipo_produto: tipo_produto.id, codigo_de_barras, data_de_validade: getStringFromDate(data_de_validade), id_ua: unidade_de_armazenamento.id, id_um: unidade_de_medida.id, nome: nome, quantidade: Number(quantidade), tamanho: Number(tamanho), valor: Number(valor), descricao });
+            await new ProdutoService(db).createProduto({ id_empresa: empresa.id, id_marca: marca.id, id_tipo_produto: tipo_produto.id, codigo_de_barras, data_de_validade: getStringFromDate(data_de_validade), id_ua: unidade_de_armazenamento.id, id_um: unidade_de_medida.id, nome, quantidade, tamanho, valor , descricao });
             Alert.alert('Sucesso', 'Produto cadastrado com sucesso!');
             onCreatedProduto();
           } catch (error) {
@@ -724,43 +724,11 @@ const FormCreateProduto: React.FC<IFormCreateProduto> = ({ onCreatedProduto, db,
                 title="Valor"
                 inputType="money"
                 error={errors.valor}
-                value={values.valor}
+                value={values.valor.toString()}
                 onChangeValue={handleChange('valor')}
                 isInvalid={errors.valor ? true : false}
                 size="md"
               />
-              <FormControl
-                isInvalid={false}
-                size={'md'}
-                isDisabled={false}
-                isRequired={true}
-              >
-                <FormControlLabel>
-                  <FormControlLabelText>Quantidade</FormControlLabelText>
-                </FormControlLabel>
-                <Input>
-                  <InputField
-                    type="text"
-                    value={values.quantidade.toString()}
-                    placeholder="100"
-                    onChangeText={handleChange('quantidade')}
-                    keyboardType="number-pad"
-                  />
-                </Input>
-
-                <FormControlHelper>
-                  <FormControlHelperText>
-                    Infrome uma quantidade.
-                  </FormControlHelperText>
-                </FormControlHelper>
-
-                <FormControlError>
-                  <FormControlErrorIcon as={AlertCircleIcon} />
-                  <FormControlErrorText>
-                    {errors.quantidade}
-                  </FormControlErrorText>
-                </FormControlError>
-              </FormControl>
               <FormControl
                 isInvalid={false}
                 size={'md'}

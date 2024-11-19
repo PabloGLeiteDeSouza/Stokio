@@ -715,7 +715,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                   action="negative"
                   onPress={() => {
                     if (values.emails.length > 1) {
-                      setFieldValue("emails",[...values.emails.slice(-1)]);
+                      setFieldValue("emails",[...values.emails.slice(0, -1)]);
                     } else {
                       Alert.alert('Aviso', 'Não há mais emails a serem removidos')
                     }

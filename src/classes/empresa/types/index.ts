@@ -15,6 +15,14 @@ export type Empresa = {
   id_pessoa: number;
 };
 
+export interface EmpresaCustomSimpleRequest{
+  id: number;
+  razao_social: string;
+  nome_fantasia: string;
+  cnpj: string | null;
+  cpf: string;
+}
+
 export type Pessoa = {
   id: number;
   nome: string;
