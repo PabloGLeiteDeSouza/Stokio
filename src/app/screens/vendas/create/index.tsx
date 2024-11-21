@@ -40,22 +40,56 @@ import onUpdateProduct from './functions/onUpdateProduct';
 import onAddProduct from './functions/onAddProduct';
 import onRemoveProduct from './functions/onRemoveProduct';
 import { formatValue } from '@/utils/calc';
+import { ClienteService } from '@/classes/cliente/cliente.service';
+import { useSQLiteContext } from 'expo-sqlite';
+import LoadingScreen from '@/components/LoadingScreen';
+import { ProdutoService } from '@/classes/produto/produto.service';
+import FormCreateVenda from '@/components/Forms/venda';
 const Create: React.FC<CadastrarVendaScreen> = ({ navigation, route }) => {
-  const [clientes, setClientes] = React.useState([
-    {
-      id: '1',
-      nome: 'Cliente 1',
-      cpf: '213.213.321.23',
-    },
-  ]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [haveClientes, setHaveClientes] = React.useState(false);
+  const [haveProdutos, setHaveProdutos] = React.useState(false);
+  const db = useSQLiteContext();
+
   React.useEffect(() => {
     async function Start() {
       try {
-        setClientes([...clientes]);
-      } catch (error) {}
+        const cli = await new ClienteService(db).findAllClientes();
+        if (cli.length < 1) {
+          throw new Error("Não há clientes cadastrados", { cause: "ERR_DONT_HAVE_CLIENTS" });
+        }
+        setHaveClientes(true);
+        const produto = await new ProdutoService(db).getAllProdutos();
+        if (produto.length < 1) {
+          throw new Error("Não há produtos cadastrados", { cause: "ERR_DONT_HAVE_PRODUTOS" });
+        }
+        setHaveProdutos(true);
+        setIsLoading(false);
+      } catch (error) {
+        const err = error as Error;
+        if (err.cause === 'ERR_DB_FIND_ALL_CLIENTES') {
+          Alert.alert('Erro', 'Erro ao buscar clientes contacte o suporte do aplicativo!');
+          navigation?.goBack();
+        } else if (err.cause === "ERR_DONT_HAVE_CLIENTS") {
+          Alert.alert("Erro", err.message);
+          navigation?.goBack();
+          navigation?.navigate('screens-clientes');
+        } else if (err.cause === "ERR_DONT_HAVE_PRODUTOS") {
+          Alert.alert("Erro", err.message);
+          navigation?.goBack();
+          navigation?.navigate('screens-produtos');
+        } else {
+
+        }
+        setIsLoading(false);
+      }
     }
     Start();
   }, []);
+
+  if (isLoading) {
+    return <LoadingScreen />
+  }
 
   return (
     <Box w="$full" h="$full">
@@ -67,500 +101,25 @@ const Create: React.FC<CadastrarVendaScreen> = ({ navigation, route }) => {
             </Heading>
           </Box>
           <Box gap="$8">
-            <Formik
-              initialValues={{
-                produtos: [
-                  {
-                    id: '',
-                    codigo_de_barras: '',
-                    nome: '',
-                    data_validade: '',
-                    marca: '',
-                    tipo: '',
-                    valor_total: '',
-                    valor: '',
-                    empresa: '',
-                    quantidade: '',
-                    qtd: '',
-                  },
-                ],
-                cliente: {
-                  id: '',
-                  nome: '',
-                  cpf: '',
-                },
-                valor: '',
-                data: new Date(),
-                status: '' as 'pago' | 'devendo',
+            <FormCreateVenda
+              id_cliente={route?.params?.id_cliente}
+              produto={{ id_produto: route?.params?.id_produto, type: route?.params?.type, i: route?.params?.indexUpdated}}
+              haveClientes={haveClientes}
+              haveProdutos={haveProdutos}
+              onAddProductToVenda={(selectedsProdutos) => {
+                navigation?.navigate('selecionar-produto', {
+                  screen: 'cadastrar-venda',
+                  type: 'create',
+                  selectedsProdutos
+                });
               }}
-              onSubmit={() => {}}
-            >
-              {({
-                values,
-                errors,
-                handleChange,
-                setFieldValue,
-                handleSubmit,
-              }) => {
-                React.useEffect(() => {
-                  if (route && route.params && route.params.cliente) {
-                    setFieldValue('cliente', { ...route.params.cliente });
-                  }
-                }, [route?.params?.cliente]);
-
-                React.useEffect(() => {
-                  if (
-                    route &&
-                    route.params &&
-                    route.params.produto &&
-                    route.params.type &&
-                    typeof route.params.indexUpdated !== 'undefined'
-                  ) {
-                    const prod = route.params.produto;
-                    const prods = values.produtos;
-                    if (
-                      route.params.type === 'create' &&
-                      values.produtos.length === 1 &&
-                      values.produtos[0].id === ''
-                    ) {
-                      prods[0] = {
-                        ...prod,
-                        valor_total: prod.valor,
-                        qtd: '1',
-                      };
-                      setFieldValue('produtos', [...prods]);
-                    } else if (route.params.type === 'create') {
-                      setFieldValue('produtos', [
-                        ...prods,
-                        { ...prod, valor_total: prod.valor, qtd: '1' },
-                      ]);
-                    } else if (route.params.type === 'update') {
-                      prods[route.params.indexUpdated] = {
-                        ...prod,
-                        valor_total: prod.valor,
-                        qtd: '1',
-                      };
-                      setFieldValue('produtos', [...prods]);
-                    } else {
-                      Alert.alert('Aviso', 'Erro ao selecionar o clinente!');
-                    }
-                    if (values.valor === '') {
-                      setFieldValue('valor', prod.valor);
-                    } else {
-                      setFieldValue(
-                        'valor',
-                        formatValue(
-                          Number(values.valor.replace(',', '.')) +
-                            Number(prod.valor.replace(',', '.')),
-                        ),
-                      );
-                    }
-                  }
-                }, [route?.params?.produto]);
-
-                return (
-                  <>
-                    <Box gap="$5">
-                      {values.cliente.id !== '' && (
-                        <Card>
-                          <HStack>
-                            <VStack>
-                              <Heading size="lg">Cliente</Heading>
-                              <Text size="lg">{values.cliente.nome}</Text>
-                              <Text size="lg">{values.cliente.cpf}</Text>
-                            </VStack>
-                          </HStack>
-                        </Card>
-                      )}
-                      {clientes.length > 0 && (
-                        <Button
-                          onPress={() =>
-                            navigation?.navigate('selecionar-cliente', {
-                              screen: 'cadastrar-venda',
-                            })
-                          }
-                        >
-                          <ButtonText>
-                            {values.cliente.id === ''
-                              ? 'Selecionar Cliente'
-                              : 'Atualizar Cliente'}
-                          </ButtonText>
-                        </Button>
-                      )}
-                      <Button
-                        onPress={() => navigation?.navigate('screens-clientes')}
-                      >
-                        <ButtonText>Cadastrar Cliente</ButtonText>
-                      </Button>
-                    </Box>
-
-                    <Box gap="$5">
-                      <Heading textAlign="center" size="xl">
-                        Produtos
-                      </Heading>
-
-                      {values.produtos.map(
-                        ({ qtd, valor_total, ...produto }, i) => {
-                          if (produto.id !== '') {
-                            return (
-                              <Box key={`produto-${i}`} gap="$5">
-                                <Card>
-                                  <HStack>
-                                    <VStack>
-                                      <Heading size="lg">
-                                        {produto.nome}
-                                      </Heading>
-                                      <Text size="lg">{produto.marca}</Text>
-                                      <Text size="lg">{produto.tipo}</Text>
-                                      <Text>{qtd} unidades</Text>
-                                      <Text>{valor_total} reais</Text>
-                                    </VStack>
-                                  </HStack>
-                                </Card>
-                                <FormControl
-                                  isInvalid={false}
-                                  size={'md'}
-                                  isDisabled={false}
-                                  isRequired={true}
-                                >
-                                  <FormControlLabel>
-                                    <FormControlLabelText>
-                                      Quantidade
-                                    </FormControlLabelText>
-                                  </FormControlLabel>
-                                  <Input>
-                                    <Button
-                                      onPress={() => {
-                                        const result = onAddProduct(
-                                          qtd,
-                                          values.valor,
-                                          produto,
-                                        );
-                                        if (typeof result != 'undefined') {
-                                          setFieldValue(
-                                            `produtos[${i}].qtd`,
-                                            result.quantidade,
-                                          );
-                                          setFieldValue(
-                                            `produtos[${i}].valor_total`,
-                                            result.valor_produto,
-                                          );
-                                          setFieldValue('valor', result.valor);
-                                        }
-                                      }}
-                                      action="positive"
-                                    >
-                                      <ButtonIcon as={AddIcon} />
-                                    </Button>
-                                    <InputField
-                                      textAlign="center"
-                                      type="text"
-                                      value={values.produtos[i].qtd}
-                                      placeholder="12"
-                                      onChangeText={(text) => {
-                                        const result = onUpdateProduct(
-                                          text,
-                                          produto,
-                                          values.valor,
-                                          valor_total,
-                                        );
-                                        if (result.erro) {
-                                          Alert.alert(
-                                            'Aviso',
-                                            'Limite do produto atingido',
-                                          );
-                                        } else if (result.remove) {
-                                          Alert.alert(
-                                            'Aviso',
-                                            'Deseja remover esse produto?',
-                                            [
-                                              {
-                                                text: 'Sim',
-                                                onPress: () => {
-                                                  setFieldValue(
-                                                    'produtos',
-                                                    values.produtos.splice(
-                                                      i,
-                                                      1,
-                                                    ),
-                                                  );
-                                                },
-                                              },
-                                              {
-                                                text: 'Não',
-                                                onPress: () =>
-                                                  Alert.alert(
-                                                    'Aviso',
-                                                    'Operação cancelada!',
-                                                  ),
-                                              },
-                                            ],
-                                          );
-                                        } else {
-                                          setFieldValue(
-                                            `produtos[${i}].qtd`,
-                                            result.quantidade,
-                                          );
-                                          setFieldValue(
-                                            'valor',
-                                            result.valor_total,
-                                          );
-                                          setFieldValue(
-                                            `produtos[${i}].valor_total`,
-                                            result.valor_total,
-                                          );
-                                        }
-                                      }}
-                                      keyboardType="number-pad"
-                                    />
-                                    <Button
-                                      onPress={() => {
-                                        const result = onRemoveProduct(
-                                          qtd,
-                                          produto,
-                                          valor_total,
-                                          values.valor,
-                                        );
-                                        if (result.remove) {
-                                          Alert.alert(
-                                            'Aviso',
-                                            'Deseja remover esse produto?',
-                                            [
-                                              {
-                                                text: 'Sim',
-                                                onPress: () => {
-                                                  if (
-                                                    values.produtos.splice(i, 1)
-                                                      .length < 1
-                                                  ) {
-                                                    setFieldValue('produtos', [
-                                                      {
-                                                        id: '',
-                                                        codigo_de_barras: '',
-                                                        nome: '',
-                                                        data_validade: '',
-                                                        marca: '',
-                                                        tipo: '',
-                                                        valor_total: '',
-                                                        valor: '',
-                                                        empresa: '',
-                                                        quantidade: '',
-                                                        qtd: '',
-                                                      },
-                                                    ]);
-                                                    setFieldValue('valor', '');
-                                                  } else {
-                                                    setFieldValue(
-                                                      'valor',
-                                                      `${Number(values.valor.replace(',', '.')) - Number(valor_total.replace(',', '.'))}`,
-                                                    );
-                                                    setFieldValue('produtos', [
-                                                      ...values.produtos.splice(
-                                                        i,
-                                                        1,
-                                                      ),
-                                                    ]);
-                                                  }
-                                                },
-                                              },
-                                              {
-                                                text: 'Não',
-                                                onPress: () =>
-                                                  Alert.alert(
-                                                    'Aviso',
-                                                    'Operação cancelada!',
-                                                  ),
-                                              },
-                                            ],
-                                          );
-                                        } else {
-                                          setFieldValue(
-                                            `produtos[${i}].qtd`,
-                                            result.quantidade,
-                                          );
-                                          setFieldValue(
-                                            `produtos[${i}].valor_total`,
-                                            result.valor_total,
-                                          );
-                                          setFieldValue('valor', result.valor);
-                                        }
-                                      }}
-                                      action="negative"
-                                    >
-                                      <ButtonIcon as={RemoveIcon} />
-                                    </Button>
-                                  </Input>
-
-                                  <FormControlHelper>
-                                    <FormControlHelperText>
-                                      Must be atleast 6 characters.
-                                    </FormControlHelperText>
-                                  </FormControlHelper>
-
-                                  <FormControlError>
-                                    <FormControlErrorIcon
-                                      as={AlertCircleIcon}
-                                    />
-                                    <FormControlErrorText>
-                                      Atleast 6 characters are required.
-                                    </FormControlErrorText>
-                                  </FormControlError>
-                                </FormControl>
-                                <Button
-                                  onPress={() => {
-                                    navigation?.navigate('selecionar-produto', {
-                                      screen: 'cadastrar-venda',
-                                      type: 'update',
-                                      indexUpdated: i,
-                                      selectedsProdutos:
-                                        values.produtos[0].id === ''
-                                          ? undefined
-                                          : values.produtos,
-                                    });
-                                  }}
-                                >
-                                  <ButtonText>Atualizar Produto</ButtonText>
-                                </Button>
-                              </Box>
-                            );
-                          }
-                        },
-                      )}
-
-                      <Button
-                        onPress={() => {
-                          navigation?.navigate('selecionar-produto', {
-                            screen: 'cadastrar-venda',
-                            type: 'create',
-                            selectedsProdutos:
-                              values.produtos[0].id === ''
-                                ? undefined
-                                : values.produtos,
-                          });
-                        }}
-                      >
-                        <ButtonText>Adicionar Produto</ButtonText>
-                      </Button>
-                      <Button
-                        onPress={() => navigation?.navigate('screens-produtos')}
-                      >
-                        <ButtonText>Cadastrar Produto</ButtonText>
-                      </Button>
-                    </Box>
-
-                    <InputDatePicker
-                      onChangeDate={(dt) => setFieldValue('data', dt)}
-                      title="Data da Venda"
-                      value={values.data}
-                    />
-
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>Valor</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <InputField
-                          editable={false}
-                          type="text"
-                          value={values.valor}
-                          placeholder="120,00"
-                        />
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Valor da compra.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          {errors.valor}
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
-
-                    <FormControl
-                      isInvalid={false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>
-                          Selecione o status da venda
-                        </FormControlLabelText>
-                      </FormControlLabel>
-                      <Select
-                        onValueChange={handleChange('status')}
-                        selectedValue={
-                          values.status === 'pago'
-                            ? 'Pago'
-                            : values.status === 'devendo'
-                              ? 'Devendo'
-                              : ''
-                        }
-                        isInvalid={false}
-                        isDisabled={false}
-                      >
-                        <SelectTrigger size={'lg'} variant={'rounded'}>
-                          <SelectInput placeholder="Selecione um status" />
-                          <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
-                        </SelectTrigger>
-                        <SelectPortal>
-                          <SelectBackdrop />
-                          <SelectContent>
-                            <SelectDragIndicatorWrapper>
-                              <SelectDragIndicator />
-                            </SelectDragIndicatorWrapper>
-                            <SelectItem
-                              label="Devendo"
-                              value="devendo"
-                              isPressed={values.status === 'devendo'}
-                            />
-                            <SelectItem
-                              label="Pago"
-                              value="pago"
-                              isPressed={values.status === 'pago'}
-                            />
-                          </SelectContent>
-                        </SelectPortal>
-                      </Select>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Must be atleast 6 characters.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          Atleast 6 characters are required.
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
-                    <Box>
-                      <Button
-                        onPress={
-                          handleSubmit as unknown as (
-                            event: GestureResponderEvent,
-                          ) => void
-                        }
-                      >
-                        <ButtonText>Cadastrar Venda</ButtonText>
-                      </Button>
-                    </Box>
-                  </>
-                );
+              onChangeCliente={(id_cliente) => { navigation?.navigate('selecionar-cliente', { screen: 'cadastrar-venda', id_cliente }); }}
+              onCreateCliente={() => { navigation?.navigate('screens-clientes'); }}
+              onCreateProduct={() => { navigation?.navigate('screens-produtos'); }}
+              onUpdateProductToVenda={(selectedsProdutos, indexUpdated) => {
+                navigation?.navigate('selecionar-produto', { screen: 'cadastrar-venda', type: 'update', indexUpdated, selectedsProdutos });
               }}
-            </Formik>
+            />
           </Box>
         </Box>
       </ScrollView>

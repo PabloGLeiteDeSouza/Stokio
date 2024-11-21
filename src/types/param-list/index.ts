@@ -278,13 +278,18 @@ export type SelecionarRamoStackParamList = {
 
 export type SelecionarProdutoStackParamList = {
   'selecionar-produto'?: {
-    screen: 'cadastrar-venda';
+    screen: 'cadastrar-venda' | 'atualizar-venda' | 'cadastrar-compra' | 'atualizar-compra';
     indexUpdated?: number;
     type: 'update' | 'create';
-    selectedsProdutos?: Array<Produto>;
+    selectedsProdutos?: Array<{ id_produto: number }>;
   };
   'cadastrar-venda'?: {
-    produto: Produto;
+    id_produto: number;
+    indexUpdated: number;
+    type: 'update' | 'create';
+  };
+  'cadastrar-compra'?: {
+    id_produto: number;
     indexUpdated: number;
     type: 'update' | 'create';
   };
@@ -316,14 +321,14 @@ export type SelecionarUmStackParamList = {
 export type SelecionarClienteStackParamList = {
   'selecionar-cliente'?: {
     screen: 'cadastrar-venda';
-    clienteSelecionado?: Cliente;
+    id_cliente?: number;
   };
-  'cadastrar-venda'?: { cliente: Cliente };
+  'cadastrar-venda'?: { id_cliente: number };
 };
 
 export type SelecionarEmpresaStackParamList = {
   'selecionar-empresa'?: {
-    screen: 'cadastrar-produto' | 'cadastrar-compra';
+    screen: 'cadastrar-produto' | 'atualizar-produto' | 'cadastrar-compra' | 'atualizar-compra';
     empresaSelecionada?: Empresa;
   };
   'cadastrar-produto'?: { empresa: Empresa };
@@ -356,22 +361,8 @@ export type VendasStackParamList = {
   'screens-ramos'?: object;
   'screens-clientes'?: object;
   'cadastrar-venda'?: {
-    cliente?: {
-      id: number;
-      nome: string;
-      cpf: string;
-    };
-    produto?: {
-      id: number;
-      codigo_de_barras: string;
-      nome: string;
-      data_validade: string;
-      tipo: string;
-      marca: string;
-      empresa: string;
-      quantidade: string;
-      valor: string;
-    };
+    id_cliente?: number;
+    id_produto?: number;
     type?: 'update' | 'create';
     indexUpdated?: number;
   };
@@ -379,13 +370,13 @@ export type VendasStackParamList = {
   'visualizar-vendas'?: object;
   'selecionar-cliente'?: {
     screen: 'cadastrar-venda';
-    clienteSelecionado?: { id: number; nome: string; cpf: string };
+    id_cliente?: number;
   };
   'selecionar-produto'?: {
     screen: 'cadastrar-venda';
     type: 'update' | 'create';
     indexUpdated?: number;
-    selectedsProdutos?: Array<Produto>;
+    selectedsProdutos?: Array<{ id: number }>;
   };
 };
 
@@ -411,22 +402,12 @@ export type ComprasStackParamList = {
       cpf: string;
       cnpj?: string;
     };
-    produto?: {
-      id: number;
-      codigo_de_barras: string;
-      nome: string;
-      data_validade: string;
-      tipo: string;
-      marca: string;
-      empresa: string;
-      quantidade: number;
-      valor: number;
-    };
+    id_produto?: number;
     code?: string;
     type?: 'update' | 'create';
     indexUpdated?: number;
   };
-  'atualizar-compra'?: { id: number };
+  'atualizar-compra'?: { id: number, id_empresa?: number; id_produto?: number; };
   'visualizar-compras'?: object;
   'detalhes-compra'?: { id: number };
   'selecionar-empresa'?: {
@@ -437,7 +418,7 @@ export type ComprasStackParamList = {
     screen: 'cadastrar-compra' | 'atualizar-compra';
     type: 'update' | 'create';
     indexUpdated?: number;
-    selectedsProdutos?: Array<Produto>;
+    selectedsProdutos?: Array<{ id_produto: number }>;
   };
 };
 

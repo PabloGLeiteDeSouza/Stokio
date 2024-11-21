@@ -147,7 +147,7 @@ const FormCreateProduto: React.FC<IFormCreateProduto> = ({ onCreatedProduto, db,
               try {
                 const res = await new ProdutoService(db).getProdutoByCodigoDeBarras(code);
                 if (res) {
-                  Alert.alert('Aviso', 'O produto ja existe')
+                  Alert.alert('Aviso', 'O produto ja existe!')
                   onRedirectProductExists();
                 }
                 setFieldValue('codigo_de_barras', code);
@@ -618,7 +618,7 @@ const FormCreateProduto: React.FC<IFormCreateProduto> = ({ onCreatedProduto, db,
                 onChangeDate={(data) => setFieldValue('data_de_validade', data)}
               />
               <FormControl
-                isInvalid={false}
+                isInvalid={errors.codigo_de_barras ? true : false}
                 size={'md'}
                 isDisabled={false}
                 isRequired={true}
@@ -647,19 +647,19 @@ const FormCreateProduto: React.FC<IFormCreateProduto> = ({ onCreatedProduto, db,
 
                 <FormControlHelper>
                   <FormControlHelperText>
-                    Must be atleast 6 characters.
+                    Informe um codigo de barras.
                   </FormControlHelperText>
                 </FormControlHelper>
 
                 <FormControlError>
                   <FormControlErrorIcon as={AlertCircleIcon} />
                   <FormControlErrorText>
-                    Atleast 6 characters are required.
+                    {errors.codigo_de_barras}
                   </FormControlErrorText>
                 </FormControlError>
               </FormControl>
               <FormControl
-                isInvalid={false}
+                isInvalid={errors.nome ? true : false}
                 size={'md'}
                 isDisabled={false}
                 isRequired={true}
@@ -678,14 +678,14 @@ const FormCreateProduto: React.FC<IFormCreateProduto> = ({ onCreatedProduto, db,
 
                 <FormControlHelper>
                   <FormControlHelperText>
-                    Must be atleast 6 characters.
+                    Informe o nome do produto.
                   </FormControlHelperText>
                 </FormControlHelper>
 
                 <FormControlError>
                   <FormControlErrorIcon as={AlertCircleIcon} />
                   <FormControlErrorText>
-                    Atleast 6 characters are required.
+                    {errors.nome}
                   </FormControlErrorText>
                 </FormControlError>
               </FormControl>
@@ -709,14 +709,14 @@ const FormCreateProduto: React.FC<IFormCreateProduto> = ({ onCreatedProduto, db,
 
                 <FormControlHelper>
                   <FormControlHelperText>
-                    Must be atleast 6 characters.
+                    Infrome uma descricao para o produto.
                   </FormControlHelperText>
                 </FormControlHelper>
 
                 <FormControlError>
                   <FormControlErrorIcon as={AlertCircleIcon} />
                   <FormControlErrorText>
-                    Atleast 6 characters are required.
+                    Infrome uma descricao para o produto.
                   </FormControlErrorText>
                 </FormControlError>
               </FormControl>

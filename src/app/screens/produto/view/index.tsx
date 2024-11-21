@@ -95,12 +95,26 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
       <Card size="md" variant="elevated" m="$3">
         <HStack justifyContent="space-between">
           <Box w="$2/3" gap="$1">
-            <Heading mb="$1" size="md">
-              {item.nome}
-            </Heading>
-            <Text size="md">{new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(getDateFromString(item.data_de_validade))}</Text>
-            <Text size="md">{item.tipo}</Text>
-            <Text size="md">{item.marca}</Text>
+            <Box>
+              <Heading>Nome</Heading>
+              <Text size="md">{item.nome}</Text>
+            </Box>
+            <Box>
+              <Heading>QTD</Heading>
+              <Text size="md">{item.quantidade}</Text>
+            </Box>
+            <Box>
+              <Heading>Data de validade</Heading>
+              <Text size="md">{new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(getDateFromString(item.data_de_validade))}</Text>
+            </Box>
+            <Box>
+              <Heading>Tipo do produto</Heading>
+              <Text size="md">{item.tipo}</Text>
+            </Box>
+            <Box>
+              <Heading>Marca do produto</Heading>
+              <Text size="md">{item.marca}</Text>
+            </Box>
           </Box>
           <Box gap="$5">
             <Button

@@ -1,5 +1,5 @@
 import LoadingScreen from '@/components/LoadingScreen';
-import { Cliente, ClienteFlatList } from '@/types/screens/cliente';
+import { Cliente, ClienteFlatList, ClienteSelectFlatList } from '@/types/screens/cliente';
 import {
   Box,
   Button,
@@ -14,49 +14,54 @@ import {
   VStack,
 } from '@gluestack-ui/themed';
 import React from 'react';
-import { ListRenderItem } from 'react-native';
+import { Alert, ListRenderItem } from 'react-native';
 import { ISlectClienteProps } from './interfaces';
+import { ClienteService } from '@/classes/cliente/cliente.service';
+import { useSQLiteContext } from 'expo-sqlite';
+import { IClienteSelectCliente, IClienteSimpleRequest } from '@/classes/cliente/interfaces';
 
 const SelectCliente: React.FC<ISlectClienteProps> = ({ navigation, route }) => {
   if (!route || !route.params || !route.params.screen) {
     navigation?.goBack();
     return null;
   }
+  if(typeof route.params.id_cliente === 'undefined'){
+    navigation?.goBack();
+    return null;
+  }
   const screen = route.params.screen;
+  const id_cliente = route.params.id_cliente;
   const [isLaoding, setIsLoading] = React.useState(true);
-  const [clientes, setClientes] = React.useState<Array<Cliente>>([
-    {
-      id: '1',
-      nome: 'José',
-      cpf: '123.123.123-12',
-      data_nascimento: '2000-05-05',
-    },
-    {
-      id: '2',
-      nome: 'Maria',
-      cpf: '424.342.564.87',
-      data_nascimento: '1999-06-15',
-    },
-  ]);
-  const [cliente, setCliente] = React.useState<Cliente>(clientes[0]);
+  const [clientes, setClientes] = React.useState<Array<IClienteSelectCliente>>([]);
+  const [cliente, setCliente] = React.useState<IClienteSelectCliente>({
+    id: id_cliente,
+    nome: '',
+    cpf: '',
+    data_nascimento: '',
+  });
+  const db = useSQLiteContext();
 
-  const FlatListCliente = FlatList as ClienteFlatList;
+  const FlatListCliente = FlatList as ClienteSelectFlatList;
 
   React.useEffect(() => {
     async function StartScreen() {
       try {
-        setClientes([...clientes]);
+        const clis = await new ClienteService(db).findAllClienteSelectCliente();
+        setClientes([...clis]);
         setIsLoading(false);
-      } catch (error) {}
+      } catch (error) {
+        Alert.alert('Erro', (error as Error).message);
+        navigation?.goBack();
+      }
     }
     StartScreen();
   }, []);
 
-  const ListRenderCliente: ListRenderItem<Cliente> = ({ item, index }) => {
+  const ListRenderCliente: ListRenderItem<IClienteSelectCliente> = ({ item, index }) => {
     return (
       <Card mt={index === 0 ? '$5' : '$2.5'} mb="$2.5" mx="$5">
         <HStack justifyContent="space-between">
-          <VStack>
+          <VStack w="$2/4">
             <Box>
               <Heading>{item.nome}</Heading>
             </Box>
@@ -67,7 +72,7 @@ const SelectCliente: React.FC<ISlectClienteProps> = ({ navigation, route }) => {
               <Text>{item.data_nascimento}</Text>
             </Box>
           </VStack>
-          <VStack>
+          <VStack w="$1/3">
             <Button
               isDisabled={item.id === cliente.id}
               onPress={() => {
@@ -98,7 +103,7 @@ const SelectCliente: React.FC<ISlectClienteProps> = ({ navigation, route }) => {
       </Box>
       <FlatListCliente data={clientes} renderItem={ListRenderCliente} />
       <Box mx="$5" my="$5">
-        <Button onPress={() => navigation?.navigate(screen, { cliente })}>
+        <Button onPress={() => navigation?.navigate(screen, { id_cliente: cliente.id })}>
           <ButtonText>Selecionar Cliente</ButtonText>
         </Button>
       </Box>

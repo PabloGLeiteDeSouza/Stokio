@@ -27,6 +27,15 @@ export interface IClienteSimpleRequest {
   id_endereco: string;
 }
 
+export interface IClienteSelectCliente {
+  id: number;
+  nome: string;
+  cpf: string;
+  data_nascimento: string;
+}
+
+
+
 export interface IClienteCreateOnly {
   cep: string;
   logradouro: string;

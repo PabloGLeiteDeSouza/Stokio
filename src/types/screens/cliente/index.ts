@@ -4,6 +4,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { ViewStyle } from '@expo/html-elements/build/primitives/View';
 import { StyledComponentProps } from '@gluestack-style/react/lib/typescript/types';
 import { FlatList, FlatListProps, StyleProp } from 'react-native';
+import { IClienteSelectCliente } from '@/classes/cliente/interfaces';
 
 export type VisualisarClienteScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -94,6 +95,16 @@ export type ClienteFlatList = React.ForwardRefExoticComponent<
     StyleProp<ViewStyle>,
     Cliente,
     FlatListProps<Cliente>,
+    'FlatList',
+    typeof FlatList
+  >
+>;
+
+export type ClienteSelectFlatList = React.ForwardRefExoticComponent<
+  StyledComponentProps<
+    StyleProp<ViewStyle>,
+    IClienteSelectCliente,
+    FlatListProps<IClienteSelectCliente>,
     'FlatList',
     typeof FlatList
   >

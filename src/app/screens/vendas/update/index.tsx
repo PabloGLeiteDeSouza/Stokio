@@ -107,7 +107,7 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                 data: new Date(),
                 status: 'devendo' as 'pago' | 'devendo',
               }}
-              onSubmit={() => {}}
+              onSubmit={async () => {}}
             >
               {({
                 values,

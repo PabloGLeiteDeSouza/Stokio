@@ -68,40 +68,38 @@ import React from 'react';
 import { Alert, GestureResponderEvent, ListRenderItem } from 'react-native';
 import { CompraFlatList } from '@/types/screens/compra';
 import { CompraViewObject } from '@/classes/compra/interfaces';
+import CompraService from '@/classes/compra/compra.service';
+import { useSQLiteContext } from 'expo-sqlite';
+import { mask } from '@/utils/mask';
+import { useIsFocused } from '@react-navigation/native';
 const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
-  const [compras, setCompras] = React.useState<CompraViewObject[]>([{
-    id: 1,
-    data: new Date(),
-    valor_venda: 100.0,
-    status: 'pendente',
-    nome_empresa: 'teste'
-  }, {
-    id: 2,
-    data: new Date(),
-    valor_venda: 100.0,
-    status: 'pendente',
-    nome_empresa: 'teste'
-  }]);
+  const [compras, setCompras] = React.useState<CompraViewObject[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
-  // async function start() {
-  //   try {
-  //     if (!isLoading) {
-  //       setIsLoading(true);
-  //     }
-  //     setCompras([]);
-  //     setIsLoading(false);
-  //   } catch (error) {
-  //     Alert.alert('Error', (error as Error).message);
-  //     setIsLoading(false);
-  //     throw error;
-  //   }
-  // }
-  // React.useEffect(() => {
-  //   start();
-  // }, []);
-  // if (isLoading) {
-  //   return <LoadingScreen />;
-  // }
+  const db = useSQLiteContext();
+  const isFocused = useIsFocused();
+  async function start() {
+    try {
+      if (!isLoading) {
+        setIsLoading(true);
+      }
+      const comprs = await new CompraService(db).findAll();
+      console.log(comprs);
+      setCompras([...comprs]);
+      setIsLoading(false);
+    } catch (error) {
+      Alert.alert('Error', (error as Error).message);
+      setIsLoading(false);
+      throw error;
+    }
+  }
+  React.useEffect(() => {
+    if(isFocused){
+      start();
+    }
+  }, [isFocused]);
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   const ListRenderCompra: ListRenderItem<CompraViewObject> = ({ item, index }) => {
     return (
@@ -110,6 +108,7 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
           <Box gap="$2.5" w="$2/3">
             <Heading size="lg">{item.nome_empresa}</Heading>
             <Text size="md">{new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(item.data)}</Text>
+            <Text>{mask(item.valor_compra.toString(), 'money')}</Text>
             <Text color={item.status === 'pendente' ? '$red600' : ''} size="md">
               {item.status}
             </Text>
@@ -117,7 +116,7 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
           <Box gap="$5">
             <Button
               onPress={() =>
-                navigation?.navigate('detalhes-compra', { id: String(item.id) })
+                navigation?.navigate('detalhes-compra', { id: item.id })
               }
             >
               <ButtonIcon as={EyeIcon} />
@@ -129,6 +128,10 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
   };
 
   const FlatListCompra = FlatList as CompraFlatList;
+
+  if(isLoading){
+    return <LoadingScreen />
+  }
 
   return compras.length < 1 ? (
     <Box h="$full" w="$full" alignItems="center" justifyContent="center">
@@ -262,6 +265,10 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
         data={compras}
         renderItem={ListRenderCompra}
         keyExtractor={(c) => String(c.id)}
+        refreshing={isLoading}
+        onRefresh={() => {
+          start();
+        }}
       />
     </Box>
   );

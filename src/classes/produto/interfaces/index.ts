@@ -5,7 +5,6 @@ export interface UnidadeDeMedida {
   id: number;
   nome: string;
   valor: string;
-  descricao?: string;
 }
 
 export interface TipoProduto {
@@ -26,11 +25,11 @@ export interface Produto {
   descricao: string | null;
   valor: number;
   quantidade: number;
+  tamanho: number;
   id_empresa: number;
   id_marca: number;
   id_tipo_produto: number;
   id_um: number;
-  tamanho: number;
   id_ua: number;
 }
 
@@ -39,7 +38,8 @@ export interface ProdutoObjectRequestAll {
   nome: string; 
   data_de_validade: string; 
   tipo: string; 
-  marca: string 
+  marca: string;
+  quantidade: number;
 }
 
 export interface ProdutoObjectComplete extends Omit<Produto, 'id_empresa' | 'id_marca' | 'id_tipo_produto' | 'id_um' | 'id_ua'> {
@@ -48,4 +48,16 @@ export interface ProdutoObjectComplete extends Omit<Produto, 'id_empresa' | 'id_
   tipo_produto: TipoProduto;
   unidade_de_medida: UnidadeDeMedida;
   unidade_de_armazenamento: UnidadeDeArmazenamento;
+}
+
+export interface ProdutoVendaRequest {
+  id: number;
+  codigo_de_barras: string;
+  nome: string;
+  data_validade: string;
+  marca: string;
+  tipo: string;
+  valor_unitario: number;
+  empresa: string;
+  quantidade: number;
 }

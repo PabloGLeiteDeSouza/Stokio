@@ -21,3 +21,12 @@ export function formatValue(valor: string | number) {
     maximumFractionDigits: 2,
   }).format(Number(valor))).replace(',', '.'));
 }
+
+
+export function sumAllValues(values: Array<number>) {
+  let sum = 0;
+  values.forEach((value) => {
+    sum += value
+  });
+  return sum;
+}

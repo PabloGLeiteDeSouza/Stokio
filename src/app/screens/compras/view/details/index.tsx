@@ -1,6 +1,10 @@
 import CompraService from "@/classes/compra/compra.service";
+import { CompraObjectBaseToDetails, ItemDeCompraObjectBase } from "@/classes/compra/interfaces";
 import LoadingScreen from "@/components/LoadingScreen";
 import { AtualizarCompraScreen } from "@/interfaces/compra";
+import { getDateFromString } from "@/utils";
+import { sumAllValues } from "@/utils/calc";
+import { mask } from "@/utils/mask";
 import { Button, ButtonText, Text } from "@gluestack-ui/themed";
 import { Box, Heading, ScrollView } from "@gluestack-ui/themed";
 import { useSQLiteContext } from "expo-sqlite";
@@ -16,14 +20,14 @@ const Details: React.FC<AtualizarCompraScreen> = ({ navigation, route }) => {
   const id = route?.params?.id;
   const db = useSQLiteContext();
 
-  const [compra, setCompra] = React.useState({});
+  const [compra, setCompra] = React.useState<CompraObjectBaseToDetails>({});
   const [isLoading, setIsLoading] = React.useState(true);
 
 
   async function start() {
     try {
-      // const venda = new CompraService(db).findById(id);
-
+      const compra = await new CompraService(db).findByIdToDetails(id);
+      setCompra(compra)
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -46,47 +50,56 @@ const Details: React.FC<AtualizarCompraScreen> = ({ navigation, route }) => {
           <Heading size="xl" textAlign="center">Detailhes da Compra</Heading>
           <Box>
             <Heading size="sm">Data da Compra:</Heading>
-            <Text>2022-01-01</Text>
+            <Text>{new Intl.DateTimeFormat('pt-br', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(getDateFromString(compra.data))}</Text>
           </Box>
           <Box>
             <Heading size="sm">Valor da Compra:</Heading>
-            <Text>R$ 100,00</Text>
+            <Text>{mask(sumAllValues(compra.itens_compra.map((i) => (i.valor_unitario * i.quantidade))).toString(), 'money')}</Text>
           </Box>
           <Box>
             <Heading textAlign="center" size="xl">Itens da Compra:</Heading>
-            <Box gap="$5">
-              <Box>
-                <Heading size="lg">Nome:</Heading>
-                <Text>Kaiak Aventura</Text>
-              </Box>
-              <Box>
-                  <Heading>Empresa:</Heading>
-                  <Text>Natura</Text>
-              </Box>
-              <Box>
-                <Heading>Marca</Heading>
-                <Text>Kaiak</Text>
-              </Box>
-              <Box>
-                <Heading>Tipo</Heading>
-                <Text>Desodorante Corporal</Text>
-              </Box>
-              <Box>
-                <Heading>Conteudo</Heading>
-                <Text>50 ml</Text>
-              </Box>
-              <Box>
-                <Heading size="sm">Valor:</Heading>
-                <Text>R$ 50,00</Text>
-              </Box>
-              <Box>
-                <Heading size="sm">Quantidade:</Heading>
-                <Text>1</Text>
-              </Box>
-            </Box>
+            {compra.itens_compra.map((vl) => {
+              return (
+                <Box key={vl.id} gap="$5">
+                  <Box>
+                    <Heading size="lg">Nome:</Heading>
+                    <Text>{vl.nome}</Text>
+                  </Box>
+                  <Box>
+                      <Heading>Empresa:</Heading>
+                      <Text>{vl.empresa}</Text>
+                  </Box>
+                  <Box>
+                    <Heading>Marca</Heading>
+                    <Text>{vl.marca}</Text>
+                  </Box>
+                  <Box>
+                    <Heading>Tipo</Heading>
+                    <Text>{vl.tipo}</Text>
+                  </Box>
+                  <Box>
+                    <Heading>Conteudo</Heading>
+                    <Text>{`${vl.tamanho} ${vl.medida}`}</Text>
+                  </Box>
+                  <Box>
+                    <Heading size="sm">Valor Unitario:</Heading>
+                    <Text>{mask(vl.valor_unitario.toString(), 'money')}</Text>
+                  </Box>
+                  <Box>
+                    <Heading size="sm">Quantidade:</Heading>
+                    <Text>{vl.quantidade}</Text>
+                  </Box>
+                  <Box>
+                    <Heading size="sm">Valor Total do item:</Heading>
+                    <Text>{mask((vl.valor_unitario * vl.quantidade).toString(), 'money')}</Text>
+                  </Box>
+                </Box>
+              )
+            })}
+            
           </Box>
           <Box my="$5" gap="$5">
-            <Button onPress={() => navigation?.navigate('atualizar-compra', { id: 1 })}>
+            <Button onPress={() => navigation?.navigate('atualizar-compra', { id: compra.id })}>
               <ButtonText>
                 Atualizar
               </ButtonText>

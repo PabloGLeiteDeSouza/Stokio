@@ -105,7 +105,7 @@ const Details: React.FC<DetalhesProdutoScreen> = ({ navigation, route }) => {
               <Text>{`${produto.tamanho} ${produto.unidade_de_medida.valor}`}</Text>
             </Box>
             <Box>
-              <Heading>Qauntidade:</Heading>
+              <Heading>Quantidade:</Heading>
               <Text>{produto.quantidade}</Text>
             </Box>
             <Box>

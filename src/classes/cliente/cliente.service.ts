@@ -2,6 +2,7 @@ import { SQLiteDatabase } from 'expo-sqlite';
 import {
   IClienteCreate,
   IClienteCreateOnly,
+  IClienteSelectCliente,
   IClienteSimpleRequest,
   IClienteUpdate,
   IClienteUpdateOnly,
@@ -137,7 +138,7 @@ export class ClienteService {
   }
 
   private async updateCliente(
-    id_pessoa: string,
+    id_pessoa: number,
     data: IClienteUpdateOnly,
   ): Promise<void> {
     const res = await this.db.runAsync(
@@ -245,6 +246,18 @@ export class ClienteService {
     }
   }
 
+  async findAllClienteSelectCliente(): Promise<IClienteSelectCliente[]> {
+    try {
+      const result = await this.db.getAllAsync<IClienteSelectCliente>('SELECT c.id, p.nome, p.cpf, p.data_nascimento FROM cliente as c INNER JOIN pessoa as p ON c.id_pessoa == p.id');
+      if(result.length < 1) {
+        throw new Error("Nenhum cliente encontrado");
+      }
+      return result;
+    } catch (error) {
+      throw new Error(`Erro ao buscar clientes: ${(error as Error).message}`);
+    }
+  }
+
   async findAllClienteByCPF(cpf: string): Promise<IClienteSimpleRequest[]> {
     try {
       const result = await this.db.getAllAsync<IClienteSimpleRequest>(
@@ -311,6 +324,9 @@ export class ClienteService {
     } catch (error) {
       throw new Error(
         `Erro ao buscar todos os clientes: ${(error as Error).message}`,
+        {
+          cause: "ERR_DB_FIND_ALL_CLIENTES"
+        }
       );
     }
   }
@@ -361,6 +377,21 @@ export class ClienteService {
         telefones,
         emails,
       };
+    } catch (error) {
+      throw new Error(`Erro ao buscar o cliente: ${(error as Error).message}`);
+    }
+  }
+
+  async findClienteByIdToVenda(id: number): Promise<{id: number; nome: string; cpf: string;}> {
+    try {
+      const cliente = await this.db.getFirstAsync<{id: number; nome: string; cpf: string;}>(
+        `SELECT c.id, p.cpf, p.nome FROM cliente as c INNER JOIN pessoa as p ON p.id == c.id_pessoa WHERE c.id = $id`,
+        { $id: id },
+      );
+      if (!cliente) {
+        throw new Error('Cliente não encontrado!');
+      }
+      return cliente;
     } catch (error) {
       throw new Error(`Erro ao buscar o cliente: ${(error as Error).message}`);
     }

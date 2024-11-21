@@ -1,5 +1,5 @@
 import { SQLiteDatabase } from 'expo-sqlite';
-import { Produto, Marca, TipoProduto, UnidadeDeMedida, ProdutoObjectRequestAll, ProdutoObjectComplete } from './interfaces';
+import { Produto, Marca, TipoProduto, UnidadeDeMedida, ProdutoObjectRequestAll, ProdutoObjectComplete, ProdutoVendaRequest } from './interfaces';
 import { Empresa, EmpresaCustomSimpleRequest } from '../empresa/types';
 import { UnidadeDeArmazenamento } from '../ua/interfaces';
 
@@ -49,7 +49,96 @@ export class ProdutoService {
         throw new Error("Nao foi possivel encontrar o produto!");
       }
       const { id_empresa, id_marca, id_tipo_produto, id_ua, id_um, ...prod } = produto;
-      const empresa = await this.db.getFirstAsync<EmpresaCustomSimpleRequest>('SELECT e.id, e.nome_fantasia, e.razao_social, e.cnpj, p.cpf FROM empresa AS e INNER JOIN pessoa AS p ON p.id == e.id_pessoa WHERE e.id == $id', {
+      const empresa = await this.db.getFirstAsync<EmpresaCustomSimpleRequest>('SELECT e.id, e.nome_fantasia, e.razao_social, e.cnpj, p.cpf  FROM empresa AS e INNER JOIN pessoa AS p ON p.id == e.id_pessoa WHERE e.id == $id', {
+        $id: produto.id_empresa,
+      });
+      if(!empresa){
+        throw new Error("Nao foi possivel encontrar a empresa!");
+      }
+      const marca = await this.db.getFirstAsync<Marca>('SELECT * FROM marca WHERE id == $id', {
+        $id: id_marca,
+      });
+      if(!marca){
+        throw new Error("Nao foi possivel encontrar a marca!");
+      }
+      const tipo_produto = await this.db.getFirstAsync<TipoProduto>('SELECT * FROM tipo_produto WHERE id == $id', {
+        $id: id_tipo_produto,
+      });
+      if(!tipo_produto){
+        throw new Error("Nao foi possivel encontrar o tipo do produto!");
+      }
+      const unidade_de_medida = await this.db.getFirstAsync<UnidadeDeMedida>('SELECT * FROM um WHERE id == $id',  {
+        $id: id_um,
+      });
+      if(!unidade_de_medida){
+        throw new Error("Nao foi possivel encontrar a unidade de medida!");
+      }
+      const unidade_de_armazenamento = await this.db.getFirstAsync<UnidadeDeArmazenamento>('SELECT * FROM ua WHERE id == $id', {
+        $id: id_ua,
+      });
+      if(!unidade_de_armazenamento){
+        throw new Error("Nao foi possivel encontrar a unidade de armazenamento!");
+      }
+      return { ...prod, empresa, marca, tipo_produto, unidade_de_medida, unidade_de_armazenamento };
+    } catch (error) {
+      throw new Error(
+        `Erro ao buscar produto pelo ID: ${(error as Error).message}`,
+      );
+    }
+  }
+
+  async getProdutoBySelectProdutoToVenda(): Promise<ProdutoVendaRequest[]> {
+    try {
+      const res = await this.db.getAllAsync<ProdutoVendaRequest>('SELECT p.id, p.codigo_de_barras, p.data_de_validade as data_validade, p.nome, p.valor as valor_unitario, p.quantidade as quantidade_disponivel, e.nome_fantasia as empresa, m.nome as marca, t.nome as tipo FROM produto as p INNER JOIN marca as m ON m.id == p.id_marca INNER JOIN empresa as e ON e.id == p.id_empresa INNER JOIN tipo_produto as t ON t.id == p.id_tipo_produto WHERE p.quantidade > 0');
+      if(res.length < 1){
+        throw new Error("Nao foi possivel encontrar nenhum produto!");
+      }
+      return res;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async getProdutoBySelectProdutoToCompra(): Promise<ProdutoVendaRequest[]> {
+    try {
+      const res = await this.db.getAllAsync<ProdutoVendaRequest>('SELECT p.id, p.codigo_de_barras, p.data_de_validade as data_validade, p.nome, p.valor as valor_unitario, p.quantidade, e.nome_fantasia as empresa, m.nome as marca, t.nome as tipo FROM produto as p INNER JOIN marca as m ON m.id == p.id_marca INNER JOIN empresa as e ON e.id == p.id_empresa INNER JOIN tipo_produto as t ON t.id == p.id_tipo_produto');
+      if(res.length < 1){
+        throw new Error("Nao foi possivel encontrar nenhum produto!");
+      }
+      return res;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Leitura de Produto
+  async getProdutoByIdToVenda(id: number): Promise<ProdutoVendaRequest> {
+    try {
+      const res = await this.db.getFirstAsync<ProdutoVendaRequest>('SELECT p.id, p.codigo_de_barras, p.data_de_validade as data_validade, p.nome, p.valor as valor_unitario, p.quantidade as quantidade_disponivel, e.nome_fantasia as empresa, m.nome as marca, t.nome as tipo FROM produto as p INNER JOIN marca as m ON m.id == p.id_marca INNER JOIN empresa as e ON e.id == p.id_empresa INNER JOIN tipo_produto as t ON t.id == p.id_tipo_produto WHERE p.id == $id', {
+        $id: id,
+      });
+      if(!res){
+        throw new Error("Nao foi possivel encontrar o produto!");
+      }
+      return res;
+    } catch (error) {
+      throw new Error(
+        `Erro ao buscar produto pelo ID: ${(error as Error).message}`,
+      );
+    }
+  }
+
+  // Leitura de Produto
+  async getProdutoByIdToCompra(id: number): Promise<ProdutoObjectComplete> {
+    try {
+      const produto = await this.db.getFirstAsync<Produto>(
+        `SELECT * FROM produto WHERE id = $id`,
+        { $id: id },
+      );
+      if(!produto){
+        throw new Error("Nao foi possivel encontrar o produto!");
+      }
+      const { id_empresa, id_marca, id_tipo_produto, id_ua, id_um, ...prod } = produto;
+      const empresa = await this.db.getFirstAsync<EmpresaCustomSimpleRequest>('SELECT e.id, e.nome_fantasia, e.razao_social, e.cnpj, p.cpf  FROM empresa AS e INNER JOIN pessoa AS p ON p.id == e.id_pessoa WHERE e.id == $id', {
         $id: produto.id_empresa,
       });
       if(!empresa){
@@ -93,7 +182,7 @@ export class ProdutoService {
   ): Promise<Produto | null> {
     try {
       const produto = await this.db.getFirstAsync<Produto>(
-        `SELECT * FROM produto WHERE codigo_de_barras = $codigoDeBarras`,
+        `SELECT * FROM produto WHERE codigo_de_barras == $codigoDeBarras`,
         { $codigoDeBarras: codigoDeBarras },
       );
       return produto || null;
@@ -112,7 +201,7 @@ export class ProdutoService {
     try {
       const $ord = orderBy ? orderBy : 'ASC';
       const produto = await this.db.getAllAsync<Produto>(
-        `SELECT * FROM produto WHERE nome = $nome ORDER BY nome $ord`,
+        `SELECT * FROM produto WHERE nome == $nome ORDER BY nome $ord`,
         { $nome: `%${nome}%`, $ord },
       );
       return produto;
@@ -130,6 +219,7 @@ export class ProdutoService {
         SELECT prod.id,
             prod.nome,
             prod.data_de_validade,
+            prod.quantidade,
             tp.nome AS tipo,
             mc.nome AS marca
         FROM produto AS prod
@@ -149,8 +239,8 @@ export class ProdutoService {
     try {
       await this.db.runAsync(
         `UPDATE produto 
-         SET codigo_de_barras = $codigoDeBarras, data_de_validade = $dataDeValidade, nome = $nome, descricao = $descricao, valor = $valor, quantidade = $quantidade, id_marca = $idMarca, id_tipo_produto = $idTipoProduto,  id_um = $idUnidadeDeMedida, tamanho = $tamanho, id_ua = $idUnidadeDeArmazenamento, id_empresa = $id_empresa,
-         WHERE id = $id`,
+         SET codigo_de_barras = $codigoDeBarras, data_de_validade = $dataDeValidade, nome = $nome, descricao = $descricao, valor = $valor, quantidade = $quantidade, id_marca = $idMarca, id_tipo_produto = $idTipoProduto,  id_um = $idUnidadeDeMedida, tamanho = $tamanho, id_ua = $idUnidadeDeArmazenamento, id_empresa = $id_empresa
+         WHERE id == $id`,
         {
           $codigoDeBarras: produto.codigo_de_barras,
           $dataDeValidade: produto.data_de_validade,
@@ -163,6 +253,7 @@ export class ProdutoService {
           $idUnidadeDeMedida: produto.id_um,
           $tamanho: produto.tamanho,
           $idUnidadeDeArmazenamento: produto.id_ua,
+          $id_empresa: produto.id_empresa,
           $id: id,
         },
       );
@@ -174,7 +265,7 @@ export class ProdutoService {
   // Exclusão de Produto
   async deleteProduto(id: number): Promise<void> {
     try {
-      await this.db.runAsync(`DELETE FROM produto WHERE id = $id`, {
+      await this.db.runAsync(`DELETE FROM produto WHERE id == $id`, {
         $id: id,
       });
     } catch (error) {
@@ -201,7 +292,7 @@ export class ProdutoService {
   async getMarcaById(id: number): Promise<Marca | null> {
     try {
       const marca = await this.db.getFirstAsync<Marca>(
-        `SELECT * FROM marca WHERE id = $id`,
+        `SELECT * FROM marca WHERE id == $id`,
         { $id: id },
       );
       return marca || null;
@@ -229,7 +320,7 @@ export class ProdutoService {
   // Atualização de Marca
   async updateMarca(id: number, marca: Marca): Promise<void> {
     try {
-      await this.db.runAsync(`UPDATE marca SET nome = $nome WHERE id = $id`, {
+      await this.db.runAsync(`UPDATE marca SET nome = $nome WHERE id == $id`, {
         $nome: marca.nome,
         $id: id,
       });
@@ -241,7 +332,7 @@ export class ProdutoService {
   // Exclusão de Marca
   async deleteMarca(id: number): Promise<void> {
     try {
-      await this.db.runAsync(`DELETE FROM marca WHERE id = $id`, {
+      await this.db.runAsync(`DELETE FROM marca WHERE id == $id`, {
         $id: id,
       });
     } catch (error) {
@@ -270,7 +361,7 @@ export class ProdutoService {
   async getTipoProdutoById(id: number): Promise<TipoProduto | null> {
     try {
       const tipo = await this.db.getFirstAsync<TipoProduto>(
-        `SELECT * FROM tipo_produto WHERE id = $id`,
+        `SELECT * FROM tipo_produto WHERE id == $id`,
         { $id: id },
       );
       return tipo || null;
@@ -285,7 +376,7 @@ export class ProdutoService {
   async updateTipoProduto(id: number, tipo: TipoProduto): Promise<void> {
     try {
       await this.db.runAsync(
-        `UPDATE tipo_produto SET nome = $nome WHERE id = $id`,
+        `UPDATE tipo_produto SET nome = $nome WHERE id == $id`,
         { $nome: tipo.nome, $id: id },
       );
     } catch (error) {
@@ -298,7 +389,7 @@ export class ProdutoService {
   // Exclusão de Tipo de Produto
   async deleteTipoProduto(id: number): Promise<void> {
     try {
-      await this.db.runAsync(`DELETE FROM tipo_produto WHERE id = $id`, {
+      await this.db.runAsync(`DELETE FROM tipo_produto WHERE id == $id`, {
         $id: id,
       });
     } catch (error) {
@@ -314,12 +405,11 @@ export class ProdutoService {
   async createUnidadeDeMedida(unidade: UnidadeDeMedida): Promise<number> {
     try {
       const result = await this.db.runAsync(
-        `INSERT INTO unidade_de_medida (nome, valor, descricao) 
-         VALUES ($nome, $valor, $descricao)`,
+        `INSERT INTO um (nome, valor) 
+         VALUES ($nome, $valor)`,
         {
           $nome: unidade.nome,
           $valor: unidade.valor,
-          $descricao: String(unidade.descricao),
         },
       );
       return result.lastInsertRowId;
@@ -334,7 +424,7 @@ export class ProdutoService {
   async getUnidadeDeMedidaById(id: number): Promise<UnidadeDeMedida | null> {
     try {
       const unidade = await this.db.getFirstAsync<UnidadeDeMedida>(
-        `SELECT * FROM unidade_de_medida WHERE id = $id`,
+        `SELECT * FROM um WHERE id == $id`,
         { $id: id },
       );
       return unidade || null;
@@ -352,11 +442,10 @@ export class ProdutoService {
   ): Promise<void> {
     try {
       await this.db.runAsync(
-        `UPDATE unidade_de_medida SET nome = $nome, valor = $valor, descricao = $descricao WHERE id = $id`,
+        `UPDATE um SET nome = $nome, valor = $valor WHERE id == $id`,
         {
           $nome: unidade.nome,
           $valor: unidade.valor,
-          $descricao: String(unidade.descricao),
           $id: id,
         },
       );
@@ -370,7 +459,7 @@ export class ProdutoService {
   // Exclusão de Unidade de Medida
   async deleteUnidadeDeMedida(id: number): Promise<void> {
     try {
-      await this.db.runAsync(`DELETE FROM unidade_de_medida WHERE id = $id`, {
+      await this.db.runAsync(`DELETE FROM um WHERE id == $id`, {
         $id: id,
       });
     } catch (error) {

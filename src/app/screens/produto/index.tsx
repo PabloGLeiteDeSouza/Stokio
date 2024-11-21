@@ -15,7 +15,7 @@ const ProdutoScreens: React.FC = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="visualizar-produto"
+        name="visualizar-produtos"
         component={View}
         options={{ title: 'Visualizar Produtos' }}
       />

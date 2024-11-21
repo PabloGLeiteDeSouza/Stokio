@@ -75,16 +75,26 @@ import { onAddProduct, onRemoveProduct, onUpdateProduct } from '../functions';
 import { Empresa } from '@/types/screens/empresa';
 import { getStringFromDate } from '@/utils';
 import produtos from '../../../../../components/forms/produtos';
+import CompraService from '@/classes/compra/compra.service';
+import { CompraObjectBaseUpdate } from '@/classes/compra/interfaces';
 
 const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
+
+  if(!route || !route.params || !route.params.id){
+    navigation?.goBack();
+    return null;
+  }
+  const id = route.params.id;
   const [haveProducts, setHaveProducts] = React.useState(false);
   const [temEmpresas, setTemEmpresas] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [compra, setCompra] = React.useState<CompraObjectBaseUpdate>({})
   const db = useSQLiteContext();
 
   const StartScreen = async () => {
     try {
-      // const emp = await new EmpresaService(db).getAllEmpresas();
+      const cmp = await new CompraService(db).findByIdToUpdate(id);
+      setCompra(cmp);
       // if (emp.length < 1) {
       //   throw new Error('Não há empresas cadastradas', { cause: 'ERR_EMPRESA_FINDALL_NOT_FOUND' });
       // }
@@ -129,35 +139,10 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
           </Box>
           <Box gap="$8">
             <Formik
-              initialValues={{
-                produtos: [
-                  {
-                    id: 1,
-                    codigo_de_barras: '23432432424324',
-                    nome: 'sadasdasdasas',
-                    tipo: 'asdasd',
-                    marca: 'asdsadsa',
-                    empresa: 'asdasddsadas',
-                    data_validade: new Date(),
-                    valor: 10.00,
-                    quantidade: 5,
-                    quantidade_disponivel: 50,
-                  },
-                ],
-                empresa: {
-                  id: 1,
-                  nome_fantasia: 'asdadsadasdsa',
-                  razao_social: '',
-                  cpf: '21332154312',
-                  cnpj: '32446542000112',
-                } as Empresa,
-                valor: 50.00,
-                data: new Date(),
-                status: 'pendente' as 'pago' | 'pendente',
-              }}
+              initialValues={compra}
               onSubmit={async (value) => {
                 try {
-                  
+                  const data = await new CompraService(db).update()
                 } catch (error) {
                   
                 }
@@ -177,50 +162,66 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                 }, [route?.params?.empresa]);
 
                 React.useEffect(() => {
-                  if (
-                    route &&
-                    route.params &&
-                    route.params.produto &&
-                    route.params.type &&
-                    typeof route.params.indexUpdated !== 'undefined'
-                  ) {
-                    const prod = route.params.produto;
-                    const prods = values.produtos;
-                    if (route.params.type === 'create') {
-                      if (values.produtos.length === 1 && values.produtos[0].id === 0) {
-                        setFieldValue('produtos', [{
-                          ...prod,
-                          data_validade: new Date(prod.data_validade),
-                          quantidade: 1,
-                          quantidade_disponivel: prod.quantidade,
-                        }]);
-                        setFieldValue('valor', prod.valor);
+                  async function insert_produto() {
+                    try {
+                      if (
+                        typeof route !== 'undefined' &&
+                        typeof route.params !== 'undefined' &&
+                        typeof route.params.id_produto !== 'undefined' &&
+                        typeof route.params.type !== 'undefined' &&
+                        typeof route.params.indexUpdated !== 'undefined'
+                      ) {
+                        const prod = await new ProdutoService(db).getProdutoByIdToVenda(route.params.id_produto);
+                        const prods = values.produtos;
+                       
+                        if (route.params.type === 'create') {
+                          if (values.produtos.length === 1 && values.produtos[0].id === 0) {
+                            setFieldValue('produtos', [{
+                              ...prod,
+                              data_validade: new Date(prod.data_validade),
+                              valor_total: prod.valor_unitario,
+                              quantidade: 1,
+                              quantidade_disponivel: prod.quantidade,
+                            }]);
+                            setFieldValue('valor', prod.valor_unitario);
+                          } else {
+                            setFieldValue('produtos', [
+                              ...prods,
+                              { ...prod, 
+                                data_validade: new Date(prod.data_validade), 
+                                quantidade: 1,
+                                valor_total: prod.valor_unitario, 
+                                quantidade_disponivel: prod.quantidade,
+                              },
+                            ]);
+                            setFieldValue('valor', values.valor + prod.valor_unitario);
+                          }
+                        } else if (route.params.type === 'update') {
+                          let i = route.params.indexUpdated;
+                          const produto = prods[i];
+                          setFieldValue('valor', (values.valor - (produto.valor_unitario * produto.quantidade)) + (prod.valor_unitario * 1));
+                          prods[i] = {
+                            ...prod,
+                            data_validade: new Date(prod.data_validade), 
+                            quantidade: 1,
+                            valor_total: prod.valor_unitario, 
+                            quantidade_disponivel: prod.quantidade,
+                          }; 
+                          setFieldValue(`produtos`, prods);
+                        } else {
+                          throw new Error("Erro ao selecionar o produto!");
+                        }
                       } else {
-                        setFieldValue('produtos', [
-                          ...prods,
-                          { ...prod, data_validade: new Date(prod.data_validade), quantidade: 1, quantidade_disponivel: prod.quantidade, },
-                        ]);
-                        setFieldValue('valor', values.valor + prod.valor);
+                        throw new Error("Erro ao selecionar o produto!");
                       }
-                    } else if (route.params.type === 'update') {
-                      let i = route.params.indexUpdated;
-                      const produto = prods[i];
-                      setFieldValue('valor', (values.valor - (produto.valor * produto.quantidade)) + (prod.valor * 1));
-                      prods[route.params.indexUpdated] = {
-                        ...prod,
-                        data_validade: new Date(prod.data_validade),
-                        quantidade: 1,
-                        quantidade_disponivel: prod.quantidade,
-                      }; 
-                      setFieldValue(`produtos[${i}]`, {...prod, data_validade: new Date(prod.data_validade),
-                        quantidade: 1,
-                        quantidade_disponivel: prod.quantidade,}
-                      );  
-                    } else {
-                      Alert.alert('Aviso', 'Erro ao selecionar o clinente!');
+                    } catch (error) {
+                      Alert.alert("Erro", (error as Error).message);
                     }
                   }
-                }, [route?.params?.produto]);
+                  if(typeof route?.params?.id_produto === 'number'){
+                    insert_produto();
+                  }
+                }, [route?.params?.id_produto]);
 
                 return (
                   <>
@@ -241,6 +242,7 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                           onPress={() =>
                             navigation?.navigate('selecionar-empresa', {
                               screen: 'cadastrar-compra',
+                              empresaSelecionada: values.empresa,
                             })
                           }
                         >
@@ -264,7 +266,7 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                       </Heading>
 
                       {values.produtos.map(
-                        ({ quantidade, quantidade_disponivel, ...produto }, i) => {
+                        ({ quantidade, quantidade_disponivel,  valor_total, valor_unitario, ...produto }, i) => {
                           if (produto.id !== 0) {
                             return (
                               <Box key={`produto-${i}`} gap="$5">
@@ -277,7 +279,7 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                                       <Text size="lg">{produto.marca}</Text>
                                       <Text size="lg">{produto.tipo}</Text>
                                       <Text>{quantidade} unidades</Text>
-                                      <Text>{(quantidade * produto.valor)} reais</Text>
+                                      <Text>{valor_total} reais</Text>
                                     </VStack>
                                   </HStack>
                                 </Card>
@@ -295,18 +297,9 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                                   <Input>
                                     <Button
                                       onPress={() => {
-                                        try {
-                                          const result = onAddProduct(
-                                            quantidade_disponivel,
-                                            quantidade,
-                                            produto.valor,
-                                            values.valor,
-                                          );
-                                          setFieldValue(`produtos[${i}].quantidade`, result.quantidade);
-                                          setFieldValue('valor', result.valor);
-                                        } catch (error) {
-                                          Alert.alert("Erro", (error as Error).message);
-                                        }
+                                        setFieldValue(`produtos[${i}].quantidade`, (quantidade + 1));
+                                        setFieldValue(`produtos[${i}].valor_total`, (quantidade + 1) * valor_unitario);
+                                        setFieldValue('valor', values.valor + valor_unitario);
                                       }}
                                       action="positive"
                                     >
@@ -318,126 +311,92 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                                       value={values.produtos[i].quantidade.toString()}
                                       placeholder="12"
                                       onChangeText={(text) => {
-                                        try {
-                                          const result = onUpdateProduct(
-                                            text,
-                                            quantidade,
-                                            produto.valor,
-                                            values.valor,
-                                          );
-                                          setFieldValue(
-                                            `produtos[${i}].quantidade`,
-                                            result.quantidade,
-                                          );
-                                          setFieldValue(
-                                            'valor',
-                                            result.valor,
-                                          );
-                                        } catch (error) {
-                                          const e = error as Error
-                                          if (e.cause === "ERR_REMOVE_PRODUCT") {
-                                            Alert.alert("Aviso", e.message, [
-                                              {
-                                                text: "Sim",
-                                                onPress: async () => {
-                                                  if (values.produtos.length === 1) {
-                                                    await setFieldValue('produtos', [
-                                                      {
-                                                        id: 0,
-                                                        codigo_de_barras: '',
-                                                        nome: '',
-                                                        tipo: '',
-                                                        marca: '',
-                                                        empresa: '',
-                                                        data_validade: new Date(),
-                                                        valor: 0,
-                                                        quantidade: 0,
-                                                        quantidade_disponivel: 0,
-                                                      },
-                                                    ])
-                                                  } else {
-                                                    await setFieldValue(
-                                                      'produtos',
-                                                      values.produtos.splice(
-                                                        i,
-                                                        1,
-                                                      ),
-                                                    );
-                                                  }
-                                                }
-                                              }, 
-                                              {
-                                                text: "Não",
-                                                onPress: () => {
-                                                  Alert.alert(
-                                                    'Aviso',
-                                                    'Operação cancelada!',
-                                                  );
+                                        const new_qtd = Number(text);
+                                        if (new_qtd > 0) {
+                                          const valor_total_old = quantidade * valor_unitario;
+                                          const valor_total_new = new_qtd * valor_unitario;
+                                          setFieldValue(`produtos[${i}].quantidade`, new_qtd);
+                                          setFieldValue(`produtos[${i}].valor_total`, valor_total_new);
+                                          setFieldValue('valor', (values.valor - valor_total_old) + valor_total_new);
+                                        } else {
+                                          Alert.alert('Aviso', `Voce deseja remover o produto ${produto.nome} ?`, [
+                                            {
+                                              text: 'Sim',
+                                              onPress: async () => {
+                                                if (values.produtos.length > 1) {
+                                                  setFieldValue('produtos', values.produtos.splice(i, 1))
+                                                } else {
+                                                  setFieldValue('produtos', [
+                                                    {
+                                                      id: 0,
+                                                      codigo_de_barras: '',
+                                                      nome: '',
+                                                      tipo: '',
+                                                      marca: '',
+                                                      empresa: '',
+                                                      data_validade: new Date(),
+                                                      valor_total: 0,
+                                                      valor_unitario: 0,
+                                                      quantidade: 0,
+                                                      quantidade_disponivel: 0,
+                                                    }
+                                                  ])
                                                 }
                                               }
-                                            ])
-                                          }
+                                            },
+                                            {
+                                              text: "Não",
+                                              onPress: () => {
+                                                Alert.alert(
+                                                  'Aviso',
+                                                  'Operação cancelada!',
+                                                );
+                                              }
+                                            }
+                                          ])
                                         }
                                       }}
                                       keyboardType="number-pad"
                                     />
                                     <Button
                                       onPress={() => {
-                                        try {
-                                          const result = onRemoveProduct(
-                                            quantidade,
-                                            produto.valor,
-                                            values.valor,
-                                          );
-                                          setFieldValue(
-                                            `produtos[${i}].quantidade`,
-                                            result.quantidade,
-                                          );
-                                          setFieldValue('valor', result.valor);
-                                        } catch (error) {
-                                          const e = error as Error;
-                                          if(e.cause === "ERR_REMOVE_PRODUCT") {
-                                            Alert.alert("Aviso", e.message, [
-                                              {
-                                                text: "Sim",
-                                                onPress: async () => {
-                                                  if (values.produtos.length === 1) {
-                                                    await setFieldValue('produtos', [
-                                                      {
-                                                        id: 0,
-                                                        codigo_de_barras: '',
-                                                        nome: '',
-                                                        tipo: '',
-                                                        marca: '',
-                                                        empresa: '',
-                                                        data_validade: new Date(),
-                                                        valor: 0,
-                                                        quantidade: 0,
-                                                        quantidade_disponivel: 0,
-                                                      },
-                                                    ])
-                                                  } else {
-                                                    await setFieldValue(
-                                                      'produtos',
-                                                      values.produtos.splice(
-                                                        i,
-                                                        1,
-                                                      ),
-                                                    );
-                                                  }
-                                                }
-                                              }, 
-                                              {
-                                                text: "Não",
-                                                onPress: () => {
-                                                  Alert.alert(
-                                                    'Aviso',
-                                                    'Operação cancelada!',
-                                                  );
+                                        if (quantidade > 1) {
+                                          setFieldValue(`produtos[${i}].quantidade`, (quantidade - 1));
+                                          setFieldValue(`produtos[${i}].valor_total`, (quantidade - 1) * valor_unitario);
+                                          setFieldValue('valor', values.valor - valor_unitario);
+                                        } else {
+                                          Alert.alert("Aviso", `Voce deseja mesmo remover o produto ${produto.nome} da compra?`, [
+                                            {
+                                              text: "Sim",
+                                              onPress: async() => {
+                                                setFieldValue('valor', (values.valor - (quantidade * valor_unitario)));
+                                                if (values.produtos.length > 1) {
+                                                  setFieldValue('produtos', values.produtos.splice(i, 1));
+                                                  Alert.alert("Aviso", "Operação realizada com sucesso!");
+                                                } else {
+                                                  setFieldValue('produtos', [{
+                                                    id: 0,
+                                                    codigo_de_barras: '',
+                                                    nome: '',
+                                                    tipo: '',
+                                                    marca: '',
+                                                    empresa: '',
+                                                    data_validade: new Date(),
+                                                    valor_total: 0,
+                                                    valor_unitario: 0,
+                                                    quantidade: 0,
+                                                    quantidade_disponivel: 0,
+                                                  }])
                                                 }
                                               }
-                                            ])
-                                          }
+                                            },
+                                            {
+                                              text: "Não",
+                                              onPress: () => {
+                                                Alert.alert("Aviso", "Operação cancelada!");
+                                              }
+                                            }
+                                          ])
                                         }
                                       }}
                                       action="negative"
@@ -467,10 +426,7 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                                       screen: 'cadastrar-compra',
                                       type: 'update',
                                       indexUpdated: i,
-                                      selectedsProdutos:
-                                        values.produtos[0].id === 0
-                                          ? undefined
-                                          : values.produtos.map((data) => { return {...data, data_validade: getStringFromDate(data.data_validade) }; }),
+                                      selectedsProdutos: values.produtos.map((data) => { return { id_produto: data.id };}),
                                     });
                                   }}
                                 >
@@ -487,10 +443,7 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                           navigation?.navigate('selecionar-produto', {
                             screen: 'cadastrar-compra',
                             type: 'create',
-                            selectedsProdutos:
-                              values.produtos[0].id === 0
-                              ? undefined
-                              : values.produtos.map((data) => { return {...data, data_validade: getStringFromDate(data.data_validade) }; }),
+                            selectedsProdutos: values.produtos.map((data) => { return { id_produto: data.id } }),
                           });
                         }}
                       >

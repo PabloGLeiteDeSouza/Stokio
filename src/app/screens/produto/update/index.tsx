@@ -32,12 +32,16 @@ import { mask } from '@/utils/mask';
 import InputText from '@/components/Input';
 import { useSQLiteContext } from 'expo-sqlite';
 import { ProdutoService } from '@/classes/produto/produto.service';
-import { getDateFromString } from '@/utils';
+import { getDateFromString, getStringFromDate } from '@/utils';
+import MarcaService from '@/classes/marca/marca.service';
+import TipoProdutoService from '@/classes/tipo_produto/tipo_produto.service';
+import UmService from '@/classes/um/um.service';
+import { Alert, GestureResponderEvent } from 'react-native';
 const validationSchema = Yup.object().shape({
   codigo_de_barras: Yup.string().required('O código de barras é obrigatório'),
   nome: Yup.string().required('O nome é obrigatório'),
   descricao: Yup.string().required('A descrição é obrigatória'),
-  preco: Yup.number().required('O preço é obrigatório'),
+  valor: Yup.number().required('O valor é obrigatório'),
   data_de_validade: Yup.date().required('A data de válidade é obrigatória'),
   tipo_produto: Yup.object().shape({
     id: Yup.number().required('O tipo de produto é obrigatório'),
@@ -100,7 +104,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
       id: 1,
       nome_fantasia: 'asdasdsadas',
       razao_social: 'asdasdasdsadsa',
-      cnpj: '12312323000112',
+      cnpj: '12312323000112' as string | null,
       cpf: '12312312312',
     },
   });
@@ -135,13 +139,30 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
               onSubmit={async (values) => {
                 try {
                   const { empresa, marca, tipo_produto, unidade_de_armazenamento, unidade_de_medida, ...prod } = values;
-                  const data = await new ProdutoService(db).updateProduto(prod.id, prod);
+                  if (marca.id === 0) {
+                    marca.id = await new MarcaService(db).create(marca);
+                  }  else {
+                    await new ProdutoService(db).updateMarca(marca.id, marca);
+                  }
+                  if (tipo_produto.id === 0) {
+                    tipo_produto.id = await new TipoProdutoService(db).create(tipo_produto);
+                  }  else {
+                    await new ProdutoService(db).updateTipoProduto(tipo_produto.id, tipo_produto);
+                  }
+                  if (unidade_de_medida.id === 0) {
+                    unidade_de_medida.id = await new UmService(db).create(unidade_de_medida);
+                  }  else {
+                    await new ProdutoService(db).updateUnidadeDeMedida(unidade_de_medida.id, unidade_de_medida);
+                  }
+                  await new ProdutoService(db).updateProduto(prod.id, {...prod, data_de_validade: getStringFromDate(prod.data_de_validade), id_empresa: empresa.id, id_marca: marca.id, id_tipo_produto: tipo_produto.id, id_um: unidade_de_medida.id, id_ua: unidade_de_armazenamento.id });
+                  Alert.alert('Sucesso', 'Produto atualizaddo com sucesso!');
+                  navigation?.navigate('visualizar-produtos');
                 } catch (err) {
-
+                  Alert.alert('Erro', (err as Error).message);
                 }
               }}
             >
-              {({ values, errors, handleChange, setFieldValue }) => {
+              {({ values, errors, handleChange, handleSubmit, setFieldValue }) => {
                 React.useEffect(() => {
                   if (route && route.params?.code) {
                     setFieldValue('codigo_de_barras', route.params.code);
@@ -199,7 +220,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                             {values.empresa.cnpj !== '' && (
                               <Box>
                                 <Text>CNPJ</Text>
-                                <Text>{mask(values.empresa.cnpj, 'cnpj')}</Text>
+                                <Text>{mask(String(values.empresa.cnpj), 'cnpj')}</Text>
                               </Box>
                             )}
                             {values.empresa.cnpj === '' && (
@@ -725,7 +746,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                       </FormControlError>
                     </FormControl>
                     <Box>
-                      <Button>
+                      <Button onPress={handleSubmit as unknown as (event: GestureResponderEvent) => void}>
                         <ButtonText>Atualizar Produto</ButtonText>
                       </Button>
                     </Box>

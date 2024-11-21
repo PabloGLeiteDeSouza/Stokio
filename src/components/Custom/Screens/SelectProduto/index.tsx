@@ -10,69 +10,36 @@ import {
   VStack,
 } from '@gluestack-ui/themed';
 import React from 'react';
-import { ListRenderItem } from 'react-native';
+import { Alert, ListRenderItem } from 'react-native';
 import { ISelectProdutoProps } from './interfaces';
-import { Produto, ProdutoFlatList } from '@/types/screens/produto';
+import { Produto, ProdutoFlatList, ProdutoSelectFlatList } from '@/types/screens/produto';
 import { Text } from '@gluestack-ui/themed';
 import { getDateFromString, getStringFromDate } from '@/utils';
+import { useSQLiteContext } from 'expo-sqlite';
+import { ProdutoService } from '@/classes/produto/produto.service';
+import { ProdutoVendaRequest } from '@/classes/produto/interfaces';
 
 const SelectProduto: React.FC<ISelectProdutoProps> = ({
   navigation,
   route,
 }) => {
-  if (!route || !route.params || !route.params.screen || !route.params.type) {
+  if (!route || !route.params || !route.params.screen || !route.params.type || !route.params.selectedsProdutos) {
     navigation?.goBack();
     return null;
   }
-
-  const selectedProducts = route.params.selectedsProdutos
-    ? route.params.selectedsProdutos
-    : [
-        {
-          id: 0,
-        },
-      ];
+  if (route.params.type === 'update' && typeof route?.params?.indexUpdated === 'undefined') {
+    Alert.alert('Aviso', 'informe o identificador para alterar!');
+    navigation?.goBack();
+    return null;
+  }
+  const selectedProducts = route.params.selectedsProdutos;
   const screen = route.params.screen;
   const indexUpdated = route.params.indexUpdated
     ? route.params.indexUpdated
     : 0;
   const type = route.params.type;
-  const [produtos, setProdutos] = React.useState<Array<Produto>>([
-    {
-      id: 1,
-      codigo_de_barras: '7324623784632324',
-      nome: 'KAIAK AVENTURA DESODORANTE COLONIA',
-      data_validade: '2026-11-26',
-      marca: 'KAIAK',
-      tipo: 'DESODORANTE COLONIA',
-      empresa: 'NATURA',
-      valor: 5.00,
-      quantidade: 15,
-    },
-    {
-      id: 2,
-      codigo_de_barras: '3459765398563487',
-      nome: 'MEU PRIMEIRO HUMOR DESODORANTE COLONIA',
-      data_validade: '2025-08-18',
-      marca: 'HUMOR',
-      tipo: 'DESODORANTE COLONIA',
-      empresa: 'NATURA',
-      valor: 10.00,
-      quantidade: 25,
-    },
-    {
-      id: 3,
-      codigo_de_barras: '2345320958347982456',
-      nome: `KAIAK DESODORANTE ROLL'ON`,
-      data_validade: '2026-11-10',
-      empresa: 'NATURA',
-      marca: 'KAIAK',
-      tipo: `DESODORANTE ROLL'ON`,
-      valor: 12.99,
-      quantidade: 50,
-    },
-  ]);
-  const [produto, setProduto] = React.useState<Produto>({
+  const [produtos, setProdutos] = React.useState<Array<ProdutoVendaRequest>>([]);
+  const [produto, setProduto] = React.useState<ProdutoVendaRequest>({
     id: 0,
     codigo_de_barras: '',
     nome: '',
@@ -80,17 +47,26 @@ const SelectProduto: React.FC<ISelectProdutoProps> = ({
     marca: '',
     tipo: '',
     empresa: '',
-    valor: 0,
+    valor_unitario: 0,
     quantidade: 0,
   });
   const [isLoading, setIsLoading] = React.useState(true);
+  const db = useSQLiteContext();
 
   React.useEffect(() => {
     async function startScreen() {
       try {
-        setProdutos([...produtos]);
+        if (screen === "cadastrar-venda") {
+          const prods = await new ProdutoService(db).getProdutoBySelectProdutoToVenda();
+          setProdutos([...prods]);
+        } else {
+          const prods = await new ProdutoService(db).getProdutoBySelectProdutoToCompra();
+          setProdutos([...prods]);
+        }
         setIsLoading(false);
       } catch (error) {
+        Alert.alert('Erro', (error as Error).message);
+        navigation?.goBack()
         setIsLoading(false);
         throw error;
       }
@@ -98,9 +74,9 @@ const SelectProduto: React.FC<ISelectProdutoProps> = ({
     startScreen();
   }, []);
 
-  const FlatListProdutos = FlatList as ProdutoFlatList;
+  const FlatListProdutos = FlatList as ProdutoSelectFlatList;
 
-  const ListRenderProdutos: ListRenderItem<Produto> = ({ item }) => {
+  const ListRenderProdutos: ListRenderItem<ProdutoVendaRequest> = ({ item }) => {
     return (
       <Card my="$5" mx="$5">
         <HStack justifyContent="space-between">
@@ -135,18 +111,18 @@ const SelectProduto: React.FC<ISelectProdutoProps> = ({
               <Text>{item.empresa}</Text>
             </Box>
             <Box>
-              <Heading>Quantidade</Heading>
+              <Heading>Quantidade Disponivel</Heading>
               <Text>{item.quantidade}</Text>
             </Box>
             <Box>
-              <Heading>Valor</Heading>
-              <Text>R$ {item.valor}</Text>
+              <Heading>Valor unitario</Heading>
+              <Text>R$ {item.valor_unitario}</Text>
             </Box>
           </VStack>
           <VStack w="$2/6">
             <Button
               isDisabled={
-                selectedProducts.find((prod) => prod.id === item.id)
+                selectedProducts.find((prod) => prod.id_produto === item.id)
                   ? true
                   : item.id === produto.id
               }
@@ -155,7 +131,7 @@ const SelectProduto: React.FC<ISelectProdutoProps> = ({
               }}
             >
               <ButtonText>
-                {selectedProducts.find((prod) => prod.id === item.id)
+                {selectedProducts.find((prod) => prod.id_produto === item.id)
                   ? 'Ja usado'
                   : item.id === produto.id
                     ? 'Selecionado'
@@ -188,7 +164,7 @@ const SelectProduto: React.FC<ISelectProdutoProps> = ({
         <Button
           onPress={() =>
             navigation?.navigate(screen, {
-              produto,
+              id_produto: produto.id,
               indexUpdated,
               type,
             })
