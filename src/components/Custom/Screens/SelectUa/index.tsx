@@ -45,10 +45,10 @@ const SelectUa: React.FC<ISelectUaProps> = ({ navigation, route }) => {
 
   const FlatListUas = FlatList as UaFlatList;
 
-  const ListRenderUas: ListRenderItem<Ua> = ({ item }) => {
+  const ListRenderUas: ListRenderItem<Ua> = ({ item, index }) => {
     return (
-      <Card>
-        <HStack gap="$2.5">
+      <Card mt={index === 0 ? '$5' : '$2.5'} mb={'$2.5'}>
+        <HStack justifyContent="space-between" >
           <VStack w="$3/5">
             <Box>
               <Heading>{item.nome}</Heading>

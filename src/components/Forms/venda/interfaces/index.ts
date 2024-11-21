@@ -4,7 +4,9 @@ export interface IFormCreateVenda {
     haveClientes: boolean;
     haveProdutos: boolean;
     id_cliente?: number;
-    produto: { id_produto?: number; i?: number; type?: 'create' | 'update'}; 
+    id_produto?: number;
+    indexUpdated?: number; 
+    tipo?: 'create' | 'update'; 
     onCreateProduct: () => ReturnFunctions; 
     onCreateCliente: () => ReturnFunctions;
     onChangeCliente: (id_cliente: number) => ReturnFunctions;

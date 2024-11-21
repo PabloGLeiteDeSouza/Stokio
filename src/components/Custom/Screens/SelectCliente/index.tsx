@@ -19,6 +19,7 @@ import { ISlectClienteProps } from './interfaces';
 import { ClienteService } from '@/classes/cliente/cliente.service';
 import { useSQLiteContext } from 'expo-sqlite';
 import { IClienteSelectCliente, IClienteSimpleRequest } from '@/classes/cliente/interfaces';
+import { mask } from '@/utils/mask';
 
 const SelectCliente: React.FC<ISlectClienteProps> = ({ navigation, route }) => {
   if (!route || !route.params || !route.params.screen) {
@@ -66,10 +67,10 @@ const SelectCliente: React.FC<ISlectClienteProps> = ({ navigation, route }) => {
               <Heading>{item.nome}</Heading>
             </Box>
             <Box>
-              <Text>{item.cpf}</Text>
+              <Text>{mask(item.cpf, 'cpf')}</Text>
             </Box>
             <Box>
-              <Text>{item.data_nascimento}</Text>
+              <Text>{new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(item.data_nascimento))}</Text>
             </Box>
           </VStack>
           <VStack w="$1/3">

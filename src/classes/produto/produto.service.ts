@@ -89,7 +89,7 @@ export class ProdutoService {
 
   async getProdutoBySelectProdutoToVenda(): Promise<ProdutoVendaRequest[]> {
     try {
-      const res = await this.db.getAllAsync<ProdutoVendaRequest>('SELECT p.id, p.codigo_de_barras, p.data_de_validade as data_validade, p.nome, p.valor as valor_unitario, p.quantidade as quantidade_disponivel, e.nome_fantasia as empresa, m.nome as marca, t.nome as tipo FROM produto as p INNER JOIN marca as m ON m.id == p.id_marca INNER JOIN empresa as e ON e.id == p.id_empresa INNER JOIN tipo_produto as t ON t.id == p.id_tipo_produto WHERE p.quantidade > 0');
+      const res = await this.db.getAllAsync<ProdutoVendaRequest>('SELECT p.id, p.codigo_de_barras, p.data_de_validade as data_validade, p.nome, p.valor as valor_unitario, p.quantidade, e.nome_fantasia as empresa, m.nome as marca, t.nome as tipo FROM produto as p INNER JOIN marca as m ON m.id == p.id_marca INNER JOIN empresa as e ON e.id == p.id_empresa INNER JOIN tipo_produto as t ON t.id == p.id_tipo_produto WHERE p.quantidade > 0');
       if(res.length < 1){
         throw new Error("Nao foi possivel encontrar nenhum produto!");
       }
@@ -113,7 +113,7 @@ export class ProdutoService {
   // Leitura de Produto
   async getProdutoByIdToVenda(id: number): Promise<ProdutoVendaRequest> {
     try {
-      const res = await this.db.getFirstAsync<ProdutoVendaRequest>('SELECT p.id, p.codigo_de_barras, p.data_de_validade as data_validade, p.nome, p.valor as valor_unitario, p.quantidade as quantidade_disponivel, e.nome_fantasia as empresa, m.nome as marca, t.nome as tipo FROM produto as p INNER JOIN marca as m ON m.id == p.id_marca INNER JOIN empresa as e ON e.id == p.id_empresa INNER JOIN tipo_produto as t ON t.id == p.id_tipo_produto WHERE p.id == $id', {
+      const res = await this.db.getFirstAsync<ProdutoVendaRequest>('SELECT p.id, p.codigo_de_barras, p.data_de_validade as data_validade, p.nome, p.valor as valor_unitario, p.quantidade, e.nome_fantasia as empresa, m.nome as marca, t.nome as tipo FROM produto as p INNER JOIN marca as m ON m.id == p.id_marca INNER JOIN empresa as e ON e.id == p.id_empresa INNER JOIN tipo_produto as t ON t.id == p.id_tipo_produto WHERE p.id == $id', {
         $id: id,
       });
       if(!res){

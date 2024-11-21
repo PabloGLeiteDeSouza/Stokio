@@ -103,7 +103,9 @@ const Create: React.FC<CadastrarVendaScreen> = ({ navigation, route }) => {
           <Box gap="$8">
             <FormCreateVenda
               id_cliente={route?.params?.id_cliente}
-              produto={{ id_produto: route?.params?.id_produto, type: route?.params?.type, i: route?.params?.indexUpdated}}
+              id_produto={route?.params?.id_produto}
+              tipo={route?.params?.type}
+              indexUpdated={route?.params?.indexUpdated}
               haveClientes={haveClientes}
               haveProdutos={haveProdutos}
               onAddProductToVenda={(selectedsProdutos) => {

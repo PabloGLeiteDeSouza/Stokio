@@ -18,7 +18,7 @@ import {
 import { IInputDatePicker } from './interfaces';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { Alert } from 'react-native';
-import { getDateFromString, getMinDateFor18YearsOld } from '@/utils';
+import { getDateFromString, getMinDateFor18YearsOld, getStringFromDate } from '@/utils';
 
 const InputDatePicker: React.FC<IInputDatePicker> = ({
   title,
@@ -36,8 +36,7 @@ const InputDatePicker: React.FC<IInputDatePicker> = ({
   placeholder,
   ...props
 }) => {
-  const [ajustDate, setAjustDate] = React.useState(false);
-  const [data, setData] = React.useState(value ? `${value.getDate()+1}/${value.getMonth()}/${value.getFullYear()}` : '');
+  const [data, setData] = React.useState(value ? new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(value) : '');
   const startPicker = () => {
     DateTimePickerAndroid.open({
       minuteInterval,
@@ -48,6 +47,7 @@ const InputDatePicker: React.FC<IInputDatePicker> = ({
         if (event.type === 'set') {
           if (selectedDate) {
             onChangeDate(selectedDate);
+            setData(new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(selectedDate));
           }
         }
       },
@@ -70,15 +70,10 @@ const InputDatePicker: React.FC<IInputDatePicker> = ({
         <Input>
           <InputField
             type="text"
-            placeholder={'01/01/1999' + ` ${placeholder}`}
-            value={ajustDate ? data : new Intl.DateTimeFormat('pt-BR', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-            }).format(value ? value : maximumDate ? maximumDate : new Date())}
+            placeholder={placeholder ? placeholder : '01/01/1999'}
+            value={data}
             onChangeText={(text) => {
-              try {
-                setAjustDate(true);
+              try {            
                 if (text.length === 2) {
                   return setData(text+"/");
                 } else if (text.length === 5) {
@@ -96,7 +91,6 @@ const InputDatePicker: React.FC<IInputDatePicker> = ({
                 if (!data.includes('/')) {
                   throw new Error("Data invalida!");
                 }
-                setAjustDate(false);
                 onChangeDate(getDateFromString(data));
               } catch (error) {
                 const err = error as Error;

@@ -17,7 +17,7 @@ export function getMinDateFor18YearsOld(): Date {
 }
 
 export function getStringFromDate(data: Date) {
-  return `${data.getFullYear()}-${data.getMonth()}-${data.getDate() + 1}`;
+  return `${data.getFullYear()}-${data.getMonth() + 1}-${data.getDate() + 1}`;
 }
 
 export function getDateFromString(data: string) {

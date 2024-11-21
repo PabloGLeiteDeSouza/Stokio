@@ -74,7 +74,8 @@ import { IFormCreateVenda } from './interfaces';
 import { ProdutoService } from '@/classes/produto/produto.service';
 import { useSQLiteContext } from 'expo-sqlite';
 import { ClienteService } from '@/classes/cliente/cliente.service';
-const FormCreateVenda: React.FC<IFormCreateVenda> = ({ haveClientes, haveProdutos, id_cliente, produto, onCreateProduct, onCreateCliente, onChangeCliente, onAddProductToVenda, onUpdateProductToVenda }) => {
+import VendaService from '@/classes/venda/venda.service';
+const FormCreateVenda: React.FC<IFormCreateVenda> = ({ haveClientes, haveProdutos, id_cliente, id_produto, indexUpdated, tipo, onCreateProduct, onCreateCliente, onChangeCliente, onAddProductToVenda, onUpdateProductToVenda }) => {
 
     const db = useSQLiteContext();
   
@@ -107,7 +108,13 @@ const FormCreateVenda: React.FC<IFormCreateVenda> = ({ haveClientes, haveProduto
           data: new Date(),
           status: '' as 'pago' | 'devendo',
         }}
-        onSubmit={() => {}}
+        onSubmit={async (values) => {
+          try {
+            await new VendaService(db).create()
+          } catch (error) {
+            
+          }
+        }}
       >
         {({ values, errors, handleChange, setFieldValue, handleSubmit }) => {
           React.useEffect(() => {
@@ -126,55 +133,57 @@ const FormCreateVenda: React.FC<IFormCreateVenda> = ({ haveClientes, haveProduto
 
           React.useEffect(() => {
             async function insert_product() {
-                if (produto.id_produto && produto.type && produto.i) {
+                if (id_produto && tipo) {
                     try {
-                        const { quantidade, ...prod} = await new ProdutoService(db).getProdutoByIdToVenda(produto.id_produto);
-                        const prods = values.produtos;
-                        if (
-                            produto.type === 'create' &&
-                            values.produtos.length === 1 &&
-                            values.produtos[0].id === 0
-                          ) {
-                            prods[0] = {
+                      const { quantidade, ...prod} = await new ProdutoService(db).getProdutoByIdToVenda(id_produto);
+                      console.log('dados');
+                      const prods = values.produtos;
+                      if (
+                          tipo === 'create' &&
+                          values.produtos.length === 1 &&
+                          values.produtos[0].id === 0
+                        ) {
+                          console.log(quantidade);
+                          prods[0] = {
+                            ...prod,
+                            quantidade_disponivel: quantidade,
+                            valor_total: prod.valor_unitario,
+                            quantidade: 1,
+                          };
+                          setFieldValue('produtos', [{
                               ...prod,
                               quantidade_disponivel: quantidade,
                               valor_total: prod.valor_unitario,
                               quantidade: 1,
-                            };
-                            setFieldValue('produtos', [{
-                                ...prod,
-                                quantidade_disponivel: quantidade,
-                                valor_total: prod.valor_unitario,
-                                quantidade: 1,
-                              }]);
-                              setFieldValue('valor', prod.valor_unitario);
-                          } else if (produto.type === 'create') {
-                            setFieldValue('produtos', prods.push({
-                                ...prod,
-                                quantidade_disponivel: quantidade,
-                                valor_total: prod.valor_unitario,
-                                quantidade: 1,
-                            }));
-                            setFieldValue('valor',values.valor + prod.valor_unitario);
-                          } else if (produto.type === 'update' && produto.i) {
-                            setFieldValue('valor',(values.valor - values.produtos[produto.i].valor_total) + prod.valor_unitario);
-                            prods[produto.i] = {
-                                ...prod,
-                                quantidade_disponivel: quantidade,
-                                valor_total: prod.valor_unitario,
-                                quantidade: 1,
-                            };
-                            setFieldValue('produtos', [...prods]);
-                          } else {
-                            Alert.alert('Aviso', 'Erro ao selecionar o cliente!');
-                          }
+                            }]);
+                            setFieldValue('valor', prod.valor_unitario);
+                        } else if (tipo === 'create') {
+                          setFieldValue('produtos', prods.push({
+                              ...prod,
+                              quantidade_disponivel: quantidade,
+                              valor_total: prod.valor_unitario,
+                              quantidade: 1,
+                          }));
+                          setFieldValue('valor',values.valor + prod.valor_unitario);
+                        } else if (tipo === 'update' && typeof indexUpdated === "number") {
+                          setFieldValue('valor',(values.valor - values.produtos[indexUpdated].valor_total) + prod.valor_unitario);
+                          prods[indexUpdated] = {
+                              ...prod,
+                              quantidade_disponivel: quantidade,
+                              valor_total: prod.valor_unitario,
+                              quantidade: 1,
+                          };
+                          setFieldValue('produtos', [...prods]);
+                        } else {
+                          Alert.alert('Aviso', 'Erro ao selecionar o cliente!');
+                        }
                     } catch (error) {
                         Alert.alert('Erro', (error as Error).message);
                     }
                 }
             }
             insert_product();
-          }, [produto]);
+          }, [id_produto, tipo, indexUpdated]);
           return (
             <>
               <Box gap="$5">
@@ -184,7 +193,7 @@ const FormCreateVenda: React.FC<IFormCreateVenda> = ({ haveClientes, haveProduto
                       <VStack>
                         <Heading size="lg">Cliente</Heading>
                         <Text size="lg">{values.cliente.nome}</Text>
-                        <Text size="lg">{values.cliente.cpf}</Text>
+                        <Text size="lg">{mask(values.cliente.cpf, 'cpf')}</Text>
                       </VStack>
                     </HStack>
                   </Card>
@@ -241,7 +250,7 @@ const FormCreateVenda: React.FC<IFormCreateVenda> = ({ haveClientes, haveProduto
                           <Input>
                             <Button
                               onPress={() => {
-                                if ((quantidade + 1) < quantidade_disponivel) {
+                                if ((quantidade + 1) <= quantidade_disponivel) {
                                     setFieldValue('valor', values.valor + valor_unitario);
                                     setFieldValue(`produtos[${i}].valor_total`, valor_total + valor_unitario);
                                     setFieldValue(`produtos[${i}].quantidade`, quantidade + 1);

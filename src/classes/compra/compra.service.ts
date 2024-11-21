@@ -86,7 +86,7 @@ export default class CompraService {
         data: getDateFromString(data),
       };
       type Empresa = { id: number; nome_fantasia: string; razao_social: string; cnpj: string | null; cpf: string; }
-      const empresa = await this.db.getFirstAsync<Empresa>("SELECT e.id, e.nome_fantasia, e.razao_soccial, e.cnpj, p.cpf FROM empresa as e INNER JOIN pessoa as p ON p.id == e.id_pessoa WHERE e.id == $id", {
+      const empresa = await this.db.getFirstAsync<Empresa>("SELECT e.id, e.nome_fantasia, e.razao_social, e.cnpj, p.cpf FROM empresa as e INNER JOIN pessoa as p ON p.id == e.id_pessoa WHERE e.id == $id", {
         $id: compra.id_empresa,
       })
       if (!empresa) {

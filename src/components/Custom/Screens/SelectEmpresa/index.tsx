@@ -16,6 +16,7 @@ import { Empresa, EmpresaFlatList } from '@/types/screens/empresa';
 import { Text } from '@gluestack-ui/themed';
 import { useSQLiteContext } from 'expo-sqlite';
 import { EmpresaService } from '@/classes/empresa/empresa.service';
+import { mask } from '@/utils/mask';
 
 const SelectEmpresa: React.FC<ISelectEmpresaProps> = ({
   navigation,
@@ -58,7 +59,7 @@ const SelectEmpresa: React.FC<ISelectEmpresaProps> = ({
               <Heading>{item.nome_fantasia}</Heading>
             </Box>
             <Box>
-              {item.cnpj ? <Text>{item.cnpj}</Text> : <Text>{item.cpf}</Text>}
+              {item.cnpj ? <Text>{mask(item.cnpj, 'cnpj')}</Text> : <Text>{mask(item.cpf, 'cpf')}</Text>}
             </Box>
             <Box>
               <Text>{item.razao_social}</Text>
