@@ -14,3 +14,14 @@ export interface ItemVenda {
 export interface VendaWithItensVenda {
 
 }
+
+export interface VendaCreateObject {
+    id_cliente: number;
+    data: Date;
+    status: "pago" | "devendo";
+    produtos: {
+        quantidade: number;
+        valor_unitario: number;
+        id_produto: number;
+    }[];
+}

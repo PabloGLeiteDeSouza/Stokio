@@ -75,11 +75,10 @@ import { ProdutoService } from '@/classes/produto/produto.service';
 import { useSQLiteContext } from 'expo-sqlite';
 import { ClienteService } from '@/classes/cliente/cliente.service';
 import VendaService from '@/classes/venda/venda.service';
-const FormCreateVenda: React.FC<IFormCreateVenda> = ({ haveClientes, haveProdutos, id_cliente, id_produto, indexUpdated, tipo, onCreateProduct, onCreateCliente, onChangeCliente, onAddProductToVenda, onUpdateProductToVenda }) => {
+const FormCreateVenda: React.FC<IFormCreateVenda> = ({ onCreatedVenda, haveClientes, haveProdutos, id_cliente, id_produto, indexUpdated, tipo, onCreateProduct, onCreateCliente, onChangeCliente, onAddProductToVenda, onUpdateProductToVenda }) => {
 
     const db = useSQLiteContext();
-  
-  
+
     return (
     <>
       <Formik
@@ -110,9 +109,19 @@ const FormCreateVenda: React.FC<IFormCreateVenda> = ({ haveClientes, haveProduto
         }}
         onSubmit={async (values) => {
           try {
-            await new VendaService(db).create()
+            const venda = {
+              id_cliente: values.cliente.id,
+              data: values.data,
+              status: values.status,
+              produtos: values.produtos.map((v) => {
+                return { quantidade: v.quantidade, valor_unitario: v.valor_unitario, id_produto: v.id };
+              }),
+            }
+            await new VendaService(db).create(venda);
+            Alert.alert('Sucesso', 'Venda cadastrada com sucesso!')
+            onCreatedVenda();
           } catch (error) {
-            
+            Alert.alert('Erro', (error as Error).message);
           }
         }}
       >

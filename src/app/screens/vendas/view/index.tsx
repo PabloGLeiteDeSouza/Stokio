@@ -74,22 +74,30 @@ import BuscasTipos from './busca_tipos_vendas.json';
 import { Venda, VendaFlatList } from '@/types/screens/venda';
 import { ListRenderItem } from 'react-native';
 import { VisualizarVendaScreen } from '@/interfaces/venda';
+import VendaService from '@/classes/venda/venda.service';
+import { useSQLiteContext } from 'expo-sqlite';
+import LoadingScreen from '@/components/LoadingScreen';
+import { mask } from '@/utils/mask';
+import { useIsFocused } from '@react-navigation/native';
 
 const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
+  
   const tipos_busca: Array<{ label: string; value: string }> = BuscasTipos;
 
-  const [vendas, setVendas] = React.useState<Array<Venda>>(Vendas);
+  const [vendas, setVendas] = React.useState<Array<Venda>>([]);
   const [loadingVendas, setLoadingVendas] = React.useState(true);
-
+  const [isLoading, setIsLoading] = React.useState(true);
+  const db = useSQLiteContext();
   const FlatListVenda = FlatList as VendaFlatList;
-
+  const isFocused = useIsFocused();
   const ListRenderVenda: ListRenderItem<Venda> = ({ item }) => {
     return (
       <Card size="md" variant="elevated" m="$3">
         <HStack justifyContent="space-between">
           <Box gap="$2.5" w="$2/3">
             <Heading size="lg">{item.nome}</Heading>
-            <Text size="md">{item.valor}</Text>
+            <Text size="md">{mask(item.valor.toString(), 'money')}</Text>
+            <Text>{new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(item.data_venda)}</Text>
             <Text color={item.status === 'devendo' ? '$red600' : ''} size="md">
               {item.status}
             </Text>
@@ -97,7 +105,7 @@ const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
           <Box gap="$5">
             <Button
               onPress={() =>
-                navigation?.navigate('detalhes-venda', { id: String(item.id) })
+                navigation?.navigate('detalhes-venda', { id: item.id })
               }
             >
               <ButtonIcon as={EyeIcon} />
@@ -108,11 +116,30 @@ const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
     );
   };
 
-  React.useEffect(() => {
-    setTimeout(() => {
+  const Start = async () => {
+    try {
+      const vendas = await new VendaService(db).search();
+      setVendas(vendas);
       setLoadingVendas(false);
-    }, 2000);
-  }, []);
+      setIsLoading(false);
+    } catch (error) {
+      console.error(error);
+      setVendas([]);
+      setLoadingVendas(false);
+      setIsLoading(false);
+    }
+  }
+
+
+  React.useEffect(() => {
+    if (isFocused) {
+      Start()
+    }
+  }, [isFocused]);
+
+  if (isLoading) {
+    return <LoadingScreen />
+  }
 
   return vendas.length < 1 ? (
     <Box h="$full" w="$full" alignItems="center" justifyContent="center">

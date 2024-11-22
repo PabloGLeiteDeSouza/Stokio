@@ -77,6 +77,7 @@ import { getStringFromDate } from '@/utils';
 import produtos from '../../../../../components/forms/produtos';
 import CompraService from '@/classes/compra/compra.service';
 import { CompraCreate } from '@/classes/compra/interfaces';
+import { mask } from '@/utils/mask';
 const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
   const [haveProducts, setHaveProducts] = React.useState(false);
   const [temEmpresas, setTemEmpresas] = React.useState(false);
@@ -259,7 +260,10 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
                             <VStack>
                               <Heading size="lg">Empresa</Heading>
                               <Text size="lg">{values.empresa.nome_fantasia}</Text>
-                              <Text size="lg">{values.empresa.cpf}</Text>
+                              <Text size="lg">{mask(values.empresa.cpf, 'cpf')}</Text>
+                              {values.empresa.cnpj &&(
+                                <Text size="lg">{mask(values.empresa.cnpj, 'cnpj')}</Text>
+                              )}
                             </VStack>
                           </HStack>
                         </Card>

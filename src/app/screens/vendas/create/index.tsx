@@ -121,6 +121,9 @@ const Create: React.FC<CadastrarVendaScreen> = ({ navigation, route }) => {
               onUpdateProductToVenda={(selectedsProdutos, indexUpdated) => {
                 navigation?.navigate('selecionar-produto', { screen: 'cadastrar-venda', type: 'update', indexUpdated, selectedsProdutos });
               }}
+              onCreatedVenda={() => {
+                navigation?.goBack();
+              }}
             />
           </Box>
         </Box>

@@ -13,6 +13,8 @@ import {
 } from '@gluestack-ui/themed';
 import ScreensTipoProduto from './tipo_produtos';
 import { ConfiguracoesScreenProps } from '@/interfaces/config';
+import export_database from './utils/export_database';
+import import_database from './utils/import_database';
 
 const Stack = createNativeStackNavigator();
 
@@ -76,12 +78,12 @@ const ConfigScreen: React.FC<ConfiguracoesScreenProps> = ({ navigation }) => {
             </Heading>
           </Box>
           <Box>
-            <Button>
+            <Button onPress={import_database}>
               <ButtonText>Importar Dados</ButtonText>
             </Button>
           </Box>
           <Box mb="$5">
-            <Button>
+            <Button onPress={export_database}>
               <ButtonText>Exportar Dados</ButtonText>
             </Button>
           </Box>

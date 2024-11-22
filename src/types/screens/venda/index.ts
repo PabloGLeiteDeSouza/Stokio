@@ -46,9 +46,9 @@ export type DetalhesVendaScreenRouterProp = RouteProp<
 >;
 
 export type Venda = {
-  id: string;
-  data_venda: string;
-  data_atualizacao: string;
+  id: number;
+  nome: string;
+  data_venda: Date;
   valor: number;
   status: string;
 };

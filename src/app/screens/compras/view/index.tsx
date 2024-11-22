@@ -87,9 +87,7 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
       setCompras([...comprs]);
       setIsLoading(false);
     } catch (error) {
-      Alert.alert('Error', (error as Error).message);
       setIsLoading(false);
-      throw error;
     }
   }
   React.useEffect(() => {
