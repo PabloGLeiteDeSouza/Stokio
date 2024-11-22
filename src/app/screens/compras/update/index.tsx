@@ -76,7 +76,7 @@ import { Empresa } from '@/types/screens/empresa';
 import { getStringFromDate } from '@/utils';
 import produtos from '../../../../../components/forms/produtos';
 import CompraService from '@/classes/compra/compra.service';
-import { CompraObjectBaseUpdate } from '@/classes/compra/interfaces';
+import { CompraObjectBaseUpdate, CompraUpdate } from '@/classes/compra/interfaces';
 
 const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
 
@@ -142,9 +142,20 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
               initialValues={compra}
               onSubmit={async (value) => {
                 try {
-                  const data = await new CompraService(db).update()
+                  const dados: CompraUpdate = {
+                    id: value.id,
+                    data: value.data,
+                    id_empresa: value.empresa.id, 
+                    status: value.status, 
+                    item_compra: value.produtos.map(({ id, id_produto, valor_unitario, quantidade }) => {
+                      return { id, id_produto , valor_unitario, quantidade };
+                    })
+                  }
+                  await new CompraService(db).update(dados);
+                  Alert.alert('Sucesso', 'Compra atualizada com sucesso');
+                  navigation?.goBack();
                 } catch (error) {
-                  
+                  Alert.alert('Erro', (error as Error).message);
                 }
               }}
             >
@@ -159,7 +170,7 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                   if (route && route.params && route.params.empresa) {
                     setFieldValue('empresa', { ...route.params.empresa });
                   }
-                }, [route?.params?.empresa]);
+                }, [route?.params?.id_empresa]);
 
                 React.useEffect(() => {
                   async function insert_produto() {
@@ -171,7 +182,7 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                         typeof route.params.type !== 'undefined' &&
                         typeof route.params.indexUpdated !== 'undefined'
                       ) {
-                        const prod = await new ProdutoService(db).getProdutoByIdToVenda(route.params.id_produto);
+                        const prod = await new ProdutoService(db).getProdutoByIdToCompra(route.params.id_produto);
                         const prods = values.produtos;
                        
                         if (route.params.type === 'create') {
@@ -201,6 +212,7 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                           const produto = prods[i];
                           setFieldValue('valor', (values.valor - (produto.valor_unitario * produto.quantidade)) + (prod.valor_unitario * 1));
                           prods[i] = {
+                            id: produto.id,
                             ...prod,
                             data_validade: new Date(prod.data_validade), 
                             quantidade: 1,

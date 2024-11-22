@@ -407,7 +407,20 @@ export type ComprasStackParamList = {
     type?: 'update' | 'create';
     indexUpdated?: number;
   };
-  'atualizar-compra'?: { id: number, id_empresa?: number; id_produto?: number; };
+  'atualizar-compra'?: { 
+    id: number,
+    empresa?: {
+      id: number;
+      nome_fantasia: string;
+      razao_social: string;
+      cpf: string;
+      cnpj?: string;
+    };
+    id_produto?: number;
+    code?: string;
+    type?: 'update' | 'create';
+    indexUpdated?: number;
+  };
   'visualizar-compras'?: object;
   'detalhes-compra'?: { id: number };
   'selecionar-empresa'?: {

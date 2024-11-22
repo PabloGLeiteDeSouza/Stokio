@@ -1,5 +1,5 @@
 import { SQLiteDatabase } from 'expo-sqlite';
-import { CompraCreate, CompraObjectBase, CompraObjectBaseToDetails, CompraObjectBaseUpdate, CompraViewObject, ItemCompraObjectBaseDetails, ItemDeCompraObjectBase } from './interfaces';
+import { CompraCreate, CompraObjectBase, CompraObjectBaseToDetails, CompraObjectBaseUpdate, CompraUpdate, CompraViewObject, ItemCompraObjectBaseDetails, ItemDeCompraObjectBase } from './interfaces';
 import { getDateFromString, getStringFromDate } from '@/utils';
 
 export default class CompraService {
@@ -33,11 +33,30 @@ export default class CompraService {
     }
   }
 
-  async update(dados: CompraObjectBaseUpdate) {
+  async update(dados: CompraUpdate) {
     try {
-      dados.produtos
-      this.db.runAsync('UPDATE compra SET WHERE ')
-      this.db.runAsync('UPDATE compra SET WHERE ')
+      const { item_compra , ...compra } = dados;
+      const dt = await this.db.runAsync('UPDATE compra SET data = $data, status = $status, id_empresa = $id_empresa WHERE id == $id', {
+        $id: compra.id,
+        $data: getStringFromDate(compra.data),
+        $status: compra.status,
+        $id_empresa: compra.id_empresa
+      });
+      if (dt.changes < 1) {
+        throw new Error("Não foi possível criar a compra");
+      }
+      item_compra.forEach(async ({ id, id_produto, valor_unitario, quantidade }) => {
+        const dt1 = await this.db.runAsync('UPDATE item_compra id_compra = $id_compra, id_produto = $id_produto, valor_unitario = $valor_unitario, quantidade = $quantidade WHERE id == $id', {
+          $id: id,
+          $id_compra: compra.id,
+          $id_produto: id_produto,
+          $valor_unitario: valor_unitario,
+          $quantidade: quantidade,
+        })
+        if (dt1.changes < 1) {
+          throw new Error("Não foi possível criar o item da venda!");
+        }
+      })
     } catch(err){
 
     }
@@ -51,13 +70,12 @@ export default class CompraService {
     data: Date;
     nome_empresa: string;
     valor_compra: number;
-}[]> {
+  }[]> {
     try {
-      const result = await this.db.getAllAsync<{ id: number; status: string; data: string; nome_empresa: string;  }>('SELECT c.id, c.data, c.status, e.nome_fantasia as nome_empresa FROM compra as c INNER JOIN empresa as e ON e.id == c.id_empresa');
+      const result = await this.db.getAllAsync<{ id: number; status: string; data: string; nome_empresa: string; }>('SELECT c.id, c.data, c.status, e.nome_fantasia as nome_empresa FROM compra as c INNER JOIN empresa as e ON e.id == c.id_empresa');
       if (result.length < 1) {
         throw new Error("Nao fora m encontradas compras");
       }
-      console.log('compra ', result);
       const res = await Promise.all(result.map(async (r) => {
         const valores = await this.db.getAllAsync<{ quantidade: number; valor_unitario: number; }>('SELECT quantidade, valor_unitario FROM item_compra WHERE id_compra == $id', {
           $id: r.id,
@@ -103,7 +121,8 @@ export default class CompraService {
         valor_unitario: number;
         quantidade: number;
         quantidade_disponivel: number;
-      }>("SELECT p.id, p.codigo_de_barras, p.nome, tp.nome as tipo, m.nome as marca, e.nome_fantasia as empresa, p.data_de_validade as data_validade, p.quantidade as quantidade_disponivel, ic.valor_unitario, ic.quantidade FROM item_compra as ic INNER JOIN produto as p ON p.id == ic.id_produto INNER JOIN tipo_produto as tp ON tp.id == p.id_tipo_produto INNER JOIN marca as m ON m.id == p.id_marca INNER JOIN empresa as e ON e.id == p.id_empresa WHERE ic.id_compra == $id", {
+        id_produto: number;
+      }>("SELECT p.id as id_produto, p.codigo_de_barras, p.nome, tp.nome as tipo, m.nome as marca, e.nome_fantasia as empresa, p.data_de_validade as data_validade, p.quantidade as quantidade_disponivel, ic.id, ic.valor_unitario, ic.quantidade FROM item_compra as ic INNER JOIN produto as p ON p.id == ic.id_produto INNER JOIN tipo_produto as tp ON tp.id == p.id_tipo_produto INNER JOIN marca as m ON m.id == p.id_marca INNER JOIN empresa as e ON e.id == p.id_empresa WHERE ic.id_compra == $id", {
         $id: compra.id,
       })
       if (prods.length < 1) {

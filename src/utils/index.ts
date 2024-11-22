@@ -17,7 +17,8 @@ export function getMinDateFor18YearsOld(): Date {
 }
 
 export function getStringFromDate(data: Date) {
-  return `${data.getFullYear()}-${data.getMonth() + 1}-${data.getDate() + 1}`;
+  const [dia, mes, ano] = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(data).split('/');
+  return `${ano}-${mes}-${dia}`;
 }
 
 export function getDateFromString(data: string) {

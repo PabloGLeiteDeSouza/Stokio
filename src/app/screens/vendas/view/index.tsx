@@ -98,7 +98,7 @@ const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
             <Heading size="lg">{item.nome}</Heading>
             <Text size="md">{mask(item.valor.toString(), 'money')}</Text>
             <Text>{new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(item.data_venda)}</Text>
-            <Text color={item.status === 'devendo' ? '$red600' : ''} size="md">
+            <Text color={item.status === 'devendo' ? '$red600' : '$green600'} size="md">
               {item.status}
             </Text>
           </Box>

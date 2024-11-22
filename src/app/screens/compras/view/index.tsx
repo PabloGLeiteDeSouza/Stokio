@@ -83,7 +83,7 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
         setIsLoading(true);
       }
       const comprs = await new CompraService(db).findAll();
-      console.log(comprs);
+      console.log('compras', comprs);
       setCompras([...comprs]);
       setIsLoading(false);
     } catch (error) {
@@ -107,7 +107,7 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
             <Heading size="lg">{item.nome_empresa}</Heading>
             <Text size="md">{new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(item.data)}</Text>
             <Text>{mask(item.valor_compra.toString(), 'money')}</Text>
-            <Text color={item.status === 'pendente' ? '$red600' : ''} size="md">
+            <Text color={item.status === 'pendente' ? '$red600' : '$green600'} size="md">
               {item.status}
             </Text>
           </Box>

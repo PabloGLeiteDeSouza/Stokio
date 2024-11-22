@@ -8,6 +8,11 @@ export default class VendaService {
 
   async create(data: VendaCreateObject) {
     try {
+      const dados = await this.db.getFirstAsync<{ saldo: number }>('SELECT saldo FROM cliente WHERE id == $id', { $id: data.id_cliente })
+        if (!dados) {
+          throw new Error("Não existe o cliente informado!");
+        }
+      const saldo = dados
       const r = await this.db.runAsync('INSERT into venda ( data, status, id_cliente ) VALUES ( $data, $status, $id_cliente )', {
         $data: getStringFromDate(data.data),
         $status: data.status,
@@ -19,6 +24,7 @@ export default class VendaService {
       const id_venda = r.lastInsertRowId;
       await Promise.all( data.produtos.map(async (p) => {
         try {
+          
           const res = await this.db.runAsync('INSERT into item_venda ( quantidade, valor_unitario, id_venda, id_produto ) VALUES ( $quantidade, $valor_unitario, $id_venda, $id_produto )', {
             $quantidade: p.quantidade,
             $valor_unitario: p.valor_unitario,
@@ -47,8 +53,7 @@ export default class VendaService {
       if (tipo) {
         
       }
-      const saldo
-      const dados = await this.db.getAllAsync<{ nome: string; status: string; id: number; data_venda: string; }>(`SELECT p.nome, v.status, v.id, v.data as data_venda FROM venda as v INNER JOIN cliente as c ON c.id == v.id_cliente INNER JOIN pessoa as p ON p.id == c.id_pessoa ${params}`)
+      const dados = await this.db.getAllAsync<{ nome: string; status: string; id: number; data_venda: string; saldo: number}>(`SELECT p.nome, c.saldo, v.status, v.id, v.data as data_venda FROM venda as v INNER JOIN cliente as c ON c.id == v.id_cliente INNER JOIN pessoa as p ON p.id == c.id_pessoa ${params}`)
       if(dados.length < 1){
         throw new Error("Nao ha vendas cadastradas!");
       }
@@ -61,7 +66,8 @@ export default class VendaService {
           if (itns_venda.length < 1) {
             throw new Error("Nao ha itens de venda!");
           }
-          return { ...res, data_venda: getDateFromString(res.data_venda), valor: itns_venda.map((itv) => itv.quantidade * itv.valor_unitario).reduce((p, c) => p + c, 0)}
+          const valor = itns_venda.map((itv) => itv.quantidade * itv.valor_unitario).reduce((p, c) => p + c, 0);
+          return { ...res, data_venda: getDateFromString(res.data_venda), valor };
         } catch (error) {
           throw error;
         }

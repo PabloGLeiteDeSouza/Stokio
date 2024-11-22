@@ -84,18 +84,22 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
           <Box gap="$8">
             <Formik
               initialValues={{
-                produtos: [
+                itens_de_venda: [
                   {
                     id: 1,
-                    codigo_de_barras: '2343243432432432',
-                    nome: 'asdasdsadsadasd',
-                    data_validade: new Date('2026-10-27'),
-                    marca: 'asdasdsadas',
-                    tipo: 'asdsadsadsada',
-                    valor: 10.00,
-                    empresa: 'asdsadsadsaasdsa',
-                    quantidade_disponivel: 50,
+                    produto: {
+                      id: 1,
+                      codigo_de_barras: '2343243432432432',
+                      nome: 'asdasdsadsadasd',
+                      data_validade: new Date('2026-10-27'),
+                      marca: 'asdasdsadas',
+                      tipo: 'asdsadsadsada',
+                      valor: 10.00,
+                      empresa: 'asdsadsadsaasdsa',
+                      quantidade: 50,
+                    },
                     quantidade: 5,
+
                   },
                 ],
                 cliente: {
@@ -117,60 +121,73 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                 handleSubmit,
               }) => {
                 React.useEffect(() => {
-                  if (route && route.params && route.params.cliente) {
-                    setFieldValue('cliente', { ...route.params.cliente });
+                  if (route && route.params && route.params.empresa) {
+                    setFieldValue('empresa', { ...route.params.empresa });
                   }
-                }, [route?.params?.cliente]);
+                }, [route?.params?.empresa]);
 
                 React.useEffect(() => {
-                  if (
-                    route &&
-                    route.params &&
-                    route.params.produto &&
-                    route.params.type &&
-                    typeof route.params.indexUpdated !== 'undefined'
-                  ) {
-                    const prod = route.params.produto;
-                    const prods = values.produtos;
-                    if (
-                      route.params.type === 'create' &&
-                      values.produtos.length === 1 &&
-                      values.produtos[0].id === ''
-                    ) {
-                      prods[0] = {
-                        ...prod,
-                        valor_total: prod.valor,
-                        qtd: '1',
-                      };
-                      setFieldValue('produtos', [...prods]);
-                    } else if (route.params.type === 'create') {
-                      setFieldValue('produtos', [
-                        ...prods,
-                        { ...prod, valor_total: prod.valor, qtd: '1' },
-                      ]);
-                    } else if (route.params.type === 'update') {
-                      prods[route.params.indexUpdated] = {
-                        ...prod,
-                        valor_total: prod.valor,
-                        qtd: '1',
-                      };
-                      setFieldValue('produtos', [...prods]);
-                    } else {
-                      Alert.alert('Aviso', 'Erro ao selecionar o clinente!');
-                    }
-                    if (values.valor === '') {
-                      setFieldValue('valor', prod.valor);
-                    } else {
-                      setFieldValue(
-                        'valor',
-                        formatValue(
-                          Number(values.valor.replace(',', '.')) +
-                            Number(prod.valor.replace(',', '.')),
-                        ),
-                      );
+                  async function insert_produto() {
+                    try {
+                      if (
+                        typeof route !== 'undefined' &&
+                        typeof route.params !== 'undefined' &&
+                        typeof route.params.id_produto !== 'undefined' &&
+                        typeof route.params.type !== 'undefined' &&
+                        typeof route.params.indexUpdated !== 'undefined'
+                      ) {
+                        const prod = await new ProdutoService(db).getProdutoByIdToVenda(route.params.id_produto);
+                        const prods = values.produtos;
+                        
+                        if (route.params.type === 'create') {
+                          if (values.produtos.length === 1 && values.produtos[0].id === 0) {
+                            setFieldValue('produtos', [{
+
+                              ...prod,
+                              data_validade: new Date(prod.data_validade),
+                              valor_total: prod.valor_unitario,
+                              quantidade: 1,
+                              quantidade_disponivel: prod.quantidade,
+                            }]);
+                            setFieldValue('valor', prod.valor_unitario);
+                          } else {
+                            setFieldValue('produtos', [
+                              ...prods,
+                              { ...prod, 
+                                data_validade: new Date(prod.data_validade), 
+                                quantidade: 1,
+                                valor_total: prod.valor_unitario, 
+                                quantidade_disponivel: prod.quantidade,
+                              },
+                            ]);
+                            setFieldValue('valor', values.valor + prod.valor_unitario);
+                          }
+                        } else if (route.params.type === 'update') {
+                          let i = route.params.indexUpdated;
+                          const produto = prods[i];
+                          setFieldValue('valor', (values.valor - (produto.valor_unitario * produto.quantidade)) + (prod.valor_unitario * 1));
+                          prods[i] = {
+                            ...prod,
+                            data_validade: new Date(prod.data_validade), 
+                            quantidade: 1,
+                            valor_total: prod.valor_unitario, 
+                            quantidade_disponivel: prod.quantidade,
+                          }; 
+                          setFieldValue(`produtos`, prods);
+                        } else {
+                          throw new Error("Erro ao selecionar o produto!");
+                        }
+                      } else {
+                        throw new Error("Erro ao selecionar o produto!");
+                      }
+                    } catch (error) {
+                      Alert.alert("Erro", (error as Error).message);
                     }
                   }
-                }, [route?.params?.produto]);
+                  if(typeof route?.params?.id_produto === 'number'){
+                    insert_produto();
+                  }
+                }, [route?.params?.id_produto]);
 
                 return (
                   <>

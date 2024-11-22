@@ -18,6 +18,7 @@ import { getDateFromString, getStringFromDate } from '@/utils';
 import { useSQLiteContext } from 'expo-sqlite';
 import { ProdutoService } from '@/classes/produto/produto.service';
 import { ProdutoVendaRequest } from '@/classes/produto/interfaces';
+import { mask } from '@/utils/mask';
 
 const SelectProduto: React.FC<ISelectProdutoProps> = ({
   navigation,
@@ -116,7 +117,7 @@ const SelectProduto: React.FC<ISelectProdutoProps> = ({
             </Box>
             <Box>
               <Heading>Valor unitario</Heading>
-              <Text>R$ {item.valor_unitario}</Text>
+              <Text>{mask(item.valor_unitario.toString(), 'money')}</Text>
             </Box>
           </VStack>
           <VStack w="$2/6">

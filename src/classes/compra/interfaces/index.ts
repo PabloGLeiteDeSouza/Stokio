@@ -15,12 +15,14 @@ export interface ItemDeCompraObjectBase {
 
 export interface ItemDeCompraCreate extends Omit<ItemDeCompraObjectBase, 'id' | 'id_compra'> {};
 
+export interface ItemDeCompraUpdate extends Omit<ItemDeCompraObjectBase, 'id_compra'> {};
+
 export interface CompraCreate extends Omit<CompraObjectBase, 'id'> {
     item_compra: Array<ItemDeCompraCreate>
 };
 
 export interface CompraUpdate extends CompraObjectBase {
-    item_compra: Array<ItemDeCompraObjectBase>;
+    item_compra: Array<ItemDeCompraUpdate>;
 }
 
 export interface CompraViewObject extends Omit<CompraObjectBase, 'id_empresa'> {
@@ -49,18 +51,21 @@ export interface CompraObjectBaseToDetails {
 }
 
 export interface CompraObjectBaseUpdate {
-    produtos: {
-        id: number,
-        codigo_de_barras: string;
-        nome: string;
-        tipo: string;
-        marca: string;
-        empresa: string;
-        data_validade: Date;
-        valor_total: number,
-        valor_unitario: number,
-        quantidade: number,
-        quantidade_disponivel: number,
+    itens_de_venda: {
+        id: number;
+        quantidade: number;
+        valor_unitario: number;
+        produto: {
+            id: number;
+            data_validade: Date;
+            codigo_de_barras: string;
+            nome: string;
+            tipo: string;
+            marca: string;
+            empresa: string;
+            valor_unitario: number;
+            quantidade: number;
+        },
     }[],
     empresa: {
       id: number,
@@ -69,6 +74,7 @@ export interface CompraObjectBaseUpdate {
       cpf: string,
       cnpj: string | null,
     };
+    id: number;
     valor: number,
     data: Date,
     status: string,
