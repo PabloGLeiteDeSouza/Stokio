@@ -367,4 +367,23 @@ export class EmpresaService implements IEmpresaService {
       throw error;
     }
   }
+
+  async getEmpresaByIdToCompra(id: number) {
+    try {
+      const empresa = await this.db.getFirstAsync<{
+        id: number;
+        nome_fantasia: string;
+        razao_social: string;
+        cpf: string;
+        cnpj: string | null;
+      }>(
+        'SELECT e.id, e.nome_fantasia, e.razao_social, e.cnpj, p.cpf FROM empresa as e INNER JOIN pessoa as p ON p.id == e.id_pessoa WHERE e.id == $id',
+        { $id: id },
+      );
+      if (!empresa) throw new Error('Nao foi possivel encontrar a empresa!');
+      return empresa
+    } catch (error) {
+      throw error;
+    }
+  }
 }

@@ -102,7 +102,7 @@ export default class CompraService {
       const compra = {
         ...cmp,
         data: getDateFromString(data),
-      };
+      }; 
       type Empresa = { id: number; nome_fantasia: string; razao_social: string; cnpj: string | null; cpf: string; }
       const empresa = await this.db.getFirstAsync<Empresa>("SELECT e.id, e.nome_fantasia, e.razao_social, e.cnpj, p.cpf FROM empresa as e INNER JOIN pessoa as p ON p.id == e.id_pessoa WHERE e.id == $id", {
         $id: compra.id_empresa,
@@ -110,32 +110,43 @@ export default class CompraService {
       if (!empresa) {
         throw new Error("Empresa não encontrada");
       }
-      const prods = await this.db.getAllAsync<{
+      const result_itens_compra = await this.db.getAllAsync<{
         id: number;
-        codigo_de_barras: string;
-        nome: string;
-        tipo: string;
-        marca: string;
-        empresa: string;
-        data_validade: string;
-        valor_unitario: number;
         quantidade: number;
-        quantidade_disponivel: number;
+        valor_unitario: number;
         id_produto: number;
-      }>("SELECT p.id as id_produto, p.codigo_de_barras, p.nome, tp.nome as tipo, m.nome as marca, e.nome_fantasia as empresa, p.data_de_validade as data_validade, p.quantidade as quantidade_disponivel, ic.id, ic.valor_unitario, ic.quantidade FROM item_compra as ic INNER JOIN produto as p ON p.id == ic.id_produto INNER JOIN tipo_produto as tp ON tp.id == p.id_tipo_produto INNER JOIN marca as m ON m.id == p.id_marca INNER JOIN empresa as e ON e.id == p.id_empresa WHERE ic.id_compra == $id", {
-        $id: compra.id,
+        id_compra: number;
+      }>("SELECT * FROM item_compra WHERE id_compra == $id", {
+        $id: id,
       })
-      if (prods.length < 1) {
-        throw new Error('Produtos nao encontrados!');
+
+      if (result_itens_compra.length < 1) {
+        throw new Error("Nao foram encontrados itens de compra");
       }
-      let valor = 0;
-      const produtos = prods.map((p) => {
-        const valor_total = p.quantidade * p.valor_unitario;
-        valor += valor_total;
-        const data_validade = getDateFromString(p.data_validade);
-        return { ...p, data_validade, valor_total };
-      });
-      return { ...compra, empresa, produtos, valor };
+      const itens_de_compra = await Promise.all(result_itens_compra.map(async (itv) => {
+        try {
+          const res = await this.db.getFirstAsync<{
+            id: number;
+            data_validade: Date;
+            codigo_de_barras: string;
+            nome: string;
+            tipo: string;
+            marca: string;
+            empresa: string;
+            valor_unitario: number;
+            quantidade: number;
+        }>('SELECT p.id, p.data_de_validade as data_validade, p.codigo_de_barras, p.nome, tp.nome as tipo, mc.nome as marca, e.nome_fantasia as empresa, p.valor as valor_unitario, p.quantidade FROM produto as p INNER JOIN marca as mc ON mc.id == p.id_marca INNER JOIN tipo_produto as tp ON tp.id == p.id_tipo_produto INNER JOIN empresa as e ON e.id == p.id_empresa WHERE p.id == $id', {
+          $id: itv.id_produto,
+        })
+        if (!res) {
+          throw new Error("");
+        }
+        return { ...itv, produto: res };
+        } catch (error) {
+          throw error
+        }
+      }))
+      return { ...compra, empresa, itens_de_compra };
     } catch (error) {
       throw error;
     }

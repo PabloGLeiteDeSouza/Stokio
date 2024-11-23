@@ -73,10 +73,11 @@ import LoadingScreen from '@/components/LoadingScreen';
 import InputText from '@/components/Input';
 import { onAddProduct, onRemoveProduct, onUpdateProduct } from '../functions';
 import { Empresa } from '@/types/screens/empresa';
-import { getStringFromDate } from '@/utils';
+import { getDateFromString, getStringFromDate } from '@/utils';
 import produtos from '../../../../../components/forms/produtos';
 import CompraService from '@/classes/compra/compra.service';
 import { CompraObjectBaseUpdate, CompraUpdate } from '@/classes/compra/interfaces';
+import { mask } from '@/utils/mask';
 
 const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
 
@@ -142,13 +143,14 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
               initialValues={compra}
               onSubmit={async (value) => {
                 try {
+                  const { data, empresa, id, itens_de_compra, status } = value
                   const dados: CompraUpdate = {
-                    id: value.id,
-                    data: value.data,
-                    id_empresa: value.empresa.id, 
-                    status: value.status, 
-                    item_compra: value.produtos.map(({ id, id_produto, valor_unitario, quantidade }) => {
-                      return { id, id_produto , valor_unitario, quantidade };
+                    id: id,
+                    data: data,
+                    id_empresa: empresa.id, 
+                    status: status,
+                    itens_de_compra: itens_de_compra.map(({ id, quantidade, valor_unitario, produto}) => {
+                      return { id, id_produto: produto.id , valor_unitario, quantidade };
                     })
                   }
                   await new CompraService(db).update(dados);
@@ -170,7 +172,7 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                   if (route && route.params && route.params.empresa) {
                     setFieldValue('empresa', { ...route.params.empresa });
                   }
-                }, [route?.params?.id_empresa]);
+                }, [route?.params?.empresa]);
 
                 React.useEffect(() => {
                   async function insert_produto() {
@@ -180,46 +182,35 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                         typeof route.params !== 'undefined' &&
                         typeof route.params.id_produto !== 'undefined' &&
                         typeof route.params.type !== 'undefined' &&
-                        typeof route.params.indexUpdated !== 'undefined'
+                        typeof route.params.indexUpdated !== 'undefined' 
                       ) {
                         const prod = await new ProdutoService(db).getProdutoByIdToCompra(route.params.id_produto);
-                        const prods = values.produtos;
+                        const itens_de_compra = values.itens_de_compra;
                        
                         if (route.params.type === 'create') {
-                          if (values.produtos.length === 1 && values.produtos[0].id === 0) {
-                            setFieldValue('produtos', [{
-                              ...prod,
-                              data_validade: new Date(prod.data_validade),
-                              valor_total: prod.valor_unitario,
-                              quantidade: 1,
-                              quantidade_disponivel: prod.quantidade,
-                            }]);
-                            setFieldValue('valor', prod.valor_unitario);
-                          } else {
-                            setFieldValue('produtos', [
-                              ...prods,
-                              { ...prod, 
-                                data_validade: new Date(prod.data_validade), 
+                            setFieldValue('itens_de_compra', [
+                              ...itens_de_compra,
+                              { 
+                                produto: {
+                                  ...prod
+                                },
                                 quantidade: 1,
-                                valor_total: prod.valor_unitario, 
-                                quantidade_disponivel: prod.quantidade,
+                                valor_unitario: prod.valor_unitario,
                               },
                             ]);
-                            setFieldValue('valor', values.valor + prod.valor_unitario);
-                          }
+                            
                         } else if (route.params.type === 'update') {
-                          let i = route.params.indexUpdated;
-                          const produto = prods[i];
-                          setFieldValue('valor', (values.valor - (produto.valor_unitario * produto.quantidade)) + (prod.valor_unitario * 1));
-                          prods[i] = {
-                            id: produto.id,
-                            ...prod,
-                            data_validade: new Date(prod.data_validade), 
+                          const i = route.params.indexUpdated;
+                          itens_de_compra[i] = {
+                            ...itens_de_compra[i],
+                            produto: {
+                              ...prod,
+                              data_validade: getDateFromString(prod.data_validade),
+                            },
                             quantidade: 1,
-                            valor_total: prod.valor_unitario, 
-                            quantidade_disponivel: prod.quantidade,
+                            valor_unitario: prod.valor_unitario,
                           }; 
-                          setFieldValue(`produtos`, prods);
+                          setFieldValue(`itens_de_compra`, itens_de_compra);
                         } else {
                           throw new Error("Erro ao selecionar o produto!");
                         }
@@ -276,186 +267,149 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                       <Heading textAlign="center" size="xl">
                         Produtos
                       </Heading>
-
-                      {values.produtos.map(
-                        ({ quantidade, quantidade_disponivel,  valor_total, valor_unitario, ...produto }, i) => {
-                          if (produto.id !== 0) {
-                            return (
-                              <Box key={`produto-${i}`} gap="$5">
-                                <Card>
-                                  <HStack>
-                                    <VStack>
-                                      <Heading size="lg">
-                                        {produto.nome}
-                                      </Heading>
-                                      <Text size="lg">{produto.marca}</Text>
-                                      <Text size="lg">{produto.tipo}</Text>
-                                      <Text>{quantidade} unidades</Text>
-                                      <Text>{valor_total} reais</Text>
-                                    </VStack>
-                                  </HStack>
-                                </Card>
-                                <FormControl
-                                  isInvalid={false}
-                                  size={'md'}
-                                  isDisabled={false}
-                                  isRequired={true}
-                                >
-                                  <FormControlLabel>
-                                    <FormControlLabelText>
-                                      Quantidade
-                                    </FormControlLabelText>
-                                  </FormControlLabel>
-                                  <Input>
-                                    <Button
-                                      onPress={() => {
-                                        setFieldValue(`produtos[${i}].quantidade`, (quantidade + 1));
-                                        setFieldValue(`produtos[${i}].valor_total`, (quantidade + 1) * valor_unitario);
-                                        setFieldValue('valor', values.valor + valor_unitario);
-                                      }}
-                                      action="positive"
-                                    >
-                                      <ButtonIcon as={AddIcon} />
-                                    </Button>
-                                    <InputField
-                                      textAlign="center"
-                                      type="text"
-                                      value={values.produtos[i].quantidade.toString()}
-                                      placeholder="12"
-                                      onChangeText={(text) => {
-                                        const new_qtd = Number(text);
-                                        if (new_qtd > 0) {
-                                          const valor_total_old = quantidade * valor_unitario;
-                                          const valor_total_new = new_qtd * valor_unitario;
-                                          setFieldValue(`produtos[${i}].quantidade`, new_qtd);
-                                          setFieldValue(`produtos[${i}].valor_total`, valor_total_new);
-                                          setFieldValue('valor', (values.valor - valor_total_old) + valor_total_new);
-                                        } else {
-                                          Alert.alert('Aviso', `Voce deseja remover o produto ${produto.nome} ?`, [
-                                            {
-                                              text: 'Sim',
-                                              onPress: async () => {
-                                                if (values.produtos.length > 1) {
-                                                  setFieldValue('produtos', values.produtos.splice(i, 1))
-                                                } else {
-                                                  setFieldValue('produtos', [
-                                                    {
-                                                      id: 0,
-                                                      codigo_de_barras: '',
-                                                      nome: '',
-                                                      tipo: '',
-                                                      marca: '',
-                                                      empresa: '',
-                                                      data_validade: new Date(),
-                                                      valor_total: 0,
-                                                      valor_unitario: 0,
-                                                      quantidade: 0,
-                                                      quantidade_disponivel: 0,
-                                                    }
-                                                  ])
-                                                }
-                                              }
-                                            },
-                                            {
-                                              text: "Não",
-                                              onPress: () => {
-                                                Alert.alert(
-                                                  'Aviso',
-                                                  'Operação cancelada!',
-                                                );
-                                              }
-                                            }
-                                          ])
-                                        }
-                                      }}
-                                      keyboardType="number-pad"
-                                    />
-                                    <Button
-                                      onPress={() => {
-                                        if (quantidade > 1) {
-                                          setFieldValue(`produtos[${i}].quantidade`, (quantidade - 1));
-                                          setFieldValue(`produtos[${i}].valor_total`, (quantidade - 1) * valor_unitario);
-                                          setFieldValue('valor', values.valor - valor_unitario);
-                                        } else {
-                                          Alert.alert("Aviso", `Voce deseja mesmo remover o produto ${produto.nome} da compra?`, [
-                                            {
-                                              text: "Sim",
-                                              onPress: async() => {
-                                                setFieldValue('valor', (values.valor - (quantidade * valor_unitario)));
-                                                if (values.produtos.length > 1) {
-                                                  setFieldValue('produtos', values.produtos.splice(i, 1));
-                                                  Alert.alert("Aviso", "Operação realizada com sucesso!");
-                                                } else {
-                                                  setFieldValue('produtos', [{
-                                                    id: 0,
-                                                    codigo_de_barras: '',
-                                                    nome: '',
-                                                    tipo: '',
-                                                    marca: '',
-                                                    empresa: '',
-                                                    data_validade: new Date(),
-                                                    valor_total: 0,
-                                                    valor_unitario: 0,
-                                                    quantidade: 0,
-                                                    quantidade_disponivel: 0,
-                                                  }])
-                                                }
-                                              }
-                                            },
-                                            {
-                                              text: "Não",
-                                              onPress: () => {
-                                                Alert.alert("Aviso", "Operação cancelada!");
-                                              }
-                                            }
-                                          ])
-                                        }
-                                      }}
-                                      action="negative"
-                                    >
-                                      <ButtonIcon as={RemoveIcon} />
-                                    </Button>
-                                  </Input>
-
-                                  <FormControlHelper>
-                                    <FormControlHelperText>
-                                      Must be atleast 6 characters.
-                                    </FormControlHelperText>
-                                  </FormControlHelper>
-
-                                  <FormControlError>
-                                    <FormControlErrorIcon
-                                      as={AlertCircleIcon}
-                                    />
-                                    <FormControlErrorText>
-                                      Atleast 6 characters are required.
-                                    </FormControlErrorText>
-                                  </FormControlError>
-                                </FormControl>
+                      {values.itens_de_compra.map(({produto, quantidade, id, valor_unitario}, i) => {
+                        return (
+                          <Box key={`item-de-compra-${id}`}>
+                            <Card>
+                              <HStack>
+                                <VStack>
+                                  <Heading size="lg">
+                                    {produto.nome}
+                                  </Heading>
+                                  <Text size="lg">{produto.marca}</Text>
+                                  <Text size="lg">{produto.tipo}</Text>
+                                  <Text>{quantidade} unidades</Text>
+                                  <Text>{mask((quantidade * valor_unitario).toString(), 'money')}</Text>
+                                </VStack>
+                              </HStack>
+                            </Card>
+                            <FormControl
+                              isInvalid={false}
+                              size={'md'}
+                              isDisabled={false}
+                              isRequired={true}
+                            >
+                              <FormControlLabel>
+                                <FormControlLabelText>
+                                  Quantidade
+                                </FormControlLabelText>
+                              </FormControlLabel>
+                              <Input>
                                 <Button
                                   onPress={() => {
-                                    navigation?.navigate('selecionar-produto', {
-                                      screen: 'cadastrar-compra',
-                                      type: 'update',
-                                      indexUpdated: i,
-                                      selectedsProdutos: values.produtos.map((data) => { return { id_produto: data.id };}),
-                                    });
+                                    if ((quantidade + 1) < produto.quantidade) {
+                                      setFieldValue(`itens_de_compra[${i}].quantidade`, (quantidade + 1));
+                                    } else {
+                                      Alert.alert('Erro', 'Quantidade insuficiente')
+                                    }
                                   }}
+                                  action="positive"
                                 >
-                                  <ButtonText>Atualizar Produto</ButtonText>
+                                  <ButtonIcon as={AddIcon} />
                                 </Button>
-                              </Box>
-                            );
-                          }
-                        },
-                      )}
+                                <InputField
+                                  textAlign="center"
+                                  type="text"
+                                  value={values.itens_de_compra[i].quantidade.toString()}
+                                  placeholder="12"
+                                  onChangeText={(text) => {
+                                    const new_qtd = Number(text);
+                                    if (new_qtd > 0) {
+                                      setFieldValue(`itens_de_compra[${i}].quantidade`, new_qtd);
+                                    } else {
+                                      Alert.alert('Aviso', `Voce deseja remover o produto ${produto.nome} ?`, [
+                                        {
+                                          text: 'Sim',
+                                          onPress: async () => {
+                                            if (values.itens_de_compra.length > 1) {
+                                              setFieldValue('itens_de_compra', values.itens_de_compra.splice(i, 1))
+                                            } else {
+                                              Alert.alert("Aviso", "E necessario que exista ao menos um item de compra!")
+                                            }
+                                          }
+                                        },
+                                        {
+                                          text: "Não",
+                                          onPress: () => {
+                                            Alert.alert(
+                                              'Aviso',
+                                              'Operação cancelada!',
+                                            );
+                                          }
+                                        }
+                                      ])
+                                    }
+                                  }}
+                                  keyboardType="number-pad"
+                                />
+                                <Button
+                                  onPress={() => {
+                                    if (quantidade > 1) {
+                                      setFieldValue(`itens_de_compra[${i}].quantidade`, (quantidade - 1));
+                                    } else {
+                                      Alert.alert("Aviso", `Voce deseja mesmo remover o produto ${produto.nome} da compra?`, [
+                                        {
+                                          text: "Sim",
+                                          onPress: async() => {
+                                            if (values.itens_de_compra.length > 1) {
+                                              setFieldValue('item_de_compra', values.itens_de_compra.splice(i, 1));
+                                              Alert.alert("Aviso", "Operação realizada com sucesso!");
+                                            } else {
+                                              Alert.alert("Aviso", "E necessario que exista ao menos um item de compra!")
+                                            }
+                                          }
+                                        },
+                                        {
+                                          text: "Não",
+                                          onPress: () => {
+                                            Alert.alert("Aviso", "Operação cancelada!");
+                                          }
+                                        }
+                                      ])
+                                    }
+                                  }}
+                                  action="negative"
+                                >
+                                  <ButtonIcon as={RemoveIcon} />
+                                </Button>
+                              </Input>
 
+                              <FormControlHelper>
+                                <FormControlHelperText>
+                                  Must be atleast 6 characters.
+                                </FormControlHelperText>
+                              </FormControlHelper>
+
+                              <FormControlError>
+                                <FormControlErrorIcon
+                                  as={AlertCircleIcon}
+                                />
+                                <FormControlErrorText>
+                                  Atleast 6 characters are required.
+                                </FormControlErrorText>
+                              </FormControlError>
+                            </FormControl>
+                            <Button
+                              onPress={() => {
+                                navigation?.navigate('selecionar-produto', {
+                                  screen: 'cadastrar-compra',
+                                  type: 'update',
+                                  indexUpdated: i,
+                                  selectedsProdutos: values.itens_de_compra.map(({ produto }) => { return { id_produto: produto.id };}),
+                                });
+                              }}
+                            >
+                              <ButtonText>Atualizar Produto</ButtonText>
+                            </Button>
+                          </Box>
+                        )
+                      })}
                       <Button
                         onPress={() => {
                           navigation?.navigate('selecionar-produto', {
                             screen: 'cadastrar-compra',
                             type: 'create',
-                            selectedsProdutos: values.produtos.map((data) => { return { id_produto: data.id } }),
+                            selectedsProdutos: values.itens_de_compra.map(({produto}) => { return { id_produto: produto.id } }),
                           });
                         }}
                       >
@@ -478,7 +432,7 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                       isReadOnly={true}
                       title="Valor da compra"
                       inputType='money'
-                      value={values.valor.toString()}
+                      value={values.itens_de_compra.map(({ quantidade, valor_unitario }) => quantidade * valor_unitario).reduce((p, c) => p+c).toString()}
                       onChangeValue={handleChange('valor')}
                     />
 

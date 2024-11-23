@@ -1,5 +1,5 @@
 import { SQLiteDatabase } from 'expo-sqlite';
-import { Produto, Marca, TipoProduto, UnidadeDeMedida, ProdutoObjectRequestAll, ProdutoObjectComplete, ProdutoVendaRequest } from './interfaces';
+import { Produto, Marca, TipoProduto, UnidadeDeMedida, ProdutoObjectRequestAll, ProdutoObjectComplete, ProdutoVendaRequest, ProdutoCompraRequest } from './interfaces';
 import { Empresa, EmpresaCustomSimpleRequest } from '../empresa/types';
 import { UnidadeDeArmazenamento } from '../ua/interfaces';
 
@@ -127,48 +127,17 @@ export class ProdutoService {
     }
   }
 
-  // Leitura de Produto
-  async getProdutoByIdToCompra(id: number): Promise<ProdutoObjectComplete> {
+  // Leitura de Produto pelo id Para Compra
+  async getProdutoByIdToCompra(id: number): Promise<ProdutoCompraRequest> {
     try {
-      const produto = await this.db.getFirstAsync<Produto>(
-        `SELECT * FROM produto WHERE id = $id`,
+      const produto = await this.db.getFirstAsync<ProdutoCompraRequest>(
+        `SELECT p.id, p.codigo_de_barras, p.nome, p.data_de_validade as data_validade, m.nome as marca, t.nome as tipo, e.nome_fantasia as empresa, p.quantidade FROM produto as p INNER JOIN marca as m ON m.id == p.id_marca INNER JOIN tipo_produto as t ON t.id == p.id_tipo_produto INNER JOIN empresa e ON e.id == p.id_empresa WHERE id = $id`,
         { $id: id },
       );
       if(!produto){
         throw new Error("Nao foi possivel encontrar o produto!");
       }
-      const { id_empresa, id_marca, id_tipo_produto, id_ua, id_um, ...prod } = produto;
-      const empresa = await this.db.getFirstAsync<EmpresaCustomSimpleRequest>('SELECT e.id, e.nome_fantasia, e.razao_social, e.cnpj, p.cpf  FROM empresa AS e INNER JOIN pessoa AS p ON p.id == e.id_pessoa WHERE e.id == $id', {
-        $id: produto.id_empresa,
-      });
-      if(!empresa){
-        throw new Error("Nao foi possivel encontrar a empresa!");
-      }
-      const marca = await this.db.getFirstAsync<Marca>('SELECT * FROM marca WHERE id == $id', {
-        $id: id_marca,
-      });
-      if(!marca){
-        throw new Error("Nao foi possivel encontrar a marca!");
-      }
-      const tipo_produto = await this.db.getFirstAsync<TipoProduto>('SELECT * FROM tipo_produto WHERE id == $id', {
-        $id: id_tipo_produto,
-      });
-      if(!tipo_produto){
-        throw new Error("Nao foi possivel encontrar o tipo do produto!");
-      }
-      const unidade_de_medida = await this.db.getFirstAsync<UnidadeDeMedida>('SELECT * FROM um WHERE id == $id',  {
-        $id: id_um,
-      });
-      if(!unidade_de_medida){
-        throw new Error("Nao foi possivel encontrar a unidade de medida!");
-      }
-      const unidade_de_armazenamento = await this.db.getFirstAsync<UnidadeDeArmazenamento>('SELECT * FROM ua WHERE id == $id', {
-        $id: id_ua,
-      });
-      if(!unidade_de_armazenamento){
-        throw new Error("Nao foi possivel encontrar a unidade de armazenamento!");
-      }
-      return { ...prod, empresa, marca, tipo_produto, unidade_de_medida, unidade_de_armazenamento };
+      return produto
     } catch (error) {
       throw new Error(
         `Erro ao buscar produto pelo ID: ${(error as Error).message}`,

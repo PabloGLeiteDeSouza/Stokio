@@ -22,7 +22,7 @@ export interface CompraCreate extends Omit<CompraObjectBase, 'id'> {
 };
 
 export interface CompraUpdate extends CompraObjectBase {
-    item_compra: Array<ItemDeCompraUpdate>;
+    itens_de_compra: Array<ItemDeCompraUpdate>;
 }
 
 export interface CompraViewObject extends Omit<CompraObjectBase, 'id_empresa'> {
@@ -51,7 +51,7 @@ export interface CompraObjectBaseToDetails {
 }
 
 export interface CompraObjectBaseUpdate {
-    itens_de_venda: {
+    itens_de_compra: {
         id: number;
         quantidade: number;
         valor_unitario: number;
@@ -75,7 +75,6 @@ export interface CompraObjectBaseUpdate {
       cnpj: string | null,
     };
     id: number;
-    valor: number,
     data: Date,
     status: string,
 }

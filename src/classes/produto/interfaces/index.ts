@@ -50,7 +50,20 @@ export interface ProdutoObjectComplete extends Omit<Produto, 'id_empresa' | 'id_
   unidade_de_armazenamento: UnidadeDeArmazenamento;
 }
 
+
 export interface ProdutoVendaRequest {
+  id: number;
+  codigo_de_barras: string;
+  nome: string;
+  data_validade: string;
+  marca: string;
+  tipo: string;
+  valor_unitario: number;
+  empresa: string;
+  quantidade: number;
+}
+
+export interface ProdutoCompraRequest {
   id: number;
   codigo_de_barras: string;
   nome: string;
