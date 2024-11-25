@@ -74,10 +74,10 @@ import { RemoveIcon } from '@gluestack-ui/themed';
 import SelectEstados from '@/components/Custom/Selects/SelectEstados';
 import buscaCep from '@/utils/buscaCep/buscaCep';
 
-const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db, pessoas, onSelectPerson }) => {
+const FormCreateClient: React.FC<IFormCreateCliente> = ({ id_pessoa, onCreated, db, havePessoas, onSelectPerson }) => {
     const [isReadOnlyAll, setIsReadOnlyAll] = React.useState(false);
     const [isReadOnlyAddress, setIsReadOnlyAddress] = React.useState(false);
-    const [isNewPerson, setIsNewPerson] = React.useState(pessoas.length < 1);
+    const [isNewPerson, setIsNewPerson] = React.useState(!havePessoas);
   return (
     <>
       <Formik
@@ -121,16 +121,14 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db,
       >
         {({ handleChange, setFieldValue, handleSubmit, values, errors }) => {
           React.useEffect(() => {
-            if (pessoa) {
-              const pss = {
-                ...pessoa,
-                data_nascimento: getDateFromString(
-                  pessoa.data_nascimento,
-                ),
-              };
-              setFieldValue('pessoa', pss);
+            async function insert_pessoa() {
+              if (id_pessoa) {
+                const pessoa = await new ClienteService(db).findPessoaById(id_pessoa);
+                setFieldValue('pessoa', pessoa);
+              }
             }
-          }, [pessoa]);
+            insert_pessoa();
+          }, [id_pessoa]);
           const ErrorsReturn = (i: number) => {
             if (
               errors.telefones &&
@@ -246,12 +244,7 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db,
                   <Box gap="$5">
                     <Button
                       onPress={() => {
-                        onSelectPerson(pessoas, {
-                          ...values.pessoa,
-                          data_nascimento: getStringFromDate(
-                            values.pessoa.data_nascimento,
-                          )
-                        });
+                        onSelectPerson(values.pessoa.id);
                       }}
                     >
                       <ButtonText>

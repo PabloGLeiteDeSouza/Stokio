@@ -9,7 +9,6 @@ import {
   SeachParamsEmpresa,
   TelefoneDataUpdate,
   EmailDataUpdate,
-  EnderecoDataUpdate,
   RamoDataUpdate,
   EmpresaDataTableResult,
   EmpresaSearchRelatinalPessoa,
@@ -28,15 +27,16 @@ export class EmpresaService implements IEmpresaService {
 
   async create(dados: EmpresaCreate) {
     try {
-      if (dados.cnpj) {
+      const empresa = dados
+      if (empresa.cnpj) {
         const empresaExistente = await this.db.getFirstAsync(
           'SELECT id FROM empresa WHERE cnpj = $cnpj',
-          { $cnpj: dados.cnpj },
+          { $cnpj: empresa.cnpj },
         );
         if (empresaExistente)
           throw new Error('Empresa já cadastrada com este CNPJ!');
       }
-      if (dados.pessoa.id) {
+      if (typeof empresa.pessoa.id === 'number' && empresa.pessoa.id !== 0) {
         const pessoa = await this.db.getFirstAsync(
           'SELECT * FROM pessoa WHERE id == $id',
           {
@@ -44,44 +44,34 @@ export class EmpresaService implements IEmpresaService {
           },
         );
         if (!pessoa) throw new Error('Pessoa não encontrada');
+      } else {
+        const res = await this.db.runAsync("INSERT into pessoa (nome, cpf, data_nascimento) VALUES ($nome, $cpf, $data_nascimento)", {
+          $nome: empresa.pessoa.nome,
+          $cpf: empresa.pessoa.cpf,
+          $data_nascimento: getStringFromDate(empresa.pessoa.data_nascimento)
+        })
+        if (res.changes < 1) {
+          throw new Error('Erro ao cadastrar pessoa')
+        }
+        empresa.pessoa.id = res.lastInsertRowId
       }
-      if (dados.ramo.id) {
+      if (typeof empresa.ramo.id === "number" && empresa.ramo.id !== 0) {
         const res = await this.db.getFirstAsync(
           'SELECT * from ramo  WHERE id == $id',
           {
-            $id: dados.ramo.id,
+            $id: empresa.ramo.id,
           },
         );
         if (!res) throw new Error('Ramo não encontrado');
+      } else {
+        const res = await this.db.runAsync("INSERT into ramo (nome) VALUES ($nome)",{
+          $nome: empresa.ramo.nome
+        })
+        if (res.changes < 1) {
+          throw new Error('Erro ao cadastrar ramo')
+        }
+        empresa.ramo.id = res.lastInsertRowId
       }
-      const id_pessoa =
-        dados.pessoa.id !== 0
-          ? dados.pessoa.id
-          : (
-              await this.db.runAsync(
-                'INSERT into pessoa ( nome, data_nascimento, cpf ) VALUES ( $nome, $data_nascimento, $cpf )',
-                {
-                  $nome: String(dados.pessoa.nome),
-                  $data_nascimento: getStringFromDate(
-                    dados.pessoa.data_nascimento,
-                  ),
-                  $cpf: String(dados.pessoa.cpf),
-                },
-              )
-            ).lastInsertRowId;
-
-      const id_ramo =
-        dados.ramo.id !== 0
-          ? dados.ramo.id
-          : (
-              await this.db.runAsync(
-                'INSERT into ramo ( nome ) VALUES ( $nome )',
-                {
-                  $nome: String(dados.ramo.nome),
-                },
-              )
-            ).lastInsertRowId;
-
       const res_emp = await this.db.runAsync(
         'INSERT INTO empresa ( nome_fantasia, razao_social, cnpj, cep, logradouro, numero, complemento, bairro, cidade, uf, id_ramo, id_pessoa ) VALUES ( $nome_fantasia, $razao_social, $cnpj, $cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf, $id_ramo, $id_pessoa )',
         {
@@ -95,8 +85,8 @@ export class EmpresaService implements IEmpresaService {
           $bairro: dados.bairro,
           $cidade: dados.cidade,
           $uf: dados.uf,
-          $id_ramo: id_ramo,
-          $id_pessoa: id_pessoa,
+          $id_ramo: empresa.ramo.id,
+          $id_pessoa: empresa.pessoa.id,
         },
       );
 
@@ -290,10 +280,41 @@ export class EmpresaService implements IEmpresaService {
   }
 
   async getAllPessoas(): Promise<Pessoa[]> {
-    const data = await this.db.getAllAsync<Pessoa>('SELECT * FROM pessoa');
-    return data.map((pss) => {
-      return { ...pss, data_nascimento: new Date(pss.data_nascimento) };
-    });
+    try {
+      const empresas = await this.db.getAllAsync('SELECT * FROM empresa')
+      if (empresas.length < 1) {
+        const data = await this.db.getAllAsync<Omit<Pessoa, 'data_nascimento'> & { data_nascimento: string }>('SELECT * FROM pessoa');
+        if (data.length < 1) {
+          throw new Error("Nenhuma pessoa encontrada");
+        }
+        return data.map((pss) => {
+          return { ...pss, data_nascimento: getDateFromString(pss.data_nascimento) };
+        });
+      }
+      const data = await this.db.getAllAsync<Omit<Pessoa, 'data_nascimento'> & { data_nascimento: string }>('SELECT p.id, p.nome, p.cpf, p.data_nascimento FROM pessoa as p INNER JOIN empresa as e ON p.id != e.id_pessoa');
+      if (data.length < 1) {
+        throw new Error("Nenhuma pessoa encontrada");
+      }
+      return data.map((pss) => {
+        return { ...pss, data_nascimento: getDateFromString(pss.data_nascimento) };
+      });
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async getPessoaById(id: number): Promise<Pessoa> {
+    try {
+      const data = await this.db.getFirstAsync<Omit<Pessoa, 'data_nascimento'> & { data_nascimento: string }>('SELECT * FROM pessoa WHERE id == $id', {
+        $id: id,
+      });
+      if (!data) {
+        throw new Error("Não foi possível encontrar nenhuma pessoa!");
+      }
+      return { ...data, data_nascimento: getDateFromString(data.data_nascimento) };
+    } catch (error) {
+      throw error
+    }
   }
 
   async getAllEmpresas() {

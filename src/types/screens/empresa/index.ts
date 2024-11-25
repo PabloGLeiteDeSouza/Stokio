@@ -77,8 +77,8 @@ export type EmpresaObject = {
 export type EmpresaFlatList = React.ForwardRefExoticComponent<
   StyledComponentProps<
     StyleProp<ViewStyle>,
-    Empresa,
-    FlatListProps<Empresa>,
+    EmpresaSearchRelatinalPessoa,
+    FlatListProps<EmpresaSearchRelatinalPessoa>,
     'FlatList',
     typeof FlatList
   >

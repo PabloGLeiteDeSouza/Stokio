@@ -127,7 +127,7 @@ const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
             <Heading size="md">CPF</Heading>
             <Text size="sm">{mask(item.cpf, 'cpf')}</Text>
             <Heading size="md" >Saldo</Heading>
-            <Text color={ item.saldo < 100 ? '$red600' : '$green600' } size="sm">{mask(item.saldo.toString(), 'money')}</Text>
+            <Text color={ Number(item.saldo) < 100 ? '$red600' : '$green600' } size="sm">{mask(item.saldo.toString(), 'money')}</Text>
           </Box>
           <Box gap="$5">
             <Button
@@ -175,13 +175,19 @@ const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
             busca: '',
             tipo: '',
           }}
-          onSubmit={() => {}}
+          onSubmit={async (values) => {
+            try {
+              
+            } catch (error) {
+              
+            }
+          }}
         >
-          {({ values, handleChange, setFieldValue }) => {
+          {({ values, errors, handleChange, setFieldValue }) => {
             return (
               <>
                 <FormControl
-                  isInvalid={false}
+                  isInvalid={errors.tipo ? true : false}
                   size={'md'}
                   isDisabled={false}
                   isRequired={true}
@@ -192,14 +198,16 @@ const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
                     </FormControlLabelText>
                   </FormControlLabel>
                   <Select
+                    selectedValue={values.tipo === 'cpf' ? 'CPF' : values.tipo === 'nome' ? 'NOME' : ''}
                     onValueChange={(text) => {
                       setFieldValue('tipo', text);
                     }}
+                    initialLabel={values.tipo === 'cpf' ? 'CPF' : values.tipo === 'nome' ? 'NOME' : ''}
                     isInvalid={false}
                     isDisabled={false}
                   >
                     <SelectTrigger size="lg" variant={'rounded'}>
-                      <SelectInput placeholder="Selecione uma opcao" />
+                      <SelectInput placeholder="Selecione uma opção" />
                       <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
                     </SelectTrigger>
                     <SelectPortal>
@@ -208,23 +216,15 @@ const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
                         <SelectDragIndicatorWrapper>
                           <SelectDragIndicator />
                         </SelectDragIndicatorWrapper>
-                        <SelectItem label="UX Research" value="UX Research" />
-                        <SelectItem
-                          label="Web Development"
-                          value="Web Development"
+                        <SelectItem 
+                          label="CPF"
+                          value="cpf"
+                          isPressed={values.tipo === 'cpf'}
                         />
                         <SelectItem
-                          label="Cross Platform Development Process"
-                          value="Cross Platform Development Process"
-                        />
-                        <SelectItem
-                          label="UI Designing"
-                          value="UI Designing"
-                          isDisabled={true}
-                        />
-                        <SelectItem
-                          label="Backend Development"
-                          value="Backend Development"
+                          label="NOME"
+                          value="nome"
+                          isPressed={values.tipo === 'nome'}
                         />
                       </SelectContent>
                     </SelectPortal>
@@ -232,51 +232,53 @@ const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
 
                   <FormControlHelper>
                     <FormControlHelperText>
-                      Must be atleast 6 characters.
+                      Selecione um tipo de busca para o cliente.
                     </FormControlHelperText>
                   </FormControlHelper>
 
                   <FormControlError>
                     <FormControlErrorIcon as={AlertCircleIcon} />
                     <FormControlErrorText>
-                      Atleast 6 characters are required.
+                      {errors.tipo}
                     </FormControlErrorText>
                   </FormControlError>
                 </FormControl>
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>Buscar</FormControlLabelText>
-                  </FormControlLabel>
-                  <Input>
-                    <InputField
-                      type="text"
-                      value={values.busca}
-                      placeholder="Buscar"
-                      onChangeText={handleChange('busca')}
-                    />
-                    <Button>
-                      <ButtonIcon as={SearchIcon} />
-                    </Button>
-                  </Input>
+                {values.tipo !== '' && (
+                  <FormControl
+                    isInvalid={errors.busca ? true : false}
+                    size={'md'}
+                    isDisabled={false}
+                    isRequired={true}
+                  >
+                    <FormControlLabel>
+                      <FormControlLabelText>Buscar</FormControlLabelText>
+                    </FormControlLabel>
+                    <Input>
+                      <InputField
+                        type="text"
+                        value={values.busca}
+                        placeholder="Buscar"
+                        onChangeText={handleChange('busca')}
+                      />
+                      <Button>
+                        <ButtonIcon as={SearchIcon} />
+                      </Button>
+                    </Input>
 
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Must be atleast 6 characters.
-                    </FormControlHelperText>
-                  </FormControlHelper>
+                    <FormControlHelper>
+                      <FormControlHelperText>
+                        informe a forma de busca de acordo com o {values.tipo}.
+                      </FormControlHelperText>
+                    </FormControlHelper>
 
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        {errors.busca}
+                      </FormControlErrorText>
+                    </FormControlError>
+                  </FormControl>
+                )}
               </>
             );
           }}

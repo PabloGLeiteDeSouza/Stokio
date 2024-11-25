@@ -26,7 +26,6 @@ export function getDateFromString(data: string) {
     const [dia, mes, ano] = data.split('/');
     return new Date(`${ano}-${mes}-${Number(dia)+1}`);
   } else {
-    console.log('data ',data);
     const [ano, mes, dia] = data.split('-');
     return new Date(`${ano}-${mes}-${Number(dia)+1}`);
   }

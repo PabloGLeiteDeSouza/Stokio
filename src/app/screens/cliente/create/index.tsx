@@ -10,7 +10,7 @@ import { IPessoaUpdate } from '@/classes/cliente/interfaces';
 import FormCreateClient from '@/components/Forms/cliente/create';
 
 const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
-  const [pessoas, setPessoas] = React.useState<Array<IPessoaUpdate>>([]);
+  const [havePessoas, setHavePessoas] = React.useState(false);
   const [isNewPerson, setIsNewPerson] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const db = useSQLiteContext();
@@ -19,7 +19,9 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
     try {
       const pss = await new ClienteService(db).findAllPessoas();
       if (pss.length > 0) {
-        setPessoas([...pss]);
+        setHavePessoas(true);
+      } else {
+        setIsNewPerson(true);
       }
       setIsLoading(false);
     } catch (error) {
@@ -49,15 +51,14 @@ const Create: React.FC<CadastrarClienteScreen> = ({ navigation, route }) => {
               onCreated={() => {
                 navigation?.goBack();
               }}
-              onSelectPerson={(pessoas, pessoaSelecionada) => {
+              onSelectPerson={(id_pessoa) => {
                 navigation?.navigate('selecionar-pessoa', {
-                  pessoas,
+                  id_pessoa,
                   screen: 'cadastrar-cliente',
-                  pessoaSelecionada,
                 });
               }}
-              pessoas={pessoas.length > 0 ? pessoas.map((item) => { return { ...item, data_nascimento: getStringFromDate(item.data_nascimento) };}) : []}
-              pessoa={route?.params?.pessoa}
+              havePessoas={havePessoas}
+              id_pessoa={route?.params?.id_pessoa}
             />
           </Box>
         </Box>

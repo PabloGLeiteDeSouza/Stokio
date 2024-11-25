@@ -33,12 +33,12 @@ const SelectCliente: React.FC<ISlectClienteProps> = ({ navigation, route }) => {
   const screen = route.params.screen;
   const id_cliente = route.params.id_cliente;
   const [isLaoding, setIsLoading] = React.useState(true);
-  const [clientes, setClientes] = React.useState<Array<IClienteSelectCliente>>([]);
-  const [cliente, setCliente] = React.useState<IClienteSelectCliente>({
+  const [clientes, setClientes] = React.useState<Array<Omit<IClienteSelectCliente, 'data_nascimento'> & { data_nascimento: Date }>>([]);
+  const [cliente, setCliente] = React.useState<Omit<IClienteSelectCliente, 'data_nascimento'> & { data_nascimento: Date }>({
     id: id_cliente,
     nome: '',
     cpf: '',
-    data_nascimento: '',
+    data_nascimento: new Date(),
   });
   const db = useSQLiteContext();
 
@@ -58,7 +58,7 @@ const SelectCliente: React.FC<ISlectClienteProps> = ({ navigation, route }) => {
     StartScreen();
   }, []);
 
-  const ListRenderCliente: ListRenderItem<IClienteSelectCliente> = ({ item, index }) => {
+  const ListRenderCliente: ListRenderItem<Omit<IClienteSelectCliente, 'data_nascimento'> & { data_nascimento: Date }> = ({ item, index }) => {
     return (
       <Card mt={index === 0 ? '$5' : '$2.5'} mb="$2.5" mx="$5">
         <HStack justifyContent="space-between">

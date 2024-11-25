@@ -74,8 +74,8 @@ import { ButtonIcon } from '@gluestack-ui/themed';
 import { AddIcon } from '@gluestack-ui/themed';
 import { RemoveIcon } from '@gluestack-ui/themed';
 import buscaCep from '@/utils/buscaCep/buscaCep';
-const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onChangePessoa, onChangeRamo, pessoas, pessoa, haveRamos, ramo,  }) => {
-  const [isNewPerson, setIsNewPerson] = React.useState(pessoas.length < 1);
+const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onChangePessoa, onChangeRamo, havePessoas, id_pessoa, haveRamos, ramo,  }) => {
+  const [isNewPerson, setIsNewPerson] = React.useState(!havePessoas);
   const [isNewRamo, setIsNewRamo] = React.useState(!haveRamos);
   const [isReadOnlyAll, setIsReadOnlyAll] = React.useState(false);
   const [isReadOnlyAddress, setIsReadOnlyAddress] = React.useState(false);
@@ -129,14 +129,14 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
       >
         {({ handleChange, handleSubmit, setFieldValue, values, errors }) => {
           React.useEffect(() => {
-            if (pessoa) {
-              const { data_nascimento, ...person } = pessoa;
-              setFieldValue('pessoa', {
-                ...person,
-                data_nascimento: new Date(data_nascimento),
-              });
+            async function insert_pessoa() {
+              if (id_pessoa) {
+                const pss = await new EmpresaService(db).getPessoaById(id_pessoa)
+                setFieldValue('pessoa', pss);
+              }
             }
-          }, [pessoa]);
+            insert_pessoa()
+          }, [id_pessoa]);
           React.useEffect(() => { 
             if (ramo) {
               const rm = ramo;
@@ -151,7 +151,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                   <Box gap="$5">
                     <Button
                       onPress={() => {
-                        onChangePessoa(pessoas, { ...values.pessoa, data_nascimento: getStringFromDate(values.pessoa.data_nascimento) })
+                        onChangePessoa(values.pessoa.id)
                       }}
                     >
                       <ButtonText>Selecionar Pessoa</ButtonText>
@@ -175,7 +175,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                         </Box>
                         <Box>
                           <Text>
-                            {formatDate(values.pessoa.data_nascimento)}
+                            {new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(values.pessoa.data_nascimento)}
                           </Text>
                         </Box>
                         <Box>
@@ -186,12 +186,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                   </Card>
                   <Box gap="$5">
                     <Button
-                      onPress={() => onChangePessoa(pessoas, {
-                        id: values.pessoa.id,
-                        nome: values.pessoa.nome,
-                        cpf: values.pessoa.cpf,
-                        data_nascimento: getStringFromDate(values.pessoa.data_nascimento)
-                      })}
+                      onPress={() => onChangePessoa(values.pessoa.id)}
                     >
                       <ButtonText>Alterar Pessoa</ButtonText>
                     </Button>

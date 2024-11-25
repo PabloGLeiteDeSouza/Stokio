@@ -395,22 +395,34 @@ export class ClienteService {
 
   async findAllPessoas(): Promise<IPessoaUpdate[]> {
     try {
-      const clientes = await this.db.getAllAsync('SELECT * FROM cliente');
-      const data =
-        clientes.length > 0
-          ? await this.db.getAllAsync<Omit<IPessoaUpdate, 'data_nascimento'> & { data_nascimento: string }>(
-              'SELECT * FROM pessoa as p INNER JOIN cliente as c ON c.id_pessoa == p.id',
-            )
-          : await this.db.getAllAsync<Omit<IPessoaUpdate, 'data_nascimento'> & { data_nascimento: string }>('SELECT * FROM pessoa');
-      if (data.length < 1) {
+      const clientes = await this.db.getAllAsync<Omit<IPessoaUpdate, 'data_nascimento'> & { data_nascimento: string; }>('SELECT p.id, p.nome, p.cpf, p.data_nascimento FROM pessoa as p INNER JOIN cliente as c ON c.id_pessoa != p.id');
+      if (clientes.length < 1) {
         return [];
       }
-      return data.map((item) => {
+      return clientes.map((item) => {
         return {
           ...item,
           data_nascimento: getDateFromString(item.data_nascimento),
         };
       });
+    } catch (error) {
+      throw new Error('Erro ao buscar pessoas: ' + (error as Error).message);
+    }
+  }
+
+  async findPessoaById(id: number): Promise<IPessoaUpdate> {
+    try {
+      const cliente = await this.db.getFirstAsync<Omit<IPessoaUpdate, 'data_nascimento'> & { data_nascimento: string; }>('SELECT * FROM pessoa WHERE id == $id', {
+        $id: id
+      });
+      if (!cliente) {
+        throw new Error("Não foi possível encontrar a pessoa");
+        
+      }
+      return {
+        ...cliente,
+        data_nascimento: getDateFromString(cliente.data_nascimento),
+      }
     } catch (error) {
       throw new Error('Erro ao buscar pessoas: ' + (error as Error).message);
     }

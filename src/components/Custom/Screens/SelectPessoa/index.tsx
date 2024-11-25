@@ -15,29 +15,36 @@ import React from 'react';
 import { ListRenderItem } from 'react-native';
 import { ISlectPessoaProps } from './interfaces';
 import { getStringFromDate } from '@/utils';
+import { ClienteService } from '@/classes/cliente/cliente.service';
+import { useSQLiteContext } from 'expo-sqlite';
+import { EmpresaService } from '@/classes/empresa/empresa.service';
 
 const SelectPessoa: React.FC<ISlectPessoaProps> = ({ navigation, route }) => {
   if (!route || !route.params || !route.params.screen) {
     navigation?.goBack();
     return null;
   }
-  if (!route || !route.params || !route.params.pessoas) {
-    navigation?.goBack();
-    return null;
-  }
   const screen = route.params.screen;
-  const [pessoas, setPessoas] = React.useState<Array<Pessoa>>([
-    ...route.params.pessoas,
-  ]);
-  const selectedPessoa = route.params.pessoaSelecionada
-    ? route.params.pessoaSelecionada
-    : pessoas[0];
-  const [pessoa, setPessoa] = React.useState<Pessoa>(selectedPessoa);
+  const id_pessoa = route.params.id_pessoa;
+  const [pessoas, setPessoas] = React.useState<Array<Pessoa>>([]);
+  const [pessoa, setPessoa] = React.useState<Pessoa>({
+    id: id_pessoa ? id_pessoa : 0,
+    nome: '',
+    data_nascimento: new Date(),
+    cpf: '',
+  });
   const [isLoading, setIsLoading] = React.useState(true);
+  const db = useSQLiteContext();
 
   const startScreen = React.useCallback(async () => {
     try {
-      setPessoas([...pessoas]);
+      if (screen === "cadastrar-cliente") {
+        const pess = await new ClienteService(db).findAllPessoas();
+        setPessoas([...pess]);
+      } else {
+        const pess = await new EmpresaService(db).getAllPessoas();
+        setPessoas([...pess]);
+      }
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -110,7 +117,7 @@ const SelectPessoa: React.FC<ISlectPessoaProps> = ({ navigation, route }) => {
         <Button
           onPress={() =>
             navigation?.navigate(screen, {
-              pessoa,
+              id_pessoa: pessoa.id,
             })
           }
         >

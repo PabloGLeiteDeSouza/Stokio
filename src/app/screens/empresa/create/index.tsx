@@ -67,9 +67,8 @@ import FormCreateEmpresa from '@/components/Forms/empresa/create';
 
 const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = React.useState(true);
-  const [pessoas, setPessoas] = React.useState<Pessoa[]>([]);
-  const [isNewPerson, setIsNewPerson] = React.useState(false);
-  const [isNewRamo, setIsNewRamo] = React.useState(false);
+  const [havePessoas, setHavePessoas] = React.useState(false);
+  const [haveRamos, setHaveRamos] = React.useState(false);
   const db = useSQLiteContext();
   const isfocused = useIsFocused();
 
@@ -77,12 +76,10 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
     try {
       const pss = await new EmpresaService(db).getAllPessoas();
       const rm = await new RamoService(db).haveRamos();
-      if (pss.length < 1) {
-        setIsNewPerson(true);
-      } else {
-        setPessoas([...pss]);
+      if (pss.length > 0) {
+        setHavePessoas(true);
       }
-      setIsNewRamo(!rm);
+      setHaveRamos(rm);
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -109,11 +106,10 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
           <Box gap="$5">
             <FormCreateEmpresa
               db={db}
-              onChangePessoa={(pessoas, pessoaSelecionada) => {
+              onChangePessoa={(id_pessoa) => {
                 navigation?.navigate('selecionar-pessoa', {
-                  pessoas,
                   screen: 'cadastrar-empresa',
-                  pessoaSelecionada,
+                  id_pessoa,
                 })
               }}
               onChangeRamo={(ramoSelecionado) => {
@@ -125,10 +121,10 @@ const Create: React.FC<CadastrarEmpresaScreen> = ({ navigation, route }) => {
               onSubmited={() => {
                 navigation?.goBack();
               }}
-              pessoa={route?.params?.pessoa}
+              id_pessoa={route?.params?.id_pessoa}
               ramo={route?.params?.ramo}
-              pessoas={pessoas.length > 0 ? pessoas.map((p) => { return { ...p, data_nascimento: getStringFromDate(p.data_nascimento) }}) : []}
-              haveRamos={!isNewRamo}
+              havePessoas={havePessoas}
+              haveRamos={haveRamos}
             />
           </Box>
         </Box>

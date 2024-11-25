@@ -203,7 +203,6 @@ const Update: React.FC<AtualizarEmpresaScreen> = ({ navigation, route }) => {
                 errors,
               }) => {
                 React.useEffect(() => {
-                  console.log('modify ramo');
                   if (route && route.params && route.params.ramo) {
                     const rm = route.params.ramo;
                     setFieldValue('ramo', rm);

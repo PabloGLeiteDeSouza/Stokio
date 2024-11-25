@@ -45,7 +45,7 @@ export default class CompraService {
       if (res_compra.changes < 1) {
         throw new Error("Não foi possível atualizar a compra");
       }
-      itens_de_compra.forEach(async (it) => {
+      await Promise.all(itens_de_compra.map(async (it) => {
         try {
           if (typeof it.id !== 'undefined' && it.id !== 0) {
             const itv_old = await this.db.getFirstAsync<{ id_produto: number; quantidade: number }>('SELECT id_produto, quantidade FROM item_compra WHERE id == $id', {
@@ -82,6 +82,7 @@ export default class CompraService {
                 }
               } else {
                 const df = it.quantidade - itv_old.quantidade;
+                console.log("diferenca", df)
                 const updt = await this.db.runAsync('UPDATE item_compra SET quantidade = $quantidade WHERE id == $id', {
                   $quantidade: (itv_old.quantidade + df),
                   $id: it.id,
@@ -90,7 +91,7 @@ export default class CompraService {
                   throw new Error("Não foi possível atualizar o item da compra!");
                 }
                 const updt_prod = await this.db.runAsync('UPDATE produto SET quantidade = $quantidade WHERE id == $id', {
-                  $quantidade: (itv_old.quantidade + df),
+                  $quantidade: (d_p.quantidade + df),
                   $id: it.id_produto
                 });
                 console.log(updt_prod);
@@ -141,7 +142,7 @@ export default class CompraService {
         } catch (error) {
           throw error;
         }
-      });
+      }));
     } catch (err) {
       throw err;
     }

@@ -1,14 +1,9 @@
-import { IPessoaUpdate } from "@/classes/cliente/interfaces";
-import { Pessoa } from "@/types/screens/cliente";
 import { SQLiteDatabase } from "expo-sqlite";
 
-
-type pessoa = Omit<Pessoa, 'data_nascimento'> & { data_nascimento: string };
-
 export interface IFormCreateCliente {
-    pessoa?: Omit<Pessoa, 'data_nascimento'> & { data_nascimento: string };
-    pessoas: Array<Omit<Pessoa, 'data_nascimento'> & { data_nascimento: string }>;
+    id_pessoa?: number;
+    havePessoas: boolean;
     onCreated: () => Promise<void> | void;
     db: SQLiteDatabase;
-    onSelectPerson: (pessoas: Array<pessoa>, pessoaSelecionada: pessoa) => Promise<void> | void;
+    onSelectPerson: (id_pessoa?: number) => Promise<void> | void;
 }

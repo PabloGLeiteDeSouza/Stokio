@@ -211,13 +211,12 @@ export type EmpresasStackParamList = {
   'screens-ramos'?: object;
   'screens-itens-venda'?: object;
   'visualizar-empresas'?: object;
-  'cadastrar-empresa'?: { pessoa?: Omit<pessoa, 'data_nascimento'> & { data_nascimento: string }; ramo?: Ramo };
-  'detalhes-empresa'?: { id: number };
-  'atualizar-empresa'?: { id: number; pessoa?: pessoa; ramo?: Ramo };
+  'cadastrar-empresa'?:{ id_pessoa: number; ramo?: Ramo };
+  'detalhes-empresa'?: { id: number; };
+  'atualizar-empresa'?: { id: number; id_pessoa: number; ramo?: Ramo };
   'selecionar-pessoa'?: {
     screen: 'cadastrar-empresa';
-    pessoas: Array<Omit<pessoa, 'data_nascimento'> & { data_nascimento: string }>;
-    pessoaSelecionada?: Omit<pessoa, 'data_nascimento'> & { data_nascimento: string };
+    id_pessoa?: number; 
   };
   'selecionar-ramo'?: {
     screen: 'cadastrar-empresa' | 'atualizar-empresa';
@@ -243,12 +242,11 @@ export type ClientesStackParamList = {
   'screens-tipos-uas'?: object;
   'screens-ramos'?: object;
   'screens-itens-venda'?: object;
-  'cadastrar-cliente'?: { pessoa: PerssoaSelectType };
+  'cadastrar-cliente'?: { id_pessoa: number };
   'atualizar-cliente'?: { id: number };
   'selecionar-pessoa'?: {
     screen: 'cadastrar-cliente' | 'atualizar-cliente';
-    pessoas: PerssoaSelectType[];
-    pessoaSelecionada?: PerssoaSelectType;
+    id_pessoa?: number;
   };
   'visualizar-clientes'?: object;
   'detalhes-cliente'?: { id: number };
@@ -338,11 +336,10 @@ export type SelecionarEmpresaStackParamList = {
 export type PessoasStackParamList = {
   'selecionar-pessoa'?: {
     screen: 'cadastrar-cliente' | 'cadastrar-empresa';
-    pessoas: Array<PerssoaSelectType>;
-    pessoaSelecionada: PerssoaSelectType;
+    id_pessoa?: number;
   };
-  'cadastrar-cliente'?: { pessoa?: PerssoaSelectType };
-  'cadastrar-empresa'?: { pessoa?: PerssoaSelectType };
+  'cadastrar-cliente'?: { id_pessoa?: number };
+  'cadastrar-empresa'?: { id_pessoa?: number };
 };
 
 export type VendasStackParamList = {
@@ -366,20 +363,14 @@ export type VendasStackParamList = {
     type?: 'update' | 'create';
     indexUpdated?: number;
   };
-  'atualizar-venda'?: { 
-    id: number; 
-    id_cliente?: number;
-    id_produto?: number;
-    type?: 'update' | 'create';
-    indexUpdated?: number; 
-  };
+  'atualizar-venda'?: { id: number };
   'visualizar-vendas'?: object;
   'selecionar-cliente'?: {
-    screen: 'cadastrar-venda' | 'atualizar-venda';
+    screen: 'cadastrar-venda';
     id_cliente?: number;
   };
   'selecionar-produto'?: {
-    screen: 'cadastrar-venda' | 'atualizar-venda';
+    screen: 'cadastrar-venda';
     type: 'update' | 'create';
     indexUpdated?: number;
     selectedsProdutos?: Array<{ id: number }>;
@@ -414,7 +405,7 @@ export type ComprasStackParamList = {
     indexUpdated?: number;
   };
   'atualizar-compra'?: { 
-    id: number,
+    id: number, 
     empresa?: {
       id: number;
       nome_fantasia: string;
@@ -423,7 +414,6 @@ export type ComprasStackParamList = {
       cnpj?: string;
     };
     id_produto?: number;
-    code?: string;
     type?: 'update' | 'create';
     indexUpdated?: number;
   };

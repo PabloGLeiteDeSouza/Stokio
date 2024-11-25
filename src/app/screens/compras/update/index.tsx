@@ -191,6 +191,7 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                             setFieldValue('itens_de_compra', [
                               ...itens_de_compra,
                               {
+                                id: 0,
                                 produto: {
                                   ...prod
                                 },
@@ -198,7 +199,6 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                                 valor_unitario: prod.valor_unitario,
                               },
                             ]);
-                            
                         } else if (route.params.type === 'update') {
                           const i = route.params.indexUpdated;
                           itens_de_compra[i] = {
@@ -235,7 +235,10 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                             <VStack>
                               <Heading size="lg">Empresa</Heading>
                               <Text size="lg">{values.empresa.nome_fantasia}</Text>
-                              <Text size="lg">{values.empresa.cpf}</Text>
+                              <Text size="lg">{mask(values.empresa.cpf, 'cpf')}</Text>
+                              {values.empresa.cnpj && (
+                                <Text size="lg">{mask(values.empresa.cnpj, 'cnpj')}</Text>
+                              )}
                             </VStack>
                           </HStack>
                         </Card>
@@ -387,6 +390,18 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                                 </FormControlErrorText>
                               </FormControlError>
                             </FormControl>
+                            <Button
+                              onPress={() => {
+                                navigation?.navigate('selecionar-produto', {
+                                  screen: 'atualizar-compra',
+                                  type: 'update',
+                                  indexUpdated: i,
+                                  selectedsProdutos: values.itens_de_compra.map((data) => { return { id_produto: data.produto.id };}),
+                                });
+                              }}
+                            >
+                              <ButtonText>Atualizar Produto</ButtonText>
+                            </Button>
                           </Box>
                         )
                       })}
@@ -423,7 +438,7 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                     />
 
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={errors.status ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
@@ -471,14 +486,14 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Informe o status da compra.
                         </FormControlHelperText>
                       </FormControlHelper>
 
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          Atleast 6 characters are required.
+                          {errors.status}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>

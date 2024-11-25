@@ -103,8 +103,8 @@ export type ClienteFlatList = React.ForwardRefExoticComponent<
 export type ClienteSelectFlatList = React.ForwardRefExoticComponent<
   StyledComponentProps<
     StyleProp<ViewStyle>,
-    IClienteSelectCliente,
-    FlatListProps<IClienteSelectCliente>,
+    Omit<IClienteSelectCliente, 'data_nascimento'> & { data_nascimento: Date },
+    FlatListProps<Omit<IClienteSelectCliente, 'data_nascimento'> & { data_nascimento: Date }>,
     'FlatList',
     typeof FlatList
   >
