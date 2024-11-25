@@ -96,13 +96,19 @@ export default class VendaService {
 
   async findByIdUpdate(id: number){
     try {
-      const venda = await this.db.getFirstAsync<{ data: string: status: string; id_cliente: number }>('SELECT * FROM venda WHERE id == $id', {
+      const venda = await this.db.getFirstAsync<{ id: number; data: string; status: string; id_cliente: number; }>('SELECT * FROM venda WHERE id == $id', {
         $id: id,
       });
       if (!venda) {
         throw new Error("Venda não encontrada!");
       }
-      const res_cli = await
+      const cliente = await this.db.getFirstAsync<{id: number; nome: string; cpf: string;}>(
+        `SELECT c.id, p.cpf, p.nome FROM cliente as c INNER JOIN pessoa as p ON p.id == c.id_pessoa WHERE c.id = $id`,
+        { $id: venda.id_cliente },
+      );
+      if (!cliente) {
+        throw new Error('Cliente não encontrado!');
+      }
       const itv_res = await this.db.getAllAsync<{ id: number; quantidade: number; valor_unitario: number, id_produto: number }>('SELECT * FROM item_venda WHERE id_venda == $id', {
         $id: id,
       });
@@ -122,7 +128,7 @@ export default class VendaService {
           throw error;
         }
       }));
-      return { ...venda, itens_de_venda }
+      return { ...venda, data: getDateFromString(venda.data), cliente, itens_de_venda }
     } catch (error) {
       throw error;
     }

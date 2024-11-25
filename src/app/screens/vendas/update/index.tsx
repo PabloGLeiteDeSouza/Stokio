@@ -49,6 +49,7 @@ import { ClienteService } from '@/classes/cliente/cliente.service';
 import { ProdutoService } from '@/classes/produto/produto.service';
 import { getDateFromString } from '@/utils';
 import VendaService from '@/classes/venda/venda.service';
+import { IClienteSimpleRequest } from '@/classes/cliente/interfaces';
 
 const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
   if (!route || !route.params || !route.params.id) {
@@ -60,23 +61,32 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
 
   const db = useSQLiteContext();
 
-  const [clientes, setClientes] = React.useState([]);
+  const [clientes, setClientes] = React.useState<IClienteSimpleRequest[]>([]);
   const [venda, setVenda] = React.useState<{
+    id: number;
+    status: string | 'pago' | 'devendo';
+    id_cliente: number;
+    data: Date;
+    cliente: {
+      id: number;
+      nome: string;
+      cpf: string;
+    };
     itens_de_venda: {
+      id: number;
+      quantidade: number;
+      valor_unitario: number;
+      produto: {
+        data_validade: Date;
         id: number;
-        quantidade: number;
+        codigo_de_barras: string;
+        nome: string;
+        marca: string;
+        tipo: string;
         valor_unitario: number;
-        produto: {
-            data_validade: Date;
-            id: number;
-            codigo_de_barras: string;
-            nome: string;
-            marca: string;
-            tipo: string;
-            valor_unitario: number;
-            empresa: string;
-            quantidade: number;
-        };
+        empresa: string;
+        quantidade: number;
+      };
     }[];
 }>({})
   React.useEffect(() => {
@@ -470,7 +480,7 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                     </Box>
 
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={errors.status ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
@@ -519,14 +529,14 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Informe o status da venda.
                         </FormControlHelperText>
                       </FormControlHelper>
 
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          Atleast 6 characters are required.
+                          {errors.status}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
@@ -538,7 +548,7 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                           ) => void
                         }
                       >
-                        <ButtonText>Cadastrar Venda</ButtonText>
+                        <ButtonText>Atualizar Venda</ButtonText>
                       </Button>
                     </Box>
                   </>
