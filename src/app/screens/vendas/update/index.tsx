@@ -120,7 +120,25 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
           <Box gap="$8">
             <Formik
               initialValues={venda}
-              onSubmit={async () => {}}
+              onSubmit={async (values) => {
+                try {
+                  const { data, cliente, id, itens_de_compra, status } = value;
+                  const dados: VendaUpdate = {
+                    id: id,
+                    data: data,
+                    id_cliente: cliente.id, 
+                    status: status,
+                    itens_de_compra: itens_de_compra.map(({ id, quantidade, valor_unitario, produto}) => {
+                      return { id, id_produto: produto.id , valor_unitario, quantidade };
+                    })
+                  }
+                  await new VendaService(db).update(dados);
+                  Alert.alert('Sucesso', 'Venda atualizada com sucesso');
+                  navigation?.navigate('visualizar-vendas');
+                } catch (error) {
+                  Alert.alert('Erro', (error as Error).message);
+                }
+              }}
             >
               {({
                 values,

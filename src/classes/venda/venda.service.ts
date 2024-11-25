@@ -55,7 +55,13 @@ export default class VendaService {
     }
   }
 
-  async update() {}
+  async update(dados) {
+    try {
+      
+    } catch (error) {
+      
+    }
+  }
 
   async delete() {}
 
