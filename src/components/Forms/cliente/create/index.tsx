@@ -110,7 +110,6 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ pessoa, onCreated, db,
         }}
         onSubmit={async (values) => {
           try {
-            values;
             await new ClienteService(db).create(values);
             Alert.alert('Sucesso', 'Cliente cadastrardo com sucesso!');
             onCreated();

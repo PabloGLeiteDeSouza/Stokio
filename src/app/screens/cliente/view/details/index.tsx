@@ -78,7 +78,7 @@ const Details: React.FC<DetalhesClienteScreen> = ({ navigation, route }) => {
                   day: '2-digit',
                   month: '2-digit',
                   year: 'numeric',
-                }).format(new Date(cliente.pessoa.data_nascimento))}
+                }).format(cliente.pessoa.data_nascimento)}
               </Text>
             </Box>
             <Box gap="$1.5">
@@ -149,7 +149,28 @@ const Details: React.FC<DetalhesClienteScreen> = ({ navigation, route }) => {
                 <ButtonIcon as={EditIcon} />
                 <ButtonText>Editar</ButtonText>
               </Button>
-              <Button gap="$2.5" action="negative">
+              <Button onPress={async () => {
+                Alert.alert('Aviso', `Voce deseja mesmo deletar o cliente: ${cliente.pessoa.nome} ?`, [
+                  {
+                    text: 'Sim',
+                    onPress: async () => {
+                      try {
+                        await new ClienteService(db).deleteCliente(cliente.id);
+                        Alert.alert('Aviso', 'Cliente deletado com sucesso', [{
+                          text: 'Ok',
+                          onPress: () => navigation?.goBack(),
+                        }]);
+                      } catch (error) {
+                        Alert.alert('Erro', (error as Error).message);
+                      }
+                    }
+                  },
+                  {
+                    text: 'Não',
+                    onPress: () => Alert.alert('Aviso', 'Operacao cancelada'),
+                  }
+                ])
+              }} gap="$2.5" action="negative">
                 <ButtonIcon as={TrashIcon} />
                 <ButtonText>Excluir</ButtonText>
               </Button>

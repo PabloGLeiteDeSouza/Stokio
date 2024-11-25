@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   FormControl,
   FormControlLabel,
@@ -15,10 +15,24 @@ import {
   CalendarDaysIcon,
   AlertCircleIcon,
 } from '@gluestack-ui/themed';
-import { IInputDatePicker } from './interfaces';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { Alert } from 'react-native';
-import { getDateFromString, getStringFromDate } from '@/utils';
+import { FormikErrors } from 'formik';
+
+interface IInputDatePicker {
+  title: string;
+  value?: Date;
+  onChangeDate: (date: Date) => void;
+  error?: FormikErrors<Date> | undefined;
+  maximumDate?: Date;
+  minimumDate?: Date;
+  isInvalid?: boolean;
+  size?: "sm" | "md" | "lg" | undefined;
+  isDisabled?: boolean;
+  isRequired?: boolean;
+  isReadOnly?: boolean;
+  placeholder?: string;
+}
 
 const InputDatePicker: React.FC<IInputDatePicker> = ({
   title,
@@ -27,32 +41,37 @@ const InputDatePicker: React.FC<IInputDatePicker> = ({
   error,
   maximumDate,
   minimumDate,
-  minuteInterval,
   isInvalid,
   size,
   isDisabled,
   isRequired,
   isReadOnly,
   placeholder,
-  ...props
 }) => {
-  // Formatar a data no formato DD/MM/AAAA para exibição
-  const formatDate = (date: Date | string | undefined): string => {
-    if (!date) return '';
-    const dateObj = new Date(date);
-    const day = String(dateObj.getDate()).padStart(2, '0');
-    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-    const year = dateObj.getFullYear();
+  const formatDate = (date: Date): string => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
 
-  const [data, setData] = useState<string>(value ? formatDate(value) : '');
+  const parseDate = (dateString: string): Date | null => {
+    const [day, month, year] = dateString.split('/').map(Number);
+    if (!day || !month || !year) return null;
+
+    const date = new Date(year, month - 1, day);
+    return date.getDate() === day && date.getMonth() === month - 1 && date.getFullYear() === year
+      ? date
+      : null;
+  };
+
+  const [inputValue, setInputValue] = useState<string>(value ? formatDate(value) : '');
 
   const handleDateChange = useCallback(
     (selectedDate: Date) => {
       if (selectedDate) {
         onChangeDate(selectedDate);
-        setData(formatDate(selectedDate));
+        setInputValue(formatDate(selectedDate));
       }
     },
     [onChangeDate]
@@ -60,78 +79,79 @@ const InputDatePicker: React.FC<IInputDatePicker> = ({
 
   const startPicker = useCallback(() => {
     DateTimePickerAndroid.open({
-      minuteInterval,
-      minimumDate,
-      maximumDate,
-      value: value || maximumDate || new Date(),
-      onChange: (event, selectedDate) => {
-        if (event.type === 'set' && selectedDate) {
-          handleDateChange(selectedDate);
-        }
-      },
       mode: 'date',
-      ...props,
+      value: value || new Date(),
+      maximumDate,
+      minimumDate,
+      onChange: (_, selectedDate) => {
+        if (selectedDate) handleDateChange(selectedDate);
+      },
     });
-  }, [handleDateChange, maximumDate, minimumDate, minuteInterval, value, props]);
+  }, [handleDateChange, maximumDate, minimumDate, value]);
 
   const handleInputChange = (text: string) => {
-    try {
-      // Atualiza o texto enquanto mantém o formato DD/MM/AAAA
-      if (text.length === 2 || text.length === 5) {
-        setData((prev) => prev + '/');
-      } else {
-        setData(text);
-      }
+    let formattedText = text
+      .replace(/[^0-9]/g, '')
+      .slice(0, 8) // Limita o tamanho ao necessário para DD/MM/AAAA
+      .replace(/(\d{2})(\d)/, '$1/$2')
+      .replace(/(\d{2})\/(\d{2})(\d)/, '$1/$2/$3');
 
-      // Quando a data estiver completa e validada (DD/MM/AAAA)
-      if (text.length === 10 && /^(\d{2})\/(\d{2})\/(\d{4})$/.test(text)) {
-        onChangeDate(getDateFromString(text)); // Converte para o formato de data AAAA-MM-DD
+    setInputValue(formattedText);
+
+    // Verifica se está no formato DD/MM/AAAA completo
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(formattedText)) {
+      const parsedDate = parseDate(formattedText);
+      if (parsedDate) {
+        onChangeDate(parsedDate);
+      } else {
+        Alert.alert('Erro', 'Data inválida. Por favor, insira uma data válida.');
       }
-    } catch (error) {
-      Alert.alert('Erro', (error as Error).message);
     }
   };
 
   const handleBlur = () => {
-    try {
-      // Verifica se a data inserida está no formato correto
-      if (!data.includes('/')) throw new Error('Data inválida!');
-      onChangeDate(getDateFromString(data));
-    } catch (error) {
-      Alert.alert('Erro', (error as Error).message);
+    if (inputValue && !/^\d{2}\/\d{2}\/\d{4}$/.test(inputValue)) {
+      Alert.alert('Erro', 'Formato de data inválido. Use DD/MM/AAAA.');
+      setInputValue(value ? formatDate(value) : '');
     }
   };
 
   return (
-    <FormControl isInvalid={isInvalid} size={size} isDisabled={isDisabled} isRequired={isRequired} isReadOnly={isReadOnly}>
+    <FormControl
+      isInvalid={isInvalid}
+      size={size}
+      isDisabled={isDisabled}
+      isRequired={isRequired}
+      isReadOnly={isReadOnly}
+    >
       <FormControlLabel>
         <FormControlLabelText>{title}</FormControlLabelText>
       </FormControlLabel>
 
       <Input>
         <InputField
-          type="text"
           placeholder={placeholder || 'DD/MM/AAAA'}
-          value={data}
+          value={inputValue}
           onChangeText={handleInputChange}
           keyboardType="number-pad"
           onBlur={handleBlur}
+          editable={!isReadOnly && !isDisabled}
         />
-        <Button onPress={startPicker}>
+        <Button onPress={startPicker} disabled={isReadOnly || isDisabled}>
           <ButtonIcon as={CalendarDaysIcon} />
         </Button>
       </Input>
 
       <FormControlHelper>
         <FormControlHelperText>
-          Selecione uma data válida. A data deve ser informada por completo; caso contrário, a última data correta será considerada.
+          Insira uma data no formato DD/MM/AAAA ou utilize o seletor de data.
         </FormControlHelperText>
       </FormControlHelper>
 
       {error && (
         <FormControlError>
           <FormControlErrorIcon as={AlertCircleIcon} />
-          <FormControlErrorText>{String(error)}</FormControlErrorText>
+          <FormControlErrorText>{error as string}</FormControlErrorText>
         </FormControlError>
       )}
     </FormControl>

@@ -502,7 +502,7 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
                     />
 
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={errors.status ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
@@ -550,14 +550,14 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Selecione um status para a compra.
                         </FormControlHelperText>
                       </FormControlHelper>
 
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          Atleast 6 characters are required.
+                          {errors.status}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>

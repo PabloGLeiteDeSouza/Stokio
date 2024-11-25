@@ -14,7 +14,7 @@ import {
   ITelefone,
   ITelefoneUpdate,
 } from './interfaces';
-import { getStringFromDate } from '@/utils';
+import { getDateFromString, getStringFromDate } from '@/utils';
 
 export class ClienteService {
   private db: SQLiteDatabase;
@@ -211,10 +211,6 @@ export class ClienteService {
   // Método de deleção de cliente
   async deleteCliente(id: number): Promise<void> {
     try {
-      await this.db.runAsync(
-        'DELETE FROM pessoa WHERE id = (SELECT id_pessoa FROM cliente WHERE id = $id)',
-        { $id: id },
-      );
       await this.db.runAsync('DELETE FROM cliente WHERE id = $id', { $id: id });
       await this.db.runAsync('DELETE FROM telefone WHERE id_cliente = $id', {
         $id: id,
@@ -246,13 +242,13 @@ export class ClienteService {
     }
   }
 
-  async findAllClienteSelectCliente(): Promise<IClienteSelectCliente[]> {
+  async findAllClienteSelectCliente(): Promise<Array<Omit<IClienteSelectCliente, 'data_nascimento'> & { data_nascimento: Date }>> {
     try {
       const result = await this.db.getAllAsync<IClienteSelectCliente>('SELECT c.id, p.nome, p.cpf, p.data_nascimento FROM cliente as c INNER JOIN pessoa as p ON c.id_pessoa == p.id');
       if(result.length < 1) {
         throw new Error("Nenhum cliente encontrado");
       }
-      return result;
+      return result.map((r) => { return {...r, data_nascimento: getDateFromString(r.data_nascimento)} as Omit<IClienteSelectCliente, 'data_nascimento'> & { data_nascimento: Date }});
     } catch (error) {
       throw new Error(`Erro ao buscar clientes: ${(error as Error).message}`);
     }
@@ -315,12 +311,12 @@ export class ClienteService {
 
   async findAllClientes(): Promise<IClienteSimpleRequest[]> {
     try {
-      const result = await this.db.getAllAsync<IClienteSimpleRequest>(
+      const result = await this.db.getAllAsync<Omit<IClienteSimpleRequest, 'data_nascimento'> & { data_nascimento: string }>(
         `SELECT cliente.*, pessoa.nome, pessoa.cpf, pessoa.data_nascimento as data_nascimento
          FROM cliente
          INNER JOIN pessoa ON cliente.id_pessoa = pessoa.id`,
       );
-      return result;
+      return result.map((r) => { return { ...r, data_nascimento: getDateFromString(r.data_nascimento) }; });
     } catch (error) {
       throw new Error(
         `Erro ao buscar todos os clientes: ${(error as Error).message}`,
@@ -331,7 +327,7 @@ export class ClienteService {
     }
   }
 
-  async findClienteById(id: string): Promise<IClienteUpdate> {
+  async findClienteById(id: number): Promise<IClienteUpdate> {
     try {
       const cliente = await this.db.getFirstAsync<ISimpleCliente>(
         `SELECT * FROM cliente WHERE id = $id`,
@@ -341,7 +337,7 @@ export class ClienteService {
         throw new Error('Cliente não encontrado!');
       }
 
-      const pessoa = await this.db.getFirstAsync<IPessoaUpdate>(
+      const pessoa = await this.db.getFirstAsync<Omit<IPessoaUpdate, 'data_nascimento'> & { data_nascimento: string }>(
         `
         SELECT * FROM pessoa WHERE id == $id`,
         { $id: cliente.id_pessoa },
@@ -372,7 +368,7 @@ export class ClienteService {
         ...cliente,
         pessoa: {
           ...pessoa,
-          data_nascimento: new Date(pessoa.data_nascimento),
+          data_nascimento: getDateFromString(pessoa.data_nascimento),
         },
         telefones,
         emails,
@@ -402,17 +398,17 @@ export class ClienteService {
       const clientes = await this.db.getAllAsync('SELECT * FROM cliente');
       const data =
         clientes.length > 0
-          ? await this.db.getAllAsync<IPessoaUpdate>(
+          ? await this.db.getAllAsync<Omit<IPessoaUpdate, 'data_nascimento'> & { data_nascimento: string }>(
               'SELECT * FROM pessoa as p INNER JOIN cliente as c ON c.id_pessoa == p.id',
             )
-          : await this.db.getAllAsync<IPessoaUpdate>('SELECT * FROM pessoa');
+          : await this.db.getAllAsync<Omit<IPessoaUpdate, 'data_nascimento'> & { data_nascimento: string }>('SELECT * FROM pessoa');
       if (data.length < 1) {
-        return data;
+        return [];
       }
       return data.map((item) => {
         return {
           ...item,
-          data_nascimento: new Date(item.data_nascimento),
+          data_nascimento: getDateFromString(item.data_nascimento),
         };
       });
     } catch (error) {

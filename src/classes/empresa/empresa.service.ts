@@ -17,7 +17,7 @@ import {
   Pessoa,
 } from './types';
 import { IEmpresaService } from './interfaces';
-import { getStringFromDate } from '@/utils';
+import { getDateFromString, getStringFromDate } from '@/utils';
 
 export class EmpresaService implements IEmpresaService {
   private db: SQLiteDatabase;
@@ -229,15 +229,11 @@ export class EmpresaService implements IEmpresaService {
   async delete(id: number) {
     try {
       await this.db.runAsync(
-        'DELETE FROM empresa_telefone WHERE id_empresa = $id',
+        'DELETE FROM telefone WHERE id_empresa = $id',
         { $id: id },
       );
       await this.db.runAsync(
-        'DELETE FROM empresa_email WHERE id_empresa = $id',
-        { $id: id },
-      );
-      await this.db.runAsync(
-        'DELETE FROM empresa_endereco WHERE id_empresa = $id',
+        'DELETE FROM email WHERE id_empresa = $id',
         { $id: id },
       );
       await this.db.runAsync('DELETE FROM empresa WHERE id = $id', { $id: id });
@@ -330,7 +326,7 @@ export class EmpresaService implements IEmpresaService {
 
       if (!ramo) throw new Error('Não foi possível encontrar o ramo!');
 
-      const pessoa = await this.db.getFirstAsync<Pessoa>(
+      const pessoa = await this.db.getFirstAsync<Omit<Pessoa, 'data_nascimento'> & { data_nascimento: string; }>(
         'SELECT * FROM pessoa WHERE id == $id',
         {
           $id: empresa.id_pessoa,
@@ -358,7 +354,7 @@ export class EmpresaService implements IEmpresaService {
         ramo,
         pessoa: {
           ...pessoa,
-          data_nascimento: new Date(pessoa.data_nascimento),
+          data_nascimento: getDateFromString(pessoa.data_nascimento),
         },
         telefones,
         emails,

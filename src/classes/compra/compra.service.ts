@@ -35,30 +35,115 @@ export default class CompraService {
 
   async update(dados: CompraUpdate) {
     try {
-      const { item_compra , ...compra } = dados;
-      const dt = await this.db.runAsync('UPDATE compra SET data = $data, status = $status, id_empresa = $id_empresa WHERE id == $id', {
-        $id: compra.id,
+      const { itens_de_compra , ...compra } = dados;
+      const res_compra = await this.db.runAsync('UPDATE compra SET data = $data, status = $status, id_empresa = $id_empresa WHERE id == $id', {
         $data: getStringFromDate(compra.data),
         $status: compra.status,
-        $id_empresa: compra.id_empresa
+        $id_empresa: compra.id_empresa,
+        $id: compra.id
       });
-      if (dt.changes < 1) {
-        throw new Error("Não foi possível criar a compra");
+      if (res_compra.changes < 1) {
+        throw new Error("Não foi possível atualizar a compra");
       }
-      item_compra.forEach(async ({ id, id_produto, valor_unitario, quantidade }) => {
-        const dt1 = await this.db.runAsync('UPDATE item_compra id_compra = $id_compra, id_produto = $id_produto, valor_unitario = $valor_unitario, quantidade = $quantidade WHERE id == $id', {
-          $id: id,
-          $id_compra: compra.id,
-          $id_produto: id_produto,
-          $valor_unitario: valor_unitario,
-          $quantidade: quantidade,
-        })
-        if (dt1.changes < 1) {
-          throw new Error("Não foi possível criar o item da venda!");
+      itens_de_compra.forEach(async (it) => {
+        try {
+          if (typeof it.id !== 'undefined' && it.id !== 0) {
+            const itv_old = await this.db.getFirstAsync<{ id_produto: number; quantidade: number }>('SELECT id_produto, quantidade FROM item_compra WHERE id == $id', {
+              $id: it.id
+            });
+            if (!itv_old) {
+              throw new Error("Nao foi possivel encontrar o item da venda");
+            }
+            const d_p = await this.db.getFirstAsync<{ quantidade: number }>("SELECT quantidade FROM produto WHERE id == $id", {
+              $id: itv_old.id_produto,
+            });
+            if (!d_p) {
+              throw new Error("Nao foi possivel encontrar o produto");
+            }
+            if (it.id_produto === itv_old.id_produto) {
+              if (it.quantidade < itv_old.quantidade) {
+                const df = itv_old.quantidade - it.quantidade;
+                if ((d_p.quantidade - df) < 0) {
+                  throw new Error("Nao e possivel fazer a atualizacao pois o produto esta vinculado a vendas ja feitas!");
+                }
+                const updt = await this.db.runAsync('UPDATE item_compra SET quantidade = $quantidade WHERE id == $id', {
+                  $quantidade: it.quantidade,
+                  $id: it.id,
+                })
+                if (updt.changes < 1) {
+                  throw new Error("Não foi possível atualizar o item da compra!");
+                }
+                const updt_prod = await this.db.runAsync('UPDATE produto SET quantidade = $quantidade WHERE id == $id', {
+                  $quantidade: (d_p.quantidade - df),
+                  $id: it.id_produto
+                });
+                if (updt_prod.changes < 1) {
+                  throw new Error("Não foi possível atualizar o produto!");
+                }
+              } else {
+                const df = it.quantidade - itv_old.quantidade;
+                const updt = await this.db.runAsync('UPDATE item_compra SET quantidade = $quantidade WHERE id == $id', {
+                  $quantidade: (itv_old.quantidade + df),
+                  $id: it.id,
+                })
+                if (updt.changes < 1) {
+                  throw new Error("Não foi possível atualizar o item da compra!");
+                }
+                const updt_prod = await this.db.runAsync('UPDATE produto SET quantidade = $quantidade WHERE id == $id', {
+                  $quantidade: (itv_old.quantidade + df),
+                  $id: it.id_produto
+                });
+                console.log(updt_prod);
+                if (updt_prod.changes < 1) {
+                  throw new Error("Não foi possível atualizar o produto!");
+                }
+              }
+            } else {
+              if((itv_old.quantidade - d_p.quantidade) >= 0){
+                const res = await this.db.runAsync('UPDATE produto SET quantidade = $quantidade WHERE id == $id', {
+                  $quantidade: (itv_old.quantidade - d_p.quantidade),
+                  $id: itv_old.id_produto,
+                });
+                if (res.changes < 1) {
+                  throw new Error("Não foi possível atualizar o produto!");
+                }
+                const res_cmp = await this.db.runAsync('UPDATE item_compra SET valor_unitario = $valor_unitario, quantidade = $quantidade, id_produto = $id_produto WHERE id == $id', {
+                  $valor_unitario: it.valor_unitario,
+                  $quantidade: it.quantidade,
+                  $id_produto: it.id_produto,
+                  $id: it.id
+                });
+                if (res_cmp.changes < 1) {
+                  throw new Error("Não foi possível atualizar o item da compra!");
+                }
+                const res_new_prod = await this.db.runAsync('UPDATE produto SET quantidade = SUM(quantidade + $quantidade) WHERE id = $id', {
+                  $quantidade: it.quantidade,
+                  $id: it.id_produto,
+                })
+                if (res_new_prod.changes < 1) {
+                  throw new Error("Não foi possível atualizar a compra!");
+                }
+              } else {
+                throw new Error("Nao e possivel fazer a atualizacao pois o produto esta vinculado a vendas ja feitas!");
+              }
+            }
+          } else {
+            const res = await this.db.runAsync('INSERT into item_compra (quantidade, valor_unitario, id_compra, id_produto) VALUES ($quantidade, $valor_unitario, $id_compra, $id_produto )', {
+              $quantidade: it.quantidade,
+              $valor_unitario: it.valor_unitario,
+              $id_compra: compra.id,
+              $id_produto: it.id_produto
+            })
+            if (res.changes < 1) {
+              throw new Error("Não foi possível atualizar a compra");
+            }
+          }
+        } catch (error) {
+          throw error;
         }
-      })
-    } catch(err){
-
+      });
+    } catch (err) {
+      throw err;
     }
   }
 

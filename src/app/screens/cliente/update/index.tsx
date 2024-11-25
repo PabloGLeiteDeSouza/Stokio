@@ -151,7 +151,7 @@ const Update: React.FC<AtualizarClienteScreen> = ({ navigation, route }) => {
   React.useEffect(() => {
     async function startScreen() {
       try {
-        const cli = await new ClienteService(db).findClienteById(String(id));
+        const cli = await new ClienteService(db).findClienteById(id);
         setCliente(cli);
         setIsLoading(false);
       } catch (error) {

@@ -241,7 +241,7 @@ const FormCreateVenda: React.FC<IFormCreateVenda> = ({ onCreatedVenda, haveClien
                               <Text size="lg">{produto.marca}</Text>
                               <Text size="lg">{produto.tipo}</Text>
                               <Text>{quantidade} unidades</Text>
-                              <Text>{valor_total} reais</Text>
+                              <Text>{mask(valor_total.toString(), 'money')}</Text>
                             </VStack>
                           </HStack>
                         </Card>

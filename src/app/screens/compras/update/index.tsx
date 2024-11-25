@@ -155,7 +155,7 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                   }
                   await new CompraService(db).update(dados);
                   Alert.alert('Sucesso', 'Compra atualizada com sucesso');
-                  navigation?.goBack();
+                  navigation?.navigate('visualizar-compras');
                 } catch (error) {
                   Alert.alert('Erro', (error as Error).message);
                 }
@@ -190,7 +190,7 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                         if (route.params.type === 'create') {
                             setFieldValue('itens_de_compra', [
                               ...itens_de_compra,
-                              { 
+                              {
                                 produto: {
                                   ...prod
                                 },
@@ -269,7 +269,7 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                       </Heading>
                       {values.itens_de_compra.map(({produto, quantidade, id, valor_unitario}, i) => {
                         return (
-                          <Box key={`item-de-compra-${id}`}>
+                          <Box key={`item-de-compra-${i}`} gap="$2">
                             <Card>
                               <HStack>
                                 <VStack>
@@ -297,11 +297,7 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                               <Input>
                                 <Button
                                   onPress={() => {
-                                    if ((quantidade + 1) < produto.quantidade) {
-                                      setFieldValue(`itens_de_compra[${i}].quantidade`, (quantidade + 1));
-                                    } else {
-                                      Alert.alert('Erro', 'Quantidade insuficiente')
-                                    }
+                                    setFieldValue(`itens_de_compra[${i}].quantidade`, (quantidade + 1));
                                   }}
                                   action="positive"
                                 >
@@ -376,7 +372,7 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
 
                               <FormControlHelper>
                                 <FormControlHelperText>
-                                  Must be atleast 6 characters.
+                                  Informe o uma quantidade valida.
                                 </FormControlHelperText>
                               </FormControlHelper>
 
@@ -385,22 +381,12 @@ const Update: React.FC<AtualizarCompraScreen> = ({navigation, route}) => {
                                   as={AlertCircleIcon}
                                 />
                                 <FormControlErrorText>
-                                  Atleast 6 characters are required.
+                                  {typeof errors.itens_de_compra !== 'undefined' && 
+                                    typeof errors.itens_de_compra[i] === 'object' ? 
+                                      errors.itens_de_compra[i].quantidade : ''}
                                 </FormControlErrorText>
                               </FormControlError>
                             </FormControl>
-                            <Button
-                              onPress={() => {
-                                navigation?.navigate('selecionar-produto', {
-                                  screen: 'cadastrar-compra',
-                                  type: 'update',
-                                  indexUpdated: i,
-                                  selectedsProdutos: values.itens_de_compra.map(({ produto }) => { return { id_produto: produto.id };}),
-                                });
-                              }}
-                            >
-                              <ButtonText>Atualizar Produto</ButtonText>
-                            </Button>
                           </Box>
                         )
                       })}

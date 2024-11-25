@@ -1,5 +1,5 @@
 import { EmpresaService } from '@/classes/empresa/empresa.service';
-import { EmpresaUpdateData } from '@/classes/empresa/types';
+import { EmpresaUpdate } from '@/classes/empresa/types';
 import LoadingScreen from '@/components/LoadingScreen';
 import { DetalhesEmpresaScreen } from '@/interfaces/empresa';
 import { mask } from '@/utils/mask';
@@ -25,7 +25,7 @@ const Details: React.FC<DetalhesEmpresaScreen> = ({ navigation, route }) => {
   }
   const id = route.params.id;
   const [isLoading, setIsLoading] = React.useState(true);
-  const [empresa, setEmpresa] = React.useState<EmpresaUpdateData>({});
+  const [empresa, setEmpresa] = React.useState<EmpresaUpdate>({});
   const db = useSQLiteContext();
 
   async function start() {
@@ -78,7 +78,7 @@ const Details: React.FC<DetalhesEmpresaScreen> = ({ navigation, route }) => {
                   day: '2-digit',
                   month: '2-digit',
                   year: 'numeric',
-                }).format(new Date(empresa.pessoa.data_nascimento))}
+                }).format(empresa.pessoa.data_nascimento)}
               </Text>
             </Box>
             {empresa.cnpj === '' ? (
@@ -92,10 +92,12 @@ const Details: React.FC<DetalhesEmpresaScreen> = ({ navigation, route }) => {
                   <Heading>CPF:</Heading>
                   <Text>{mask(empresa.pessoa.cpf, 'cpf')}</Text>
                 </Box>
-                <Box>
-                  <Heading>CNPJ:</Heading>
-                  <Text>{mask(empresa.cnpj, 'cnpj')}</Text>
-                </Box>
+                {empresa.cnpj && (
+                  <Box>
+                    <Heading>CNPJ:</Heading>
+                    <Text>{mask(empresa.cnpj, 'cnpj')}</Text>
+                  </Box>
+                )}
               </>
             )}
 
@@ -168,7 +170,29 @@ const Details: React.FC<DetalhesEmpresaScreen> = ({ navigation, route }) => {
                 <ButtonIcon as={EditIcon} />
                 <ButtonText>Editar</ButtonText>
               </Button>
-              <Button 
+              <Button
+                onPress={() => {
+                  Alert.alert('Aviso', `Voce deseja mesmo deletar a empresa de nome fantasia ${empresa.nome_fantasia} ?`, [
+                    {
+                      text: 'Sim',
+                      onPress: async () => {
+                        await new EmpresaService(db).delete(empresa.id);
+                        Alert.alert('Aviso', 'Empresa deletada com sucesso!', [
+                          {
+                            text: 'OK',
+                            onPress: () => navigation?.goBack(),
+                          }
+                        ])
+                      }
+                    },
+                    {
+                      text: 'Não',
+                      style: 'cancel',
+                      onPress: () => Alert.alert('Aviso', 'Operacao cancelada')
+                    }
+                  ])
+                  
+                }} 
                 gap="$5"
                 action="negative"
               >

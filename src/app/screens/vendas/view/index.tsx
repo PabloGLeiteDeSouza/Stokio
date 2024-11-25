@@ -123,7 +123,6 @@ const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
       setLoadingVendas(false);
       setIsLoading(false);
     } catch (error) {
-      console.error(error);
       setVendas([]);
       setLoadingVendas(false);
       setIsLoading(false);

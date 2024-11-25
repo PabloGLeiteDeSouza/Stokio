@@ -77,6 +77,7 @@ import { useIsFocused } from '@react-navigation/native';
 import LoadingScreen from '@/components/LoadingScreen';
 import { IClienteSimpleRequest } from '@/classes/cliente/interfaces';
 import { mask } from '@/utils/mask';
+import { getDateFromString } from '@/utils';
 
 const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
   const [clientes, setClientes] = React.useState<Array<IClienteSimpleRequest>>(
@@ -121,10 +122,12 @@ const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric',
-              }).format(new Date(item.data_nascimento))}
+              }).format(item.data_nascimento)}
             </Text>
             <Heading size="md">CPF</Heading>
             <Text size="sm">{mask(item.cpf, 'cpf')}</Text>
+            <Heading size="md" >Saldo</Heading>
+            <Text color={ item.saldo < 100 ? '$red600' : '$green600' } size="sm">{mask(item.saldo.toString(), 'money')}</Text>
           </Box>
           <Box gap="$5">
             <Button

@@ -1,6 +1,7 @@
 import { SQLiteDatabase } from 'expo-sqlite';
 import { VendaCreateObject } from './interfaces';
 import { getDateFromString, getStringFromDate } from '@/utils';
+import { ProdutoVendaRequest } from '../produto/interfaces';
 
 export default class VendaService {
 
@@ -12,7 +13,18 @@ export default class VendaService {
         if (!dados) {
           throw new Error("Não existe o cliente informado!");
         }
-      const saldo = dados
+      const saldo = dados.saldo;
+      const total = data.produtos.map((p) => p.valor_unitario * p.quantidade).reduce((p, c) => p + c, 0);
+      if (saldo < total) {
+        throw new Error("Cliente nao possui saldo suficiente");
+      }
+      const r_c = await this.db.runAsync('UPDATE cliente SET saldo = $saldo WHERE id = $id', {
+        $id: data.id_cliente,
+        $saldo: (saldo - total),
+      });
+      if (r_c.changes < 1) {
+        throw new Error("Não foi possivel atualizar o saldo do cliente");
+      }
       const r = await this.db.runAsync('INSERT into venda ( data, status, id_cliente ) VALUES ( $data, $status, $id_cliente )', {
         $data: getStringFromDate(data.data),
         $status: data.status,
@@ -82,8 +94,38 @@ export default class VendaService {
 
   }
 
-  async findByIdUpdate(){
-
+  async findByIdUpdate(id: number){
+    try {
+      const venda = await this.db.getFirstAsync<{ data: string: status: string; id_cliente: number }>('SELECT * FROM venda WHERE id == $id', {
+        $id: id,
+      });
+      if (!venda) {
+        throw new Error("Venda não encontrada!");
+      }
+      const res_cli = await
+      const itv_res = await this.db.getAllAsync<{ id: number; quantidade: number; valor_unitario: number, id_produto: number }>('SELECT * FROM item_venda WHERE id_venda == $id', {
+        $id: id,
+      });
+      if (itv_res.length < 1) {
+        throw new Error("Nao ha itens de venda!");
+      }
+      const itens_de_venda = await Promise.all(itv_res.map(async ({ id, quantidade, valor_unitario, id_produto }) => {
+        try {
+          const res = await this.db.getFirstAsync<ProdutoVendaRequest>('SELECT p.id, p.codigo_de_barras, p.data_de_validade as data_validade, p.nome, p.valor as valor_unitario, p.quantidade, e.nome_fantasia as empresa, m.nome as marca, t.nome as tipo FROM produto as p INNER JOIN marca as m ON m.id == p.id_marca INNER JOIN empresa as e ON e.id == p.id_empresa INNER JOIN tipo_produto as t ON t.id == p.id_tipo_produto WHERE p.id == $id', {
+            $id: id_produto,
+          });
+          if(!res){
+            throw new Error("Nao foi possivel encontrar o produto!");
+          }
+          return { id, quantidade, valor_unitario, produto: { ...res, data_validade: getDateFromString(res.data_validade) } }
+        } catch (error) {
+          throw error;
+        }
+      }));
+      return { ...venda, itens_de_venda }
+    } catch (error) {
+      throw error;
+    }
   }
 
   async findAll() {}

@@ -10,7 +10,12 @@ import {
 } from '@gluestack-ui/themed';
 import React from 'react';
 
-const Details: React.FC<DetalhesVendaScreen> = ({ navigation }) => {
+const Details: React.FC<DetalhesVendaScreen> = ({ navigation, route }) => {
+  if(!route || !route.params || !route.params.id){
+    navigation?.goBack();
+    return null;
+  }
+  const id = route.params.id;
   return (
     <Box h="$full" w="$full">
       <ScrollView mx="$1">

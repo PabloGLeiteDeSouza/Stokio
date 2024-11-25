@@ -43,27 +43,53 @@ import { formatValue } from '@/utils/calc';
 import LoadingScreen from '@/components/LoadingScreen';
 import { mask } from '@/utils/mask';
 import InputText from '@/components/Input';
+import { EmpresaService } from '@/classes/empresa/empresa.service';
+import { useSQLiteContext } from 'expo-sqlite';
+import { ClienteService } from '@/classes/cliente/cliente.service';
+import { ProdutoService } from '@/classes/produto/produto.service';
+import { getDateFromString } from '@/utils';
+import VendaService from '@/classes/venda/venda.service';
 
 const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
   if (!route || !route.params || !route.params.id) {
     navigation?.goBack();
     return null;
   }
+  const id = route.params.id;
   const [isLoading, setIsLoading] = React.useState(true);
 
-  const [clientes, setClientes] = React.useState([
-    {
-      id: '1',
-      nome: 'Cliente 1',
-      cpf: '213.213.321.23',
-    },
-  ]);
+  const db = useSQLiteContext();
+
+  const [clientes, setClientes] = React.useState([]);
+  const [venda, setVenda] = React.useState<{
+    itens_de_venda: {
+        id: number;
+        quantidade: number;
+        valor_unitario: number;
+        produto: {
+            data_validade: Date;
+            id: number;
+            codigo_de_barras: string;
+            nome: string;
+            marca: string;
+            tipo: string;
+            valor_unitario: number;
+            empresa: string;
+            quantidade: number;
+        };
+    }[];
+}>({})
   React.useEffect(() => {
     async function Start() {
       try {
-        setClientes([...clientes]);
+        const cli = await new ClienteService(db).findAllClientes();
+        const vnd = await new VendaService(db).findByIdUpdate(id);
+        setVenda(vnd);
+        setClientes([...cli]);
         setIsLoading(false);
-      } catch (error) {}
+      } catch (error) {
+        
+      }
     }
     Start();
   }, []);
@@ -83,34 +109,7 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
           </Box>
           <Box gap="$8">
             <Formik
-              initialValues={{
-                itens_de_venda: [
-                  {
-                    id: 1,
-                    produto: {
-                      id: 1,
-                      codigo_de_barras: '2343243432432432',
-                      nome: 'asdasdsadsadasd',
-                      data_validade: new Date('2026-10-27'),
-                      marca: 'asdasdsadas',
-                      tipo: 'asdsadsadsada',
-                      valor: 10.00,
-                      empresa: 'asdsadsadsaasdsa',
-                      quantidade: 50,
-                    },
-                    quantidade: 5,
-
-                  },
-                ],
-                cliente: {
-                  id: 1,
-                  nome: 'sdasddsadassdas',
-                  cpf: '12323154387',
-                },
-                valor: 50.00,
-                data: new Date(),
-                status: 'devendo' as 'pago' | 'devendo',
-              }}
+              initialValues={venda}
               onSubmit={async () => {}}
             >
               {({
@@ -121,10 +120,14 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                 handleSubmit,
               }) => {
                 React.useEffect(() => {
-                  if (route && route.params && route.params.empresa) {
-                    setFieldValue('empresa', { ...route.params.empresa });
+                  async function insert_cliente() {
+                    if (route && route.params && route.params.id_cliente) {
+                      const cliente = await new ClienteService(db).findClienteByIdToVenda(route.params.id_cliente);
+                      setFieldValue('empresa', { ...cliente });
+                    }
                   }
-                }, [route?.params?.empresa]);
+                  insert_cliente();
+                }, [route?.params?.id_cliente]);
 
                 React.useEffect(() => {
                   async function insert_produto() {
@@ -137,43 +140,40 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                         typeof route.params.indexUpdated !== 'undefined'
                       ) {
                         const prod = await new ProdutoService(db).getProdutoByIdToVenda(route.params.id_produto);
-                        const prods = values.produtos;
+                        const itens_de_venda = values.itens_de_venda;
                         
                         if (route.params.type === 'create') {
-                          if (values.produtos.length === 1 && values.produtos[0].id === 0) {
-                            setFieldValue('produtos', [{
-
-                              ...prod,
-                              data_validade: new Date(prod.data_validade),
-                              valor_total: prod.valor_unitario,
+                          if (values.itens_de_venda.length === 1 && values.itens_de_venda[0].id === 0) {
+                            setFieldValue('itens_de_venda', [{ 
+                              produto: prod,
+                              valor_unitario: prod.valor_unitario,
                               quantidade: 1,
-                              quantidade_disponivel: prod.quantidade,
                             }]);
-                            setFieldValue('valor', prod.valor_unitario);
                           } else {
                             setFieldValue('produtos', [
-                              ...prods,
-                              { ...prod, 
-                                data_validade: new Date(prod.data_validade), 
+                              ...itens_de_venda,
+                              { 
+                                produto: {
+                                  ...prod,
+                                  data_validade: getDateFromString(prod.data_validade),
+                                },
+                                valor_unitario: prod.valor_unitario,
                                 quantidade: 1,
-                                valor_total: prod.valor_unitario, 
-                                quantidade_disponivel: prod.quantidade,
                               },
                             ]);
-                            setFieldValue('valor', values.valor + prod.valor_unitario);
                           }
                         } else if (route.params.type === 'update') {
                           let i = route.params.indexUpdated;
-                          const produto = prods[i];
-                          setFieldValue('valor', (values.valor - (produto.valor_unitario * produto.quantidade)) + (prod.valor_unitario * 1));
-                          prods[i] = {
-                            ...prod,
-                            data_validade: new Date(prod.data_validade), 
+                          itens_de_venda[i] = {
+                            id: 0,
+                            produto: {
+                              ...prod,
+                              data_validade: getDateFromString(prod.data_validade),
+                            },
                             quantidade: 1,
-                            valor_total: prod.valor_unitario, 
-                            quantidade_disponivel: prod.quantidade,
+                            valor_unitario: prod.valor_unitario
                           }; 
-                          setFieldValue(`produtos`, prods);
+                          setFieldValue(`itens_de_venda`, itens_de_venda);
                         } else {
                           throw new Error("Erro ao selecionar o produto!");
                         }
@@ -212,7 +212,7 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                           }
                         >
                           <ButtonText>
-                            {values.cliente.id === ''
+                            {values.cliente.id === 0
                               ? 'Selecionar Cliente'
                               : 'Atualizar Cliente'}
                           </ButtonText>
@@ -226,16 +226,16 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                     </Box>
 
                     <Box gap="$5">
-                      {values.produtos.length > 0 ? (
+                      {values.itens_de_venda.length > 0 ? (
                         <>
                           <Heading textAlign="center" size="xl">
                             Produtos
                           </Heading>
-                          {values.produtos.map(
-                            ({ quantidade, quantidade_disponivel, valor, ...produto }, i) => {
-                              if (produto.id !== '') {
+                          {values.itens_de_venda.map(
+                            ({ quantidade, produto, valor_unitario, id }, i) => {
+                              if (id !== 0) {
                                 return (
-                                  <Box key={`produto-${i}`} gap="$5">
+                                  <Box key={`item_de_compra-${i}`} gap="$5">
                                     <Card>
                                       <HStack>
                                         <VStack>
@@ -245,7 +245,7 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                                           <Text size="lg">{produto.marca}</Text>
                                           <Text size="lg">{produto.tipo}</Text>
                                           <Text>{quantidade} unidades</Text>
-                                          <Text>{valor * quantidade} reais</Text>
+                                          <Text>{mask((valor_unitario * quantidade).toString(), 'money')}</Text>
                                         </VStack>
                                       </HStack>
                                     </Card>
@@ -263,24 +263,15 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                                       <Input>
                                         <Button
                                           onPress={() => {
-                                            const result = onAddProduct(
-                                              quantidade.toString(),
-                                              valor.toString(),
-                                              produto,
-                                            );
-                                            if (typeof result != 'undefined') {
+                                           
+                                            if ((quantidade + 1) <= produto.quantidade) {
                                               setFieldValue(
-                                                `produtos[${i}].quantidade`,
-                                                result.quantidade,
+                                                `itens_de_venda[${i}].quantidade`,
+                                                (quantidade + 1)
                                               );
-                                              setFieldValue(
-                                                `produtos[${i}].valor`,
-                                                result.valor_produto,
-                                              );
-                                              setFieldValue(
-                                                'valor',
-                                                result.valor,
-                                              );
+                                              
+                                            } else {
+                                              Alert.alert('Erro', 'Quantidade insuficiente');
                                             }
                                           }}
                                           action="positive"
@@ -290,123 +281,32 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                                         <InputField
                                           textAlign="center"
                                           type="text"
-                                          value={values.produtos[i].qtd}
+                                          value={values.itens_de_venda[i].quantidade.toString()}
                                           placeholder="12"
                                           onChangeText={(text) => {
-                                            const result = onUpdateProduct(
-                                              text,
-                                              produto,
-                                              values.valor,
-                                              valor_total,
-                                            );
-                                            if (result.erro) {
-                                              Alert.alert(
-                                                'Aviso',
-                                                'Limite do produto atingido',
-                                              );
-                                            } else if (result.remove) {
-                                              Alert.alert(
-                                                'Aviso',
-                                                'Deseja remover esse produto?',
-                                                [
-                                                  {
-                                                    text: 'Sim',
-                                                    onPress: () => {
-                                                      setFieldValue(
-                                                        'produtos',
-                                                        values.produtos.splice(
-                                                          i,
-                                                          1,
-                                                        ),
-                                                      );
-                                                    },
-                                                  },
-                                                  {
-                                                    text: 'Não',
-                                                    onPress: () =>
-                                                      Alert.alert(
-                                                        'Aviso',
-                                                        'Operação cancelada!',
-                                                      ),
-                                                  },
-                                                ],
+                                            if (Number(text) > 0) {
+                                              setFieldValue(
+                                                `itens_de_venda[${i}].quantidade`,
+                                                Number(text),
                                               );
                                             } else {
-                                              setFieldValue(
-                                                `produtos[${i}].qtd`,
-                                                result.quantidade,
-                                              );
-                                              setFieldValue(
-                                                'valor',
-                                                result.valor_total,
-                                              );
-                                              setFieldValue(
-                                                `produtos[${i}].valor_total`,
-                                                result.valor_total,
-                                              );
-                                            }
-                                          }}
-                                          keyboardType="number-pad"
-                                        />
-                                        <Button
-                                          onPress={() => {
-                                            const result = onRemoveProduct(
-                                              qtd,
-                                              produto,
-                                              valor_total,
-                                              values.valor,
-                                            );
-                                            if (result.remove) {
                                               Alert.alert(
                                                 'Aviso',
-                                                'Deseja remover esse produto?',
+                                                `Deseja remover o produto ${produto.nome}?`,
                                                 [
                                                   {
                                                     text: 'Sim',
                                                     onPress: () => {
-                                                      if (
-                                                        values.produtos.splice(
-                                                          i,
-                                                          1,
-                                                        ).length < 1
-                                                      ) {
+                                                      if (values.itens_de_venda.length > 1) {
                                                         setFieldValue(
-                                                          'produtos',
-                                                          [
-                                                            {
-                                                              id: '',
-                                                              codigo_de_barras:
-                                                                '',
-                                                              nome: '',
-                                                              data_validade: '',
-                                                              marca: '',
-                                                              tipo: '',
-                                                              valor_total: '',
-                                                              valor: '',
-                                                              empresa: '',
-                                                              quantidade: '',
-                                                              qtd: '',
-                                                            },
-                                                          ],
-                                                        );
-                                                        setFieldValue(
-                                                          'valor',
-                                                          '',
+                                                          'itens_de_venda',
+                                                          values.itens_de_venda.splice(
+                                                            i,
+                                                            1,
+                                                          ),
                                                         );
                                                       } else {
-                                                        setFieldValue(
-                                                          'valor',
-                                                          `${Number(values.valor.replace(',', '.')) - Number(valor_total.replace(',', '.'))}`,
-                                                        );
-                                                        setFieldValue(
-                                                          'produtos',
-                                                          [
-                                                            ...values.produtos.splice(
-                                                              i,
-                                                              1,
-                                                            ),
-                                                          ],
-                                                        );
+                                                        Alert.alert('Aviso', 'E preciso no minimo um item de venda para a venda existir!')
                                                       }
                                                     },
                                                   },
@@ -420,18 +320,43 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                                                   },
                                                 ],
                                               );
+                                            }
+                                          }}
+                                          keyboardType="number-pad"
+                                        />
+                                        <Button
+                                          onPress={() => {
+                                            if ((quantidade - 1) > 0) {
+                                              setFieldValue(`itens_de_venda[${i}].quantidade`, (quantidade - 1));
                                             } else {
-                                              setFieldValue(
-                                                `produtos[${i}].qtd`,
-                                                result.quantidade,
-                                              );
-                                              setFieldValue(
-                                                `produtos[${i}].valor_total`,
-                                                result.valor_total,
-                                              );
-                                              setFieldValue(
-                                                'valor',
-                                                result.valor,
+                                              Alert.alert(
+                                                'Aviso',
+                                                'Deseja remover esse produto?',
+                                                [
+                                                  {
+                                                    text: 'Sim',
+                                                    onPress: () => {
+                                                      if (
+                                                        values.itens_de_venda.length > 0
+                                                      ) {
+                                                        setFieldValue(
+                                                          'itens_de_venda',
+                                                          values.itens_de_venda.splice(i, 1)
+                                                        );
+                                                      } else {
+                                                        Alert.alert('Aviso', 'Nao se pode remover todos os itens de venda!')
+                                                      }
+                                                    },
+                                                  },
+                                                  {
+                                                    text: 'Não',
+                                                    onPress: () =>
+                                                      Alert.alert(
+                                                        'Aviso',
+                                                        'Operação cancelada!',
+                                                      ),
+                                                  },
+                                                ],
                                               );
                                             }
                                           }}
@@ -461,8 +386,8 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                                         navigation?.navigate(
                                           'selecionar-produto',
                                           {
-                                            screen: 'cadastrar-venda',
-                                            produtoSelecionado: produto,
+                                            screen: 'atualizar-venda',
+                                            selectedsProdutos: values.itens_de_venda.map(({ produto }) => { return { id: produto.id }; }),
                                             type: 'update',
                                             indexUpdated: i,
                                           },
@@ -476,8 +401,8 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                                         navigation?.navigate(
                                           'selecionar-produto',
                                           {
-                                            screen: 'cadastrar-venda',
-                                            produtoSelecionado: produto,
+                                            screen: 'atualizar-venda',
+                                            selectedsProdutos: values.itens_de_venda.map(({ produto }) => { return { id: produto.id }; }),
                                             type: 'create',
                                           },
                                         );
@@ -537,14 +462,12 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                       title="Data da Venda"
                       value={values.data}
                     />
-
-                    <InputText
-                      isReadOnly={true}
-                      inputType='money'
-                      title="Valor da Venda"
-                      value={values.valor}
-                      errors={errors.valor}
-                    />
+                    <Box>
+                      <Card>
+                        <Heading>Valor da compra</Heading>
+                        <Text>{mask(values.itens_de_venda.map(({ quantidade, valor_unitario }) => quantidade * valor_unitario).reduce((p, c) => p + c, 0).toString(), 'money')}</Text>
+                      </Card>
+                    </Box>
 
                     <FormControl
                       isInvalid={false}
