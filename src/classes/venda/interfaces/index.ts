@@ -46,3 +46,16 @@ export interface VendaDetails {
     status: string;
     id_cliente: number;
 }
+
+export interface UpdateVenda {
+    id: number;
+    status: string;
+    data: Date;
+    id_empresa: number;
+    itens_de_venda: {
+        id?: number;
+        quantidade: number;
+        valor_unitario: number;
+        id_produto: number;
+    }[]
+}
