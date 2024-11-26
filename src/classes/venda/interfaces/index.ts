@@ -6,11 +6,6 @@ export interface Venda {
     status: string;
 }
 
-export interface ItemVenda {
-    id: number;
-    produto: Pick<Produto, 'id' | ''>;
-}
-
 export interface VendaWithItensVenda {
 
 }

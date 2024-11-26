@@ -1,4 +1,4 @@
-import { SQLiteDatabase } from 'expo-sqlite';
+import { SQLiteDatabase, SQLiteVariadicBindParams } from 'expo-sqlite';
 import { UpdateVenda, VendaCreateObject } from './interfaces';
 import { getDateFromString, getStringFromDate } from '@/utils';
 import { ProdutoVendaRequest } from '../produto/interfaces';
@@ -206,18 +206,39 @@ export default class VendaService {
     }
   }
 
-  async search(value?: string | number | Date, tipo?: 'nome_pessoa' | 'nome_produto' | 'data' | 'status' | 'valor', value1?: Date)  {
+  async search(value?: string | number | Date, tipo?: 'nome_pessoa' | 'data' | 'status' | 'valor', value1?: Date)  {
     try {
-      let params = '';
+      const pesquisa = { query: "", params: {  }};
       switch (tipo) {
-        case '':
+        case 'data':
+          if (typeof value !== 'undefined' && typeof value !== "string" && typeof value !== 'number' && typeof value1 !== 'undefined') {
+            pesquisa.query = ' WHERE v.data >= $data_inicial AND v.data <= $data_final';
+            pesquisa.params = { $data_inicial: getStringFromDate(value), $data_final: getStringFromDate(value1) };
+          }
+          break;
+        case 'nome_pessoa':
+          if (typeof value === "string") {
+            pesquisa.query = ` WHERE p.nome LIKE '%' || $nome || '%'`;
+            pesquisa.params = { $nome: value };
+          }
+          break;
+        case 'status':
+          if (typeof value === "string") {
+            pesquisa.query = ` WHERE v.status LIKE '%' || $status || '%'`;
+            pesquisa.params = { $status: value };
+          }
+          break;
+        case 'valor':
+          if (typeof value === "number") {
+            pesquisa.query = ` WHERE v.valor == $valor`;
+            pesquisa.params = { $valor: value };
+          }
+          break;
+        default:
           
           break;
-      
-        default:
-          break;
       }
-      const dados = await this.db.getAllAsync<{ nome: string; status: string; id: number; data_venda: string; saldo: number}>(`SELECT p.nome, c.saldo, v.status, v.id, v.data as data_venda FROM venda as v INNER JOIN cliente as c ON c.id == v.id_cliente INNER JOIN pessoa as p ON p.id == c.id_pessoa ${params}`)
+      const dados = await this.db.getAllAsync<{ nome: string; status: string; id: number; data_venda: string; saldo: number}>(`SELECT p.nome, c.saldo, v.status, v.id, v.data as data_venda FROM venda as v INNER JOIN cliente as c ON c.id == v.id_cliente INNER JOIN pessoa as p ON p.id == c.id_pessoa ${pesquisa.query}`, pesquisa.params)
       if(dados.length < 1){
         throw new Error("Nao ha vendas cadastradas!");
       }

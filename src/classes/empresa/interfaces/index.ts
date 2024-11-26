@@ -9,6 +9,6 @@ import {
 export interface IEmpresaService {
   create(dados: EmpresaCreate): Promise<void>;
   update(dados: EmpresaUpdate): Promise<void>;
-  search(criteria: EmpresaSearchCriteria): Promise<EmpresaObject[]>;
+  search(tipo: "cpf" | "cnpj" | "nome_pessoa" | "nome_fantasia" | "razao_social", value: string): Promise<EmpresaObject[]>
   delete(id: number): Promise<void>;
 }

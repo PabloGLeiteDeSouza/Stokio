@@ -70,13 +70,14 @@ import { Card } from '@gluestack-ui/themed';
 import { EditIcon } from '@gluestack-ui/themed';
 import { SearchIcon } from '@gluestack-ui/themed';
 import { EmpresaFlatList } from '@/types/screens/empresa';
-import { Alert, ListRenderItem } from 'react-native';
+import { Alert, GestureResponderEvent, ListRenderItem } from 'react-native';
 import { VisualizarEmpresaScreen } from '@/interfaces/empresa';
 import { EmpresaService } from '@/classes/empresa/empresa.service';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useIsFocused } from '@react-navigation/native';
 import { mask } from '@/utils/mask';
 import { EmpresaSearchRelatinalPessoa } from '@/classes/empresa/types';
+import InputText from '@/components/Input';
 
 const View: React.FC<VisualizarEmpresaScreen> = ({ navigation }) => {
   const focused = useIsFocused();
@@ -165,11 +166,18 @@ const View: React.FC<VisualizarEmpresaScreen> = ({ navigation }) => {
         <Formik
           initialValues={{
             busca: '',
-            tipo: '',
+            tipo: 'cpf' as 'cpf' | 'cnpj' | 'nome_pessoa' | 'nome_fantasia' | 'razao_social',
           }}
-          onSubmit={() => {}}
+          onSubmit={async (value) => {
+            try {
+              const resut = await new EmpresaService(db).search(value.tipo, value.busca);
+              setEmpresas(result);
+            } catch (error) {
+              Alert.alert("Erro", (error as Error).message);
+            }
+          }}
         >
-          {({ values, handleChange, setFieldValue }) => {
+          {({ values, errors, handleChange, handleSubmit, setFieldValue }) => {
             return (
               <>
                 <FormControl
@@ -187,6 +195,18 @@ const View: React.FC<VisualizarEmpresaScreen> = ({ navigation }) => {
                     onValueChange={(text) => {
                       setFieldValue('tipo', text);
                     }}
+                    initialLabel={'CPF'}
+                    selectedValue={
+                      values.tipo === 'cnpj' ? 
+                        'CNPJ' : 
+                        values.tipo === 'cpf' ? 
+                          'CPF' : 
+                          values.tipo === 'nome_fantasia' ? 
+                            'Nome Fantasia' : 
+                              values.tipo === 'nome_pessoa' ? 
+                                'Nome Pessoa' : 
+                                'Razão Social'
+                    }
                     isInvalid={false}
                     isDisabled={false}
                   >
@@ -200,23 +220,30 @@ const View: React.FC<VisualizarEmpresaScreen> = ({ navigation }) => {
                         <SelectDragIndicatorWrapper>
                           <SelectDragIndicator />
                         </SelectDragIndicatorWrapper>
-                        <SelectItem label="UX Research" value="UX Research" />
-                        <SelectItem
-                          label="Web Development"
-                          value="Web Development"
+                        <SelectItem 
+                          label="CPF"
+                          value="cpf"
+                          isPressed={values.tipo === 'cpf'}
                         />
                         <SelectItem
-                          label="Cross Platform Development Process"
-                          value="Cross Platform Development Process"
+                          label="CNPJ"
+                          value="cnpj"
+                          isPressed={values.tipo === 'cnpj'}
                         />
                         <SelectItem
-                          label="UI Designing"
-                          value="UI Designing"
-                          isDisabled={true}
+                          label="Nome da Pessoa"
+                          value="nome_pessoa"
+                          isPressed={values.tipo === 'nome_pessoa'}
                         />
                         <SelectItem
-                          label="Backend Development"
-                          value="Backend Development"
+                          label="Nome Fantasia"
+                          value="nome_fantasia"
+                          isPressed={values.tipo === 'nome_fantasia'}
+                        />
+                        <SelectItem
+                          label="Razão Social"
+                          value="razao_social"
+                          isPressed={values.tipo === 'razao_social'}
                         />
                       </SelectContent>
                     </SelectPortal>
@@ -224,51 +251,67 @@ const View: React.FC<VisualizarEmpresaScreen> = ({ navigation }) => {
 
                   <FormControlHelper>
                     <FormControlHelperText>
-                      Must be atleast 6 characters.
+                      Informe o tipo de pesquisa para de empresa.
                     </FormControlHelperText>
                   </FormControlHelper>
 
                   <FormControlError>
                     <FormControlErrorIcon as={AlertCircleIcon} />
                     <FormControlErrorText>
-                      Atleast 6 characters are required.
+                      {errors.tipo}
                     </FormControlErrorText>
                   </FormControlError>
                 </FormControl>
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>Buscar</FormControlLabelText>
-                  </FormControlLabel>
-                  <Input>
-                    <InputField
-                      type="text"
+                {values.tipo === 'cnpj' || values.tipo === 'cpf' ? (
+                  <>
+                    <InputText
+                      customType='search_input'
+                      inputType={values.tipo}
+                      onSubmitedValues={async (text) => { await setFieldValue('busca', text); handleSubmit(); }}
+                      onChangeValue={handleChange('busca')}
+                      error={errors.busca}
                       value={values.busca}
-                      placeholder="Buscar"
-                      onChangeText={handleChange('busca')}
                     />
-                    <Button>
-                      <ButtonIcon as={SearchIcon} />
-                    </Button>
-                  </Input>
+                  </>
+                ) : (
+                  <>
+                    <FormControl
+                      isInvalid={false}
+                      size={'md'}
+                      isDisabled={false}
+                      isRequired={true}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>{values.tipo === "nome_fantasia" ? "Nome Fantasia" : values.tipo === "nome_pessoa" ? "Nome" : "Razão Social"}</FormControlLabelText>
+                      </FormControlLabel>
+                      <Input>
+                        <InputField
+                          type="text"
+                          value={values.busca}
+                          placeholder={values.tipo === "nome_fantasia" ? "Nome Fantasia" : values.tipo === "nome_pessoa" ? "Nome" : "Razão Social"}
+                          onChangeText={handleChange('busca')}
+                        />
+                        <Button onPress={handleSubmit as unknown as (event: GestureResponderEvent) => void}>
+                          <ButtonIcon as={SearchIcon} />
+                        </Button>
+                      </Input>
 
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Must be atleast 6 characters.
-                    </FormControlHelperText>
-                  </FormControlHelper>
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          Must be atleast 6 characters.
+                        </FormControlHelperText>
+                      </FormControlHelper>
 
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
+                      <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
+                          Atleast 6 characters are required.
+                        </FormControlErrorText>
+                      </FormControlError>
+                    </FormControl>
+                  </>
+                )}
+                
               </>
             );
           }}

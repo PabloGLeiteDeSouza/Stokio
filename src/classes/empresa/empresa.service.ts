@@ -1,7 +1,6 @@
 import { SQLiteDatabase } from 'expo-sqlite';
 import {
   EmpresaCreate,
-  EmpresaSearchCriteria,
   TelefoneData,
   EmailData,
   RamoObject,
@@ -15,10 +14,9 @@ import {
   EmpresaUpdate,
   Pessoa,
 } from './types';
-import { IEmpresaService } from './interfaces';
 import { getDateFromString, getStringFromDate } from '@/utils';
 
-export class EmpresaService implements IEmpresaService {
+export class EmpresaService {
   private db: SQLiteDatabase;
 
   constructor(dbInstance: SQLiteDatabase) {
@@ -196,24 +194,44 @@ export class EmpresaService implements IEmpresaService {
     return data;
   }
 
-  async search(criteria: EmpresaSearchCriteria): Promise<EmpresaObject[]> {
-    let query =
-      'SELECT * FROM empresa INNER JOIN pessoa_empresa ON empresa.id = pessoa_empresa.id_empresa INNER JOIN pessoa ON pessoa_empresa.id_pessoa = pessoa.id WHERE 1=1';
-    const params: SeachParamsEmpresa = {};
+  async search(tipo: 'cpf' | 'cnpj' | 'nome_pessoa' | 'nome_fantasia' | 'razao_social', value: string ): Promise<EmpresaObject[]> {
+    try {
+      let query =
+      'SELECT emp.razao_social, emp.nome_fantasia, emp.cnpj, emp.id, pessoa.cpf FROM empresa as emp INNER JOIN pessoa ON pressoa.id = emp.id_pessoa';
+      const params: SeachParamsEmpresa = {};
 
-    if (criteria.cnpj) {
-      query += ' AND empresa.cnpj = $cnpj';
-      params.$cnpj = criteria.cnpj;
+      switch (tipo) {
+        case 'cnpj':
+          query += ' AND emp.cnpj LIKE $cnpj';
+          params.$cnpj = `%${value}%`;
+          break;
+        case 'cpf':
+          query += ' AND pessoa.cpf LIKE $cpf';
+          params.$cpf = `%${value}%`;
+          break;
+        
+        case 'nome_fantasia':
+          query += ' AND emp.nome_fantasia LIKE $nome';
+          params.$nome = `%${value}%`;
+          break;
+        
+        case 'nome_pessoa':
+          query += ' AND pessoa.nome LIKE $nome';
+          params.$nome = `%${value}%`;
+          break;
+
+        case 'razao_social':
+          query += ' AND emp.razao_social LIKE $razao_social';
+          params.$razao_social = `%${value}%`;
+          break;
+
+        default:
+          throw new Error("Não foi possível ");
+      }
+      return await this.db.getAllAsync(query, params);
+    } catch (error) {
+      throw error;
     }
-    if (criteria.nome) {
-      query += ' AND pessoa.nome LIKE $nome';
-      params.$nome = `%${criteria.nome}%`;
-    }
-    if (criteria.cpf) {
-      query += ' AND pessoa.cpf = $cpf';
-      params.$cpf = criteria.cpf;
-    }
-    return await this.db.getAllAsync(query, params);
   }
 
   async delete(id: number) {
