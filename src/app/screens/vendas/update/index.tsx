@@ -128,7 +128,7 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                     data: data,
                     id_cliente: cliente.id, 
                     status: status,
-                    itens_de_compra: itens_de_compra.map(({ id, quantidade, valor_unitario, produto}) => {
+                    itens_de_venda: itens_de_compra.map(({ id, quantidade, valor_unitario, produto}) => {
                       return { id, id_produto: produto.id , valor_unitario, quantidade };
                     })
                   }
