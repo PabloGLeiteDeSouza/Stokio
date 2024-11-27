@@ -132,7 +132,7 @@ const Create: React.FC<CadastrarTipoUaScreen> = ({ navigation }) => {
                     isRequired={false}
                   >
                     <FormControlLabel>
-                      <FormControlLabelText>Descricao</FormControlLabelText>
+                      <FormControlLabelText>Descrição</FormControlLabelText>
                     </FormControlLabel>
                     <Textarea>
                       <TextareaInput
@@ -143,14 +143,14 @@ const Create: React.FC<CadastrarTipoUaScreen> = ({ navigation }) => {
 
                     <FormControlHelper>
                       <FormControlHelperText>
-                        Descricao do aplicativo.
+                        Descrição do Tipo de Unidade de Armazenamento.
                       </FormControlHelperText>
                     </FormControlHelper>
 
                     <FormControlError>
                       <FormControlErrorIcon as={AlertCircleIcon} />
                       <FormControlErrorText>
-                        Atleast 6 characters are required.
+                        {errors.descricao}
                       </FormControlErrorText>
                     </FormControlError>
                   </FormControl>

@@ -75,27 +75,27 @@ export class RamoService implements IRamoService {
   async findByName(nome: string): Promise<RamoObject[]> {
     try {
       const ramos = await this.db.getAllAsync<RamoObject>(
-        'SELECT * FROM ramo WHERE nome LIKE $nome',
-        { $nome: `%${nome}%` },
+        `SELECT * FROM ramo WHERE nome LIKE '%' || $nome || '%'`,
+        { $nome: nome },
       );
-
+      if(ramos.length < 1){
+        throw new Error("Não foi possível encontrar nenhum ramo!");
+      }
       return ramos;
     } catch (error) {
-      throw new Error(
-        `Erro ao buscar ramo por nome: ${(error as Error).message}`,
-      );
+      throw error;
     }
   }
   // Busca todos os ramos
   async findAll(): Promise<RamoObject[]> {
     try {
       const ramos = await this.db.getAllAsync<RamoObject>('SELECT * FROM ramo');
-
+      if (ramos.length < 1) {
+        throw new Error("Não foi possível encontrar nenhum ramo!");
+      }
       return ramos;
     } catch (error) {
-      throw new Error(
-        `Erro ao buscar todos os ramos: ${(error as Error).message}`,
-      );
+      throw error;
     }
   }
 

@@ -16,6 +16,10 @@
         "value": "tipo"
     },
     {
+        "label": "Data de Validade",
+        "value": "data_validade"
+    },
+    {
         "label": "Unidade de armazenamento",
         "value": "ua"
     }

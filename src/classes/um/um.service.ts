@@ -86,7 +86,7 @@ export default class UmService {
     }
   }
 
-  async delete(id: string) {
+  async delete(id: number) {
     try {
       const data = await this.db.runAsync(`DELETE FROM um WHERE id = $id`, {
         $id: id,

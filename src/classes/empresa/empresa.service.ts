@@ -13,6 +13,7 @@ import {
   EmpresaSearchRelatinalPessoa,
   EmpresaUpdate,
   Pessoa,
+  EmpresaObjectSearch,
 } from './types';
 import { getDateFromString, getStringFromDate } from '@/utils';
 
@@ -194,41 +195,45 @@ export class EmpresaService {
     return data;
   }
 
-  async search(tipo: 'cpf' | 'cnpj' | 'nome_pessoa' | 'nome_fantasia' | 'razao_social', value: string ): Promise<EmpresaObject[]> {
+  async search(tipo: 'cpf' | 'cnpj' | 'nome_pessoa' | 'nome_fantasia' | 'razao_social', value: string ): Promise<EmpresaObjectSearch[]> {
     try {
       let query =
-      'SELECT emp.razao_social, emp.nome_fantasia, emp.cnpj, emp.id, pessoa.cpf FROM empresa as emp INNER JOIN pessoa ON pressoa.id = emp.id_pessoa';
+      'SELECT e.razao_social, e.nome_fantasia, e.cnpj, e.id, p.cpf FROM empresa as e INNER JOIN pessoa as p ON p.id = e.id_pessoa';
       const params: SeachParamsEmpresa = {};
 
       switch (tipo) {
         case 'cnpj':
-          query += ' AND emp.cnpj LIKE $cnpj';
+          query += ' WHERE e.cnpj LIKE $cnpj';
           params.$cnpj = `%${value}%`;
           break;
         case 'cpf':
-          query += ' AND pessoa.cpf LIKE $cpf';
+          query += ' WHERE p.cpf LIKE $cpf';
           params.$cpf = `%${value}%`;
           break;
         
         case 'nome_fantasia':
-          query += ' AND emp.nome_fantasia LIKE $nome';
+          query += ` WHERE e.nome_fantasia LIKE $nome || ''`;
           params.$nome = `%${value}%`;
           break;
         
         case 'nome_pessoa':
-          query += ' AND pessoa.nome LIKE $nome';
-          params.$nome = `%${value}%`;
+          query += ` WHERE p.nome LIKE '%' || $nome || '%'`;
+          params.$nome = value;
           break;
 
         case 'razao_social':
-          query += ' AND emp.razao_social LIKE $razao_social';
-          params.$razao_social = `%${value}%`;
+          query += ` WHERE emp.razao_social LIKE '%' || $razao_social || '%'`;
+          params.$razao_social = value;
           break;
 
         default:
           throw new Error("Não foi possível ");
       }
-      return await this.db.getAllAsync(query, params);
+      const dados = await this.db.getAllAsync<EmpresaObjectSearch>(query, params);
+      if (dados.length < 1) {
+        throw new Error("Não foi possível encontrar nenhuma empresa");
+      }
+      return dados;
     } catch (error) {
       throw error;
     }

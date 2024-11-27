@@ -83,4 +83,18 @@ export default class MarcaService {
     }
     return true;
   }
+
+  async getAllByNome (nome: string) {
+    try {
+      const dados = await this.db.getAllAsync<MarcaUpdate>(`SELECT * FROM marca WHERE nome LIKE '%' || $nome || '%'`,{
+        $nome: nome,
+      })
+      if(dados.length < 1){
+        throw new Error("Nao foi possivel encontrar uma marca!");
+      }
+      return dados;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

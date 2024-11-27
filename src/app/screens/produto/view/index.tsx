@@ -81,6 +81,7 @@ import { Produto, ProdutoObjectRequestAll } from '@/classes/produto/interfaces';
 import LoadingScreen from '@/components/LoadingScreen';
 import { useIsFocused } from '@react-navigation/native';
 import { getDateFromString } from '@/utils';
+import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
 const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
   const tipos_busca: Array<{
     label: string;
@@ -180,13 +181,33 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
         <Formik
           initialValues={{
             busca: '',
-            tipo: 'nome',
+            data_validade: new Date(),
+            tipo: 'nome' as 'nome' | 'tipo' | 'data_validade' | 'ua' | 'marca',
           }}
-          onSubmit={() => {}}
+          onSubmit={async ({ busca, data_validade, tipo }) => {
+            try{
+              if(tipo === "data_validade"){
+
+              }
+              const dados = await new ProdutoService(db).search();
+            } catch(error) {
+              Alert.alert('Error', (error as Error).message);
+            }
+          }}
         >
           {({ values, handleChange, setFieldValue, errors }) => {
             return (
               <>
+                {values.tipo === "data" &&(
+                  <>
+                    <InputDatePicker
+                      title='Data de Validade'
+                      value={values.data_validade}
+                      onChangeDate={(date) => setFieldValue('data_validade', date)}
+                      error={errors.data_validade}
+                    />
+                  </>
+                )}
                 <FormControl
                   isInvalid={false}
                   size={'md'}

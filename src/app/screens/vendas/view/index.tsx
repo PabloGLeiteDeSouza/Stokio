@@ -72,7 +72,7 @@ import Vendas from './vendas.json';
 import { SearchIcon } from '@gluestack-ui/themed';
 import BuscasTipos from './busca_tipos_vendas.json';
 import { Venda, VendaFlatList } from '@/types/screens/venda';
-import { ListRenderItem } from 'react-native';
+import { Alert, ListRenderItem } from 'react-native';
 import { VisualizarVendaScreen } from '@/interfaces/venda';
 import VendaService from '@/classes/venda/venda.service';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -161,7 +161,7 @@ const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
             busca: '',
             data_inicial: new Date(),
             data_final: new Date(),
-            tipo: '',
+            tipo: '' as "data" | "status" | "valor" | "nome_pessoa",
           }}
           onSubmit={async (values) => {
             try{

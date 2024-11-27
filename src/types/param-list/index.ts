@@ -1,6 +1,6 @@
 import { UmUpdate } from '@/classes/um/interfaces';
 import { Cliente, Pessoa } from '../screens/cliente';
-import { Pessoa as pessoa } from '@/classes/empresa/types';
+import { Pessoa as pessoa, RamoObject } from '@/classes/empresa/types';
 import { Empresa } from '../screens/empresa';
 import { Marca } from '../screens/marca';
 import { Produto } from '../screens/produto';
@@ -62,7 +62,7 @@ export type RootStackParamList = {
   'atualizar-marca'?: { id: number };
   'atualizar-tipo-produto'?: { id: number };
   'atualizar-tipo-ua'?: { id: number };
-  'atualizar-ramo'?: { ramo: Ramo };
+  'atualizar-ramo'?: { ramo: RamoObject };
   'atualizar-cliente'?: { id: number };
   'atualizar-venda'?: { id: number };
   'atualizar-venda-item'?: { id: number };

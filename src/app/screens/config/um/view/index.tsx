@@ -28,7 +28,7 @@ import { Card } from '@gluestack-ui/themed';
 import { EditIcon } from '@gluestack-ui/themed';
 import { SearchIcon } from '@gluestack-ui/themed';
 import { UmFlatList } from '@/types/screens/um';
-import { Alert, ListRenderItem } from 'react-native';
+import { Alert, GestureResponderEvent, ListRenderItem } from 'react-native';
 import { VisualizarUmScreen } from '@/interfaces/um';
 import { useIsFocused } from '@react-navigation/native';
 import UmService from '@/classes/um/um.service';
@@ -143,11 +143,10 @@ const View: React.FC<VisualizarUmScreen> = ({ navigation }) => {
               setUms([...resp]);
             } catch (error) {
               Alert.alert('Erro', (error as Error).message);
-              throw error;
             }
           }}
         >
-          {({ values, handleChange }) => {
+          {({ values, handleChange, handleSubmit }) => {
             return (
               <>
                 <FormControl
@@ -166,7 +165,7 @@ const View: React.FC<VisualizarUmScreen> = ({ navigation }) => {
                       placeholder="Buscar"
                       onChangeText={handleChange('busca')}
                     />
-                    <Button>
+                    <Button onPress={handleSubmit as unknown as (event: GestureResponderEvent) => void}>
                       <ButtonIcon as={SearchIcon} />
                     </Button>
                   </Input>

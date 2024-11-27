@@ -1,5 +1,5 @@
 import { SQLiteDatabase, SQLiteVariadicBindParams } from 'expo-sqlite';
-import { UpdateVenda, VendaCreateObject } from './interfaces';
+import { UpdateVenda, VendaCreateObject, VendaDetails } from './interfaces';
 import { getDateFromString, getStringFromDate } from '@/utils';
 import { ProdutoVendaRequest } from '../produto/interfaces';
 
@@ -238,18 +238,53 @@ export default class VendaService {
           
           break;
       }
-      const dados = await this.db.getAllAsync<{ nome: string; status: string; id: number; data_venda: string; saldo: number}>(`SELECT p.nome, c.saldo, v.status, v.id, v.data as data_venda FROM venda as v INNER JOIN cliente as c ON c.id == v.id_cliente INNER JOIN pessoa as p ON p.id == c.id_pessoa ${pesquisa.query}`, pesquisa.params)
+      const dados = await this.db.getAllAsync<{ nome: string; status: string; id: number; data_venda: string; }>(`SELECT p.nome, c.saldo, v.status, v.id, v.data as data_venda FROM venda as v INNER JOIN cliente as c ON c.id == v.id_cliente INNER JOIN pessoa as p ON p.id == c.id_pessoa ${pesquisa.query}`, pesquisa.params)
       if(dados.length < 1){
         throw new Error("Nao ha vendas cadastradas!");
       }
-      return dados;
+      const vendas = await Promise.all(dados.map(async (v) => {
+        try {
+          const itv = await this.db.getAllAsync<{ id: number; quantidade: number; valor_unitario: number; }>('SELECT * FROM item_venda WHERE id_venda == $id', {
+            $id: v.id,
+          });
+          if (itv.length < 1) {
+            throw new Error("Nao ha itens de venda para essa venda!");
+          }
+          return { ...v, data_venda: getDateFromString(v.data_venda), valor: itv.map(({ quantidade, valor_unitario }) => quantidade * valor_unitario).reduce((p, c) => p + c, 0) };
+        } catch (error) {
+          throw error;
+        }
+      }))
+      return vendas;
     } catch (error) {
       throw error;
     }
   }
 
-  async findByIdDetails(){
-
+  async findByIdDetails(id: number): Promise<VendaDetails>{
+    try {
+      const venda = await this.db.getFirstAsync<{id: number; data: string; status: string; id_cliente: number;}>('SELECT * FROM venda WHERE id == $id', {
+        $id: id,
+      });
+      if (!venda) {
+        throw new Error("Venda não encontrada!");
+      }
+      const cliente = await this.db.getFirstAsync<{ id: number; nome: string; cpf: string; data_nascimento: string; }>('SELECT * FROM cliente WHERE id == $id', {
+        $id: venda.id_cliente
+      });
+      if (!cliente) {
+        throw new Error("Cliente não encontrado!");
+      }
+      const itens_de_venda = await this.db.getAllAsync<{ id: number; quantidade: number; valor_unitario: number; nome: string; tipo: string; marca: string; }>('SELECT itv.id, itv.quantidade, itv.valor_unitario, p.nome, t.nome as tipo, m.nome as marca FROM item_venda INNER JOIN produto as p ON p.id == itv.id_produto INNER JOIN tipo_produto as t ON t.id == p.id_tipo_produto INNER JOIN marca as m ON m.id == p.id_marca WHERE itv.id_venda == $id', {
+        $id: id,
+      });
+      if(itens_de_venda.length < 1){
+        throw new Error("Nao ha itens de venda para essa venda!");
+      }
+      return { ...venda, data: getDateFromString(venda.data), cliente: { ...cliente, data_nascimento: getDateFromString(cliente.data_nascimento) }, itens_de_venda }
+    } catch (error) {
+      throw error;
+    }
   }
 
   async findByIdUpdate(id: number){

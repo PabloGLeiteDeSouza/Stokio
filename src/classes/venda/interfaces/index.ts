@@ -22,12 +22,11 @@ export interface VendaCreateObject {
 }
 
 export interface VendaDetails {
-    data: Date;
     cliente: {
-        data_nascimento: Date;
         id: number;
         nome: string;
         cpf: string;
+        data_nascimento: Date;
     };
     itens_de_venda: {
         id: number;
@@ -38,6 +37,7 @@ export interface VendaDetails {
         marca: string;
     }[];
     id: number;
+    data: Date;
     status: string;
     id_cliente: number;
 }

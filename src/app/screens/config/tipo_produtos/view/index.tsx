@@ -148,7 +148,6 @@ const View: React.FC<VisualizarTipoProdutoScreen> = ({ navigation }) => {
               setTipos_Produtos(res);
             } catch (error) {
               Alert.alert('Error', (error as Error).message);
-              throw error;
             }
           }}
         >

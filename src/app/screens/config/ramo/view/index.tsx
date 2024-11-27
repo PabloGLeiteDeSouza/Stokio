@@ -77,10 +77,11 @@ import { useIsFocused } from '@react-navigation/native';
 import { useSQLiteContext } from 'expo-sqlite';
 import { RamoService } from '@/classes/ramo/ramo.service';
 import LoadingScreen from '@/components/LoadingScreen';
+import { RamoObject } from '@/classes/empresa/types';
 
 const View: React.FC<VisualizarRamoScreen> = ({ navigation }) => {
   const db = useSQLiteContext();
-  const [ramos, setRamos] = React.useState<Array<Ramo>>([]);
+  const [ramos, setRamos] = React.useState<Array<RamoObject>>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const focused = useIsFocused();
 
@@ -92,12 +93,15 @@ const View: React.FC<VisualizarRamoScreen> = ({ navigation }) => {
       setIsLoading(false);
     } catch (error) {
       Alert.alert('Error', (error as Error).message);
-      throw error;
+      setRamos([]);
+      setIsLoading(false);
     }
   }
 
   React.useEffect(() => {
-    start();
+    if(focused){
+      start();
+    }
   }, [focused]);
 
   const buscar = async (nome: string) => {
@@ -111,7 +115,7 @@ const View: React.FC<VisualizarRamoScreen> = ({ navigation }) => {
 
 
   const FlatListRamo = FlatList as RamoFlatList;
-  const ListRenderRamo: ListRenderItem<Ramo> = ({ item }) => {
+  const ListRenderRamo: ListRenderItem<RamoObject> = ({ item }) => {
     return (
       <Card size="md" variant="elevated" m="$3">
         <HStack justifyContent="space-between">
@@ -135,8 +139,12 @@ const View: React.FC<VisualizarRamoScreen> = ({ navigation }) => {
                   onPress: async () => {
                     try {
                       await new RamoService(db).delete(item.id);
-                      Alert.alert('Sucesso', `Ramo deletado com sucesso!`);
-                      start();
+                      Alert.alert('Sucesso', `Ramo deletado com sucesso!`, [
+                        {
+                          text: 'Ok',
+                          onPress: () => start()
+                        }
+                      ]);
                       } catch (error) {
                         Alert.alert('Error', (error as Error).message);
                       }

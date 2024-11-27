@@ -176,6 +176,17 @@ export type EmpresaObject = {
   id_pessoa?: number;
 };
 
+export type EmpresaObjectSearch = {
+  id: number;
+  nome: string;
+  nome_fantasia: string;
+  razao_social: string;
+  cnpj: string | null;
+  cpf: string;
+  id_ramo?: number;
+  id_pessoa?: number;
+};
+
 export type RamoObject = {
   id: number;
   nome: string;

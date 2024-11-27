@@ -71,7 +71,7 @@ import Marcas from './marcas.json';
 import { SearchIcon } from '@gluestack-ui/themed';
 import { VisualizarMarcaScreen } from '@/interfaces/marca';
 import { Marca, MarcaFlatList } from '@/types/screens/marca';
-import { Alert, ListRenderItem } from 'react-native';
+import { Alert, GestureResponderEvent, ListRenderItem } from 'react-native';
 import LoadingScreen from '@/components/LoadingScreen';
 import MarcaService from '@/classes/marca/marca.service';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -172,9 +172,16 @@ const View: React.FC<VisualizarMarcaScreen> = ({ navigation }) => {
           initialValues={{
             busca: '',
           }}
-          onSubmit={() => {}}
+          onSubmit={async (values) => {
+            try {
+              const dados = await new MarcaService(db).getAllByNome(values.busca);
+              setMarcas([...dados]);
+            } catch (error) {
+              Alert.alert('Erro', (error as Error).message);
+            }
+          }}
         >
-          {({ values, handleChange, errors }) => {
+          {({ values, handleChange, handleSubmit, errors }) => {
             return (
               <>
                 <FormControl
@@ -191,9 +198,9 @@ const View: React.FC<VisualizarMarcaScreen> = ({ navigation }) => {
                       type="text"
                       value={values.busca}
                       placeholder="Buscar"
-                      onChangeText={handleChange('buscar')}
+                      onChangeText={handleChange('busca')}
                     />
-                    <Button>
+                    <Button onPress={handleSubmit as unknown as (event: GestureResponderEvent) => void}>
                       <ButtonIcon as={SearchIcon} />
                     </Button>
                   </Input>

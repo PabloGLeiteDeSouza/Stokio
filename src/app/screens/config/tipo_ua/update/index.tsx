@@ -41,7 +41,6 @@ const Update: React.FC<AtualizarTipoUaScreen> = ({ navigation, route }) => {
         setIsLoading(true);
       }
       const data = await new TipoUaService(db).getId(id);
-      console.log(data);
       setTipoUa(data);
       setIsLoading(false);
     } catch (error) {
@@ -124,12 +123,12 @@ const Update: React.FC<AtualizarTipoUaScreen> = ({ navigation, route }) => {
                     isRequired={false}
                   >
                     <FormControlLabel>
-                      <FormControlLabelText>Descricao</FormControlLabelText>
+                      <FormControlLabelText>Descrição</FormControlLabelText>
                     </FormControlLabel>
                     <Textarea>
                       <TextareaInput
                         onChangeText={handleChange('descricao')}
-                        value={values.descricao}
+                        value={String(values.descricao)}
                         placeholder="Descricao"
                         
                       />
@@ -137,7 +136,7 @@ const Update: React.FC<AtualizarTipoUaScreen> = ({ navigation, route }) => {
 
                     <FormControlHelper>
                       <FormControlHelperText>
-                        Descricao do aplicativo.
+                        Descrição do Tipo de Unidade de Armazenamento.
                       </FormControlHelperText>
                     </FormControlHelper>
 

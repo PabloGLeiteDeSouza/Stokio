@@ -225,16 +225,11 @@ const FormCreateUa: React.FC<IFormCreateUa> = ({ db, onSubimited, haveTipoUa, on
                   {values.tipo_ua.id !== 0 && (
                     <>
                       <Box>
-                        <Card>
+                        <Card gap="$2">
                           <Heading>Tipo de unidade de armazenamento</Heading>
-                          <HStack>
-                            <Text>Nome:</Text>
-                            <Text>{values.tipo_ua.nome}</Text>
-                          </HStack>
-                          <VStack>
-                            <Text>Descrição:</Text>
-                            <Text>{values.tipo_ua.nome}</Text>
-                          </VStack>
+                          <Heading>Nome:</Heading>
+                          <Text>{values.tipo_ua.nome}</Text>
+                          <Text>{values.tipo_ua.descricao}</Text>
                         </Card>
                       </Box>
                     </>

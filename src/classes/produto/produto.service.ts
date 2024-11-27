@@ -38,6 +38,11 @@ export class ProdutoService {
     }
   }
 
+  async search(){
+    
+  }
+
+
   // Leitura de Produto
   async getProdutoById(id: number): Promise<ProdutoObjectComplete> {
     try {
