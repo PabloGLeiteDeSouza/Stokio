@@ -170,7 +170,7 @@ const View: React.FC<VisualizarEmpresaScreen> = ({ navigation }) => {
           }}
           onSubmit={async (value) => {
             try {
-              const resut = await new EmpresaService(db).search(value.tipo, value.busca);
+              const result = await new EmpresaService(db).search(value.tipo, value.busca);
               setEmpresas(result);
             } catch (error) {
               Alert.alert("Erro", (error as Error).message);
