@@ -72,6 +72,7 @@ import CompraService from '@/classes/compra/compra.service';
 import { useSQLiteContext } from 'expo-sqlite';
 import { mask } from '@/utils/mask';
 import { useIsFocused } from '@react-navigation/native';
+import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
 const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
   const [compras, setCompras] = React.useState<CompraViewObject[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -148,12 +149,12 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
             initialValues={{
               busca: '',
               tipo: '',
-              data_inicio: '',
-              data_fim: '',
+              data_inicio: new Date(),
+              data_final: new Date(),
             }}
             onSubmit={async () => {}}
           >
-            {({ values, errors, handleChange, handleBlur, handleSubmit }) => {
+            {({ values, errors, setFieldValue, handleChange, handleBlur, handleSubmit }) => {
               return (
                 <>
                   <FormControl
@@ -183,8 +184,8 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
                           </SelectDragIndicatorWrapper>
                           <SelectItem label="UX Research" value="UX Research" />
                           <SelectItem
-                            label="Web Development"
-                            value="Web Development"
+                            label="Data"
+                            value="data"
                           />
                           <SelectItem
                             label="Cross Platform Development Process"
@@ -214,40 +215,65 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
                       <FormControlErrorText>{errors.tipo}</FormControlErrorText>
                     </FormControlError>
                   </FormControl>
-                  <FormControl
-                    isInvalid={errors.busca ? true : false}
-                    size={'md'}
-                    isDisabled={false}
-                    isRequired={true}
-                  >
-                    <FormControlLabel>
-                      <FormControlLabelText>Buscar</FormControlLabelText>
-                    </FormControlLabel>
-                    <Input>
-                      <InputField
-                        type="text"
-                        value={values.busca}
-                        placeholder="Busca...."
-                        onChangeText={handleChange('busca')}
+                  {values.tipo !== "data" && (
+                    <>
+                      <FormControl
+                        isInvalid={errors.busca ? true : false}
+                        size={'md'}
+                        isDisabled={false}
+                        isRequired={true}
+                      >
+                        <FormControlLabel>
+                          <FormControlLabelText>Buscar</FormControlLabelText>
+                        </FormControlLabel>
+                        <Input>
+                          <InputField
+                            type="text"
+                            value={values.busca}
+                            placeholder="Busca...."
+                            onChangeText={handleChange('busca')}
+                          />
+                          <Button onPress={handleSubmit as unknown as (event: GestureResponderEvent) => void}>
+                            <ButtonIcon as={SearchIcon} />
+                          </Button>
+                        </Input>
+
+                        <FormControlHelper>
+                          <FormControlHelperText>
+                            Insira o que deve ser buscado.
+                          </FormControlHelperText>
+                        </FormControlHelper>
+
+                        <FormControlError>
+                          <FormControlErrorIcon as={AlertCircleIcon} />
+                          <FormControlErrorText>
+                            {errors.busca}
+                          </FormControlErrorText>
+                        </FormControlError>
+                      </FormControl>
+                    </>
+                  )}
+                  {values.tipo === "data" && (
+                    <Box>
+                      <InputDatePicker
+                        onChangeDate={(dt) => setFieldValue('data_inicial', dt)}
+                        title='Data inicial'
+                        value={values.data_final}
                       />
-                      <Button onPress={handleSubmit as unknown as (event: GestureResponderEvent) => void}>
-                        <ButtonIcon as={SearchIcon} />
-                      </Button>
-                    </Input>
-
-                    <FormControlHelper>
-                      <FormControlHelperText>
-                        Insira o que deve ser buscado.
-                      </FormControlHelperText>
-                    </FormControlHelper>
-
-                    <FormControlError>
-                      <FormControlErrorIcon as={AlertCircleIcon} />
-                      <FormControlErrorText>
-                        {errors.busca}
-                      </FormControlErrorText>
-                    </FormControlError>
-                  </FormControl>
+                      <InputDatePicker
+                        onChangeDate={(dt) => setFieldValue('data_final', dt)}
+                        title='Data final'
+                        value={values.data_final}
+                      />
+                      <Box>
+                        <Button>
+                          <ButtonText>
+                            Buscar
+                          </ButtonText>
+                        </Button>
+                      </Box>
+                    </Box>
+                  )}
                 </>
               );
             }}

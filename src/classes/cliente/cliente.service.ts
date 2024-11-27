@@ -137,6 +137,43 @@ export class ClienteService {
     }
   }
 
+  async search(tipo: 'nome' | 'cpf' | 'saldo', value: string) {
+    try {
+      const dados = { query: '', params: {} };
+      switch (tipo) {
+        case 'nome':
+          dados.query = `WHERE p.nome LIKE '%' || $nome || '%'`;
+          dados.params = { $nome: value };
+          break;
+        case 'cpf':
+          dados.query = `WHERE p.cpf LIKE '%' || $cpf || '%'`;
+          dados.params = { $cpf: value };
+        break;
+        case 'saldo':
+          dados.query = 'WHERE c.saldo == $saldo';
+          dados.params = { $saldo: value };
+        break;
+      }
+      const data = await this.db.getAllAsync<{
+        id: number;
+        nome: string;
+        cpf: string;
+        data_nascimento: string;
+        saldo: string;
+        id_pessoa: string;
+      }>(
+        `SELECT c.id, c.saldo, c.id_pessoa, p.nome, p.data_nascimento, p.cpf FROM cliente as c INNER JOIN pessoa as p ON p.id == c.id_pessoa ${dados.query}`, 
+        dados.params
+      );
+      if (data.length < 1) {
+        throw new Error("Nao foi possivel encontrar nenehum cliente");
+      }
+      return data.map((v) => { return { ...v, data_nascimento: getDateFromString(v.data_nascimento) };});
+    } catch (error) {
+      throw error;
+    }
+  }
+
   private async updateCliente(
     id_pessoa: number,
     data: IClienteUpdateOnly,

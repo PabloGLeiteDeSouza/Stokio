@@ -242,22 +242,7 @@ export default class VendaService {
       if(dados.length < 1){
         throw new Error("Nao ha vendas cadastradas!");
       }
-      const res = await Promise.all(dados.map(async (d) => {
-        try {
-          const { ...res } = d;
-          const itns_venda = await this.db.getAllAsync<{ quantidade: number; valor_unitario: number }>('SELECT quantidade, valor_unitario FROM item_venda WHERE id_venda == $id', {
-            $id: res.id,
-          });
-          if (itns_venda.length < 1) {
-            throw new Error("Nao ha itens de venda!");
-          }
-          const valor = itns_venda.map((itv) => itv.quantidade * itv.valor_unitario).reduce((p, c) => p + c, 0);
-          return { ...res, data_venda: getDateFromString(res.data_venda), valor };
-        } catch (error) {
-          throw error;
-        }
-      }))
-      return res;
+      return dados;
     } catch (error) {
       throw error;
     }

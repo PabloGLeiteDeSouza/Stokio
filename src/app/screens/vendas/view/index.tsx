@@ -79,6 +79,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 import LoadingScreen from '@/components/LoadingScreen';
 import { mask } from '@/utils/mask';
 import { useIsFocused } from '@react-navigation/native';
+import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
 
 const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
   
@@ -158,6 +159,8 @@ const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
         <Formik
           initialValues={{
             busca: '',
+            data_inicial: new Date(),
+            data_final: new Date(),
             tipo: '',
           }}
           onSubmit={() => {}}
@@ -254,6 +257,27 @@ const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
                     </FormControlErrorText>
                   </FormControlError>
                 </FormControl>
+                {values.tipo === "data" && (
+                    <Box>
+                      <InputDatePicker
+                        onChangeDate={(dt) => setFieldValue('data_inicial', dt)}
+                        title='Data inicial'
+                        value={values.data_inicial}
+                      />
+                      <InputDatePicker
+                        onChangeDate={(dt) => setFieldValue('data_final', dt)}
+                        title='Data final'
+                        value={values.data_final}
+                      />
+                      <Box>
+                        <Button>
+                          <ButtonText>
+                            Buscar
+                          </ButtonText>
+                        </Button>
+                      </Box>
+                    </Box>
+                  )}
               </>
             );
           }}

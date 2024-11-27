@@ -69,7 +69,7 @@ import { Card } from '@gluestack-ui/themed';
 import { SearchIcon } from '@gluestack-ui/themed';
 import { VisualizarClienteScreen } from '@/interfaces/cliente';
 import { FlatList } from '@gluestack-ui/themed';
-import { Alert, ListRenderItem } from 'react-native';
+import { Alert, GestureResponderEvent, ListRenderItem } from 'react-native';
 import { ClientFlatList } from './types';
 import { useSQLiteContext } from 'expo-sqlite';
 import { ClienteService } from '@/classes/cliente/cliente.service';
@@ -78,6 +78,7 @@ import LoadingScreen from '@/components/LoadingScreen';
 import { IClienteSimpleRequest } from '@/classes/cliente/interfaces';
 import { mask } from '@/utils/mask';
 import { getDateFromString } from '@/utils';
+import InputText from '@/components/Input';
 
 const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
   const [clientes, setClientes] = React.useState<Array<IClienteSimpleRequest>>(
@@ -173,17 +174,18 @@ const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
         <Formik
           initialValues={{
             busca: '',
-            tipo: '',
+            tipo: 'nome' as 'nome' | 'cpf' | 'saldo',
           }}
           onSubmit={async (values) => {
             try {
-              
+              const clientes = await new ClienteService(db).search(values.tipo, values.busca);
+              setClientes([...clientes]);
             } catch (error) {
-              
+              Alert.alert('Erro', (error as Error).message);
             }
           }}
         >
-          {({ values, errors, handleChange, setFieldValue }) => {
+          {({ values, errors, handleChange, setFieldValue, handleSubmit }) => {
             return (
               <>
                 <FormControl
@@ -198,11 +200,12 @@ const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
                     </FormControlLabelText>
                   </FormControlLabel>
                   <Select
-                    selectedValue={values.tipo === 'cpf' ? 'CPF' : values.tipo === 'nome' ? 'NOME' : ''}
+                    selectedValue={values.tipo === 'cpf' ? 'CPF' : values.tipo === 'nome' ? 'NOME' : 'SALDO'}
                     onValueChange={(text) => {
                       setFieldValue('tipo', text);
+                      setFieldValue('busca', '')
                     }}
-                    initialLabel={values.tipo === 'cpf' ? 'CPF' : values.tipo === 'nome' ? 'NOME' : ''}
+                    initialLabel={values.tipo === 'cpf' ? 'CPF' : values.tipo === 'nome' ? 'NOME' : 'SALDO'}
                     isInvalid={false}
                     isDisabled={false}
                   >
@@ -226,6 +229,11 @@ const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
                           value="nome"
                           isPressed={values.tipo === 'nome'}
                         />
+                        <SelectItem
+                          label="SALDO"
+                          value="saldo"
+                          isPressed={values.tipo === 'saldo'}
+                        />
                       </SelectContent>
                     </SelectPortal>
                   </Select>
@@ -243,7 +251,7 @@ const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
                     </FormControlErrorText>
                   </FormControlError>
                 </FormControl>
-                {values.tipo !== '' && (
+                {values.tipo === "nome" && (
                   <FormControl
                     isInvalid={errors.busca ? true : false}
                     size={'md'}
@@ -260,7 +268,7 @@ const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
                         placeholder="Buscar"
                         onChangeText={handleChange('busca')}
                       />
-                      <Button>
+                      <Button onPress={handleSubmit as unknown as (event: GestureResponderEvent) => void}>
                         <ButtonIcon as={SearchIcon} />
                       </Button>
                     </Input>
@@ -278,6 +286,25 @@ const View: React.FC<VisualizarClienteScreen> = ({ navigation, route }) => {
                       </FormControlErrorText>
                     </FormControlError>
                   </FormControl>
+                )}
+                {values.tipo !== "nome" && (
+                  <>
+                    <InputText
+                      title={values.tipo === "saldo" ? "Buscar saldo" : ""}
+                      customType='default'
+                      value={values.busca}
+                      error={errors.busca}
+                      inputType={values.tipo === "saldo" ? "money" : values.tipo}
+                      onChangeValue={handleChange('busca')}
+                    />
+                    <Box>
+                      <Button onPress={handleSubmit as unknown as (event: GestureResponderEvent) => void}>
+                        <ButtonText>
+                          Buscar
+                        </ButtonText>
+                      </Button>
+                    </Box>
+                  </>
                 )}
               </>
             );

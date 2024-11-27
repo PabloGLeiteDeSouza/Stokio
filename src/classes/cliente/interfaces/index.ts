@@ -24,7 +24,6 @@ export interface IClienteSimpleRequest {
   data_nascimento: Date;
   saldo: string;
   id_pessoa: string;
-  id_endereco: string;
 }
 
 export interface IClienteSelectCliente {
