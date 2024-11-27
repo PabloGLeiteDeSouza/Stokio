@@ -163,7 +163,18 @@ const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
             data_final: new Date(),
             tipo: '',
           }}
-          onSubmit={() => {}}
+          onSubmit={async (values) => {
+            try{
+              if(values.tipo === 'data') {
+                const vendas = await new VendaService(db).search(values.data_inicial, values.tipo, values.data_final);
+                return setVendas(vendas);
+              }
+              const vendas = await new VendaService(db).search(values.busca, values.tipo);
+              setVendas(vendas);
+            } catch(error){
+              Alert.alert("Erro", (error as Error).message); 
+            }
+          }}
         >
           {({ values, handleChange, setFieldValue }) => {
             return (
