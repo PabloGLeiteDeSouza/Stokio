@@ -5,7 +5,8 @@ import { AtualizarCompraScreen } from "@/interfaces/compra";
 import { getDateFromString } from "@/utils";
 import { sumAllValues } from "@/utils/calc";
 import { mask } from "@/utils/mask";
-import { Button, ButtonText, Text } from "@gluestack-ui/themed";
+import { Button, ButtonText, EditIcon, Text, TrashIcon } from "@gluestack-ui/themed";
+import { ButtonIcon } from "@gluestack-ui/themed";
 import { Box, Heading, ScrollView } from "@gluestack-ui/themed";
 import { useSQLiteContext } from "expo-sqlite";
 import React from "react";
@@ -99,12 +100,14 @@ const Details: React.FC<AtualizarCompraScreen> = ({ navigation, route }) => {
             
           </Box>
           <Box my="$5" gap="$5">
-            <Button onPress={() => navigation?.navigate('atualizar-compra', { id: compra.id })}>
+            <Button gap="$2.5" onPress={() => navigation?.navigate('atualizar-compra', { id: compra.id })}>
+              <ButtonIcon as={EditIcon} />
               <ButtonText>
                 Atualizar
               </ButtonText>
             </Button>
-            <Button action="negative">
+            <Button gap="$5" action="negative">
+              <ButtonIcon as={TrashIcon} />
               <ButtonText>
                 Excluir
               </ButtonText>

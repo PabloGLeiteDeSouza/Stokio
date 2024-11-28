@@ -59,6 +59,7 @@ import {
   ButtonIcon,
   RemoveIcon,
   AddIcon,
+  EditIcon,
 } from '@gluestack-ui/themed';
 import { Box, Heading, ScrollView } from '@gluestack-ui/themed';
 import { Formik } from 'formik';

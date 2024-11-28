@@ -5,7 +5,7 @@
     },
     {
         "label": "Nome da Pessoa",
-        "value": "nome"
+        "value": "nome_pessoa"
     },
     {
         "label": "Valor da Venda",

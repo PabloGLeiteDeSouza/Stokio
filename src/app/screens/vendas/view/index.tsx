@@ -72,7 +72,7 @@ import Vendas from './vendas.json';
 import { SearchIcon } from '@gluestack-ui/themed';
 import BuscasTipos from './busca_tipos_vendas.json';
 import { Venda, VendaFlatList } from '@/types/screens/venda';
-import { Alert, ListRenderItem } from 'react-native';
+import { Alert, GestureResponderEvent, ListRenderItem } from 'react-native';
 import { VisualizarVendaScreen } from '@/interfaces/venda';
 import VendaService from '@/classes/venda/venda.service';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -80,11 +80,12 @@ import LoadingScreen from '@/components/LoadingScreen';
 import { mask } from '@/utils/mask';
 import { useIsFocused } from '@react-navigation/native';
 import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
-
+import InputText from '@/components/Input';
 const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
-  
-  const tipos_busca: Array<{ label: string; value: string }> = BuscasTipos;
-
+  const tipos_busca: Array<{
+    label: string;
+    value: string;
+  }> = BuscasTipos;
   const [vendas, setVendas] = React.useState<Array<Venda>>([]);
   const [loadingVendas, setLoadingVendas] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -98,15 +99,26 @@ const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
           <Box gap="$2.5" w="$2/3">
             <Heading size="lg">{item.nome}</Heading>
             <Text size="md">{mask(item.valor.toString(), 'money')}</Text>
-            <Text>{new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(item.data_venda)}</Text>
-            <Text color={item.status === 'devendo' ? '$red600' : '$green600'} size="md">
+            <Text>
+              {new Intl.DateTimeFormat('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+              }).format(item.data_venda)}
+            </Text>
+            <Text
+              color={item.status === 'devendo' ? '$red600' : '$green600'}
+              size="md"
+            >
               {item.status}
             </Text>
           </Box>
           <Box gap="$5">
             <Button
               onPress={() =>
-                navigation?.navigate('detalhes-venda', { id: item.id })
+                navigation?.navigate('detalhes-venda', {
+                  id: item.id,
+                })
               }
             >
               <ButtonIcon as={EyeIcon} />
@@ -116,7 +128,6 @@ const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
       </Card>
     );
   };
-
   const Start = async () => {
     try {
       const vendas = await new VendaService(db).search();
@@ -128,19 +139,15 @@ const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
       setLoadingVendas(false);
       setIsLoading(false);
     }
-  }
-
-
+  };
   React.useEffect(() => {
     if (isFocused) {
-      Start()
+      Start();
     }
   }, [isFocused]);
-
   if (isLoading) {
-    return <LoadingScreen />
+    return <LoadingScreen />;
   }
-
   return vendas.length < 1 ? (
     <Box h="$full" w="$full" alignItems="center" justifyContent="center">
       <Box gap="$5">
@@ -161,26 +168,33 @@ const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
             busca: '',
             data_inicial: new Date(),
             data_final: new Date(),
-            tipo: '' as "data" | "status" | "valor" | "nome_pessoa",
+            tipo: '' as 'data' | 'status' | 'valor' | 'nome_pessoa',
           }}
           onSubmit={async (values) => {
-            try{
-              if(values.tipo === 'data') {
-                const vendas = await new VendaService(db).search(values.data_inicial, values.tipo, values.data_final);
+            try {
+              if (values.tipo === 'data') {
+                const vendas = await new VendaService(db).search(
+                  values.data_inicial,
+                  values.tipo,
+                  values.data_final,
+                );
                 return setVendas(vendas);
               }
-              const vendas = await new VendaService(db).search(values.busca, values.tipo);
+              const vendas = await new VendaService(db).search(
+                values.busca,
+                values.tipo,
+              );
               setVendas(vendas);
-            } catch(error){
-              Alert.alert("Erro", (error as Error).message); 
+            } catch (error) {
+              Alert.alert('Erro', (error as Error).message);
             }
           }}
         >
-          {({ values, handleChange, setFieldValue }) => {
+          {({ values, errors, handleChange, handleSubmit, setFieldValue }) => {
             return (
               <>
                 <FormControl
-                  isInvalid={false}
+                  isInvalid={errors.tipo ? true : false}
                   size={'md'}
                   isDisabled={false}
                   isRequired={true}
@@ -193,6 +207,9 @@ const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
                   <Select
                     onValueChange={(text) => {
                       setFieldValue('tipo', text);
+                      setFieldValue('busca', '');
+                      setFieldValue('data_inicial', new Date());
+                      setFieldValue('data_final', new Date());
                     }}
                     isInvalid={false}
                     isDisabled={false}
@@ -223,72 +240,169 @@ const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
 
                   <FormControlHelper>
                     <FormControlHelperText>
-                      Must be atleast 6 characters.
+                      Selecione um tipo para a busca da venda.
                     </FormControlHelperText>
                   </FormControlHelper>
 
                   <FormControlError>
                     <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
+                    <FormControlErrorText>{errors.tipo}</FormControlErrorText>
                   </FormControlError>
                 </FormControl>
-                <FormControl
-                  isInvalid={false}
-                  size={'md'}
-                  isDisabled={false}
-                  isRequired={true}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText>Buscar</FormControlLabelText>
-                  </FormControlLabel>
-                  <Input>
-                    <InputField
-                      type="text"
+                {values.tipo === 'valor' && (
+                  <Box gap="$2.5">
+                    <InputText
+                      title="Valor da Venda"
+                      inputType="money"
                       value={values.busca}
-                      placeholder="Buscar"
-                      onChangeText={handleChange('busca')}
+                      onChangeValue={handleChange('busca')}
+                      error={errors.busca}
                     />
-                    <Button>
-                      <ButtonIcon as={SearchIcon} />
-                    </Button>
-                  </Input>
-
-                  <FormControlHelper>
-                    <FormControlHelperText>
-                      Must be atleast 6 characters.
-                    </FormControlHelperText>
-                  </FormControlHelper>
-
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Atleast 6 characters are required.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-                {values.tipo === "data" && (
                     <Box>
-                      <InputDatePicker
-                        onChangeDate={(dt) => setFieldValue('data_inicial', dt)}
-                        title='Data inicial'
-                        value={values.data_inicial}
-                      />
-                      <InputDatePicker
-                        onChangeDate={(dt) => setFieldValue('data_final', dt)}
-                        title='Data final'
-                        value={values.data_final}
-                      />
-                      <Box>
-                        <Button>
-                          <ButtonText>
-                            Buscar
-                          </ButtonText>
-                        </Button>
-                      </Box>
+                      <Button
+                        onPress={
+                          handleSubmit as unknown as (
+                            event: GestureResponderEvent,
+                          ) => void
+                        }
+                      >
+                        <ButtonText>Buscar</ButtonText>
+                      </Button>
                     </Box>
-                  )}
+                  </Box>
+                )}
+                {values.tipo === 'nome_pessoa' && (
+                  <>
+                    <FormControl
+                      isInvalid={errors.busca ? true : false}
+                      size={'md'}
+                      isDisabled={false}
+                      isRequired={true}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>Buscar</FormControlLabelText>
+                      </FormControlLabel>
+                      <Input>
+                        <InputField
+                          type="text"
+                          value={values.busca}
+                          placeholder="Buscar"
+                          onChangeText={handleChange('busca')}
+                        />
+                        <Button
+                          onPress={
+                            handleSubmit as unknown as (
+                              event: GestureResponderEvent,
+                            ) => void
+                          }
+                        >
+                          <ButtonIcon as={SearchIcon} />
+                        </Button>
+                      </Input>
+
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          Informe o nome do cliente correto para a busca.
+                        </FormControlHelperText>
+                      </FormControlHelper>
+
+                      <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
+                          {errors.busca}
+                        </FormControlErrorText>
+                      </FormControlError>
+                    </FormControl>
+                  </>
+                )}
+                {values.tipo === 'data' && (
+                  <Box>
+                    <InputDatePicker
+                      onChangeDate={(dt) => setFieldValue('data_inicial', dt)}
+                      title="Data inicial"
+                      value={values.data_inicial}
+                    />
+                    <InputDatePicker
+                      onChangeDate={(dt) => setFieldValue('data_final', dt)}
+                      title="Data final"
+                      value={values.data_final}
+                      minimumDate={values.data_inicial}
+                    />
+                    <Box>
+                      <Button
+                        onPress={
+                          handleSubmit as unknown as (
+                            event: GestureResponderEvent,
+                          ) => void
+                        }
+                      >
+                        <ButtonText>Buscar</ButtonText>
+                      </Button>
+                    </Box>
+                  </Box>
+                )}
+                {values.tipo === 'status' && (
+                  <Box>
+                    <FormControl
+                      isInvalid={errors.busca ? true : false}
+                      size={'md'}
+                      isDisabled={false}
+                      isRequired={true}
+                    >
+                      <FormControlLabel>
+                        <FormControlLabelText>Selecione o status:</FormControlLabelText>
+                      </FormControlLabel>
+
+                      <Select
+                        isInvalid={errors.busca ? true : false}
+                        isDisabled={false}
+                        initialLabel=""
+                        selectedValue={values.busca === 'pago' ? "Pago" : values.busca === 'devendo' ? "Devendo" : ""}
+                      >
+                        <SelectTrigger size={'lg'} variant={'rounded'}>
+                          <SelectInput placeholder="Selecione uma opcao" />
+                          <SelectIcon
+                            mr={'$3'}
+                            ml={0}
+                            as={ChevronDownIcon}
+                          />
+                        </SelectTrigger>
+                        <SelectPortal>
+                          <SelectBackdrop />
+                          <SelectContent>
+                            <SelectDragIndicatorWrapper>
+                              <SelectDragIndicator />
+                            </SelectDragIndicatorWrapper>
+                            <SelectItem
+                              label="Pago"
+                              value="pago"
+                              isPressed={values.busca === "pago"}
+                            />
+                            <SelectItem
+                              label="Devendo"
+                              value="devendo"
+                              isPressed={values.busca === "devendo"}
+                            />
+                            
+                          </SelectContent>
+                        </SelectPortal>
+                      </Select>
+
+                      <FormControlHelper>
+                        <FormControlHelperText>
+                          Selecione uma opcao para buscar
+                        </FormControlHelperText>
+                      </FormControlHelper>
+
+                      <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
+                          {errors.busca}
+                        </FormControlErrorText>
+                      </FormControlError>
+                    </FormControl>
+                  </Box>
+                )}
               </>
             );
           }}
@@ -309,7 +423,6 @@ const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
         keyExtractor={(item) => String(item.id)}
         refreshing={loadingVendas}
         onRefresh={() => {
-          console.log('refreshed');
           setLoadingVendas(true);
           setTimeout(() => {
             setLoadingVendas(false);

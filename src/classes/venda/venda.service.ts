@@ -269,7 +269,7 @@ export default class VendaService {
       if (!venda) {
         throw new Error("Venda não encontrada!");
       }
-      const cliente = await this.db.getFirstAsync<{ id: number; nome: string; cpf: string; data_nascimento: string; }>('SELECT * FROM cliente WHERE id == $id', {
+      const cliente = await this.db.getFirstAsync<{ id: number; nome: string; cpf: string; data_nascimento: string; }>('SELECT c.id, c.saldo, p.nome, p.cpf, p.data_nascimento FROM cliente as c INNER JOIN pessoa as p ON p.id == c.id_pessoa WHERE id == $id', {
         $id: venda.id_cliente
       });
       if (!cliente) {

@@ -432,11 +432,19 @@ export class ClienteService {
 
   async findAllPessoas(): Promise<IPessoaUpdate[]> {
     try {
-      const clientes = await this.db.getAllAsync<Omit<IPessoaUpdate, 'data_nascimento'> & { data_nascimento: string; }>('SELECT p.id, p.nome, p.cpf, p.data_nascimento FROM pessoa as p INNER JOIN cliente as c ON c.id_pessoa != p.id');
-      if (clientes.length < 1) {
+      const have = await this.haveClients();
+      let pessoas:  (Omit<IPessoaUpdate, "data_nascimento"> & {
+        data_nascimento: string;
+      })[];
+      if (have) {
+        pessoas = await this.db.getAllAsync<Omit<IPessoaUpdate, 'data_nascimento'> & { data_nascimento: string; }>('SELECT p.id, p.nome, p.cpf, p.data_nascimento FROM pessoa as p INNER JOIN cliente as c ON c.id_pessoa <> p.id');
+      } else {
+        pessoas = await this.db.getAllAsync<Omit<IPessoaUpdate, 'data_nascimento'> & { data_nascimento: string; }>('SELECT * FROM pessoa');
+      }
+      if (pessoas.length < 1) {
         return [];
       }
-      return clientes.map((item) => {
+      return pessoas.map((item) => {
         return {
           ...item,
           data_nascimento: getDateFromString(item.data_nascimento),
@@ -464,4 +472,9 @@ export class ClienteService {
       throw new Error('Erro ao buscar pessoas: ' + (error as Error).message);
     }
   }
+
+  async haveClients(): Promise<boolean>{
+    return (await this.db.getAllAsync('SELECT * FROM cliente')).length > 1
+  }
+
 }
