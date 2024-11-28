@@ -197,8 +197,7 @@ export class EmpresaService {
 
   async search(tipo: 'cpf' | 'cnpj' | 'nome_pessoa' | 'nome_fantasia' | 'razao_social', value: string ): Promise<EmpresaObjectSearch[]> {
     try {
-      let query =
-      'SELECT e.razao_social, e.nome_fantasia, e.cnpj, e.id, p.cpf FROM empresa as e INNER JOIN pessoa as p ON p.id = e.id_pessoa';
+      let query = 'SELECT e.razao_social, e.nome_fantasia, e.cnpj, e.id, p.cpf FROM empresa as e INNER JOIN pessoa as p ON p.id = e.id_pessoa';
       const params: SeachParamsEmpresa = {};
 
       switch (tipo) {

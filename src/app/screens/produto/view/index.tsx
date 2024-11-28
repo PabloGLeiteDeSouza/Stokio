@@ -73,7 +73,7 @@ import { SearchIcon } from '@gluestack-ui/themed';
 import BuscasTipos from './busca_tipos_vendas.json';
 import { VisualizarProdutoScreen } from '@/interfaces/produto';
 import { ProdutoFlatList } from '@/types/screens/produto';
-import { Alert, ListRenderItem } from 'react-native';
+import { Alert, GestureResponderEvent, ListRenderItem } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useSQLiteContext } from 'expo-sqlite';
 import { ProdutoService } from '@/classes/produto/produto.service';
@@ -181,13 +181,14 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
         <Formik
           initialValues={{
             busca: '',
-            data_validade: new Date(),
-            tipo: 'nome' as 'nome' | 'tipo' | 'data_validade' | 'ua' | 'marca',
+            data_inicio: new Date(),
+            data_fim: new Date(),
+            tipo: 'nome' as 'nome' | 'tipo' | 'data_validade' | 'ua' | 'marca' | 'codigo_de_barras',
           }}
-          onSubmit={async ({ busca, data_validade, tipo }) => {
+          onSubmit={async ({ busca, data_fim, data_inicio, tipo }) => {
             try{
               if(tipo === "data_validade"){
-
+                
               }
               const dados = await new ProdutoService(db).search();
             } catch(error) {
@@ -195,21 +196,11 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
             }
           }}
         >
-          {({ values, handleChange, setFieldValue, errors }) => {
+          {({ values, handleChange, handleSubmit, setFieldValue, errors }) => {
             return (
               <>
-                {values.tipo === "data" &&(
-                  <>
-                    <InputDatePicker
-                      title='Data de Validade'
-                      value={values.data_validade}
-                      onChangeDate={(date) => setFieldValue('data_validade', date)}
-                      error={errors.data_validade}
-                    />
-                  </>
-                )}
                 <FormControl
-                  isInvalid={false}
+                  isInvalid={errors.tipo ? true : false}
                   size={'md'}
                   isDisabled={false}
                   isRequired={true}
@@ -242,7 +233,7 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
                         {tipos_busca.map((item, i) => {
                           return (
                             <SelectItem
-                              key={i}
+                              key={`select-opcao-${i}`}
                               label={item.label}
                               value={item.value}
                               isPressed={item.value === values.tipo}
@@ -255,17 +246,40 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
 
                   <FormControlHelper>
                     <FormControlHelperText>
-                      Must be atleast 6 characters.
+                      Selecione um tipo.
                     </FormControlHelperText>
                   </FormControlHelper>
 
                   <FormControlError>
                     <FormControlErrorIcon as={AlertCircleIcon} />
                     <FormControlErrorText>
-                      Atleast 6 characters are required.
+                      {errors.tipo}
                     </FormControlErrorText>
                   </FormControlError>
                 </FormControl>
+                {values.tipo === "data_validade" &&(
+                  <>
+                    <InputDatePicker
+                      title='Data de Inicio'
+                      value={values.data_inicio}
+                      onChangeDate={(date) => setFieldValue('data_inicio', date)}
+                      error={errors.data_inicio}
+                    />
+                    <InputDatePicker
+                      title='Data de Fim'
+                      value={values.data_fim}
+                      onChangeDate={(date) => setFieldValue('data_fim', date)}
+                      error={errors.data_fim}
+                    />
+                    <Box>
+                      <Button onPress={handleSubmit as unknown as (event: GestureResponderEvent) => void}>
+                        <ButtonText>
+                          Buscar
+                        </ButtonText>
+                      </Button>
+                    </Box>
+                  </>
+                )}
                 {values.tipo === 'codigo_de_barras' && (
                   <>
                     <FormControl

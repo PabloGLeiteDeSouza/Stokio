@@ -2,6 +2,7 @@ import { SQLiteDatabase } from 'expo-sqlite';
 import { Produto, Marca, TipoProduto, UnidadeDeMedida, ProdutoObjectRequestAll, ProdutoObjectComplete, ProdutoVendaRequest, ProdutoCompraRequest } from './interfaces';
 import { Empresa, EmpresaCustomSimpleRequest } from '../empresa/types';
 import { UnidadeDeArmazenamento } from '../ua/interfaces';
+import { getDateFromString, getStringFromDate } from '@/utils';
 
 export class ProdutoService {
   constructor(private db: SQLiteDatabase) {}
@@ -38,8 +39,59 @@ export class ProdutoService {
     }
   }
 
-  async search(){
-    
+  async search(value?: string | number | Date, tipo?: 'nome_pessoa' | 'data' | 'status' | 'valor', value1?: Date){
+    try {
+      const pesquisa = { query: "", params: {  }};
+      switch (tipo) {
+        case 'data':
+          if (typeof value !== 'undefined' && typeof value !== "string" && typeof value !== 'number' && typeof value1 !== 'undefined') {
+            pesquisa.query = ' WHERE v.data >= $data_inicial AND v.data <= $data_final';
+            pesquisa.params = { $data_inicial: getStringFromDate(value), $data_final: getStringFromDate(value1) };
+          }
+          break;
+        case 'nome_pessoa':
+          if (typeof value === "string") {
+            pesquisa.query = ` WHERE p.nome LIKE '%' || $nome || '%'`;
+            pesquisa.params = { $nome: value };
+          }
+          break;
+        case 'status':
+          if (typeof value === "string") {
+            pesquisa.query = ` WHERE v.status LIKE '%' || $status || '%'`;
+            pesquisa.params = { $status: value };
+          }
+          break;
+        case 'valor':
+          if (typeof value === "number") {
+            pesquisa.query = ` WHERE v.valor == $valor`;
+            pesquisa.params = { $valor: value };
+          }
+          break;
+        default:
+          
+          break;
+      }
+      const dados = await this.db.getAllAsync<{ nome: string; status: string; id: number; data_venda: string; }>(`SELECT p.nome, c.saldo, v.status, v.id, v.data as data_venda FROM venda as v INNER JOIN cliente as c ON c.id == v.id_cliente INNER JOIN pessoa as p ON p.id == c.id_pessoa ${pesquisa.query}`, pesquisa.params)
+      if(dados.length < 1){
+        throw new Error("Nao ha vendas cadastradas!");
+      }
+      const vendas = await Promise.all(dados.map(async (v) => {
+        try {
+          const itv = await this.db.getAllAsync<{ id: number; quantidade: number; valor_unitario: number; }>('SELECT * FROM item_venda WHERE id_venda == $id', {
+            $id: v.id,
+          });
+          if (itv.length < 1) {
+            throw new Error("Nao ha itens de venda para essa venda!");
+          }
+          return { ...v, data_venda: getDateFromString(v.data_venda), valor: itv.map(({ quantidade, valor_unitario }) => quantidade * valor_unitario).reduce((p, c) => p + c, 0) };
+        } catch (error) {
+          throw error;
+        }
+      }))
+      return vendas;
+    } catch (error) {
+      throw error;
+    }
   }
 
 
