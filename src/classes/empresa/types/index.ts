@@ -76,7 +76,7 @@ export type EmpresaSearchRelatinalPessoa = {
   nome_fantasia: string;
   razao_social: string;
   cpf: string;
-  cnpj?: string;
+  cnpj: string | null;
 };
 
 export type EmpresaSimpleDataResult = {

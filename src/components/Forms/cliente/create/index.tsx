@@ -63,7 +63,7 @@ import {
 } from '@gluestack-ui/themed';
 
 import { Formik } from 'formik';
-import { validationSchema } from './validation';
+import * as Yup from 'yup';
 import { getDateFromString, getMinDateFor18YearsOld, getStringFromDate } from '@/utils';
 import { IFormCreateCliente } from './interfaces';
 import { Alert, GestureResponderEvent } from 'react-native';
@@ -73,11 +73,65 @@ import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
 import { RemoveIcon } from '@gluestack-ui/themed';
 import SelectEstados from '@/components/Custom/Selects/SelectEstados';
 import buscaCep from '@/utils/buscaCep/buscaCep';
+import Validator from './validation';
 
 const FormCreateClient: React.FC<IFormCreateCliente> = ({ id_pessoa, onCreated, db, havePessoas, onSelectPerson }) => {
     const [isReadOnlyAll, setIsReadOnlyAll] = React.useState(false);
     const [isReadOnlyAddress, setIsReadOnlyAddress] = React.useState(false);
     const [isNewPerson, setIsNewPerson] = React.useState(!havePessoas);
+
+    const validationSchema = Yup.object().shape({
+      pessoa: Yup.object().shape({
+        id: Yup.number(),
+        nome: Yup.string().when('pessoa.id', (id_pessoa, schema) =>
+          id_pessoa ? schema.required('Nome é obrigatório') : schema,
+        ),
+        data_nascimento: Yup.date().when('pessoa.id', {
+          is: (id_pessoa: string) => id_pessoa !== '',
+          then: (yup) => yup.required('Data de nascimento e obrigatorio'),
+        }),
+        cpf: Yup.string().required('CPF é obrigatório').test('cpf', 'CPF esta invalido', async (value) => {
+          return Validator.validateCPF(value);
+        })
+      }),
+      cep: Yup.string().required('CEP é obrigatório'),
+      logradouro: Yup.string().required('Logradouro é obrigatório'),
+      numero: Yup.string().required('Número é obrigatório'),
+      complemento: Yup.string(),
+      bairro: Yup.string().required('Bairro é obrigatório'),
+      cidade: Yup.string().required('Cidade é obrigatória'),
+      uf: Yup.string().required('UF é obrigatório'),
+      telefones: Yup.array()
+        .of(
+          Yup.object().shape({
+            numero: Yup.string()
+              .required('Número de telefone é obrigatório')
+              .min(12, 'O telefone é inválido').max(13, 'O telefone é invalido pois ultrapassa o valor máximo!').test('numero', 'O número ja existe!', (value) => {
+                return new ClienteService(db).haveCreatedTelefone(value);
+              }),
+          }),
+        )
+        .min(1, 'É necessário informar ao menos um telefone'), // Adiciona uma validação para garantir ao menos um telefone
+    
+      emails: Yup.array()
+        .of(
+          Yup.object().shape({
+            endereco: Yup.string()
+              .required('Endereço de email é obrigatório')
+              .email('Endereço de email inválido')
+              .test('endereco', 'email ja está em uso',(value) => {
+                return new ClienteService(db).haveCreatedEmail(value);
+              }),
+          }),
+        )
+        .min(1, 'É necessário informar ao menos um email'),
+      saldo: Yup.string().required('Saldo é obrigatório'),
+  });
+
+
+
+
+
   return (
     <>
       <Formik

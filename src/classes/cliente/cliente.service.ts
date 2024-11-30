@@ -477,4 +477,20 @@ export class ClienteService {
     return (await this.db.getAllAsync('SELECT * FROM cliente')).length > 1
   }
 
+  async haveCreatedEmail (email: string) {
+    const emails = await this.db.getAllAsync(
+      'SELECT * FROM email WHERE endereco == $email',
+      { $email: email },
+    );
+    return emails.length < 1
+  }
+
+  async haveCreatedTelefone (telefone: string) {
+    const telefones = await this.db.getAllAsync(
+      'SELECT * FROM telefone WHERE numero == $telefone',
+      { $telefone: telefone },
+    );
+    return telefones.length < 1
+  }
+
 }

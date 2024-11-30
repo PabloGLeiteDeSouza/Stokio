@@ -39,56 +39,63 @@ export class ProdutoService {
     }
   }
 
-  async search(value?: string | number | Date, tipo?: 'nome_pessoa' | 'data' | 'status' | 'valor', value1?: Date){
+  async search(value?: string | Date, tipo?: 'nome' | 'data_validade' | 'marca' | 'tipo' | 'codigo_de_barras' | 'ua', value1?: Date){
     try {
       const pesquisa = { query: "", params: {  }};
       switch (tipo) {
-        case 'data':
+        case 'data_validade':
           if (typeof value !== 'undefined' && typeof value !== "string" && typeof value !== 'number' && typeof value1 !== 'undefined') {
-            pesquisa.query = ' WHERE v.data >= $data_inicial AND v.data <= $data_final';
+            pesquisa.query = ' WHERE p.data_de_validade >= $data_inicial AND p.data_de_validade <= $data_final';
             pesquisa.params = { $data_inicial: getStringFromDate(value), $data_final: getStringFromDate(value1) };
           }
           break;
-        case 'nome_pessoa':
+        case 'nome':
           if (typeof value === "string") {
             pesquisa.query = ` WHERE p.nome LIKE '%' || $nome || '%'`;
             pesquisa.params = { $nome: value };
           }
           break;
-        case 'status':
+        case 'marca':
           if (typeof value === "string") {
-            pesquisa.query = ` WHERE v.status LIKE '%' || $status || '%'`;
-            pesquisa.params = { $status: value };
+            pesquisa.query = ` WHERE m.nome LIKE '%' || $marca || '%'`;
+            pesquisa.params = { $marca: value };
           }
           break;
-        case 'valor':
-          if (typeof value === "number") {
-            pesquisa.query = ` WHERE v.valor == $valor`;
-            pesquisa.params = { $valor: value };
+        case 'tipo':
+          if (typeof value === "string") {
+            pesquisa.query = ` WHERE t.nome '%' || $tipo || '%'`;
+            pesquisa.params = { $tipo: value };
+          }
+          break;
+        case 'codigo_de_barras':
+          if (typeof value === "string") {
+            pesquisa.query == ` WHERE p.codigo_de_barras LIKE '%' || $coidgo || '%'`;
+            pesquisa.params = { $coidgo: value };
+          }
+          break;
+
+        case 'ua':
+          if (typeof value === "string") {
+            pesquisa.query = ` WHERE u.nome LIKE '%' || $ua || '%'`;
+            pesquisa.params = { $ua: value };
           }
           break;
         default:
           
           break;
       }
-      const dados = await this.db.getAllAsync<{ nome: string; status: string; id: number; data_venda: string; }>(`SELECT p.nome, c.saldo, v.status, v.id, v.data as data_venda FROM venda as v INNER JOIN cliente as c ON c.id == v.id_cliente INNER JOIN pessoa as p ON p.id == c.id_pessoa ${pesquisa.query}`, pesquisa.params)
+      const dados = await this.db.getAllAsync<{
+        id: number;
+        nome: string;
+        data_de_validade: string;
+        quantidade: number;
+        tipo: string;
+        marca: string; 
+      }>(`SELECT p.id, p.nome, p.data_de_validade, p.quantidade, t.nome as tipo, m.nome as marca FROM produto as o INNER JOIN tipo_produto as t ON t.id == p.id_produto INNER JOIN marca as m ON m.id == p.id_marca ${pesquisa.query}`, pesquisa.params);
       if(dados.length < 1){
-        throw new Error("Nao ha vendas cadastradas!");
+        throw new Error("Não há produtos cadastrados!");
       }
-      const vendas = await Promise.all(dados.map(async (v) => {
-        try {
-          const itv = await this.db.getAllAsync<{ id: number; quantidade: number; valor_unitario: number; }>('SELECT * FROM item_venda WHERE id_venda == $id', {
-            $id: v.id,
-          });
-          if (itv.length < 1) {
-            throw new Error("Nao ha itens de venda para essa venda!");
-          }
-          return { ...v, data_venda: getDateFromString(v.data_venda), valor: itv.map(({ quantidade, valor_unitario }) => quantidade * valor_unitario).reduce((p, c) => p + c, 0) };
-        } catch (error) {
-          throw error;
-        }
-      }))
-      return vendas;
+      return dados;
     } catch (error) {
       throw error;
     }

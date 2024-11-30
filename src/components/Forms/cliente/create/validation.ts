@@ -1,6 +1,4 @@
-import * as Yup from 'yup';
-
-class Validator {
+export default class Validator {
     private static isCPF(cpf: string): boolean {
       cpf = cpf.replace(/[^\d]+/g, '');
       if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
@@ -56,47 +54,3 @@ class Validator {
   
     }
 }
-
-
-export const validationSchema = Yup.object().shape({
-    pessoa: Yup.object().shape({
-      id: Yup.number(),
-      nome: Yup.string().when('pessoa.id', (id_pessoa, schema) =>
-        id_pessoa ? schema.required('Nome é obrigatório') : schema,
-      ),
-      data_nascimento: Yup.date().when('pessoa.id', {
-        is: (id_pessoa: string) => id_pessoa !== '',
-        then: (yup) => yup.required('Data de nascimento e obrigatorio'),
-      }),
-      cpf: Yup.string().required('CPF é obrigatório').test('cpf', 'CPF esta invalido', async (value) => {
-        return Validator.validateCPF(value);
-      })
-    }),
-    cep: Yup.string().required('CEP é obrigatório'),
-    logradouro: Yup.string().required('Logradouro é obrigatório'),
-    numero: Yup.string().required('Número é obrigatório'),
-    complemento: Yup.string(),
-    bairro: Yup.string().required('Bairro é obrigatório'),
-    cidade: Yup.string().required('Cidade é obrigatória'),
-    uf: Yup.string().required('UF é obrigatório'),
-    telefones: Yup.array()
-      .of(
-        Yup.object().shape({
-          numero: Yup.string()
-            .required('Número de telefone é obrigatório')
-            .min(12, 'Número de telefone deve ter no mínimo 12 caracteres'),
-        }),
-      )
-      .min(1, 'É necessário informar ao menos um telefone'), // Adiciona uma validação para garantir ao menos um telefone
-  
-    emails: Yup.array()
-      .of(
-        Yup.object().shape({
-          endereco: Yup.string()
-            .required('Endereço de email é obrigatório')
-            .email('Endereço de email inválido'),
-        }),
-      )
-      .min(1, 'É necessário informar ao menos um email'),
-    saldo: Yup.string().required('Saldo é obrigatório'),
-});

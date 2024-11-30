@@ -50,12 +50,12 @@ const SelectRamo: React.FC<ISelectRamoProps> = ({ navigation, route }) => {
     return (
       <Card mt={index === 0 ? '$5' : '$2.5'} mb="$2.5">
         <HStack justifyContent="space-between">
-          <VStack>
+          <VStack w="$1/2">
             <Box>
               <Heading>{item.nome}</Heading>
             </Box>
           </VStack>
-          <VStack>
+          <VStack w="$1/3">
             <Button
               isDisabled={item.id === ramo.id}
               onPress={() => setRamo(item)}
@@ -76,7 +76,7 @@ const SelectRamo: React.FC<ISelectRamoProps> = ({ navigation, route }) => {
 
   return (
     <Box h="$full" w="$full">
-      <Box>
+      <Box mt="$5">
         <Heading size="2xl" textAlign="center">
           Selecionar Ramo:
         </Heading>

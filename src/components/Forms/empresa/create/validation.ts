@@ -1,6 +1,4 @@
-import * as Yup from 'yup';
-
-class Validator {
+export default class Validator {
     private static isCPF(cpf: string): boolean {
       cpf = cpf.replace(/[^\d]+/g, '');
       if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
@@ -56,52 +54,3 @@ class Validator {
   
     }
 }
-
-export const validationSchema = Yup.object().shape({
-    pessoa: Yup.object().shape({
-      id: Yup.string(),
-      nome: Yup.string().when('pessoa.id', (id_pessoa, schema) =>
-        id_pessoa ? schema.required('Nome é obrigatório') : schema,
-      ),
-      data_nascimento: Yup.date().when('pessoa.id', (id_pessoa, schema) =>
-        id_pessoa ? schema.required('Data de nascimento é obrigatória') : schema,
-      ),
-      cpf: Yup.string().when('pessoa.id', (id_pessoa, schema) =>
-        id_pessoa ? schema.required('CPF é obrigatório').test('cpf', 'CPF esta invalido', async (value) => {
-            return Validator.validateCPF(value);
-        }) : schema,
-      ),
-    }),
-    cnpj: Yup.string().test('cnpj', 'CNPJ esta inválido', async (value) => {
-      if (value) {
-        return Validator.validateCNPJ(String(value));
-      } else {
-        return true;
-      }
-    }),
-    nome_fantasia: Yup.string().required('Nome fantasia e obrigatório'),
-    razao_social: Yup.string().required('Razão social e obrigatória'),
-    ramo: Yup.object().shape({
-      id: Yup.string(),
-      nome: Yup.string().when('ramo.id', (id_ramo, schema) =>
-        id_ramo ? schema.required('Nome é obrigatório') : schema,
-      ),
-    }),
-    telefones: Yup.array().of(
-      Yup.object().shape({
-        numero: Yup.string().required('Número de telefone é obrigatório'),
-      }),
-    ),
-    cep: Yup.string().required('CEP é obrigatório').min(8, 'CEP inválido!'),
-    logradouro: Yup.string().required('Logradouro é obrigatório'),
-    numero: Yup.string().required('Número é obrigatório'),
-    complemento: Yup.string(),
-    bairro: Yup.string().required('Bairro é obrigatório'),
-    cidade: Yup.string().required('Cidade é obrigatória'),
-    uf: Yup.string().required('UF e obrigatorio!'),
-    emails: Yup.array().of(
-      Yup.object().shape({
-        endereco: Yup.string().required('Endereço de email é obrigatório'),
-      }),
-    ),
-});

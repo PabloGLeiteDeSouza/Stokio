@@ -82,7 +82,7 @@ import LoadingScreen from '@/components/LoadingScreen';
 import { useIsFocused } from '@react-navigation/native';
 import { getDateFromString } from '@/utils';
 import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
-const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
+const View: React.FC<VisualizarProdutoScreen> = ({ navigation, route }) => {
   const tipos_busca: Array<{
     label: string;
     value: string;
@@ -139,7 +139,6 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
   const StartScreen = async () => {
     try {
       const prodts = await new ProdutoService(db).getAllProdutos();
-      console.log(prodts);
       setProdutos(prodts);
       setIsLoading(false);
     } catch (err) {
@@ -188,15 +187,22 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
           onSubmit={async ({ busca, data_fim, data_inicio, tipo }) => {
             try{
               if(tipo === "data_validade"){
-                
+                const dados = await new ProdutoService(db).search(data_inicio, tipo, data_fim);
+                setProdutos([...dados])
               }
-              const dados = await new ProdutoService(db).search();
+              const dados = await new ProdutoService(db).search(busca, tipo);
+              setProdutos([...dados]);
             } catch(error) {
               Alert.alert('Error', (error as Error).message);
             }
           }}
         >
           {({ values, handleChange, handleSubmit, setFieldValue, errors }) => {
+            React.useEffect(() => {
+              if(route && route.params && route.params.code){
+                setFieldValue('busca', route?.params?.code);
+              }
+            }, [route?.params?.code])
             return (
               <>
                 <FormControl
@@ -300,7 +306,7 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
                             placeholder="codigo de barras"
                             value={values.busca}
                           />
-                          <Button>
+                          <Button onPress={() => navigation?.navigate('code-scanner', { screen: 'visualizar-produtos' })}>
                             <ButtonIcon
                               as={(props: object) => (
                                 <FontAwesome5 name="barcode" {...props} />
@@ -308,7 +314,7 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
                             />
                           </Button>
                         </Input>
-                        <Button>
+                        <Button onPress={handleSubmit as unknown as (event: GestureResponderEvent) => void}>
                           <ButtonIcon as={SearchIcon} />
                         </Button>
                       </HStack>
@@ -346,21 +352,21 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation }) => {
                           placeholder="Buscar"
                           onChangeText={handleChange('busca')}
                         />
-                        <Button>
+                        <Button onPress={handleSubmit as unknown as (event: GestureResponderEvent) => void}>
                           <ButtonIcon as={SearchIcon} />
                         </Button>
                       </Input>
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Informe o nome do produto.
                         </FormControlHelperText>
                       </FormControlHelper>
 
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          Atleast 6 characters are required.
+                          {errors.busca}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
