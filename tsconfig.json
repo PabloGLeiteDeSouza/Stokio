@@ -3,13 +3,19 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "$components/*": ["./components/*"],
-      "$screens/*": ["./screens/*"],
-      "$types/*": ["./types/*"],
-      "$databases/*": ["./databases/*"],
-      "$providers/*": ["./providers/*"],
+      "@/*": ["./src/*"],
+      "$types/*": ["./src/types/*"],
+      "@components/*": ["./src/components/*"],
+      "@screens": ["./src/screens"],
+      "@app": ["./src/app"],
+      "@utils/*": ["./src/utils/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@screens/*": ["./src/app/screens/*"],
+      "@services/*": ["./src/services/*"],
       "$assets/*": ["./assets/*"],
-      "$functions": ["./functions"]
+      "@constants/*": ["./src/constants/*"],
+      "$providers/*": ["./src/providers/*"],
+      "@classes/*": ["./src/classes/*"],
     }
   }
 }

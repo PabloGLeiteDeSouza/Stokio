@@ -5,14 +5,19 @@
   "build": {
     "dev-internal-apk": {
       "android": {
-        "image": "sdk-50",
+        "image": "latest",
         "buildType": "apk",
         "resourceClass": "medium"
       },
-      "ios": {
-        
-      },
       "developmentClient": true
+    },
+    "build:apk": {
+      "android": {
+        "image": "latest",
+        "buildType": "apk",
+        "resourceClass": "medium"
+      },
+      "developmentClient": false
     },
     "development": {
       "developmentClient": true,

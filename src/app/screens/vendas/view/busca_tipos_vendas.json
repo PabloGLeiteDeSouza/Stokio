@@ -1,0 +1,18 @@
+[
+    {
+        "label": "Data",
+        "value": "data"
+    },
+    {
+        "label": "Nome da Pessoa",
+        "value": "nome_pessoa"
+    },
+    {
+        "label": "Valor da Venda",
+        "value": "valor"
+    },
+    {
+        "label": "Status da Venda",
+        "value": "status"
+    }
+]

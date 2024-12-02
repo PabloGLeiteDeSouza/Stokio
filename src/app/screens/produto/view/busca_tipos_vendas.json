@@ -1,0 +1,26 @@
+[
+    {
+        "label": "Codigo de barras",
+        "value": "codigo_de_barras"
+    },
+    {
+        "label": "Nome",
+        "value": "nome"
+    },
+    {
+        "label": "Marca",
+        "value": "marca"
+    },
+    {
+        "label": "Tipo",
+        "value": "tipo"
+    },
+    {
+        "label": "Data de Validade",
+        "value": "data_validade"
+    },
+    {
+        "label": "Unidade de armazenamento",
+        "value": "ua"
+    }
+]

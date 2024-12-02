@@ -1,12 +1,27 @@
-This is a [Next.js](https://github.com/expo/expo) + [Gluestack-ui](https://ui.gluestack.io/) project template bootstrapped with [`create-expo-app`](https://docs.expo.dev/get-started/create-a-project/).
+This is a [Expo](https://github.com/expo/expo) + [Gluestack-ui](https://ui.gluestack.io/) project template bootstrapped with [`create-expo-app`](https://docs.expo.dev/get-started/create-a-project/).
 
 ## Getting Started
 
-First, run the development server:
+First install packages and dependencies to using this application with expo server.
 
 ```bash
-# For web
+# with yarn
+yarn
+
+# with npm
+npm i
+
+```
+
+run application in the expo server.
+
+```bash
+# For web with Yarn
 yarn web
+
+# or using npm
+npm run web
+
 # For ios
 yarn ios
 # For android
@@ -30,3 +45,7 @@ You can check out:
 - [the gluestack-ui GitHub repository](https://github.com/gluestack/gluestack-ui)
 - [the gluestack-style GitHub repository](https://github.com/gluestack/gluestack-style)
 Your feedback and contributions are welcome!
+
+## In implementation phase
+
+We are building and implementing tests in the application but it is not possible to test it at the moment.
