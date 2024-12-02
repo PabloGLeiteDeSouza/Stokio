@@ -94,6 +94,14 @@ export default class TipoProdutoService {
 
   async delete(id: number) {
     try {
+      const dados = await this.db.getAllAsync('SELECT * FROM produto WHERE id_tipo_produto == $id', {
+        $id: id,
+      })
+      if (dados.length > 0) {
+        throw new Error('Não é possível excluir o tipo do produto pois ele tem produtos associados', {
+          cause: 'ERR_TIPO_PRODUTO_DELETE_ASSOCIATED_PRODUCTS',
+        });
+      }
       await this.db.runAsync('DELETE FROM tipo_produto WHERE id = $id', { $id: id });
     } catch (err) {
       throw err;

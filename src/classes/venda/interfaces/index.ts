@@ -46,7 +46,7 @@ export interface UpdateVenda {
     id: number;
     status: string;
     data: Date;
-    id_empresa: number;
+    id_cliente: number;
     itens_de_venda: {
         id?: number;
         quantidade: number;

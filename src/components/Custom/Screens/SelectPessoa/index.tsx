@@ -18,6 +18,7 @@ import { getStringFromDate } from '@/utils';
 import { ClienteService } from '@/classes/cliente/cliente.service';
 import { useSQLiteContext } from 'expo-sqlite';
 import { EmpresaService } from '@/classes/empresa/empresa.service';
+import { mask } from '@/utils/mask';
 
 const SelectPessoa: React.FC<ISlectPessoaProps> = ({ navigation, route }) => {
   if (!route || !route.params || !route.params.screen) {
@@ -41,6 +42,7 @@ const SelectPessoa: React.FC<ISlectPessoaProps> = ({ navigation, route }) => {
       if (screen === "cadastrar-cliente") {
         const pess = await new ClienteService(db).findAllPessoas();
         setPessoas([...pess]);
+        console.log(pess);
       } else {
         const pess = await new EmpresaService(db).getAllPessoas();
         setPessoas([...pess]);
@@ -58,10 +60,10 @@ const SelectPessoa: React.FC<ISlectPessoaProps> = ({ navigation, route }) => {
 
   const FlatListPessoas = FlatList as PessoaFlatList;
 
-  const ListRenderPessoas: ListRenderItem<Pessoa> = ({ item }) => {
+  const ListRenderPessoas: ListRenderItem<Pessoa> = ({ item, index }) => {
     return (
-      <Box>
-        <Card my="$5">
+      <Box key={index}>
+        <Card mt={index === 0 ? "$5" : "$2.5"} mb={index === (pessoas.length - 1) ? "$5" : "$2.5"}>
           <HStack justifyContent="space-between">
             <VStack w="$2/3">
               <Box>
@@ -77,7 +79,7 @@ const SelectPessoa: React.FC<ISlectPessoaProps> = ({ navigation, route }) => {
                 </Text>
               </Box>
               <Box>
-                <Text>{item.cpf}</Text>
+                <Text>{mask(item.cpf, 'cpf')}</Text>
               </Box>
             </VStack>
             <VStack>

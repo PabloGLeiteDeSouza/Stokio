@@ -248,6 +248,12 @@ export class ClienteService {
   // Método de deleção de cliente
   async deleteCliente(id: number): Promise<void> {
     try {
+      const venda = await this.db.getAllAsync('SELECT * FROM venda WHERE id_cliente == $id', {
+        $id: id,
+      })
+      if (venda.length > 0) {
+        throw new Error('Não é possível deletar o cliente pois ele tem uma venda associada')
+      }
       await this.db.runAsync('DELETE FROM cliente WHERE id = $id', { $id: id });
       await this.db.runAsync('DELETE FROM telefone WHERE id_cliente = $id', {
         $id: id,
@@ -437,7 +443,7 @@ export class ClienteService {
         data_nascimento: string;
       })[];
       if (have) {
-        pessoas = await this.db.getAllAsync<Omit<IPessoaUpdate, 'data_nascimento'> & { data_nascimento: string; }>('SELECT p.id, p.nome, p.cpf, p.data_nascimento FROM pessoa as p INNER JOIN cliente as c ON c.id_pessoa <> p.id');
+        pessoas = await this.db.getAllAsync<Omit<IPessoaUpdate, 'data_nascimento'> & { data_nascimento: string; }>('SELECT p.id, p.nome, p.cpf, p.data_nascimento FROM pessoa as p LEFT JOIN cliente as c ON c.id_pessoa = p.id WHERE c.id_pessoa IS NULL');
       } else {
         pessoas = await this.db.getAllAsync<Omit<IPessoaUpdate, 'data_nascimento'> & { data_nascimento: string; }>('SELECT * FROM pessoa');
       }
@@ -474,7 +480,7 @@ export class ClienteService {
   }
 
   async haveClients(): Promise<boolean>{
-    return (await this.db.getAllAsync('SELECT * FROM cliente')).length > 1
+    return (await this.db.getAllAsync('SELECT * FROM cliente')).length > 0
   }
 
   async haveCreatedEmail (email: string) {

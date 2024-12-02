@@ -242,6 +242,12 @@ export default class UaService {
 
   async delete(id: number) {
     try {
+      const dados = await this.db.getAllAsync('SELECT * FROM produto WHERE id_ua == $id', {
+        $id: id,
+      })
+      if(dados.length > 0){
+        throw new Error("Não é possível deletar uma unidade de armazenamento que tem produtos associados a ela!");
+      }
       const res = await this.db.runAsync('DELETE FROM ua WHERE id = $id', { $id: id });
       if (res.changes < 1) {
         throw new Error("Não foi possível deletar a unidade de armazenamento");

@@ -74,6 +74,7 @@ import { RemoveIcon } from '@gluestack-ui/themed';
 import SelectEstados from '@/components/Custom/Selects/SelectEstados';
 import buscaCep from '@/utils/buscaCep/buscaCep';
 import Validator from './validation';
+import { mask } from '@/utils/mask';
 
 const FormCreateClient: React.FC<IFormCreateCliente> = ({ id_pessoa, onCreated, db, havePessoas, onSelectPerson }) => {
     const [isReadOnlyAll, setIsReadOnlyAll] = React.useState(false);
@@ -288,7 +289,7 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ id_pessoa, onCreated, 
                             </Box>
                             <Box>
                               <Heading>CPF</Heading>
-                              <Text>{values.pessoa.cpf}</Text>
+                              <Text>{mask(values.pessoa.cpf, 'cpf')}</Text>
                             </Box>
                           </VStack>
                         </HStack>
@@ -384,7 +385,7 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ id_pessoa, onCreated, 
                   isRequired={true}
                 >
                   <FormControlLabel>
-                    <FormControlLabelText>Numero</FormControlLabelText>
+                    <FormControlLabelText>Número</FormControlLabelText>
                   </FormControlLabel>
                   <Input>
                     <InputField
@@ -398,7 +399,7 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ id_pessoa, onCreated, 
 
                   <FormControlHelper>
                     <FormControlHelperText>
-                      Must be atleast 6 characters.
+                      Informe um número válido.
                     </FormControlHelperText>
                   </FormControlHelper>
 
@@ -427,7 +428,7 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ id_pessoa, onCreated, 
 
                   <FormControlHelper>
                     <FormControlHelperText>
-                      Must be atleast 6 characters.
+                      Informe o complemento.
                     </FormControlHelperText>
                   </FormControlHelper>
 
@@ -459,7 +460,7 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ id_pessoa, onCreated, 
 
                   <FormControlHelper>
                     <FormControlHelperText>
-                      Must be atleast 6 characters.
+                      Informe o bairro.
                     </FormControlHelperText>
                   </FormControlHelper>
 
@@ -488,7 +489,7 @@ const FormCreateClient: React.FC<IFormCreateCliente> = ({ id_pessoa, onCreated, 
 
                   <FormControlHelper>
                     <FormControlHelperText>
-                      Must be atleast 6 characters.
+                      Infrome a cidade.
                     </FormControlHelperText>
                   </FormControlHelper>
 

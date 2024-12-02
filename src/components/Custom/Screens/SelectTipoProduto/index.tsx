@@ -54,9 +54,9 @@ const SelectTipoProduto: React.FC<ISelectTipoProdutoProps> = ({
 
   const FlatListTipoProdutos = FlatList as TipoProdutoFlatList;
 
-  const ListRenderTipoProdutos: ListRenderItem<TipoProduto> = ({ item }) => {
+  const ListRenderTipoProdutos: ListRenderItem<TipoProduto> = ({ item, index }) => {
     return (
-      <Card>
+      <Card mt={index === 0 ? "$5" : "$2.5"} mb={index === (tipoProdutos.length - 1) ? "$5" : "$2.5"}>
         <HStack w="$full" justifyContent="space-between">
           <VStack w="$3/5">
             <Box>

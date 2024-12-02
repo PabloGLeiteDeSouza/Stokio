@@ -73,6 +73,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { mask } from '@/utils/mask';
 import { useIsFocused } from '@react-navigation/native';
 import InputDatePicker from '@/components/Custom/Inputs/DatePicker';
+import InputText from '@/components/Input';
 const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
   const [compras, setCompras] = React.useState<CompraViewObject[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -148,13 +149,24 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
           <Formik
             initialValues={{
               busca: '',
-              tipo: '',
+              tipo: 'nome_empresa' as 'data' | 'nome_empresa' | 'status',
               data_inicio: new Date(),
               data_final: new Date(),
             }}
-            onSubmit={async () => {}}
+            onSubmit={async ({busca, tipo, data_inicio, data_final}) => {
+              try {
+                if (tipo === "data") {
+                  const compras = await new CompraService(db).search(data_inicio, tipo, data_final);
+                  setCompras(compras);
+                } else {
+                  const compras = await new CompraService(db).search(busca, tipo);
+                }
+              } catch (error) {
+                Alert.alert('Erro', (error as Error).message);
+              }
+            }}
           >
-            {({ values, errors, setFieldValue, handleChange, handleBlur, handleSubmit }) => {
+            {({ values, errors, setFieldValue, handleChange, handleSubmit }) => {
               return (
                 <>
                   <FormControl
@@ -171,6 +183,14 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
                     <Select
                       isInvalid={errors.tipo ? true : false}
                       isDisabled={false}
+                      initialLabel='Nome da Empresa'
+                      selectedValue={values.tipo === "data" ? "Data da compra" : values.tipo === "nome_empresa" ? "Nome da Empresa" : "Status"}
+                      onValueChange={(text) => {
+                        setFieldValue('tipo', text);
+                        setFieldValue('busca', '');
+                        setFieldValue('data_inicio', new Date());
+                        setFieldValue('data_final', new Date());
+                      }}
                     >
                       <SelectTrigger size={'lg'} variant={'rounded'}>
                         <SelectInput placeholder="Select option" />
@@ -182,23 +202,20 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
                           <SelectDragIndicatorWrapper>
                             <SelectDragIndicator />
                           </SelectDragIndicatorWrapper>
-                          <SelectItem label="UX Research" value="UX Research" />
+                          <SelectItem 
+                            label="Nome da Empresa" 
+                            value="nome_empresa" 
+                            isPressed={values.tipo === "nome_empresa"}
+                          />
                           <SelectItem
-                            label="Data"
+                            label="Data da compra"
                             value="data"
+                            isPressed={values.tipo === "data"}
                           />
                           <SelectItem
-                            label="Cross Platform Development Process"
-                            value="Cross Platform Development Process"
-                          />
-                          <SelectItem
-                            label="UI Designing"
-                            value="UI Designing"
-                            isDisabled={true}
-                          />
-                          <SelectItem
-                            label="Backend Development"
-                            value="Backend Development"
+                            label="Status"
+                            value="status"
+                            isPressed={values.tipo === "status"}
                           />
                         </SelectContent>
                       </SelectPortal>
@@ -217,56 +234,125 @@ const View: React.FC<VisualizarCompraScreen> = ({ navigation, route }) => {
                   </FormControl>
                   {values.tipo !== "data" && (
                     <>
-                      <FormControl
-                        isInvalid={errors.busca ? true : false}
-                        size={'md'}
-                        isDisabled={false}
-                        isRequired={true}
-                      >
-                        <FormControlLabel>
-                          <FormControlLabelText>Buscar</FormControlLabelText>
-                        </FormControlLabel>
-                        <Input>
-                          <InputField
-                            type="text"
-                            value={values.busca}
-                            placeholder="Busca...."
-                            onChangeText={handleChange('busca')}
-                          />
-                          <Button onPress={handleSubmit as unknown as (event: GestureResponderEvent) => void}>
-                            <ButtonIcon as={SearchIcon} />
-                          </Button>
-                        </Input>
+                      {values.tipo === "nome_empresa" && (
+                        <>
+                          <FormControl
+                            isInvalid={errors.busca ? true : false}
+                            size={'md'}
+                            isDisabled={false}
+                            isRequired={true}
+                          >
+                            <FormControlLabel>
+                              <FormControlLabelText>Informe o nome da empresa</FormControlLabelText>
+                            </FormControlLabel>
+                            <Input>
+                              <InputField
+                                type="text"
+                                value={values.busca}
+                                placeholder="Busca...."
+                                onChangeText={handleChange('busca')}
+                              />
+                              <Button onPress={handleSubmit as unknown as (event: GestureResponderEvent) => void}>
+                                <ButtonIcon as={SearchIcon} />
+                              </Button>
+                            </Input>
 
-                        <FormControlHelper>
-                          <FormControlHelperText>
-                            Insira o que deve ser buscado.
-                          </FormControlHelperText>
-                        </FormControlHelper>
+                            <FormControlHelper>
+                              <FormControlHelperText>
+                                Insira o Nome da Empresa da venda.
+                              </FormControlHelperText>
+                            </FormControlHelper>
 
-                        <FormControlError>
-                          <FormControlErrorIcon as={AlertCircleIcon} />
-                          <FormControlErrorText>
-                            {errors.busca}
-                          </FormControlErrorText>
-                        </FormControlError>
-                      </FormControl>
+                            <FormControlError>
+                              <FormControlErrorIcon as={AlertCircleIcon} />
+                              <FormControlErrorText>
+                                {errors.busca}
+                              </FormControlErrorText>
+                            </FormControlError>
+                          </FormControl>
+                        </>
+                      )}
+                      {values.tipo === "status" && (
+                        <Box gap="$5">
+                          <FormControl
+                            isInvalid={errors.tipo ? true : false}
+                            size={'md'}
+                            isDisabled={false}
+                            isRequired={true}
+                          >
+                            <FormControlLabel>
+                              <FormControlLabelText>
+                                Selecione o tipo de status
+                              </FormControlLabelText>
+                            </FormControlLabel>
+                            <Select
+                              isInvalid={errors.tipo ? true : false}
+                              isDisabled={false}
+                              initialLabel={values.busca === "pago" ? "Pago" : values.busca === "devendo" ? "Devendo" : ""}
+                              selectedValue={values.busca === "pago" ? "Pago" : values.busca === "devendo" ? "Devendo" : ""}
+                              onValueChange={handleChange('busca')}
+                            >
+                              <SelectTrigger size={'lg'} variant={'rounded'}>
+                                <SelectInput placeholder="Select option" />
+                                <SelectIcon mr={'$3'} ml={0} as={ChevronDownIcon} />
+                              </SelectTrigger>
+                              <SelectPortal>
+                                <SelectBackdrop />
+                                <SelectContent>
+                                  <SelectDragIndicatorWrapper>
+                                    <SelectDragIndicator />
+                                  </SelectDragIndicatorWrapper>
+                                  <SelectItem 
+                                    label="Pago" 
+                                    value="pago" 
+                                    isPressed={values.busca === "pago"}
+                                  />
+                                  <SelectItem
+                                    label="Devendo"
+                                    value="devendo"
+                                    isPressed={values.busca === "devendo"}
+                                  />
+                                </SelectContent>
+                              </SelectPortal>
+                            </Select>
+
+                            <FormControlHelper>
+                              <FormControlHelperText>
+                                Selecione o status da compra desejada.
+                              </FormControlHelperText>
+                            </FormControlHelper>
+
+                            <FormControlError>
+                              <FormControlErrorIcon as={AlertCircleIcon} />
+                              <FormControlErrorText>{errors.tipo}</FormControlErrorText>
+                            </FormControlError>
+                          </FormControl>
+                          <Box>
+                            <Button onPress={handleSubmit as unknown as (event: GestureResponderEvent) => void}>
+                              <ButtonText>
+                                Buscar
+                              </ButtonText>
+                            </Button>
+                          </Box>
+                        </Box>
+                      )}
                     </>
                   )}
                   {values.tipo === "data" && (
-                    <Box>
+                    <Box gap="$5">
                       <InputDatePicker
-                        onChangeDate={(dt) => setFieldValue('data_inicial', dt)}
+                        onChangeDate={(dt) => setFieldValue('data_inicio', dt)}
                         title='Data inicial'
-                        value={values.data_final}
+                        value={values.data_inicio}
                       />
                       <InputDatePicker
                         onChangeDate={(dt) => setFieldValue('data_final', dt)}
                         title='Data final'
                         value={values.data_final}
+                        minimumDate={values.data_inicio}
                       />
                       <Box>
-                        <Button>
+                        <Button onPress={handleSubmit as unknown as (event: GestureResponderEvent) => void}>
                           <ButtonText>
                             Buscar
                           </ButtonText>

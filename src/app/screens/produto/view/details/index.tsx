@@ -6,9 +6,11 @@ import {
 } from '@/interfaces/produto';
 import { getDateFromString } from '@/utils';
 import { mask } from '@/utils/mask';
+import { EditIcon, TrashIcon } from '@gluestack-ui/themed';
 import {
   Box,
   Button,
+  ButtonIcon,
   ButtonText,
   Heading,
   ScrollView,
@@ -17,6 +19,7 @@ import {
 import { useSQLiteContext } from 'expo-sqlite';
 import React from 'react';
 import { Alert } from 'react-native';
+import delete_product from '../delete';
 
 const Details: React.FC<DetalhesProdutoScreen> = ({ navigation, route }) => {
   if (!route || !route.params || !route.params.id) {
@@ -114,13 +117,20 @@ const Details: React.FC<DetalhesProdutoScreen> = ({ navigation, route }) => {
             </Box>
             <Box gap="$5">
               <Button
+                gap="$3"
                 onPress={() =>
                   navigation?.navigate('atualizar-produto', { id: produto.id })
                 }
               >
+                <ButtonIcon as={EditIcon} />
                 <ButtonText>Editar</ButtonText>
               </Button>
-              <Button action="negative">
+              <Button onPress={async () => {
+                await delete_product(produto.nome, produto.id, db, () => {
+                  navigation?.navigate('visualizar-produtos');
+                });
+              }} gap="$3" action="negative">
+                <ButtonIcon as={TrashIcon} />
                 <ButtonText>Excluir</ButtonText>
               </Button>
             </Box>

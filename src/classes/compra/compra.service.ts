@@ -148,7 +148,52 @@ export default class CompraService {
     }
   }
 
-  async delete() {}
+  async delete(id: number) {
+    try {
+      const itens = await this.db.getAllAsync<{ id: number; quantidade: number; id_produto: number }>('SELECT id, quantidade, id_produto FROM item_compra WHERE id)_compra == $id', {
+        $id: id
+      })
+      if (itens.length < 0) {
+        throw new Error("Não foi possível deletar a compra pois não existe itens vinculados a ela");
+      }
+      await Promise.all(itens.map(async (item) => {
+        try {
+          const prod = await this.db.getFirstAsync<{ quantidade: number; }>("SELECT * FROM produto WHERE id == $id", {
+            $id: item.id_produto
+          });
+          if (!prod) {
+            throw new Error("Não foi possível deletar o item da compra pois não existe produto vinculado a compra");
+          }
+          if (prod.quantidade < item.quantidade) {
+            throw new Error("Nao e possivel deletar esse item da compra pois existe uma ou mais vendas feitas com esse produto");
+          }
+          const res = await this.db.runAsync('UPDATE produto SET quantidade = quantidade - $quantidade WHERE id = $id', {
+            $quantidade: item.quantidade,
+            $id: item.id_produto,
+          });
+          if (res.changes < 1) {
+            throw new Error("Não foi possível atualizar o produto!");
+          }
+          const res_it = await this.db.runAsync('DELETE FROM item_compra WHERE id == $id', {
+            $id: item.id,
+          })
+          if (res_it.changes < 1) {
+            throw new Error("Não foi possível deletar o item da compra!");
+          }
+        } catch (error) {
+          throw error;
+        }
+      }));
+      const res = await this.db.runAsync('DELETE FROM compra WHERE id == $id', {
+        $id: id
+      });
+      if (res.changes < 1) {
+        throw new Error("Não foi possível deletar a compra!");
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
 
   async findAll(): Promise<{
     id: number;
@@ -253,6 +298,55 @@ export default class CompraService {
         throw new Error("Nenhum item de compra foi encontrada"); 
       }
       return { ...compra, itens_compra };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async search(value?: string | number | Date, tipo?: 'nome_empresa' | 'data' | 'status', value1?: Date)  {
+    try {
+      const pesquisa = { query: "", params: {  }};
+      switch (tipo) {
+        case 'data':
+          if (typeof value !== 'undefined' && typeof value !== "string" && typeof value !== 'number' && typeof value1 !== 'undefined') {
+            pesquisa.query = ' WHERE c.data >= $data_inicial AND c.data <= $data_final';
+            pesquisa.params = { $data_inicial: getStringFromDate(value), $data_final: getStringFromDate(value1) };
+          }
+          break;
+        case 'nome_empresa':
+          if (typeof value === "string") {
+            pesquisa.query = ` WHERE e.nome_fantasia LIKE '%' || $nome || '%'`;
+            pesquisa.params = { $nome: value };
+          }
+          break;
+        case 'status':
+          if (typeof value === "string") {
+            pesquisa.query = ` WHERE c.status == $status`;
+            pesquisa.params = { $status: value };
+          }
+          break;
+        default:
+          
+          break;
+      }
+      const dados = await this.db.getAllAsync<{ nome_empresa: string; status: string; id: number; data: string; }>(`SELECT e.nome_fantasia as nome_empresa, c.status, c.id, c.data FROM compra as c INNER JOIN empresa as e ON e.id == c.id_empresa${pesquisa.query}`, pesquisa.params)
+      if(dados.length < 1){
+        throw new Error("Nao ha compras cadastradas!");
+      }
+      const compras = await Promise.all(dados.map(async (c) => {
+        try {
+          const itc = await this.db.getAllAsync<{ id: number; quantidade: number; valor_unitario: number; }>('SELECT * FROM item_compra WHERE id_compra == $id', {
+            $id: c.id,
+          });
+          if (itc.length < 1) {
+            throw new Error("Nao ha itens de compra para essa compra!");
+          }
+          return { ...c, data: getDateFromString(c.data), valor_compra: itc.map(({ quantidade, valor_unitario }) => quantidade * valor_unitario).reduce((p, c) => p + c, 0) };
+        } catch (error) {
+          throw error;
+        }
+      }))
+      return compras;
     } catch (error) {
       throw error;
     }

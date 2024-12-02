@@ -88,6 +88,12 @@ export default class UmService {
 
   async delete(id: number) {
     try {
+      const dados = await this.db.getAllAsync('SELECT * FROM produto WHERE id_um == $id', {
+        $id: id,
+      });
+      if (dados.length > 0) {
+        throw new Error('Nao foi possivel deletar a unidade de medida pois ela esta associada a produtos!');
+      }
       const data = await this.db.runAsync(`DELETE FROM um WHERE id = $id`, {
         $id: id,
       });

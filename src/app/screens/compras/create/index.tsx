@@ -91,7 +91,7 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
         throw new Error('Não há empresas cadastradas', { cause: 'ERR_EMPRESA_FINDALL_NOT_FOUND' });
       }
       setTemEmpresas(true);
-      const prod = await new ProdutoService(db).getAllProdutos();
+      const prod = await new ProdutoService(db).getAllProdutosList();
       if (prod.length < 1) {
         throw new Error('Não há produtos cadastrados', { cause: 'ERR_PRODUTO_FINDALL_NOT_FOUND' });
       }
@@ -315,7 +315,7 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
                                   </HStack>
                                 </Card>
                                 <FormControl
-                                  isInvalid={false}
+                                  isInvalid={typeof errors.produtos !== 'undefined' && typeof errors.produtos[i] === 'object' ? true : false}
                                   size={'md'}
                                   isDisabled={false}
                                   isRequired={true}
@@ -438,7 +438,7 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
 
                                   <FormControlHelper>
                                     <FormControlHelperText>
-                                      Must be atleast 6 characters.
+                                      Informe a quantidade do produto.
                                     </FormControlHelperText>
                                   </FormControlHelper>
 
@@ -447,7 +447,7 @@ const Create: React.FC<CadastrarCompraScreen> = ({ navigation, route}) => {
                                       as={AlertCircleIcon}
                                     />
                                     <FormControlErrorText>
-                                      Atleast 6 characters are required.
+                                      {typeof errors.produtos !== 'undefined' && typeof errors.produtos[i] === 'object' ? errors.produtos[i].quantidade : ""}
                                     </FormControlErrorText>
                                   </FormControlError>
                                 </FormControl>

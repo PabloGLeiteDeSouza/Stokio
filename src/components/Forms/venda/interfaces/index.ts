@@ -10,7 +10,7 @@ export interface IFormCreateVenda {
     onCreateProduct: () => ReturnFunctions; 
     onCreateCliente: () => ReturnFunctions;
     onChangeCliente: (id_cliente: number) => ReturnFunctions;
-    onAddProductToVenda: (produtos: Array<{ id: number }>) => ReturnFunctions, 
-    onUpdateProductToVenda: (produtos: Array<{ id: number }>, i: number) => ReturnFunctions,
+    onAddProductToVenda: (produtos: Array<{ id_produto: number }>) => ReturnFunctions, 
+    onUpdateProductToVenda: (produtos: Array<{ id_produto: number }>, i: number) => ReturnFunctions,
     onCreatedVenda: () => ReturnFunctions;
 }

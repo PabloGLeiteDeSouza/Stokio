@@ -138,7 +138,7 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation, route }) => {
 
   const StartScreen = async () => {
     try {
-      const prodts = await new ProdutoService(db).getAllProdutos();
+      const prodts = await new ProdutoService(db).getAllProdutosList();
       setProdutos(prodts);
       setIsLoading(false);
     } catch (err) {
@@ -189,9 +189,10 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation, route }) => {
               if(tipo === "data_validade"){
                 const dados = await new ProdutoService(db).search(data_inicio, tipo, data_fim);
                 setProdutos([...dados])
+              } else {
+                const dados = await new ProdutoService(db).search(busca, tipo);
+                setProdutos([...dados]);
               }
-              const dados = await new ProdutoService(db).search(busca, tipo);
-              setProdutos([...dados]);
             } catch(error) {
               Alert.alert('Error', (error as Error).message);
             }
@@ -219,6 +220,9 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation, route }) => {
                   <Select
                     onValueChange={(text) => {
                       setFieldValue('tipo', text);
+                      setFieldValue('busca', '');
+                      setFieldValue('data_inicio', new Date());
+                      setFieldValue('data_fim', new Date());
                     }}
                     isInvalid={false}
                     isDisabled={false}
@@ -305,6 +309,7 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation, route }) => {
                             type="text"
                             placeholder="codigo de barras"
                             value={values.busca}
+                            onChangeText={handleChange('busca')}
                           />
                           <Button onPress={() => navigation?.navigate('code-scanner', { screen: 'visualizar-produtos' })}>
                             <ButtonIcon
@@ -334,7 +339,7 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation, route }) => {
                     </FormControl>
                   </>
                 )}
-                {values.tipo === 'nome' && (
+                {values.tipo === 'nome' || values.tipo === 'marca' || values.tipo === "ua" || values.tipo == "tipo" ? (
                   <>
                     <FormControl
                       isInvalid={false}
@@ -359,7 +364,7 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation, route }) => {
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Informe o nome do produto.
+                          { values.tipo === "nome" ? "Infrome o nome do produto" : values.tipo === "marca" ? "Informe a marca do produto" : values.tipo === "ua" ? "Informe a o nome da unidade de armazenamento do produto" : "Informe o tipo do produto"}
                         </FormControlHelperText>
                       </FormControlHelper>
 
@@ -371,7 +376,7 @@ const View: React.FC<VisualizarProdutoScreen> = ({ navigation, route }) => {
                       </FormControlError>
                     </FormControl>
                   </>
-                )}
+                ) : (<></>)}
               </>
             );
           }}

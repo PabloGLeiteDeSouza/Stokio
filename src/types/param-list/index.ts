@@ -363,7 +363,13 @@ export type VendasStackParamList = {
     type?: 'update' | 'create';
     indexUpdated?: number;
   };
-  'atualizar-venda'?: { id: number };
+  'atualizar-venda'?: { 
+    id: number; 
+    id_cliente?: number;
+    id_produto?: number;
+    type?: 'update' | 'create';
+    indexUpdated?: number; 
+  };
   'visualizar-vendas'?: object;
   'selecionar-cliente'?: {
     screen: 'cadastrar-venda';
@@ -373,7 +379,7 @@ export type VendasStackParamList = {
     screen: 'cadastrar-venda';
     type: 'update' | 'create';
     indexUpdated?: number;
-    selectedsProdutos?: Array<{ id: number }>;
+    selectedsProdutos?: Array<{ id_produto: number }>;
   };
 };
 

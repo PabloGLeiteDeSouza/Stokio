@@ -51,7 +51,6 @@ const validationSchema = Yup.object().shape({
     id: Yup.number().required('A marca é obrigatória'),
     nome: Yup.string().required('O nome é obrigatório'),
   }),
-  quantidade: Yup.number().required('A quantidade é obrigatória'),
   unidade_de_medida: Yup.object().shape({
     id: Yup.number().required('A unidade de medida é obrigatória'),
     nome: Yup.string().required('O nome é obrigatório'),
@@ -81,7 +80,6 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
     descricao: 'asdasdsadasdsadsadasdsa' as string | null,
     data_de_validade: new Date(),
     valor: 200.00,
-    quantidade: 20,
     tamanho: 50,
     marca: {
       id: 0,
@@ -275,7 +273,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                     {isNewMarca && (
                       <>
                         <FormControl
-                          isInvalid={false}
+                          isInvalid={errors.marca?.nome ? true : false}
                           size={'md'}
                           isDisabled={false}
                           isRequired={true}
@@ -301,7 +299,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                           <FormControlError>
                             <FormControlErrorIcon as={AlertCircleIcon} />
                             <FormControlErrorText>
-                              Atleast 6 characters are required.
+                              {errors.marca?.nome}
                             </FormControlErrorText>
                           </FormControlError>
                         </FormControl>
@@ -316,7 +314,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                           <HStack>
                             <VStack gap="$5">
                               <Box>
-                                <Heading>Maarca Selecionada:</Heading>
+                                <Heading>Marca Selecionada:</Heading>
                               </Box>
                               <Box>
                                 <Text>{values.marca.nome}</Text>
@@ -566,7 +564,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                     />
 
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={errors.codigo_de_barras ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
@@ -601,14 +599,14 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Informe um codigo de barras.
                         </FormControlHelperText>
                       </FormControlHelper>
 
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          Atleast 6 characters are required.
+                          {errors.codigo_de_barras}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
@@ -644,7 +642,7 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                       </FormControlError>
                     </FormControl>
                     <FormControl
-                      isInvalid={false}
+                      isInvalid={errors.descricao ? true : false}
                       size={'md'}
                       isDisabled={false}
                       isRequired={true}
@@ -663,14 +661,14 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
 
                       <FormControlHelper>
                         <FormControlHelperText>
-                          Must be atleast 6 characters.
+                          Informe a descricao do produto.
                         </FormControlHelperText>
                       </FormControlHelper>
 
                       <FormControlError>
                         <FormControlErrorIcon as={AlertCircleIcon} />
                         <FormControlErrorText>
-                          Atleast 6 characters are required.
+                          {errors.descricao}
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
@@ -681,38 +679,6 @@ const Update: React.FC<AtualizarProdutoScreen> = ({ navigation, route }) => {
                     onChangeValue={handleChange('valor')}
                     error={errors.valor}
                    />
-                    <FormControl
-                      isInvalid={errors.quantidade ? true : false}
-                      size={'md'}
-                      isDisabled={false}
-                      isRequired={true}
-                    >
-                      <FormControlLabel>
-                        <FormControlLabelText>Quantidade</FormControlLabelText>
-                      </FormControlLabel>
-                      <Input>
-                        <InputField
-                          type="text"
-                          value={values.quantidade.toString()}
-                          placeholder="500"
-                          onChangeText={handleChange('quantidade')}
-                          keyboardType="number-pad"
-                        />
-                      </Input>
-
-                      <FormControlHelper>
-                        <FormControlHelperText>
-                          Informe a quantidade.
-                        </FormControlHelperText>
-                      </FormControlHelper>
-
-                      <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} />
-                        <FormControlErrorText>
-                          {errors.quantidade}
-                        </FormControlErrorText>
-                      </FormControlError>
-                    </FormControl>
                     <FormControl
                       isInvalid={errors.tamanho ? true : false}
                       size={'md'}

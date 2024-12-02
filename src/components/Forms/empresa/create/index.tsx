@@ -75,6 +75,7 @@ import { AddIcon } from '@gluestack-ui/themed';
 import { RemoveIcon } from '@gluestack-ui/themed';
 import buscaCep from '@/utils/buscaCep/buscaCep';
 import Validator from './validation';
+import { mask } from '@/utils/mask';
 const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onChangePessoa, onChangeRamo, havePessoas, id_pessoa, haveRamos, ramo,  }) => {
   const [isNewPerson, setIsNewPerson] = React.useState(!havePessoas);
   const [isNewRamo, setIsNewRamo] = React.useState(!haveRamos);
@@ -93,8 +94,6 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
       cpf: Yup.string().when('pessoa.id', (id_pessoa, schema) =>
         id_pessoa ? schema.required('CPF é obrigatório').test('cpf', 'CPF está invalido', async (value) => {
             return Validator.validateCPF(value);
-        }).test('cpf', 'O cpf já está vinculado a uma pessoa existente!', async (value) => {
-          return await new EmpresaService(db).havePessoasComCpf(value);
         }) : schema,
       ),
     }),
@@ -237,7 +236,7 @@ const FormCreateEmpresa: React.FC<IFormCreateEmpresa> = ({ db, onSubmited, onCha
                           </Text>
                         </Box>
                         <Box>
-                          <Text>{values.pessoa.cpf}</Text>
+                          <Text>{mask(values.pessoa.cpf, 'cpf')}</Text>
                         </Box>
                       </VStack>
                     </HStack>

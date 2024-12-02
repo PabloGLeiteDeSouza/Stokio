@@ -63,20 +63,20 @@ export class ProdutoService {
           break;
         case 'tipo':
           if (typeof value === "string") {
-            pesquisa.query = ` WHERE t.nome '%' || $tipo || '%'`;
+            pesquisa.query = ` WHERE t.nome LIKE '%' || $tipo || '%'`;
             pesquisa.params = { $tipo: value };
           }
           break;
         case 'codigo_de_barras':
           if (typeof value === "string") {
-            pesquisa.query == ` WHERE p.codigo_de_barras LIKE '%' || $coidgo || '%'`;
+            pesquisa.query = ` WHERE p.codigo_de_barras LIKE '%' || $coidgo || '%'`;
             pesquisa.params = { $coidgo: value };
           }
           break;
 
         case 'ua':
           if (typeof value === "string") {
-            pesquisa.query = ` WHERE u.nome LIKE '%' || $ua || '%'`;
+            pesquisa.query = ` WHERE ua.nome LIKE '%' || $ua || '%'`;
             pesquisa.params = { $ua: value };
           }
           break;
@@ -91,7 +91,7 @@ export class ProdutoService {
         quantidade: number;
         tipo: string;
         marca: string; 
-      }>(`SELECT p.id, p.nome, p.data_de_validade, p.quantidade, t.nome as tipo, m.nome as marca FROM produto as o INNER JOIN tipo_produto as t ON t.id == p.id_produto INNER JOIN marca as m ON m.id == p.id_marca ${pesquisa.query}`, pesquisa.params);
+      }>(`SELECT p.id, p.nome, p.data_de_validade, p.quantidade, t.nome as tipo, m.nome as marca FROM produto as p INNER JOIN tipo_produto as t ON t.id == p.id_tipo_produto INNER JOIN marca as m ON m.id == p.id_marca ${tipo === "ua" ? "INNER JOIN ua ON ua.id == p.id_ua": ""} ${pesquisa.query}`, pesquisa.params);
       if(dados.length < 1){
         throw new Error("Não há produtos cadastrados!");
       }
@@ -260,6 +260,29 @@ export class ProdutoService {
             ON tp.id = prod.id_tipo_produto
         INNER JOIN marca AS mc
             ON mc.id = prod.id_marca
+        WHERE prod.quantidade > 0 
+        ${orderBy ? `ORDER BY ${orderBy}` : ''}`);
+      return produto;
+    } catch (error) {
+      throw new Error(`Erro ao buscar produtos: ${(error as Error).message}`);
+    }
+  }
+
+  // Leitura de Produto
+  async getAllProdutosList(orderBy?: 'ASC' | 'DESC'): Promise<ProdutoObjectRequestAll[]> {
+    try {
+      const produto = await this.db.getAllAsync<ProdutoObjectRequestAll>(`
+        SELECT prod.id,
+            prod.nome,
+            prod.data_de_validade,
+            prod.quantidade,
+            tp.nome AS tipo,
+            mc.nome AS marca
+        FROM produto AS prod
+        INNER JOIN tipo_produto AS tp
+            ON tp.id = prod.id_tipo_produto
+        INNER JOIN marca AS mc
+            ON mc.id = prod.id_marca
         ${orderBy ? `ORDER BY ${orderBy}` : ''}`);
       return produto;
     } catch (error) {
@@ -268,11 +291,11 @@ export class ProdutoService {
   }
 
   // Atualização de Produto
-  async updateProduto(id: number, produto: Produto): Promise<void> {
+  async updateProduto(id: number, produto: Omit<Produto, 'quantidade'>): Promise<void> {
     try {
       await this.db.runAsync(
         `UPDATE produto 
-         SET codigo_de_barras = $codigoDeBarras, data_de_validade = $dataDeValidade, nome = $nome, descricao = $descricao, valor = $valor, quantidade = $quantidade, id_marca = $idMarca, id_tipo_produto = $idTipoProduto,  id_um = $idUnidadeDeMedida, tamanho = $tamanho, id_ua = $idUnidadeDeArmazenamento, id_empresa = $id_empresa
+         SET codigo_de_barras = $codigoDeBarras, data_de_validade = $dataDeValidade, nome = $nome, descricao = $descricao, valor = $valor, id_marca = $idMarca, id_tipo_produto = $idTipoProduto,  id_um = $idUnidadeDeMedida, tamanho = $tamanho, id_ua = $idUnidadeDeArmazenamento, id_empresa = $id_empresa
          WHERE id == $id`,
         {
           $codigoDeBarras: produto.codigo_de_barras,
@@ -280,7 +303,6 @@ export class ProdutoService {
           $nome: produto.nome,
           $descricao: String(produto.descricao),
           $valor: produto.valor,
-          $quantidade: produto.quantidade,
           $idMarca: produto.id_marca,
           $idTipoProduto: produto.id_tipo_produto,
           $idUnidadeDeMedida: produto.id_um,
@@ -298,6 +320,15 @@ export class ProdutoService {
   // Exclusão de Produto
   async deleteProduto(id: number): Promise<void> {
     try {
+      const have_compras = await this.db.getAllAsync('SELECT * FROM item_compra WHERE id_produto == $id', {
+        $id: id,
+      })
+      if (have_compras.length > 0) {
+        throw new Error('Produto não pode ser excluído pois está relacionado a compras')
+      }
+      await this.db.runAsync(`DELETE FROM produto WHERE id = $id`, {
+        $id: id,
+      });
       await this.db.runAsync(`DELETE FROM produto WHERE id == $id`, {
         $id: id,
       });

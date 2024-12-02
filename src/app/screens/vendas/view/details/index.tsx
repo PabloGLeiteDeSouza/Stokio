@@ -1,19 +1,24 @@
 import { VendaDetails } from '@/classes/venda/interfaces';
 import VendaService from '@/classes/venda/venda.service';
+import LoadingScreen from '@/components/LoadingScreen';
 import { DetalhesVendaScreen } from '@/interfaces/venda';
 import { mask } from '@/utils/mask';
 import {
   Box,
   Button,
   ButtonText,
+  EditIcon,
   Heading,
   ScrollView,
   Text,
   VStack,
+  ButtonIcon,
+  TrashIcon
 } from '@gluestack-ui/themed';
 import { useIsFocused } from '@react-navigation/native';
 import { useSQLiteContext } from 'expo-sqlite';
 import React from 'react';
+import delete_venda from './delete_venda';
 
 const Details: React.FC<DetalhesVendaScreen> = ({ navigation, route }) => {
   if(!route || !route.params || !route.params.id){
@@ -22,23 +27,36 @@ const Details: React.FC<DetalhesVendaScreen> = ({ navigation, route }) => {
   }
   const id = route.params.id;
   const [venda, setVenda] = React.useState<VendaDetails>({});
+  const [isLoading, setIsLoading] = React.useState(true);
   const db = useSQLiteContext();
   const isFocused = useIsFocused();
 
   const start = React.useCallback(async () => {
     try {
-      const venda = await new VendaService(db).findByIdDetails(id);
-      setVenda(venda);
+      if (!isLoading) {
+        setIsLoading(true)
+        const venda = await new VendaService(db).findByIdDetails(id);
+        setVenda(venda);
+        setIsLoading(false);
+      } else {
+        const venda = await new VendaService(db).findByIdDetails(id);
+        setVenda(venda);
+        setIsLoading(false);
+      }
     } catch (error) {
       throw error;
     }
-  }, [])
+  }, [isLoading])
 
   React.useEffect(() => {
     if (isFocused) {
       start();
     }
   }, [isFocused])
+
+  if (isLoading) {
+    return <LoadingScreen />
+  }
 
   return (
     <Box h="$full" w="$full">
@@ -103,13 +121,16 @@ const Details: React.FC<DetalhesVendaScreen> = ({ navigation, route }) => {
             </Box>
             <Box gap="$5">
               <Button
+                gap="$3"
                 onPress={() =>
-                  navigation?.navigate('atualizar-venda', { id: 1 })
+                  navigation?.navigate('atualizar-venda', { id: venda.id })
                 }
               >
+                <ButtonIcon as={EditIcon} />
                 <ButtonText>Editar</ButtonText>
               </Button>
-              <Button action="negative">
+              <Button onPress={async () => delete_venda(venda.id, db, () => { navigation?.navigate('visualizar-vendas') })} gap="$3" action="negative">
+                <ButtonIcon as={TrashIcon} />
                 <ButtonText>Excluir</ButtonText>
               </Button>
             </Box>

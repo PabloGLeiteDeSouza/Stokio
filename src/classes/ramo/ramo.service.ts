@@ -102,6 +102,14 @@ export class RamoService implements IRamoService {
   // Exclui um ramo
   async delete(id: number): Promise<void> {
     try {
+      const dados = await this.db.getAllAsync('SELECT * FROM produto WHERE id_ramo == $id', {
+        $id: id,
+      })
+      if (dados.length > 0) {
+        throw new Error('Não é possível excluir o ramo pois ele tem produtos associados', {
+          cause: 'ERR_RAMO_DELETE_ASSOCIATED_PRODUCTS',
+        });
+      }
       await this.db.runAsync('DELETE FROM ramo WHERE id = $id', { $id: id });
     } catch (error) {
       throw new Error(`Erro ao excluir ramo: ${(error as Error).message}`);

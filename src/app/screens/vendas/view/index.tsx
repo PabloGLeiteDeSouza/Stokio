@@ -316,9 +316,11 @@ const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
                   </>
                 )}
                 {values.tipo === 'data' && (
-                  <Box>
+                  <Box gap="$5">
                     <InputDatePicker
-                      onChangeDate={(dt) => setFieldValue('data_inicial', dt)}
+                      onChangeDate={(dt) => {
+                        setFieldValue('data_inicial', dt);
+                      }}
                       title="Data inicial"
                       value={values.data_inicial}
                     />
@@ -342,7 +344,7 @@ const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
                   </Box>
                 )}
                 {values.tipo === 'status' && (
-                  <Box>
+                  <Box gap="$5">
                     <FormControl
                       isInvalid={errors.busca ? true : false}
                       size={'md'}
@@ -358,6 +360,7 @@ const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
                         isDisabled={false}
                         initialLabel=""
                         selectedValue={values.busca === 'pago' ? "Pago" : values.busca === 'devendo' ? "Devendo" : ""}
+                        onValueChange={handleChange('busca')}
                       >
                         <SelectTrigger size={'lg'} variant={'rounded'}>
                           <SelectInput placeholder="Selecione uma opcao" />
@@ -401,6 +404,11 @@ const View: React.FC<VisualizarVendaScreen> = ({ navigation }) => {
                         </FormControlErrorText>
                       </FormControlError>
                     </FormControl>
+                    <Button onPress={handleSubmit as unknown as (event: GestureResponderEvent) => void}>
+                      <ButtonText>
+                        Buscar
+                      </ButtonText>
+                    </Button>
                   </Box>
                 )}
               </>

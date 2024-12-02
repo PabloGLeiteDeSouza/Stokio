@@ -556,7 +556,7 @@ const FormCreateProduto: React.FC<IFormCreateProduto> = ({ onCreatedProduto, db,
                     <FormControlError>
                       <FormControlErrorIcon as={AlertCircleIcon} />
                       <FormControlErrorText>
-                        Atleast 6 characters are required.
+                        {errors.unidade_de_medida?.valor}
                       </FormControlErrorText>
                     </FormControlError>
                   </FormControl>

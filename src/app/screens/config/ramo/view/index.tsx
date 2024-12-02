@@ -92,7 +92,6 @@ const View: React.FC<VisualizarRamoScreen> = ({ navigation }) => {
       setRamos([...rms]);
       setIsLoading(false);
     } catch (error) {
-      Alert.alert('Error', (error as Error).message);
       setRamos([]);
       setIsLoading(false);
     }

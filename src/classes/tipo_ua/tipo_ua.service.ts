@@ -51,6 +51,17 @@ export default class TipoUaService {
 
   async delete(id: number) {
     try {
+      const dados = await this.db.getAllAsync('SELECT * FROM ua WHERE id_tipo_ua == $id', {
+        $id: id,
+      })
+      if (dados.length > 0) {
+        throw new Error(
+          'Não foi possível excluir o tipo de unidade de armazenamento pois há unidades de armazenamento associadas a ele',
+          {
+            cause: 'ERR_TipoUa_DELETE',
+          },
+        );
+      }
       const res = await this.db.runAsync('DELETE FROM tipo_ua WHERE id = $id', {
         $id: id,
       });

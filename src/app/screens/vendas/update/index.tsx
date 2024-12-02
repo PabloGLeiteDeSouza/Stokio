@@ -50,6 +50,7 @@ import { ProdutoService } from '@/classes/produto/produto.service';
 import { getDateFromString } from '@/utils';
 import VendaService from '@/classes/venda/venda.service';
 import { IClienteSimpleRequest } from '@/classes/cliente/interfaces';
+import { UpdateVenda } from '@/classes/venda/interfaces';
 
 const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
   if (!route || !route.params || !route.params.id) {
@@ -122,13 +123,13 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
               initialValues={venda}
               onSubmit={async (values) => {
                 try {
-                  const { data, cliente, id, itens_de_compra, status } = value;
-                  const dados: VendaUpdate = {
+                  const { data, cliente, id, itens_de_venda, status } = values;
+                  const dados: UpdateVenda = {
                     id: id,
                     data: data,
                     id_cliente: cliente.id, 
                     status: status,
-                    itens_de_venda: itens_de_compra.map(({ id, quantidade, valor_unitario, produto}) => {
+                    itens_de_venda: itens_de_venda.map(({ id, quantidade, valor_unitario, produto}) => {
                       return { id, id_produto: produto.id , valor_unitario, quantidade };
                     })
                   }
@@ -313,10 +314,13 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
                                           placeholder="12"
                                           onChangeText={(text) => {
                                             if (Number(text) > 0) {
-                                              setFieldValue(
-                                                `itens_de_venda[${i}].quantidade`,
-                                                Number(text),
-                                              );
+                                              const valor = Number(text);
+                                              if (valor <= produto.quantidade) {
+                                                setFieldValue(
+                                                  `itens_de_venda[${i}].quantidade`,
+                                                  Number(text),
+                                                );
+                                              }
                                             } else {
                                               Alert.alert(
                                                 'Aviso',
@@ -396,7 +400,7 @@ const Update: React.FC<AtualizarVendaScreen> = ({ navigation, route }) => {
 
                                       <FormControlHelper>
                                         <FormControlHelperText>
-                                          Must be atleast 6 characters.
+                                          Informe a quantidade do produto.
                                         </FormControlHelperText>
                                       </FormControlHelper>
 

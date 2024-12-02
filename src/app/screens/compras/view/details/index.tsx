@@ -10,6 +10,7 @@ import { ButtonIcon } from "@gluestack-ui/themed";
 import { Box, Heading, ScrollView } from "@gluestack-ui/themed";
 import { useSQLiteContext } from "expo-sqlite";
 import React from "react";
+import delete_compra from "./delete_compra";
 
 const Details: React.FC<AtualizarCompraScreen> = ({ navigation, route }) => {
 
@@ -106,7 +107,11 @@ const Details: React.FC<AtualizarCompraScreen> = ({ navigation, route }) => {
                 Atualizar
               </ButtonText>
             </Button>
-            <Button gap="$5" action="negative">
+            <Button onPress={ async () => {
+              await delete_compra(compra.id, db, () => {
+                navigation?.navigate('visualizar-compras')
+              })
+            }} gap="$5" action="negative">
               <ButtonIcon as={TrashIcon} />
               <ButtonText>
                 Excluir

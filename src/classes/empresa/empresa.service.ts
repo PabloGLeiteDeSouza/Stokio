@@ -240,6 +240,12 @@ export class EmpresaService {
 
   async delete(id: number) {
     try {
+      const venda = await this.db.getAllAsync('SELECT * FROM compra WHERE id_empresa == $id', {
+        $id: id,
+      })
+      if (venda.length > 0) {
+        throw new Error('Não é possível deletar o cliente pois ele tem uma compra associada')
+      }
       await this.db.runAsync(
         'DELETE FROM telefone WHERE id_empresa = $id',
         { $id: id },

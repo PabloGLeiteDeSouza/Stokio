@@ -347,7 +347,7 @@ const FormCreateVenda: React.FC<IFormCreateVenda> = ({ onCreatedVenda, haveClien
                         </FormControl>
                         <Button
                           onPress={() => {
-                            onUpdateProductToVenda(values.produtos, i)
+                            onUpdateProductToVenda(values.produtos.map(({ id }) => { return { id_produto: id }}), i)
                             
                           }}
                         >
@@ -360,7 +360,7 @@ const FormCreateVenda: React.FC<IFormCreateVenda> = ({ onCreatedVenda, haveClien
 
                 <Button
                   onPress={() => {
-                    onAddProductToVenda(values.produtos);
+                    onAddProductToVenda(values.produtos.map(({ id }) => { return { id_produto: id } }));
                   }}
                 >
                   <ButtonText>Adicionar Produto</ButtonText>
@@ -432,14 +432,14 @@ const FormCreateVenda: React.FC<IFormCreateVenda> = ({ onCreatedVenda, haveClien
 
                 <FormControlHelper>
                   <FormControlHelperText>
-                    Must be atleast 6 characters.
+                    Informe o status da venda.
                   </FormControlHelperText>
                 </FormControlHelper>
 
                 <FormControlError>
                   <FormControlErrorIcon as={AlertCircleIcon} />
                   <FormControlErrorText>
-                    Atleast 6 characters are required.
+                    {errors.status}
                   </FormControlErrorText>
                 </FormControlError>
               </FormControl>

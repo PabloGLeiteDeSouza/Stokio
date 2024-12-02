@@ -44,6 +44,14 @@ export default class MarcaService {
 
   async delete(id: number) {
     try {
+      const dados = await this.db.getAllAsync('SELECT * FROM produto WHERE id_marca == $id', {
+        $id: id,
+      })
+      if (dados.length > 0) {
+        throw new Error('Não é possível excluir a marca pois ela tem produtos associados', {
+          cause: 'ERR_MARCA_DELETE_ASSOCIATED_PRODUCTS',
+        });
+      }
       const res = await this.db.runAsync('DELETE FROM marca WHERE id = $id', {
         $id: id,
       });

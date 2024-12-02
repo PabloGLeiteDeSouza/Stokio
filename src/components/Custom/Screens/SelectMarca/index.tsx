@@ -23,7 +23,7 @@ const SelectMarca: React.FC<ISelectMarcaProps> = ({ navigation, route }) => {
   }
   const screen = route.params.screen;
   const mrc = route.params.marcaSelecionada;
-  const [ramos, setMarcas] = React.useState<Array<Marca>>([]);
+  const [marcas, setMarcas] = React.useState<Array<Marca>>([]);
   const [marca, setMarca] = React.useState<Marca>(mrc);
   const [isLoading, setIsLoading] = React.useState(true);
   const db = useSQLiteContext();
@@ -46,9 +46,9 @@ const SelectMarca: React.FC<ISelectMarcaProps> = ({ navigation, route }) => {
 
   const FlatListMarcas = FlatList as MarcaFlatList;
 
-  const ListRenderMarcas: ListRenderItem<Marca> = ({ item }) => {
+  const ListRenderMarcas: ListRenderItem<Marca> = ({ item, index }) => {
     return (
-      <Card>
+      <Card mt={ index === 0 ? "$5" : "$2.5"} mb={index === (marcas.length - 1) ? "$5" : "$2.5"}>
         <HStack w="$full" justifyContent='space-between'>
           <VStack w="$3/5">
             <Box>
@@ -76,14 +76,15 @@ const SelectMarca: React.FC<ISelectMarcaProps> = ({ navigation, route }) => {
 
   return (
     <Box h="$full" w="$full">
-      <Box>
+      <Box mt="$4">
         <Heading size="2xl" textAlign="center">
           Selecionar Marca:
         </Heading>
       </Box>
       <FlatListMarcas
+        mt='$8'
         mx="$8"
-        data={ramos}
+        data={marcas}
         renderItem={ListRenderMarcas}
         keyExtractor={(item) => String(item.id)}
       />
