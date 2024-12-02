@@ -15,6 +15,8 @@ import ScreensTipoProduto from './tipo_produtos';
 import { ConfiguracoesScreenProps } from '@/interfaces/config';
 import export_database from './utils/export_database';
 import import_database from './utils/import_database';
+import DocumentPicker from 'expo-document-picker';
+import FileSystem from 'expo-file-system'
 
 const Stack = createNativeStackNavigator();
 
