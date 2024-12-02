@@ -14,7 +14,7 @@ export default async function StartApp(
     if (!res.success) {
       throw new Error('Nao foi possivel se autenticar!');
     }
-    setPageStarting('app-screens');
+    setPageStarting('auth-screen');
     setIsLoading(false);
   } catch (error) {
     Alert.alert('Erro', (error as Error).message);
