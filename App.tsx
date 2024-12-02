@@ -13,19 +13,19 @@ export default function App() {
 
   React.useEffect(() => {
     async function Start() {
-      if (
-        (
-          await FileSystem.getInfoAsync(
-            FileSystem.documentDirectory + 'SQLite/stock.db',
-          )
-        ).exists
-      ) {
-        await FileSystem.downloadAsync(
-          // eslint-disable-next-line @typescript-eslint/no-var-requires
-          Asset.fromModule(require('@/assets/databases/stock.db')).uri,
-          `${FileSystem.documentDirectory}SQLite/stock.db`,
-        );
-      }
+      // if (
+      //   (
+      //     await FileSystem.getInfoAsync(
+      //       FileSystem.documentDirectory + 'SQLite/stock.db',
+      //     )
+      //   ).exists
+      // ) {
+      //   await FileSystem.downloadAsync(
+      //     // eslint-disable-next-line @typescript-eslint/no-var-requires
+      //     Asset.fromModule(require('@/assets/databases/stock.db')).uri,
+      //     `${FileSystem.documentDirectory}SQLite/stock.db`,
+      //   );
+      // }
       setIsLoading(false);
     }
     Start();
