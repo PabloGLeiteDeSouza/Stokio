@@ -37,7 +37,7 @@ export default function App() {
 
   return (
     <ThemeProviderApp>
-      <SQLiteProvider databaseName="stock.db">
+      <SQLiteProvider databaseName="stock.db" assetSource={{ assetId: require('./src/assets/databases/stock.db') }}>
         <Application />
       </SQLiteProvider>
     </ThemeProviderApp>
