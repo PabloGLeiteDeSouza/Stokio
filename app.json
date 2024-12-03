@@ -88,12 +88,6 @@
         {
           "faceIDPermission": "Allow $(PRODUCT_NAME) to use Face ID."
         }
-      ],
-      [
-        "expo-asset",
-        {
-          "assets": ["./src/assets/databases/stock.db", "./src/assets/images/icon.png", "./src/assets/data/Estados.json"]
-        }
       ]
     ],
     "extra": {

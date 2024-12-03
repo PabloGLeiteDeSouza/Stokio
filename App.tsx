@@ -5,7 +5,6 @@ import * as FileSystem from 'expo-file-system';
 import { Asset } from 'expo-asset';
 import { SQLiteProvider } from 'expo-sqlite';
 import Application from '@app';
-import start_new_database from '@/utils/start_database';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -15,14 +14,14 @@ export default function App() {
   React.useEffect(() => {
     async function Start() {
       if (
-        !(
+        (
           await FileSystem.getInfoAsync(
             FileSystem.documentDirectory + 'SQLite/stock.db',
           )
         ).exists
       ) {
         await FileSystem.downloadAsync(
-          'https://github.com/PabloGLeiteDeSouza/Stokio/raw/refs/heads/master/src/database/example.db',
+          Asset.fromModule(require('@/assets/databases/stock.db')).uri,
           `${FileSystem.documentDirectory}SQLite/stock.db`,
         );
       }
