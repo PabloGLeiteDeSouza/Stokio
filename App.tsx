@@ -14,19 +14,18 @@ export default function App() {
 
   React.useEffect(() => {
     async function Start() {
-      // if (
-      //   (
-      //     await FileSystem.getInfoAsync(
-      //       FileSystem.documentDirectory + 'SQLite/stock.db',
-      //     )
-      //   ).exists
-      // ) {
-      //   await FileSystem.downloadAsync(
-      //     // eslint-disable-next-line @typescript-eslint/no-var-requires
-      //     Asset.fromModule(require('@/assets/databases/stock.db')).uri,
-      //     `${FileSystem.documentDirectory}SQLite/stock.db`,
-      //   );
-      // }
+      if (
+        !(
+          await FileSystem.getInfoAsync(
+            FileSystem.documentDirectory + 'SQLite/stock.db',
+          )
+        ).exists
+      ) {
+        await FileSystem.downloadAsync(
+          'https://github.com/PabloGLeiteDeSouza/Stokio/raw/refs/heads/master/src/database/example.db',
+          `${FileSystem.documentDirectory}SQLite/stock.db`,
+        );
+      }
       setIsLoading(false);
     }
     Start();
@@ -38,7 +37,7 @@ export default function App() {
 
   return (
     <ThemeProviderApp>
-      <SQLiteProvider databaseName="stock.db" onInit={start_new_database} assetSource={{ assetId: require('./src/assets/databases/stock.db') }}>
+      <SQLiteProvider databaseName="stock.db">
         <Application />
       </SQLiteProvider>
     </ThemeProviderApp>
