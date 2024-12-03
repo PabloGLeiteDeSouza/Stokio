@@ -1,4 +1,4 @@
-import { Box, Button, ButtonText, Heading, Text } from '@gluestack-ui/themed';
+import { Box, Button, ButtonText, Heading, Image, Text } from '@gluestack-ui/themed';
 import * as LocalAutentication from 'expo-local-authentication';
 import { RootStackParamList } from '$types/param-list';
 import { Alert } from 'react-native';
@@ -33,6 +33,7 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ navigation }) => {
   return (
     <Box w="$full" alignItems="center">
       <Box px="$8" mt="$5" gap="$5">
+        <Image source="icon" w="$5" h="$5" />
         <Box>
           <Heading textAlign="center" size="2xl">
             Ola! boas vindas ao STOKIO

@@ -92,7 +92,7 @@
       [
         "expo-asset",
         {
-          "assets": ["./src/assets/databases/stock.db", "./src/assets/data/Estados.json"]
+          "assets": ["./src/assets/databases/stock.db", "./src/assets/images/icon.png", "./src/assets/data/Estados.json"]
         }
       ]
     ],
