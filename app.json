@@ -92,7 +92,7 @@
       [
         "expo-asset",
         {
-          "assets": ["src/assets/databases/example.db"]
+          "assets": ["assets/example.db"]
         }
       ]
     ],
