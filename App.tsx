@@ -13,17 +13,12 @@ export default function App() {
 
   React.useEffect(() => {
     async function Start() {
-      if (
-        (
-          await FileSystem.getInfoAsync(
-            FileSystem.documentDirectory + 'SQLite/stock.db',
-          )
-        ).exists
-      ) {
-        await FileSystem.downloadAsync(
-          Asset.fromModule(require('@/assets/databases/stock.db')).uri,
-          `${FileSystem.documentDirectory}SQLite/stock.db`,
-        );
+      if (!(await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'SQLite/stock.db')).exists) {
+        const asset = await Asset.fromModule(require('./assets/example.db')).downloadAsync();
+        await FileSystem.copyAsync({
+          from: String(asset.localUri),
+          to: FileSystem.documentDirectory + 'SQLite/stock.db',
+        });
       }
       setIsLoading(false);
     }

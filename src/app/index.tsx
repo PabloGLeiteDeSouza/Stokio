@@ -23,7 +23,6 @@ const Application: React.FC = () => {
 
   React.useEffect(() => {
     StartApp(setIsLoading, setPageStarting);
-    console.log('aaaa')
     SplashScreen.hideAsync();
   }, []);
 
