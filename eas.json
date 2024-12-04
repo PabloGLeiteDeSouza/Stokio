@@ -19,6 +19,14 @@
       },
       "developmentClient": false
     },
+    "build:googleplay": {
+      "android": {
+        "image": "latest",
+        "buildType": "app-bundle",
+        "resourceClass": "medium"
+      },
+      "developmentClient": false
+    },
     "development": {
       "developmentClient": true,
       "distribution": "internal"
